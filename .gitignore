@@ -1,9 +1,2 @@
 infrastructure/appdata/
-infrastructure/env/.env
-infrastructure/env/db.env
-infrastructure/env/ollama.env
-infrastructure/env/openwebui.env
-infrastructure/env/pipelines.env
-infrastructure/env/vdb.env
-*/.env
 
