@@ -56,7 +56,8 @@ else:
     doc_embedder = OllamaDocumentEmbedder(
             model = EMBEDDING_MODEL_NAME,
             url = OLLAMA_BASE_URL,
-            batch_size=32
+            batch_size=32,
+            keep_alive=-1
         )
 
     docs_with_embeddings = doc_embedder.run(new_docs)
@@ -84,14 +85,16 @@ template = """
 prompt_builder = PromptBuilder(template=template)
 
 # generator = OpenAIGenerator(model="gpt-3.5-turbo")
-generator = OllamaGenerator(model=MODEL_NAME,
-                            url = OLLAMA_BASE_URL,
-                            generation_kwargs={
-                                "num_predict": 1000,
-                                "temperature": .5,
-                                },
-                            timeout=450
-                            )
+generator = OllamaGenerator(
+    model=MODEL_NAME,
+    url=OLLAMA_BASE_URL,
+    generation_kwargs={
+        "num_predict": 1000,
+        "temperature": .5,
+    },
+    keep_alive=-1,  # <-- mantiene en memoria
+    timeout=450
+)
 
 basic_rag_pipeline = Pipeline()
 # Add components to your pipeline
@@ -104,12 +107,15 @@ basic_rag_pipeline.add_component("llm", generator)
 basic_rag_pipeline.connect("text_embedder.embedding", "retriever.query_embedding")
 basic_rag_pipeline.connect("retriever", "prompt_builder.documents")
 basic_rag_pipeline.connect("prompt_builder", "llm")
+while True:
 
-question = "Make a short summary of the seven wonders of the worlds"
+    question = input("\nWhat do you want to ask about the Seven Wonders of the Ancient World? (type 'exit' to quit) ")
+    if question.lower() == "exit":
+        print("Goodbye!")
+        break
+    results = basic_rag_pipeline.run({
+        "text_embedder": {"text": question},
+        "prompt_builder": {"question": question}
+    })
 
-results = basic_rag_pipeline.run({
-    "text_embedder": {"text": question},
-    "prompt_builder": {"question": question}
-})
-
-print(results["llm"]["replies"][0])
+    print(results["llm"]["replies"][0])
