@@ -8,20 +8,23 @@ services:
            - "${OLLAMA_PORT:-11434}:11434"
         volumes:
             - ollama_data:/root/.ollama
-              #        deploy:
-              #            resources:
-              #                reservations:
-              #                    devices:
-              #                        - driver: nvidia
-              #                          count: 1
-              #                          #device_ids: ["1"]
-              #                          capabilities: [gpu]
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                      - driver: nvidia
+                        count: 1
+                        #device_ids: ["1"]
+                        capabilities: [gpu]
 
     db:
         image: postgres:15-alpine
         restart: unless-stopped
         env_file:
             - env/db.env
+        environment:
+            POSTGRES_USER: ${DATABASE_USER}
+            POSTGRES_PASSWORD: ${DATABASE_PASS}
         ports:
             - "${DB_PORT:-5432}:5432"
         volumes:
@@ -32,6 +35,9 @@ services:
         restart: unless-stopped
         env_file:
             - env/vdb.env
+        environment:
+            POSTGRES_USER: ${PGVECTOR_USR}
+            POSTGRES_PASSWORD: ${PGVECTOR_PASS}
         ports:
             - "${VDB_PORT:-5433}:5432"
         volumes:
@@ -42,32 +48,30 @@ services:
         restart: unless-stopped
         env_file:
             - env/openwebui.env
-        volumes:
-            - owui_data:/app/backend/data
+        environment:
+            DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASS}@db/owebuidb?sslmode=disable
+            PGVECTOR_DB_URL: postgresql://${PGVECTOR_USR}:${PGVECTOR_PASS}@vdb/pgvdb?sslmode=disable
+            OPENAI_API_KEY: ${PIPESERVER_KEY}
+        depends_on:
+            - db
+            - vdb
         ports:
             - "${OWEBUI_PORT:-8180}:8080"
-              #        deploy:
-              #            resources:
-              #                reservations:
-              #                    devices:
-              #                        - driver: nvidia
-              #                          count: 1
-              #                          #device_ids: ["1"]
-              #                          capabilities: [gpu]
 
     pipelines:
         image: ghcr.io/open-webui/pipelines:main
         restart: unless-stopped
         env_file:
-          - env/pipelines.env
+            - env/pipelines.env
+        environment:
+            PG_CONN_STR: postgresql://${PGVECTOR_USR}:${PGVECTOR_PASS}@vdb/pgvdb?sslmode=disable
         ports:
-          - "${PIPELINES_PORT:-9099}:9099"
+            - "${PIPELINES_PORT:-9099}:9099"
         extra_hosts:
-          - host.docker.internal:host-gateway
+            - host.docker.internal:host-gateway
         volumes:
-          - pipelines:/app/pipelines
-          - rawdata:/app/pipelines/rawdata
-
+            - pipelines:/app/pipelines
+            - rawdata:/app/pipelines/rawdata
 
 volumes:
     ollama_data:
