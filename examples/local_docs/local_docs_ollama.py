@@ -35,6 +35,8 @@ RETRIEVER_TOP_K = 5
 SPLIT_LENGTH = 200
 SPLIT_OVERLAP = 20
 INPUT_DIR = Path(__file__).parent / "input"
+NUM_PREDICT = 512
+NUM_CTX = 2048
 
 PROMPT_TEMPLATE = """
 Given the following information, answer the question.
@@ -104,12 +106,15 @@ def get_document_store() -> PgvectorDocumentStore:
 
 def print_setup_summary(docs: list[Document], new_count: int, llm_model: str) -> None:
     console.rule("[bold cyan]Configuración[/bold cyan]")
-    console.print(f"  [cyan]LLM[/cyan]              {llm_model}")
-    console.print(f"  [cyan]Embedding model[/cyan]  {EMBEDDING_MODEL}")
-    console.print(f"  [cyan]Ollama URL[/cyan]       {OLLAMA_BASE_URL}")
-    console.print(f"  [cyan]DB table[/cyan]         {DB_TABLE}")
-    console.print(f"  [cyan]Retriever top-k[/cyan]  {RETRIEVER_TOP_K}")
-    console.print(f"  [cyan]Input dir[/cyan]        {INPUT_DIR}")
+    console.print(f"  [cyan]LLM[/cyan]                {llm_model}")
+    console.print(f"  [cyan]Embedding model[/cyan]    {EMBEDDING_MODEL}")
+    console.print(f"  [cyan]Embedding dimension[/cyan] {EMBEDDING_DIMENSION}")
+    console.print(f"  [cyan]Ollama URL[/cyan]         {OLLAMA_BASE_URL}")
+    console.print(f"  [cyan]DB table[/cyan]           {DB_TABLE}")
+    console.print(f"  [cyan]Retriever top-k[/cyan]    {RETRIEVER_TOP_K}")
+    console.print(f"  [cyan]Split length[/cyan]       {SPLIT_LENGTH} palabras")
+    console.print(f"  [cyan]Split overlap[/cyan]      {SPLIT_OVERLAP} palabras")
+    console.print(f"  [cyan]Input dir[/cyan]          {INPUT_DIR}")
 
     console.rule("[bold cyan]Documentos[/bold cyan]")
     if docs:
@@ -179,9 +184,9 @@ def build_rag_pipeline(store: PgvectorDocumentStore, llm_model: str = LLM_MODEL)
         model=llm_model,
         url=OLLAMA_BASE_URL,
         generation_kwargs={
-            "num_predict": 1000,
+            "num_predict": NUM_PREDICT,
             "temperature": 0.5,
-            "num_ctx": 2048,
+            "num_ctx": NUM_CTX,
         },
         keep_alive=-1,
         timeout=450,
@@ -246,10 +251,23 @@ def select_llm_model() -> str:
         console.print(f"[yellow]Ingresá un número entre 1 y {len(models)}.[/yellow]")
 
 
+def unload_models(llm_model: str) -> None:
+    for model, label in [(llm_model, "LLM"), (EMBEDDING_MODEL, "Embedding")]:
+        try:
+            ollama.generate(model=model, prompt="", keep_alive=0)
+            console.print(f"  [dim]{label} ({model}) descargado[/dim]")
+        except Exception:
+            pass
+
+
 if __name__ == "__main__":
     llm_model = select_llm_model()
     store = get_document_store()
     docs, new_count = index_new_documents(store)
     print_setup_summary(docs, new_count, llm_model)
     pipeline = build_rag_pipeline(store, llm_model)
-    run_interactive_loop(pipeline)
+    try:
+        run_interactive_loop(pipeline)
+    finally:
+        console.rule("[bold cyan]Descargando modelos[/bold cyan]")
+        unload_models(llm_model)
