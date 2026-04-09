@@ -1,13 +1,10 @@
 import os
 
-
-
 from haystack import Pipeline, Document
 from haystack.utils import Secret
 from haystack_integrations.document_stores.pgvector import PgvectorDocumentStore
 from haystack_integrations.components.retrievers.pgvector import (
-    PgvectorEmbeddingRetriever,
-    PgvectorKeywordRetriever
+    PgvectorEmbeddingRetriever
 )
 from haystack.document_stores.types import DuplicatePolicy
 from haystack.components.builders import PromptBuilder
@@ -30,7 +27,13 @@ dataset = load_dataset("bilgeyucel/seven-wonders", split="train")
 docs : list[Document] = [Document(content=doc["content"], meta=doc["meta"]) for doc in dataset]
 
 EMBEDDING_MODEL_NAME="bge-m3"
-MODEL_NAME="phi4"
+selected_model = input("Choose the LLM to use: 1) phi4 (heavier) 2) llama3.2:3b (light)")
+
+if (selected_model == 1):
+    MODEL_NAME="phi4"
+else:
+    MODEL_NAME="llama3.2:3b"
+
 OLLAMA_BASE_URL="http://localhost:11434"
 
 filtered_docs = document_store.filter_documents()
