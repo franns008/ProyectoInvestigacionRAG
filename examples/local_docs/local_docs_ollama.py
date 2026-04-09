@@ -19,13 +19,16 @@ from haystack.components.converters import (
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
 from haystack_integrations.components.embedders.ollama import OllamaDocumentEmbedder
 from haystack_integrations.components.generators.ollama import OllamaGenerator
+import ollama
+
+from rich.console import Console
 
 # --- Configuración ---
 DB_CONNECTION = "postgresql://avdbuser:avdbpass@localhost:5433/pgvdb"
 DB_TABLE = "local_docs"
 EMBEDDING_DIMENSION = 1024
 EMBEDDING_MODEL = "bge-m3"
-LLM_MODEL = "qwen2.5:1.5b"
+LLM_MODEL = "ministral-3:3b"
 OLLAMA_BASE_URL = "http://localhost:11434"
 RETRIEVER_TOP_K = 5
 INPUT_DIR = Path(__file__).parent / "input"
@@ -41,6 +44,28 @@ Context:
 Question: {{question}}
 Answer:
 """
+
+console = Console()
+
+
+class StreamState:
+    """Coordina el spinner y el streaming del LLM en el loop interactivo."""
+    def __init__(self):
+        self.status = None
+        self.started = False
+
+    def reset(self):
+        self.started = False
+
+    def callback(self, chunk):
+        if not self.started:
+            if self.status:
+                self.status.stop()
+            console.print("\n[bold green]Respuesta:[/bold green] ", end="")
+            self.started = True
+        console.print(chunk.content, end="")
+
+stream_state = StreamState()
 
 
 def load_local_documents(input_dir: Path) -> list[Document]:
@@ -71,17 +96,38 @@ def get_document_store() -> PgvectorDocumentStore:
     )
 
 
-def index_new_documents(store: PgvectorDocumentStore) -> None:
+def print_setup_summary(docs: list[Document], new_count: int, llm_model: str) -> None:
+    console.rule("[bold cyan]Configuración[/bold cyan]")
+    console.print(f"  [cyan]LLM[/cyan]              {llm_model}")
+    console.print(f"  [cyan]Embedding model[/cyan]  {EMBEDDING_MODEL}")
+    console.print(f"  [cyan]Ollama URL[/cyan]       {OLLAMA_BASE_URL}")
+    console.print(f"  [cyan]DB table[/cyan]         {DB_TABLE}")
+    console.print(f"  [cyan]Retriever top-k[/cyan]  {RETRIEVER_TOP_K}")
+    console.print(f"  [cyan]Input dir[/cyan]        {INPUT_DIR}")
+
+    console.rule("[bold cyan]Documentos[/bold cyan]")
+    if docs:
+        ext_counts: dict[str, int] = {}
+        for doc in docs:
+            ext = Path(doc.meta.get("file_path", "")).suffix.lower() or "unknown"
+            ext_counts[ext] = ext_counts.get(ext, 0) + 1
+
+        for ext, count in sorted(ext_counts.items()):
+            console.print(f"  [cyan]{ext}[/cyan]  {count} fragmentos")
+
+        index_status = f"[green]{new_count} nuevos indexados[/green]" if new_count else "[yellow]sin cambios[/yellow]"
+        console.print(f"\n  Total: [bold]{len(docs)}[/bold] fragmentos — {index_status}")
+    else:
+        console.print("  [yellow]No se encontraron documentos en 'input/'[/yellow]")
+
+
+def index_new_documents(store: PgvectorDocumentStore) -> tuple[list[Document], int]:
     if not INPUT_DIR.exists():
-        print(f"\nInput directory not found: {INPUT_DIR}")
-        print("Creá la carpeta 'input' junto al script y agregá tus documentos (pdf, docx, md, txt).")
-        return
+        console.print(f"[red]Directorio no encontrado:[/red] {INPUT_DIR}")
+        console.print("Creá la carpeta [bold]input/[/bold] junto al script y agregá tus documentos (pdf, docx, md, txt).")
+        return [], 0
 
     docs = load_local_documents(INPUT_DIR)
-
-    if not docs:
-        print("\nNo se encontraron documentos en el directorio 'input'.")
-        return
 
     existing_keys = {
         doc.meta.get("file_path")
@@ -94,23 +140,22 @@ def index_new_documents(store: PgvectorDocumentStore) -> None:
         if doc.meta.get("file_path") not in existing_keys
     ]
 
-    if not new_docs:
-        print("\nNo hay documentos nuevos para indexar.")
-        return
+    if new_docs:
+        console.print(f"\n[cyan]Indexando {len(new_docs)} documentos nuevos...[/cyan]")
+        doc_embedder = OllamaDocumentEmbedder(
+            model=EMBEDDING_MODEL,
+            url=OLLAMA_BASE_URL,
+            batch_size=32,
+            keep_alive=-1,
+            timeout=450,
+        )
+        docs_with_embeddings = doc_embedder.run(new_docs)
+        store.write_documents(docs_with_embeddings["documents"], policy=DuplicatePolicy.OVERWRITE)
 
-    print(f"\nEmbedding y escritura de {len(new_docs)} documentos nuevos en la base de datos...")
-    doc_embedder = OllamaDocumentEmbedder(
-        model=EMBEDDING_MODEL,
-        url=OLLAMA_BASE_URL,
-        batch_size=32,
-        keep_alive=-1,
-        timeout=450,
-    )
-    docs_with_embeddings = doc_embedder.run(new_docs)
-    store.write_documents(docs_with_embeddings["documents"], policy=DuplicatePolicy.OVERWRITE)
+    return docs, len(new_docs)
 
 
-def build_rag_pipeline(store: PgvectorDocumentStore) -> Pipeline:
+def build_rag_pipeline(store: PgvectorDocumentStore, llm_model: str = LLM_MODEL) -> Pipeline:
     pipeline = Pipeline()
     pipeline.add_component("text_embedder", OllamaTextEmbedder(model=EMBEDDING_MODEL, url=OLLAMA_BASE_URL))
     pipeline.add_component("embedding_retriever", PgvectorEmbeddingRetriever(document_store=store, top_k=RETRIEVER_TOP_K))
@@ -118,7 +163,7 @@ def build_rag_pipeline(store: PgvectorDocumentStore) -> Pipeline:
     pipeline.add_component("document_joiner", DocumentJoiner())
     pipeline.add_component("prompt_builder", PromptBuilder(template=PROMPT_TEMPLATE))
     pipeline.add_component("llm", OllamaGenerator(
-        model=LLM_MODEL,
+        model=llm_model,
         url=OLLAMA_BASE_URL,
         generation_kwargs={
             "num_predict": 1000,
@@ -127,7 +172,7 @@ def build_rag_pipeline(store: PgvectorDocumentStore) -> Pipeline:
         },
         keep_alive=-1,
         timeout=450,
-        streaming_callback=lambda chunk: print(chunk.content, end="", flush=True),
+        streaming_callback=stream_state.callback,
     ))
 
     pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
@@ -140,21 +185,58 @@ def build_rag_pipeline(store: PgvectorDocumentStore) -> Pipeline:
 
 
 def run_interactive_loop(pipeline: Pipeline) -> None:
+    console.print("\n[dim]Escribí [bold]exit[/bold] para salir.[/dim]\n")
+
     while True:
-        question = input("\nHacé una pregunta sobre tus documentos (escribí 'exit' para salir): ")
-        if question.lower() == "exit":
-            print("Goodbye!")
+        try:
+            question = console.input("[bold cyan]Pregunta:[/bold cyan] ").strip()
+        except (EOFError, KeyboardInterrupt):
+            console.print("\n[dim]Goodbye![/dim]")
             break
+
+        if not question:
+            continue
+        if question.lower() == "exit":
+            console.print("[dim]Goodbye![/dim]")
+            break
+
+        stream_state.reset()
+        stream_state.status = None
         pipeline.run({
             "text_embedder": {"text": question},
             "keyword_retriever": {"query": question},
             "prompt_builder": {"question": question},
         })
-        print()
+        console.print("\n")
+
+
+def select_llm_model() -> str:
+    try:
+        models = [m.model for m in ollama.list().models]
+    except Exception:
+        console.print("[red]No se pudo conectar a Ollama. Verificá que esté corriendo.[/red]")
+        raise SystemExit(1)
+
+    if not models:
+        console.print("[red]No hay modelos instalados en Ollama.[/red]")
+        raise SystemExit(1)
+
+    console.rule("[bold cyan]Seleccioná un modelo LLM[/bold cyan]")
+    for i, model in enumerate(models, 1):
+        console.print(f"  [cyan]{i}[/cyan]  {model}")
+    console.print()
+
+    while True:
+        raw = console.input("[bold cyan]Modelo:[/bold cyan] ").strip()
+        if raw.isdigit() and 1 <= int(raw) <= len(models):
+            return models[int(raw) - 1]
+        console.print(f"[yellow]Ingresá un número entre 1 y {len(models)}.[/yellow]")
 
 
 if __name__ == "__main__":
+    llm_model = select_llm_model()
     store = get_document_store()
-    index_new_documents(store)
-    pipeline = build_rag_pipeline(store)
+    docs, new_count = index_new_documents(store)
+    print_setup_summary(docs, new_count, llm_model)
+    pipeline = build_rag_pipeline(store, llm_model)
     run_interactive_loop(pipeline)
