@@ -10,6 +10,7 @@ from haystack_integrations.components.retrievers.pgvector import (
 from haystack.document_stores.types import DuplicatePolicy
 from haystack.components.builders import PromptBuilder
 from haystack.components.joiners import DocumentJoiner
+from haystack.components.preprocessors import DocumentSplitter
 from haystack.components.converters import (
     PyPDFToDocument,
     DOCXToDocument,
@@ -31,6 +32,8 @@ EMBEDDING_MODEL = "bge-m3"
 LLM_MODEL = "ministral-3:3b"
 OLLAMA_BASE_URL = "http://localhost:11434"
 RETRIEVER_TOP_K = 5
+SPLIT_LENGTH = 200
+SPLIT_OVERLAP = 20
 INPUT_DIR = Path(__file__).parent / "input"
 
 PROMPT_TEMPLATE = """
@@ -129,15 +132,22 @@ def index_new_documents(store: PgvectorDocumentStore) -> tuple[list[Document], i
 
     docs = load_local_documents(INPUT_DIR)
 
+    splitter = DocumentSplitter(
+        split_by="word",
+        split_length=SPLIT_LENGTH,
+        split_overlap=SPLIT_OVERLAP,
+    )
+    docs = splitter.run(documents=docs)["documents"]
+
     existing_keys = {
-        doc.meta.get("file_path")
+        (doc.meta.get("file_path"), doc.meta.get("_split_id"))
         for doc in store.filter_documents()
         if doc.meta.get("file_path") is not None
     }
 
     new_docs = [
         doc for doc in docs
-        if doc.meta.get("file_path") not in existing_keys
+        if (doc.meta.get("file_path"), doc.meta.get("_split_id")) not in existing_keys
     ]
 
     if new_docs:
