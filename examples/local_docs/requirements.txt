@@ -1,0 +1,8 @@
+haystack-ai
+ollama-haystack
+pgvector-haystack
+datasets>=2.6.1
+pypdf
+python-docx
+markdown-it-py
+mdit-plain
