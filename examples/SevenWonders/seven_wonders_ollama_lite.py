@@ -65,7 +65,11 @@ text_embedder = OllamaTextEmbedder(
     url=OLLAMA_BASE_URL
 )
 
-# Hybrid retrieval: embedding + keyword, top_k reducido para menos contexto al LLM
+# Hybrid retrieval: combina búsqueda semántica (embedding) con búsqueda textual (keyword).
+# El embedding retriever es bueno para preguntas conceptuales; el keyword retriever para
+# nombres propios y términos exactos. Juntos cubren más casos y mejoran la calidad.
+# top_k=5 reduce los documentos enviados al LLM vs. el default de 10,
+# achicando el prompt y acelerando la generación en CPU.
 embedding_retriever = PgvectorEmbeddingRetriever(document_store=document_store, top_k=5)
 keyword_retriever = PgvectorKeywordRetriever(document_store=document_store, top_k=5)
 document_joiner = DocumentJoiner()
@@ -88,13 +92,14 @@ generator = OllamaGenerator(
     model=MODEL_NAME,
     url=OLLAMA_BASE_URL,
     generation_kwargs={
-        "num_predict": 1000,
+        "num_predict": 1000,  # máximo de tokens a generar en la respuesta
         "temperature": 0.5,
-        "num_ctx": 2048,
+        "num_ctx": 2048,      # ventana de contexto del LLM; reducirla baja el uso de RAM
+                              # y acelera cada paso de generación en CPU (default: 4096+)
     },
     keep_alive=-1,
     timeout=450,
-    streaming_callback=lambda chunk: print(chunk.content, end="", flush=True),
+    streaming_callback=lambda chunk: print(chunk.content, end="", flush=True),  # imprime cada token apenas se genera, sin esperar la respuesta completa
 )
 
 basic_rag_pipeline = Pipeline()
@@ -121,4 +126,4 @@ while True:
         "keyword_retriever": {"query": question},
         "prompt_builder": {"question": question}
     })
-    print()  # salto de línea tras el streaming
+    print()  # salto de línea al terminar el streaming (los tokens no incluyen \n final)
