@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from haystack import Pipeline, Document
 from haystack.utils import Secret
@@ -24,19 +26,13 @@ import ollama
 
 from rich.console import Console
 
-# --- Configuración ---
-DB_CONNECTION = "postgresql://avdbuser:avdbpass@localhost:5433/pgvdb"
-DB_TABLE = "local_docs"
+# --- Configuración fija ---
+DB_CONNECTION    = "postgresql://avdbuser:avdbpass@localhost:5433/pgvdb"
+DB_TABLE         = "local_docs"
+EMBEDDING_MODEL  = "bge-m3"
 EMBEDDING_DIMENSION = 1024
-EMBEDDING_MODEL = "bge-m3"
-LLM_MODEL = "ministral-3:3b"
-OLLAMA_BASE_URL = "http://localhost:11434"
-RETRIEVER_TOP_K = 5
-SPLIT_LENGTH = 200
-SPLIT_OVERLAP = 20
-INPUT_DIR = Path(__file__).parent / "input"
-NUM_PREDICT = 512
-NUM_CTX = 2048
+OLLAMA_BASE_URL  = "http://localhost:11434"
+INPUT_DIR        = Path(__file__).parent / "input"
 
 PROMPT_TEMPLATE = """
 Given the following information, answer the question.
@@ -56,19 +52,115 @@ Answer:
 console = Console()
 
 
+@dataclass
+class Config:
+    llm_model:    str
+    num_ctx:      int
+    num_predict:  int
+    top_k:        int
+    split_length: int
+    split_overlap: int
+
+
+# --- Setup helpers ---
+
+def pick(title: str, options: list[tuple[str, Any]], default: int) -> Any:
+    """Muestra una lista numerada y devuelve el valor elegido. Enter usa el default."""
+    console.rule(f"[bold cyan]{title}[/bold cyan]")
+    for i, (label, _) in enumerate(options, 1):
+        marker = "  [dim]← predeterminado[/dim]" if i == default else ""
+        console.print(f"  [cyan]{i}[/cyan]  {label}{marker}")
+    console.print()
+    while True:
+        raw = console.input(f"[bold cyan]Opción [{default}]:[/bold cyan] ").strip()
+        if raw == "":
+            return options[default - 1][1]
+        if raw.isdigit() and 1 <= int(raw) <= len(options):
+            return options[int(raw) - 1][1]
+        console.print(f"[yellow]Ingresá un número entre 1 y {len(options)}, o Enter para el predeterminado.[/yellow]")
+
+
+def run_setup() -> Config:
+    try:
+        models = [m.model for m in ollama.list().models]
+    except Exception:
+        console.print("[red]No se pudo conectar a Ollama. Verificá que esté corriendo.[/red]")
+        raise SystemExit(1)
+
+    if not models:
+        console.print("[red]No hay modelos instalados en Ollama.[/red]")
+        raise SystemExit(1)
+
+    llm_model = pick(
+        "Seleccioná un modelo LLM",
+        [(m, m) for m in models],
+        default=1,
+    )
+
+    num_ctx = pick(
+        "Contexto del LLM (num_ctx)",
+        [
+            ("Bajo          (1 024 tokens)", 1024),
+            ("Predeterminado (2 048 tokens)", 2048),
+            ("Alto          (8 192 tokens)", 8192),
+        ],
+        default=2,
+    )
+
+    num_predict = pick(
+        "Longitud de respuesta (num_predict)",
+        [
+            ("Corta          (256 tokens)", 256),
+            ("Predeterminada (1 000 tokens)", 1000),
+            ("Larga          (3 000 tokens)", 3000),
+        ],
+        default=2,
+    )
+
+    top_k = pick(
+        "Documentos a recuperar (retriever top-k)",
+        [
+            ("Pocos    (3)", 3),
+            ("Predeterminado (5)", 5),
+            ("Muchos   (10)", 10),
+        ],
+        default=2,
+    )
+
+    split_length, split_overlap = pick(
+        "Tamaño de chunks",
+        [
+            ("Chicos        (100 palabras, overlap 10)", (100, 10)),
+            ("Predeterminado (200 palabras, overlap 20)", (200, 20)),
+            ("Grandes       (400 palabras, overlap 40)", (400, 40)),
+        ],
+        default=2,
+    )
+
+    return Config(
+        llm_model=llm_model,
+        num_ctx=num_ctx,
+        num_predict=num_predict,
+        top_k=top_k,
+        split_length=split_length,
+        split_overlap=split_overlap,
+    )
+
+
+# --- Pipeline ---
+
 class StreamState:
-    """Coordina el spinner y el streaming del LLM en el loop interactivo."""
+    """Coordina el streaming del LLM en el loop interactivo."""
     def __init__(self):
-        self.status = None
         self.started = False
 
     def reset(self):
         self.started = False
 
     def callback(self, chunk):
+        if not chunk.content:
+            return
         if not self.started:
-            if self.status:
-                self.status.stop()
             console.print("\n[bold green]Respuesta:[/bold green] ", end="")
             self.started = True
         console.print(chunk.content, end="")
@@ -104,17 +196,19 @@ def get_document_store() -> PgvectorDocumentStore:
     )
 
 
-def print_setup_summary(docs: list[Document], new_count: int, llm_model: str) -> None:
+def print_setup_summary(cfg: Config, docs: list[Document], new_count: int) -> None:
     console.rule("[bold cyan]Configuración[/bold cyan]")
-    console.print(f"  [cyan]LLM[/cyan]                {llm_model}")
-    console.print(f"  [cyan]Embedding model[/cyan]    {EMBEDDING_MODEL}")
-    console.print(f"  [cyan]Embedding dimension[/cyan] {EMBEDDING_DIMENSION}")
-    console.print(f"  [cyan]Ollama URL[/cyan]         {OLLAMA_BASE_URL}")
-    console.print(f"  [cyan]DB table[/cyan]           {DB_TABLE}")
-    console.print(f"  [cyan]Retriever top-k[/cyan]    {RETRIEVER_TOP_K}")
-    console.print(f"  [cyan]Split length[/cyan]       {SPLIT_LENGTH} palabras")
-    console.print(f"  [cyan]Split overlap[/cyan]      {SPLIT_OVERLAP} palabras")
-    console.print(f"  [cyan]Input dir[/cyan]          {INPUT_DIR}")
+    console.print(f"  [cyan]LLM[/cyan]                 {cfg.llm_model}")
+    console.print(f"  [cyan]num_ctx[/cyan]              {cfg.num_ctx} tokens")
+    console.print(f"  [cyan]num_predict[/cyan]          {cfg.num_predict} tokens")
+    console.print(f"  [cyan]Retriever top-k[/cyan]      {cfg.top_k}")
+    console.print(f"  [cyan]Split length[/cyan]         {cfg.split_length} palabras")
+    console.print(f"  [cyan]Split overlap[/cyan]        {cfg.split_overlap} palabras")
+    console.print(f"  [cyan]Embedding model[/cyan]      {EMBEDDING_MODEL}")
+    console.print(f"  [cyan]Embedding dimension[/cyan]  {EMBEDDING_DIMENSION}")
+    console.print(f"  [cyan]Ollama URL[/cyan]           {OLLAMA_BASE_URL}")
+    console.print(f"  [cyan]DB table[/cyan]             {DB_TABLE}")
+    console.print(f"  [cyan]Input dir[/cyan]            {INPUT_DIR}")
 
     console.rule("[bold cyan]Documentos[/bold cyan]")
     if docs:
@@ -132,7 +226,7 @@ def print_setup_summary(docs: list[Document], new_count: int, llm_model: str) ->
         console.print("  [yellow]No se encontraron documentos en 'input/'[/yellow]")
 
 
-def index_new_documents(store: PgvectorDocumentStore) -> tuple[list[Document], int]:
+def index_new_documents(store: PgvectorDocumentStore, cfg: Config) -> tuple[list[Document], int]:
     if not INPUT_DIR.exists():
         console.print(f"[red]Directorio no encontrado:[/red] {INPUT_DIR}")
         console.print("Creá la carpeta [bold]input/[/bold] junto al script y agregá tus documentos (pdf, docx, md, txt).")
@@ -142,8 +236,8 @@ def index_new_documents(store: PgvectorDocumentStore) -> tuple[list[Document], i
 
     splitter = DocumentSplitter(
         split_by="word",
-        split_length=SPLIT_LENGTH,
-        split_overlap=SPLIT_OVERLAP,
+        split_length=cfg.split_length,
+        split_overlap=cfg.split_overlap,
     )
     docs = splitter.run(documents=docs)["documents"]
 
@@ -173,20 +267,20 @@ def index_new_documents(store: PgvectorDocumentStore) -> tuple[list[Document], i
     return docs, len(new_docs)
 
 
-def build_rag_pipeline(store: PgvectorDocumentStore, llm_model: str = LLM_MODEL) -> Pipeline:
+def build_rag_pipeline(store: PgvectorDocumentStore, cfg: Config) -> Pipeline:
     pipeline = Pipeline()
     pipeline.add_component("text_embedder", OllamaTextEmbedder(model=EMBEDDING_MODEL, url=OLLAMA_BASE_URL))
-    pipeline.add_component("embedding_retriever", PgvectorEmbeddingRetriever(document_store=store, top_k=RETRIEVER_TOP_K))
-    pipeline.add_component("keyword_retriever", PgvectorKeywordRetriever(document_store=store, top_k=RETRIEVER_TOP_K))
+    pipeline.add_component("embedding_retriever", PgvectorEmbeddingRetriever(document_store=store, top_k=cfg.top_k))
+    pipeline.add_component("keyword_retriever", PgvectorKeywordRetriever(document_store=store, top_k=cfg.top_k))
     pipeline.add_component("document_joiner", DocumentJoiner())
     pipeline.add_component("prompt_builder", PromptBuilder(template=PROMPT_TEMPLATE))
     pipeline.add_component("llm", OllamaGenerator(
-        model=llm_model,
+        model=cfg.llm_model,
         url=OLLAMA_BASE_URL,
         generation_kwargs={
-            "num_predict": NUM_PREDICT,
+            "num_predict": cfg.num_predict,
             "temperature": 0.5,
-            "num_ctx": NUM_CTX,
+            "num_ctx": cfg.num_ctx,
         },
         keep_alive=-1,
         timeout=450,
@@ -219,40 +313,18 @@ def run_interactive_loop(pipeline: Pipeline) -> None:
             break
 
         stream_state.reset()
-        stream_state.status = None
         pipeline.run({
             "text_embedder": {"text": question},
             "keyword_retriever": {"query": question},
             "prompt_builder": {"question": question},
         })
+        if not stream_state.started:
+            console.print("\n[bold green]Respuesta:[/bold green] [dim]Sin respuesta.[/dim]")
         console.print("\n")
 
 
-def select_llm_model() -> str:
-    try:
-        models = [m.model for m in ollama.list().models]
-    except Exception:
-        console.print("[red]No se pudo conectar a Ollama. Verificá que esté corriendo.[/red]")
-        raise SystemExit(1)
-
-    if not models:
-        console.print("[red]No hay modelos instalados en Ollama.[/red]")
-        raise SystemExit(1)
-
-    console.rule("[bold cyan]Seleccioná un modelo LLM[/bold cyan]")
-    for i, model in enumerate(models, 1):
-        console.print(f"  [cyan]{i}[/cyan]  {model}")
-    console.print()
-
-    while True:
-        raw = console.input("[bold cyan]Modelo:[/bold cyan] ").strip()
-        if raw.isdigit() and 1 <= int(raw) <= len(models):
-            return models[int(raw) - 1]
-        console.print(f"[yellow]Ingresá un número entre 1 y {len(models)}.[/yellow]")
-
-
-def unload_models(llm_model: str) -> None:
-    for model, label in [(llm_model, "LLM"), (EMBEDDING_MODEL, "Embedding")]:
+def unload_models(cfg: Config) -> None:
+    for model, label in [(cfg.llm_model, "LLM"), (EMBEDDING_MODEL, "Embedding")]:
         try:
             ollama.generate(model=model, prompt="", keep_alive=0)
             console.print(f"  [dim]{label} ({model}) descargado[/dim]")
@@ -261,13 +333,13 @@ def unload_models(llm_model: str) -> None:
 
 
 if __name__ == "__main__":
-    llm_model = select_llm_model()
+    cfg = run_setup()
     store = get_document_store()
-    docs, new_count = index_new_documents(store)
-    print_setup_summary(docs, new_count, llm_model)
-    pipeline = build_rag_pipeline(store, llm_model)
+    docs, new_count = index_new_documents(store, cfg)
+    print_setup_summary(cfg, docs, new_count)
+    pipeline = build_rag_pipeline(store, cfg)
     try:
         run_interactive_loop(pipeline)
     finally:
         console.rule("[bold cyan]Descargando modelos[/bold cyan]")
-        unload_models(llm_model)
+        unload_models(cfg)
