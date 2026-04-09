@@ -38,11 +38,14 @@ INPUT_DIR = Path(__file__).parent / "input"
 
 PROMPT_TEMPLATE = """
 Given the following information, answer the question.
+YOU SHOULD ANSWER IN THE LANGUAGE OF THE QUESTION, NOT THE LANGUAGE OF THE DOCUMENTS.
+if you dont know about the question, say you dont know. Do not try to make up an answer.
 
 Context:
 {% for document in documents %}
     {{ document.content }}
 {% endfor %}
+
 
 Question: {{question}}
 Answer:
