@@ -27,7 +27,7 @@ dataset = load_dataset("bilgeyucel/seven-wonders", split="train")
 docs : list[Document] = [Document(content=doc["content"], meta=doc["meta"]) for doc in dataset]
 
 EMBEDDING_MODEL_NAME="bge-m3"
-selected_model = input("Choose the LLM to use: 1) phi4 (heavier) 2) llama3.2:3b (light)")
+selected_model = int(input("Choose the LLM to use: 1) phi4 (heavier) 2) llama3.2:3b (light)"))
 
 if (selected_model == 1):
     MODEL_NAME="phi4"
