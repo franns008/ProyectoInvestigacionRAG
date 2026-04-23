@@ -1,2 +1,14 @@
-infrastructure/appdata/
+# Ignorar todo el contenido de appdata
+infrastructure/appdata/*
+
+# Excepciones para permitir que Git rastree la carpeta pipelines
+!infrastructure/appdata/pipelines/
+
+# Ignorar todo dentro de pipelines
+infrastructure/appdata/pipelines/*
+
+# Excepción específica para el archivo pipeline_local_docs.py
+!infrastructure/appdata/pipelines/pipeline_local_docs.py
+
+
 
