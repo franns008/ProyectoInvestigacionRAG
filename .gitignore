@@ -8,4 +8,4 @@ infrastructure/appdata/*
 !infrastructure/appdata/pipelines/*
 
 
-infraestructure/.env
+infrastructure/*.env
