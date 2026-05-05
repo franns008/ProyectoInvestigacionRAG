@@ -11,4 +11,4 @@ infrastructure/appdata/pipelines/*
 !infrastructure/appdata/pipelines/pipeline_local_docs.py
 
 
-infraestructure/.env
+infrastructure/*.env
