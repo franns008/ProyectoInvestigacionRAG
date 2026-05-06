@@ -5,8 +5,10 @@ version: 1.0
 requirements: haystack-ai, pgvector-haystack, ollama-haystack, pypdf, python-docx, markdown-it-py, mdit-plain, openai
 """
 
+import re
 from typing import List, Union, Generator, Iterator
 from pathlib import Path
+from datetime import datetime
 from pydantic import BaseModel
 
 from haystack import Pipeline as HaystackPipeline, Document
@@ -27,6 +29,8 @@ from haystack.components.generators.openai import OpenAIGenerator
 from haystack.document_stores.types import DuplicatePolicy
 
 # --- Configuración fija de infraestructura ---
+LOG_FILE            = Path("/app/pipelines/logs.txt")
+
 DB_CONNECTION       = "postgresql://avdbuser:avdbpass@vdb:5432/pgvdb"
 OLLAMA_URL          = "http://ollama:11434"
 GROQ_BASE_URL       = "https://api.groq.com/openai/v1"
@@ -49,79 +53,110 @@ Answer:
 """
 
 
+def log(msg: str) -> None:
+    line = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}\n"
+    with LOG_FILE.open("a", encoding="utf-8") as f:
+        f.write(line)
+
+
 class Pipeline:
 
     class Valves(BaseModel):
         llm_model:       str   = "llama-3.1-8b-instant"
         embedding_model: str   = "bge-m3"
-        retriever_top_k: int   = 5
+        retriever_top_k: int   = 3
         temperature:     float = 0.5
         max_tokens:      int   = 1000
         split_length:    int   = 200
         split_overlap:   int   = 20
 
     def __init__(self):
-        self.name   = "Mi Haystack RAG (Groq)"
-        self.valves = self.Valves()
-        self.store  = self._get_document_store()
-        self.rag_pipeline = self._build_rag_pipeline()
+        self.name              = "Mi Haystack RAG (Groq)"
+        self.valves            = self.Valves()
+        self.store             = self._get_document_store()
+        self.retrieval_pipeline = None
+        self.rag_pipeline       = None
 
     async def on_startup(self):
+        try:
+            self.retrieval_pipeline = self._build_retrieval_pipeline()
+            self.rag_pipeline       = self._build_generation_pipeline()
+        except Exception as e:
+            print(f"[ERROR] No se pudo construir el pipeline: {e}")
+            return
         print("Indexando documentos nuevos si los hay...")
         self._index_new_documents()
 
     async def on_valves_updated(self):
         print("Valves actualizados — reconstruyendo pipeline...")
-        self.rag_pipeline = self._build_rag_pipeline()
+        self.retrieval_pipeline = self._build_retrieval_pipeline()
+        self.rag_pipeline       = self._build_generation_pipeline()
 
     def pipe(self, user_message: str, model_id: str, messages: List[dict], body: dict) -> Union[str, Generator, Iterator]:
-        print(f"[DEBUG-PIPE] Iniciando ejecución de RAG Pipeline (Groq).")
-        print(f"[DEBUG-PIPE] Mensaje del usuario: '{user_message}'")
-        print(f"[DEBUG-PIPE] Modelo configurado: {self.valves.llm_model}")
-        print(f"[DEBUG-PIPE] Historial de mensajes recibido (cantidad): {len(messages)}")
+        if self.retrieval_pipeline is None or self.rag_pipeline is None:
+            self.retrieval_pipeline = self._build_retrieval_pipeline()
+            self.rag_pipeline       = self._build_generation_pipeline()
 
-        result = self.rag_pipeline.run({
+        if user_message.startswith("### Task:"):
+            result = self.rag_pipeline.run({
+                "prompt_builder": {"question": user_message, "documents": []},
+            })
+            return result.get("llm", {}).get("replies", [""])[0]
+
+        RAG = "RAG-GROQ"
+        log(f"{RAG} ========== INICIO ==========")
+        log(f"{RAG} Pregunta: '{user_message}'")
+        log(f"{RAG} Modelo: {self.valves.llm_model} | top_k: {self.valves.retriever_top_k}")
+
+        # Paso 1: recuperar documentos
+        retrieval_result = self.retrieval_pipeline.run({
             "text_embedder": {"text": user_message},
             "keyword_retriever": {"query": user_message},
-            "prompt_builder": {"question": user_message},
-        }, include_outputs_from={"prompt_builder", "embedding_retriever", "keyword_retriever"})
+        }, include_outputs_from={"embedding_retriever", "keyword_retriever"})
 
-        # --- RECOPILACION DE METRICAS ---
-        emb_docs = result.get("embedding_retriever", {}).get("documents", [])
-        kw_docs = result.get("keyword_retriever", {}).get("documents", [])
-        total_retrieved = len(emb_docs) + len(kw_docs)
-        print(f"[METRICS] Documentos recuperados por embeddings: {len(emb_docs)}")
-        if emb_docs:
-            print("[DEBUG-DOCS] --- Detalles Documentos Embeddings ---")
-            for i, doc in enumerate(emb_docs, 1):
-                filepath = doc.meta.get("file_path", "Desconocido")
-                score = getattr(doc, "score", "N/A")
-                print(f"  {i}. Archivo: {filepath} | Score: {score}")
+        emb_docs = retrieval_result.get("embedding_retriever", {}).get("documents", [])
+        kw_docs  = retrieval_result.get("keyword_retriever",  {}).get("documents", [])
 
-        print(f"[METRICS] Documentos recuperados por keywords: {len(kw_docs)}")
-        if kw_docs:
-            print("[DEBUG-DOCS] --- Detalles Documentos Keywords ---")
-            for i, doc in enumerate(kw_docs, 1):
-                filepath = doc.meta.get("file_path", "Desconocido")
-                score = getattr(doc, "score", "N/A")
-                print(f"  {i}. Archivo: {filepath} | Score: {score}")
+        log(f"{RAG} --- RETRIEVAL ---")
+        log(f"{RAG} Embedding docs: {len(emb_docs)} | Keyword docs: {len(kw_docs)}")
+        for i, doc in enumerate(emb_docs, 1):
+            chars = len(doc.content or "")
+            log(f"{RAG}   [EMB {i}] {doc.meta.get('file_path','?')} | score={getattr(doc,'score','N/A'):.4f} | {chars} chars")
+        for i, doc in enumerate(kw_docs, 1):
+            chars = len(doc.content or "")
+            log(f"{RAG}   [KW  {i}] {doc.meta.get('file_path','?')} | score={getattr(doc,'score','N/A')} | {chars} chars")
 
-        print(f"[METRICS] Total documentos (antes de deduplicar): {total_retrieved}")
+        # Paso 2: normalizar whitespace antes de enviar al LLM
+        joined_docs = retrieval_result.get("document_joiner", {}).get("documents", [])
+        log(f"{RAG} --- DOCS TRAS DEDUPLICAR: {len(joined_docs)} ---")
+        total_chars_antes = 0
+        for i, doc in enumerate(joined_docs, 1):
+            chars_orig = len(doc.content or "")
+            total_chars_antes += chars_orig
+            if doc.content:
+                doc.content = re.sub(r'\s+', ' ', doc.content).strip()
+            log(f"{RAG}   [{i}] {doc.meta.get('file_path','?')} | {chars_orig} chars → {len(doc.content or '')} chars (tras normalizar)")
+
+        total_chars_despues = sum(len(d.content or "") for d in joined_docs)
+        log(f"{RAG} Total chars en contexto: {total_chars_antes} antes / {total_chars_despues} después de normalizar")
+        log(f"{RAG} Aprox tokens en contexto: ~{total_chars_despues // 4}")
+
+        # Paso 3: generar respuesta con documentos truncados
+        result = self.rag_pipeline.run({
+            "prompt_builder": {"question": user_message, "documents": joined_docs},
+        }, include_outputs_from={"prompt_builder"})
 
         prompt_generado = result.get("prompt_builder", {}).get("prompt", "")
-        if prompt_generado:
-            words_count = len(prompt_generado.split())
-            print(f"[METRICS] Cantidad de palabras (aprox tokens) del prompt enviado al LLM: {words_count}")
-            print(f"[DEBUG-PROMPT] Contenido completo del prompt:\n{prompt_generado}\n--- Fin Prompt ---")
-        else:
-            print("[DEBUG-PROMPT] Advertencia: No se pudo capturar el output del prompt_builder.")
+        log(f"{RAG} --- PROMPT ENVIADO A GROQ ---")
+        log(f"{RAG} Tamaño: {len(prompt_generado)} chars | ~{len(prompt_generado)//4} tokens")
+        log(f"{RAG} Contenido:\n{prompt_generado}")
+        log(f"{RAG} --- FIN PROMPT ---")
 
         respuesta_llm = result.get("llm", {}).get("replies", [""])[0]
-        resp_words_count = len(respuesta_llm.split())
-        print(f"[METRICS] Cantidad de palabras (aprox tokens) de la respuesta del LLM: {resp_words_count}")
-        print(f"[DEBUG-LLM] Respuesta completa:\n{respuesta_llm}\n--- Fin Respuesta ---")
-
-        print(f"[DEBUG-PIPE] Fin ejecución RAG Pipeline (Groq).")
+        log(f"{RAG} --- RESPUESTA LLM ---")
+        log(f"{RAG} {len(respuesta_llm)} chars | ~{len(respuesta_llm)//4} tokens")
+        log(f"{RAG} {respuesta_llm}")
+        log(f"{RAG} ========== FIN ==========")
         return respuesta_llm
 
     def _get_document_store(self) -> PgvectorDocumentStore:
@@ -184,13 +219,22 @@ class Pipeline:
         docs_with_embeddings = doc_embedder.run(new_docs)
         self.store.write_documents(docs_with_embeddings["documents"], policy=DuplicatePolicy.OVERWRITE)
 
-    def _build_rag_pipeline(self) -> HaystackPipeline:
+    def _build_retrieval_pipeline(self) -> HaystackPipeline:
         v = self.valves
         pipeline = HaystackPipeline()
         pipeline.add_component("text_embedder", OllamaTextEmbedder(model=v.embedding_model, url=OLLAMA_URL))
         pipeline.add_component("embedding_retriever", PgvectorEmbeddingRetriever(document_store=self.store, top_k=v.retriever_top_k))
         pipeline.add_component("keyword_retriever", PgvectorKeywordRetriever(document_store=self.store, top_k=v.retriever_top_k))
         pipeline.add_component("document_joiner", DocumentJoiner())
+
+        pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
+        pipeline.connect("embedding_retriever", "document_joiner")
+        pipeline.connect("keyword_retriever", "document_joiner")
+        return pipeline
+
+    def _build_generation_pipeline(self) -> HaystackPipeline:
+        v = self.valves
+        pipeline = HaystackPipeline()
         pipeline.add_component("prompt_builder", PromptBuilder(template=PROMPT_TEMPLATE))
         pipeline.add_component("llm", OpenAIGenerator(
             api_key=Secret.from_env_var("GROQ_API_KEY"),
@@ -202,9 +246,5 @@ class Pipeline:
             },
         ))
 
-        pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
-        pipeline.connect("embedding_retriever", "document_joiner")
-        pipeline.connect("keyword_retriever", "document_joiner")
-        pipeline.connect("document_joiner", "prompt_builder.documents")
         pipeline.connect("prompt_builder", "llm")
         return pipeline

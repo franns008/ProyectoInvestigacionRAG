@@ -8,14 +8,14 @@ services:
            - "${OLLAMA_PORT:-11434}:11434"
         volumes:
             - ollama_data:/root/.ollama
-        deploy:
-            resources:
-               reservations:
-                    devices:
-                      - driver: nvidia
-                        count: 1
+        #deploy:
+        #    resources:
+        #       reservations:
+        #            devices:
+         #             - driver: nvidia
+        #                count: 1
                         #device_ids: ["1"]
-                        capabilities: [gpu]
+        #                capabilities: [gpu]
 
     db:
         image: postgres:15-alpine
@@ -65,6 +65,7 @@ services:
             - env/pipelines.env
         environment:
             PG_CONN_STR: postgresql://${PGVECTOR_USR}:${PGVECTOR_PASS}@vdb/pgvdb?sslmode=disable
+            GROQ_API_KEY: ${GROQ_API_KEY}
         ports:
             - "${PIPELINES_PORT:-9099}:9099"
         extra_hosts:
