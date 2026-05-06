@@ -1,8 +1,9 @@
 """
-title: Haystack RAG Pipeline
+title: RAG lama index Pipeline
+description: Pipeline de ejemplo que utiliza LlamaIndex para cargar documentos locales y Haystack para construir un pipeline RAG.
 author: Francisco
 version: 1.1
-requirements: haystack-ai, pgvector-haystack, ollama-haystack, pypdf, python-docx, markdown-it-py, mdit-plain
+requirements: haystack-ai, pgvector-haystack, ollama-haystack, pypdf, python-docx, markdown-it-py, mdit-plain, docx2txt, llama-index
 """
 
 from typing import List, Union, Generator, Iterator
@@ -12,12 +13,12 @@ import logging
 
 # Configurar el logger
 logging.basicConfig(
-    filename='/app/pipelines/logHaystack.txt',
+    filename='/app/pipelines/logLlamaIndex.txt',
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - [%(name)s] - %(message)s',
     force=True
 )
-logger = logging.getLogger("HaystackRAG")
+logger = logging.getLogger("LlamaIndexRAG")
 
 from haystack import Pipeline as HaystackPipeline, Document
 from haystack.utils import Secret
@@ -29,9 +30,7 @@ from haystack_integrations.components.retrievers.pgvector import (
 from haystack.components.builders import PromptBuilder
 from haystack.components.joiners import DocumentJoiner
 from haystack.components.preprocessors import DocumentSplitter
-from haystack.components.converters import (
-    PyPDFToDocument, DOCXToDocument, MarkdownToDocument, TextFileToDocument
-)
+from llama_index.core import SimpleDirectoryReader, Document as LlamaDocument
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder, OllamaDocumentEmbedder
 from haystack_integrations.components.generators.ollama import OllamaGenerator
 from haystack.document_stores.types import DuplicatePolicy
@@ -61,7 +60,7 @@ Answer:
 class Pipeline:
 
     class Valves(BaseModel):
-        llm_model:       str   = "phi4"
+        llm_model:       str   = "llama3.1:8b"
         embedding_model: str   = "bge-m3"
         retriever_top_k: int   = 5
         num_ctx:         int   = 2048
@@ -71,7 +70,7 @@ class Pipeline:
         split_overlap:   int   = 20
 
     def __init__(self):
-        self.name   = "Mi Haystack RAG"
+        self.name   = "RAG lama index"
         self.valves = self.Valves()
         self.store  = self._get_document_store()
         self.rag_pipeline = self._build_rag_pipeline()
@@ -85,15 +84,58 @@ class Pipeline:
         self.rag_pipeline = self._build_rag_pipeline()
 
     def pipe(self, user_message: str, model_id: str, messages: List[dict], body: dict) -> Union[str, Generator, Iterator]:
-        logger.info(f"Ejecutando RAG para: {user_message}")
+        logger.debug(f"[DEBUG-PIPE] Iniciando ejecución de RAG Pipeline.")
+        logger.debug(f"[DEBUG-PIPE] Mensaje del usuario: '{user_message}'")
+        logger.debug(f"[DEBUG-PIPE] ID Modelo entrante: {model_id} | Usando configurado: {self.valves.llm_model}")
+        logger.debug(f"[DEBUG-PIPE] Historial de mensajes recibido (cantidad): {len(messages)}")
 
+        # Habilitamos la extracción de los outputs intermedios agregando `include_outputs_from`
         result = self.rag_pipeline.run({
             "text_embedder": {"text": user_message},
             "keyword_retriever": {"query": user_message},
             "prompt_builder": {"question": user_message},
-        })
+        }, include_outputs_from={"prompt_builder", "embedding_retriever", "keyword_retriever"})
 
-        return result["llm"]["replies"][0]
+        # --- RECOPILACION DE METRICAS ---
+        # 1. Documentos Recuperados
+        emb_docs = result.get("embedding_retriever", {}).get("documents", [])
+        kw_docs = result.get("keyword_retriever", {}).get("documents", [])
+        total_retrieved = len(emb_docs) + len(kw_docs)
+        logger.info(f"[METRICS] Documentos recuperados por embeddings: {len(emb_docs)}")
+        if emb_docs:
+            logger.debug("[DEBUG-DOCS] --- Detalles Documentos Embeddings ---")
+            for i, doc in enumerate(emb_docs, 1):
+                filepath = doc.meta.get("file_path", "Desconocido")
+                score = getattr(doc, "score", "N/A")
+                logger.debug(f"  {i}. Archivo: {filepath} | Score: {score}")
+
+        logger.info(f"[METRICS] Documentos recuperados por keywords: {len(kw_docs)}")
+        if kw_docs:
+            logger.debug("[DEBUG-DOCS] --- Detalles Documentos Keywords ---")
+            for i, doc in enumerate(kw_docs, 1):
+                filepath = doc.meta.get("file_path", "Desconocido")
+                score = getattr(doc, "score", "N/A")
+                logger.debug(f"  {i}. Archivo: {filepath} | Score: {score}")
+
+        logger.info(f"[METRICS] Total documentos (antes de deduplicar): {total_retrieved}")
+
+        # 2. Prompt Builder
+        prompt_generado = result.get("prompt_builder", {}).get("prompt", "")
+        if prompt_generado:
+            words_count = len(prompt_generado.split())
+            logger.info(f"[METRICS] Cantidad de palabras (aprox tokens) del prompt enviado al LLM: {words_count}")
+            logger.debug(f"[DEBUG-PROMPT] Contenido completo del prompt:\n{prompt_generado}\n--- Fin Prompt ---")
+        else:
+            logger.debug("[DEBUG-PROMPT] Advertencia: No se pudo capturar el output del prompt_builder en el pipeline run.")
+
+        # 3. Respuesta LLM
+        respuesta_llm = result.get("llm", {}).get("replies", [""])[0]
+        resp_words_count = len(respuesta_llm.split())
+        logger.info(f"[METRICS] Cantidad de palabras (aprox tokens) de la respuesta del LLM: {resp_words_count}")
+        logger.debug(f"[DEBUG-LLM] Respuesta completa:\n{respuesta_llm}\n--- Fin Respuesta ---")
+
+        logger.debug(f"[DEBUG-PIPE] Fin ejecución RAG Pipeline.")
+        return respuesta_llm
 
     def _get_document_store(self) -> PgvectorDocumentStore:
         return PgvectorDocumentStore(
@@ -103,21 +145,26 @@ class Pipeline:
         )
 
     def _load_local_documents(self) -> list[Document]:
-        docs: list[Document] = []
-        converters = [
-            ("*.pdf",  PyPDFToDocument()),
-            ("*.docx", DOCXToDocument()),
-            ("*.md",   MarkdownToDocument()),
-            ("*.txt",  TextFileToDocument()),
-        ]
-        for pattern, converter in converters:
-            files = list(INPUT_DIR.glob(pattern))
-            if not files:
-                continue
-            result = converter.run(sources=files)
-            docs.extend(result["documents"])
-        return docs
-
+        
+        """
+            
+            
+            Recorrer los archivos, buscando una extension y transformarla en otra.
+        """
+        reader = SimpleDirectoryReader(str(INPUT_DIR))
+        llama_documents = reader.load_data()
+        
+        # --- CONVERSIÓN: LlamaIndex -> Haystack ---
+        haystack_docs = []
+        for l_doc in llama_documents:
+            # Creamos un Document de Haystack usando la data del Document de LlamaIndex
+            haystack_doc = Document(
+                content=l_doc.text,
+                meta=l_doc.metadata
+            )
+            haystack_docs.append(haystack_doc)
+            
+        return haystack_docs
     def _index_new_documents(self) -> None:
         if not INPUT_DIR.exists():
             logger.error(f"Directorio de entrada no encontrado: {INPUT_DIR}")
