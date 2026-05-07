@@ -10,14 +10,17 @@ from pathlib import Path
 from pydantic import BaseModel
 import logging
 
-# Configurar el logger
-logging.basicConfig(
-    filename='/app/pipelines/logHaystack.txt',
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - [%(name)s] - %(message)s',
-    force=True
-)
+# Configurar el logger específico para nuestra app
 logger = logging.getLogger("HaystackRAG")
+logger.setLevel(logging.INFO)
+logger.propagate = False  # Evita que el root logger intercepte este logger
+
+# Configurar el archivo de salida solo para este logger
+if not logger.handlers:
+    file_handler = logging.FileHandler('/app/pipelines/logHaystack.txt')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - [%(name)s] - %(message)s')
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
 
 from haystack import Pipeline as HaystackPipeline, Document
 from haystack.utils import Secret
