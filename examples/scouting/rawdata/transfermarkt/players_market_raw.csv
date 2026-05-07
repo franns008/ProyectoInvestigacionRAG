@@ -1,0 +1,701 @@
+league,name,tm_id,tm_profile_url,position,nationality,age,current_club,club_tm_id,market_value_raw,market_value_eur,saison_id
+premier_league,Erling Haaland,418560,https://www.transfermarkt.com/erling-haaland/profil/spieler/418560,Centre-Forward,Norway,25,Manchester City,281,€200.00m,200000000,2024
+premier_league,Declan Rice,357662,https://www.transfermarkt.com/declan-rice/profil/spieler/357662,Central Midfield,England,27,Arsenal FC,11,€120.00m,120000000,2024
+premier_league,Bukayo Saka,433177,https://www.transfermarkt.com/bukayo-saka/profil/spieler/433177,Right Winger,England,24,Arsenal FC,11,€120.00m,120000000,2024
+premier_league,Cole Palmer,568177,https://www.transfermarkt.com/cole-palmer/profil/spieler/568177,Attacking Midfield,England,24,Chelsea FC,631,€110.00m,110000000,2024
+premier_league,Moisés Caicedo,687626,https://www.transfermarkt.com/moises-caicedo/profil/spieler/687626,Defensive Midfield,Ecuador,24,Chelsea FC,631,€110.00m,110000000,2024
+premier_league,Florian Wirtz,598577,https://www.transfermarkt.com/florian-wirtz/profil/spieler/598577,Attacking Midfield,Germany,23,Liverpool FC,31,€110.00m,110000000,2024
+premier_league,Alexander Isak,349066,https://www.transfermarkt.com/alexander-isak/profil/spieler/349066,Centre-Forward,Sweden,26,Liverpool FC,31,€100.00m,100000000,2024
+premier_league,Dominik Szoboszlai,451276,https://www.transfermarkt.com/dominik-szoboszlai/profil/spieler/451276,Attacking Midfield,Hungary,25,Liverpool FC,31,€100.00m,100000000,2024
+premier_league,William Saliba,495666,https://www.transfermarkt.com/william-saliba/profil/spieler/495666,Centre-Back,France,25,Arsenal FC,11,€90.00m,90000000,2024
+premier_league,Enzo Fernández,648195,https://www.transfermarkt.com/enzo-fernandez/profil/spieler/648195,Central Midfield,Argentina,25,Chelsea FC,631,€90.00m,90000000,2024
+premier_league,Ryan Gravenberch,478573,https://www.transfermarkt.com/ryan-gravenberch/profil/spieler/478573,Defensive Midfield,Netherlands,23,Liverpool FC,31,€90.00m,90000000,2024
+premier_league,Hugo Ekitiké,709726,https://www.transfermarkt.com/hugo-ekitike/profil/spieler/709726,Centre-Forward,France,23,Liverpool FC,31,€90.00m,90000000,2024
+premier_league,Martín Zubimendi,423440,https://www.transfermarkt.com/martin-zubimendi/profil/spieler/423440,Defensive Midfield,Spain,27,Arsenal FC,11,€80.00m,80000000,2024
+premier_league,Phil Foden,406635,https://www.transfermarkt.com/phil-foden/profil/spieler/406635,Attacking Midfield,England,14,Manchester City,281,€80.00m,80000000,2024
+premier_league,Bryan Mbeumo,413039,https://www.transfermarkt.com/bryan-mbeumo/profil/spieler/413039,Right Winger,Cameroon,15,Manchester United,985,€80.00m,80000000,2024
+premier_league,Sandro Tonali,397033,https://www.transfermarkt.com/sandro-tonali/profil/spieler/397033,Defensive Midfield,Italy,16,Newcastle United,762,€80.00m,80000000,2024
+premier_league,Alexis Mac Allister,534033,https://www.transfermarkt.com/alexis-mac-allister/profil/spieler/534033,Central Midfield,Argentina,17,Liverpool FC,31,€80.00m,80000000,2024
+premier_league,Morgan Rogers,503743,https://www.transfermarkt.com/morgan-rogers/profil/spieler/503743,Attacking Midfield,England,18,Aston Villa,405,€80.00m,80000000,2024
+premier_league,Estêvão,1056993,https://www.transfermarkt.com/estevao/profil/spieler/1056993,Right Winger,Brazil,19,Chelsea FC,631,€80.00m,80000000,2024
+premier_league,Gabriel,435338,https://www.transfermarkt.com/gabriel/profil/spieler/435338,Centre-Back,Brazil,20,Arsenal FC,11,€75.00m,75000000,2024
+premier_league,Antoine Semenyo,583255,https://www.transfermarkt.com/antoine-semenyo/profil/spieler/583255,Right Winger,Ghana,21,Manchester City,281,€75.00m,75000000,2024
+premier_league,João Pedro,626724,https://www.transfermarkt.com/joao-pedro/profil/spieler/626724,Centre-Forward,Brazil,22,Chelsea FC,631,€75.00m,75000000,2024
+premier_league,Bruno Guimarães,520624,https://www.transfermarkt.com/bruno-guimaraes/profil/spieler/520624,Central Midfield,Brazil,23,Newcastle United,762,€75.00m,75000000,2024
+premier_league,Matheus Cunha,517894,https://www.transfermarkt.com/matheus-cunha/profil/spieler/517894,Centre-Forward,Brazil,24,Manchester United,985,€70.00m,70000000,2024
+premier_league,Jurriën Timber,420243,https://www.transfermarkt.com/jurrien-timber/profil/spieler/420243,Right-Back,Netherlands,25,Arsenal FC,11,€70.00m,70000000,2024
+premier_league,Josko Gvardiol,475959,https://www.transfermarkt.com/josko-gvardiol/profil/spieler/475959,Centre-Back,Croatia,26,Manchester City,281,€70.00m,70000000,2024
+premier_league,Martin Ødegaard,316264,https://www.transfermarkt.com/martin-odegaard/profil/spieler/316264,Attacking Midfield,Norway,27,Arsenal FC,11,€65.00m,65000000,2024
+premier_league,Viktor Gyökeres,325443,https://www.transfermarkt.com/viktor-gyokeres/profil/spieler/325443,Centre-Forward,Sweden,28,Arsenal FC,11,€65.00m,65000000,2024
+premier_league,Benjamin Sesko,627442,https://www.transfermarkt.com/benjamin-sesko/profil/spieler/627442,Centre-Forward,Slovenia,29,Manchester United,985,€65.00m,65000000,2024
+premier_league,Rayan Cherki,607223,https://www.transfermarkt.com/rayan-cherki/profil/spieler/607223,Attacking Midfield,France,30,Manchester City,281,€65.00m,65000000,2024
+premier_league,Jérémy Doku,486049,https://www.transfermarkt.com/jeremy-doku/profil/spieler/486049,Left Winger,Belgium,31,Manchester City,281,€65.00m,65000000,2024
+premier_league,Marc Guéhi,392757,https://www.transfermarkt.com/marc-guehi/profil/spieler/392757,Centre-Back,England,32,Manchester City,281,€65.00m,65000000,2024
+premier_league,Rodri,357565,https://www.transfermarkt.com/rodri/profil/spieler/357565,Defensive Midfield,Spain,33,Manchester City,281,€65.00m,65000000,2024
+premier_league,Cody Gakpo,434675,https://www.transfermarkt.com/cody-gakpo/profil/spieler/434675,Left Winger,Netherlands,34,Liverpool FC,31,€65.00m,65000000,2024
+premier_league,Nick Woltemade,455661,https://www.transfermarkt.com/nick-woltemade/profil/spieler/455661,Centre-Forward,Germany,35,Newcastle United,762,€65.00m,65000000,2024
+premier_league,Micky van de Ven,557459,https://www.transfermarkt.com/micky-van-de-ven/profil/spieler/557459,Centre-Back,Netherlands,36,Tottenham Hotspur,148,€65.00m,65000000,2024
+premier_league,Reece James,472423,https://www.transfermarkt.com/reece-james/profil/spieler/472423,Right-Back,England,37,Chelsea FC,631,€60.00m,60000000,2024
+premier_league,Eberechi Eze,479999,https://www.transfermarkt.com/eberechi-eze/profil/spieler/479999,Attacking Midfield,England,38,Arsenal FC,11,€60.00m,60000000,2024
+premier_league,Morgan Gibbs-White,429014,https://www.transfermarkt.com/morgan-gibbs-white/profil/spieler/429014,Attacking Midfield,England,39,Nottingham Forest,703,€60.00m,60000000,2024
+premier_league,Elliot Anderson,567576,https://www.transfermarkt.com/elliot-anderson/profil/spieler/567576,Central Midfield,England,40,Nottingham Forest,703,€60.00m,60000000,2024
+premier_league,Pedro Neto,487465,https://www.transfermarkt.com/pedro-neto/profil/spieler/487465,Right Winger,Portugal,41,Chelsea FC,631,€60.00m,60000000,2024
+premier_league,Adam Wharton,744149,https://www.transfermarkt.com/adam-wharton/profil/spieler/744149,Defensive Midfield,England,42,Crystal Palace,873,€60.00m,60000000,2024
+premier_league,Tijjani Reijnders,460939,https://www.transfermarkt.com/tijjani-reijnders/profil/spieler/460939,Central Midfield,Netherlands,43,Manchester City,281,€60.00m,60000000,2024
+premier_league,Omar Marmoush,445939,https://www.transfermarkt.com/omar-marmoush/profil/spieler/445939,Centre-Forward,Egypt,44,Manchester City,281,€60.00m,60000000,2024
+premier_league,Rúben Dias,258004,https://www.transfermarkt.com/ruben-dias/profil/spieler/258004,Centre-Back,Portugal,45,Manchester City,281,€60.00m,60000000,2024
+premier_league,Anthony Gordon,503733,https://www.transfermarkt.com/anthony-gordon/profil/spieler/503733,Left Winger,England,25,Newcastle United,762,€60.00m,60000000,2024
+premier_league,Carlos Baleba,973085,https://www.transfermarkt.com/carlos-baleba/profil/spieler/973085,Defensive Midfield,Cameroon,22,Brighton & Hove Albion,1237,€55.00m,55000000,2024
+premier_league,Mohammed Kudus,543499,https://www.transfermarkt.com/mohammed-kudus/profil/spieler/543499,Right Winger,Ghana,25,Tottenham Hotspur,148,€55.00m,55000000,2024
+premier_league,Amad Diallo,536835,https://www.transfermarkt.com/amad-diallo/profil/spieler/536835,Right Winger,Cote d'Ivoire,23,Manchester United,985,€50.00m,50000000,2024
+premier_league,Marc Cucurella,284857,https://www.transfermarkt.com/marc-cucurella/profil/spieler/284857,Left-Back,Spain,27,Chelsea FC,631,€50.00m,50000000,2024
+premier_league,Kai Havertz,309400,https://www.transfermarkt.com/kai-havertz/profil/spieler/309400,Centre-Forward,Germany,26,Arsenal FC,11,€50.00m,50000000,2024
+premier_league,Kobbie Mainoo,820374,https://www.transfermarkt.com/kobbie-mainoo/profil/spieler/820374,Central Midfield,England,21,Manchester United,985,€50.00m,50000000,2024
+premier_league,Riccardo Calafiori,502821,https://www.transfermarkt.com/riccardo-calafiori/profil/spieler/502821,Left-Back,Italy,23,Arsenal FC,11,€50.00m,50000000,2024
+premier_league,Noni Madueke,503987,https://www.transfermarkt.com/noni-madueke/profil/spieler/503987,Right Winger,England,24,Arsenal FC,11,€50.00m,50000000,2024
+premier_league,Leny Yoro,923831,https://www.transfermarkt.com/leny-yoro/profil/spieler/923831,Centre-Back,France,20,Manchester United,985,€50.00m,50000000,2024
+premier_league,Piero Hincapié,659813,https://www.transfermarkt.com/piero-hincapie/profil/spieler/659813,Centre-Back,Ecuador,24,Arsenal FC,11,€50.00m,50000000,2024
+premier_league,Nico O'Reilly,743413,https://www.transfermarkt.com/nico-oreilly/profil/spieler/743413,Left-Back,England,21,Manchester City,281,€50.00m,50000000,2024
+premier_league,Levi Colwill,614258,https://www.transfermarkt.com/levi-colwill/profil/spieler/614258,Centre-Back,England,23,Chelsea FC,631,€50.00m,50000000,2024
+premier_league,Iliman Ndiaye,623570,https://www.transfermarkt.com/iliman-ndiaye/profil/spieler/623570,Right Winger,Senegal,26,Everton FC,29,€50.00m,50000000,2024
+premier_league,Murillo,1005649,https://www.transfermarkt.com/murillo/profil/spieler/1005649,Centre-Back,Brazil,23,Nottingham Forest,703,€50.00m,50000000,2024
+premier_league,Ibrahima Konaté,357119,https://www.transfermarkt.com/ibrahima-konate/profil/spieler/357119,Centre-Back,France,26,Liverpool FC,31,€50.00m,50000000,2024
+premier_league,Igor Thiago,739443,https://www.transfermarkt.com/igor-thiago/profil/spieler/739443,Centre-Forward,Brazil,24,Brentford FC,1148,€50.00m,50000000,2024
+premier_league,Xavi Simons,566931,https://www.transfermarkt.com/xavi-simons/profil/spieler/566931,Attacking Midfield,Netherlands,23,Tottenham Hotspur,148,€50.00m,50000000,2024
+premier_league,Cristian Romero,355915,https://www.transfermarkt.com/cristian-romero/profil/spieler/355915,Centre-Back,Argentina,28,Tottenham Hotspur,148,€50.00m,50000000,2024
+premier_league,Gabriel Martinelli,655488,https://www.transfermarkt.com/gabriel-martinelli/profil/spieler/655488,Left Winger,Brazil,24,Arsenal FC,11,€45.00m,45000000,2024
+premier_league,Matheus Nunes,601883,https://www.transfermarkt.com/matheus-nunes/profil/spieler/601883,Right-Back,Portugal,27,Manchester City,281,€45.00m,45000000,2024
+premier_league,Jarrad Branthwaite,661053,https://www.transfermarkt.com/jarrad-branthwaite/profil/spieler/661053,Centre-Back,England,23,Everton FC,29,€45.00m,45000000,2024
+premier_league,Nico González,466805,https://www.transfermarkt.com/nico-gonzalez/profil/spieler/466805,Defensive Midfield,Spain,24,Manchester City,281,€45.00m,45000000,2024
+premier_league,Gianluigi Donnarumma,315858,https://www.transfermarkt.com/gianluigi-donnarumma/profil/spieler/315858,Goalkeeper,Italy,27,Manchester City,281,€45.00m,45000000,2024
+premier_league,Andrey Santos,743600,https://www.transfermarkt.com/andrey-santos/profil/spieler/743600,Central Midfield,Brazil,22,Chelsea FC,631,€45.00m,45000000,2024
+premier_league,Jørgen Strand Larsen,429983,https://www.transfermarkt.com/jorgen-strand-larsen/profil/spieler/429983,Centre-Forward,Norway,26,Crystal Palace,873,€45.00m,45000000,2024
+premier_league,Malick Thiaw,521964,https://www.transfermarkt.com/malick-thiaw/profil/spieler/521964,Centre-Back,Germany,24,Newcastle United,762,€45.00m,45000000,2024
+premier_league,Amadou Onana,485706,https://www.transfermarkt.com/amadou-onana/profil/spieler/485706,Defensive Midfield,Belgium,24,Aston Villa,405,€45.00m,45000000,2024
+premier_league,Trevoh Chalobah,346314,https://www.transfermarkt.com/trevoh-chalobah/profil/spieler/346314,Centre-Back,England,26,Chelsea FC,631,€40.00m,40000000,2024
+premier_league,Lisandro Martínez,480762,https://www.transfermarkt.com/lisandro-martinez/profil/spieler/480762,Centre-Back,Argentina,28,Manchester United,985,€40.00m,40000000,2024
+premier_league,Rayan,1012564,https://www.transfermarkt.com/rayan/profil/spieler/1012564,Right Winger,Brazil,19,AFC Bournemouth,989,€40.00m,40000000,2024
+premier_league,Savinho,743591,https://www.transfermarkt.com/savinho/profil/spieler/743591,Left Winger,Brazil,22,Manchester City,281,€40.00m,40000000,2024
+premier_league,Rayan Aït-Nouri,578391,https://www.transfermarkt.com/rayan-ait-nouri/profil/spieler/578391,Left-Back,Algeria,24,Manchester City,281,€40.00m,40000000,2024
+premier_league,Matthijs de Ligt,326031,https://www.transfermarkt.com/matthijs-de-ligt/profil/spieler/326031,Centre-Back,Netherlands,26,Manchester United,985,€40.00m,40000000,2024
+premier_league,Bruno Fernandes,240306,https://www.transfermarkt.com/bruno-fernandes/profil/spieler/240306,Attacking Midfield,Portugal,31,Manchester United,985,€40.00m,40000000,2024
+premier_league,Boubacar Kamara,394327,https://www.transfermarkt.com/boubacar-kamara/profil/spieler/394327,Defensive Midfield,France,26,Aston Villa,405,€40.00m,40000000,2024
+premier_league,Ezri Konsa,413403,https://www.transfermarkt.com/ezri-konsa/profil/spieler/413403,Centre-Back,England,28,Aston Villa,405,€40.00m,40000000,2024
+premier_league,Tino Livramento,503981,https://www.transfermarkt.com/tino-livramento/profil/spieler/503981,Right-Back,England,23,Newcastle United,762,€40.00m,40000000,2024
+premier_league,Lucas Bergvall,866246,https://www.transfermarkt.com/lucas-bergvall/profil/spieler/866246,Central Midfield,Sweden,20,Tottenham Hotspur,148,€40.00m,40000000,2024
+premier_league,Anthony Elanga,583189,https://www.transfermarkt.com/anthony-elanga/profil/spieler/583189,Right Winger,Sweden,24,Newcastle United,762,€40.00m,40000000,2024
+premier_league,Pedro Porro,553875,https://www.transfermarkt.com/pedro-porro/profil/spieler/553875,Right-Back,Spain,26,Tottenham Hotspur,148,€40.00m,40000000,2024
+premier_league,Bart Verbruggen,565093,https://www.transfermarkt.com/bart-verbruggen/profil/spieler/565093,Goalkeeper,Netherlands,23,Brighton & Hove Albion,1237,€40.00m,40000000,2024
+premier_league,Yankuba Minteh,1012534,https://www.transfermarkt.com/yankuba-minteh/profil/spieler/1012534,Right Winger,The Gambia,21,Brighton & Hove Albion,1237,€40.00m,40000000,2024
+premier_league,Alex Scott,855256,https://www.transfermarkt.com/alex-scott/profil/spieler/855256,Central Midfield,England,22,AFC Bournemouth,989,€40.00m,40000000,2024
+premier_league,Milos Kerkez,730861,https://www.transfermarkt.com/milos-kerkez/profil/spieler/730861,Left-Back,Hungary,22,Liverpool FC,31,€40.00m,40000000,2024
+premier_league,Alejandro Garnacho,811779,https://www.transfermarkt.com/alejandro-garnacho/profil/spieler/811779,Left Winger,Argentina,21,Chelsea FC,631,€40.00m,40000000,2024
+premier_league,Junior Kroupi,955357,https://www.transfermarkt.com/junior-kroupi/profil/spieler/955357,Centre-Forward,France,19,AFC Bournemouth,989,€40.00m,40000000,2024
+premier_league,Maxence Lacroix,434224,https://www.transfermarkt.com/maxence-lacroix/profil/spieler/434224,Centre-Back,France,26,Crystal Palace,873,€40.00m,40000000,2024
+premier_league,Sven Botman,361093,https://www.transfermarkt.com/sven-botman/profil/spieler/361093,Centre-Back,Netherlands,26,Newcastle United,762,€35.00m,35000000,2024
+premier_league,Yéremy Pino,568157,https://www.transfermarkt.com/yeremy-pino/profil/spieler/568157,Right Winger,Spain,23,Crystal Palace,873,€35.00m,35000000,2024
+premier_league,Brennan Johnson,470607,https://www.transfermarkt.com/brennan-johnson/profil/spieler/470607,Right Winger,Wales,24,Crystal Palace,873,€35.00m,35000000,2024
+premier_league,Curtis Jones,433188,https://www.transfermarkt.com/curtis-jones/profil/spieler/433188,Central Midfield,England,25,Liverpool FC,31,€35.00m,35000000,2024
+premier_league,Dan Ndoye,365108,https://www.transfermarkt.com/dan-ndoye/profil/spieler/365108,Right Winger,Switzerland,25,Nottingham Forest,703,€35.00m,35000000,2024
+premier_league,Jeremie Frimpong,484547,https://www.transfermarkt.com/jeremie-frimpong/profil/spieler/484547,Right-Back,Netherlands,25,Liverpool FC,31,€35.00m,35000000,2024
+premier_league,Kevin Schade,473050,https://www.transfermarkt.com/kevin-schade/profil/spieler/473050,Left Winger,Germany,24,Brentford FC,1148,€35.00m,35000000,2024
+la_liga,Lamine Yamal,937958,https://www.transfermarkt.com/lamine-yamal/profil/spieler/937958,Right Winger,Spain,18,FC Barcelona,131,€200.00m,200000000,2024
+la_liga,Kylian Mbappé,342229,https://www.transfermarkt.com/kylian-mbappe/profil/spieler/342229,Centre-Forward,France,27,Real Madrid,418,€200.00m,200000000,2024
+la_liga,Pedri,683840,https://www.transfermarkt.com/pedri/profil/spieler/683840,Central Midfield,Spain,23,FC Barcelona,131,€150.00m,150000000,2024
+la_liga,Vinicius Junior,371998,https://www.transfermarkt.com/vinicius-junior/profil/spieler/371998,Left Winger,Brazil,25,Real Madrid,418,€150.00m,150000000,2024
+la_liga,Jude Bellingham,581678,https://www.transfermarkt.com/jude-bellingham/profil/spieler/581678,Attacking Midfield,England,22,Real Madrid,418,€140.00m,140000000,2024
+la_liga,Federico Valverde,369081,https://www.transfermarkt.com/federico-valverde/profil/spieler/369081,Central Midfield,Uruguay,27,Real Madrid,418,€120.00m,120000000,2024
+la_liga,Fermín López,636703,https://www.transfermarkt.com/fermin-lopez/profil/spieler/636703,Attacking Midfield,Spain,22,FC Barcelona,131,€100.00m,100000000,2024
+la_liga,Julián Alvarez,576024,https://www.transfermarkt.com/julian-alvarez/profil/spieler/576024,Centre-Forward,Argentina,26,Atlético de Madrid,13,€90.00m,90000000,2024
+la_liga,Arda Güler,861410,https://www.transfermarkt.com/arda-guler/profil/spieler/861410,Attacking Midfield,Türkiye,21,Real Madrid,418,€90.00m,90000000,2024
+la_liga,Raphinha,411295,https://www.transfermarkt.com/raphinha/profil/spieler/411295,Left Winger,Brazil,29,FC Barcelona,131,€80.00m,80000000,2024
+la_liga,Pau Cubarsí,962110,https://www.transfermarkt.com/pau-cubarsi/profil/spieler/962110,Centre-Back,Spain,19,FC Barcelona,131,€80.00m,80000000,2024
+la_liga,Aurélien Tchouaméni,413112,https://www.transfermarkt.com/aurelien-tchouameni/profil/spieler/413112,Defensive Midfield,France,26,Real Madrid,418,€75.00m,75000000,2024
+la_liga,Trent Alexander-Arnold,314353,https://www.transfermarkt.com/trent-alexander-arnold/profil/spieler/314353,Right-Back,England,27,Real Madrid,418,€65.00m,65000000,2024
+la_liga,Jules Koundé,411975,https://www.transfermarkt.com/jules-kounde/profil/spieler/411975,Right-Back,France,14,FC Barcelona,131,€65.00m,65000000,2024
+la_liga,Dean Huijsen,890290,https://www.transfermarkt.com/dean-huijsen/profil/spieler/890290,Centre-Back,Spain,15,Real Madrid,418,€65.00m,65000000,2024
+la_liga,Pablo Barrios,775605,https://www.transfermarkt.com/pablo-barrios/profil/spieler/775605,Central Midfield,Spain,16,Atlético de Madrid,13,€60.00m,60000000,2024
+la_liga,Dani Olmo,293385,https://www.transfermarkt.com/dani-olmo/profil/spieler/293385,Attacking Midfield,Spain,17,FC Barcelona,131,€60.00m,60000000,2024
+la_liga,Álvaro Carreras,811778,https://www.transfermarkt.com/alvaro-carreras/profil/spieler/811778,Left-Back,Spain,18,Real Madrid,418,€60.00m,60000000,2024
+la_liga,Alejandro Balde,636688,https://www.transfermarkt.com/alejandro-balde/profil/spieler/636688,Left-Back,Spain,19,FC Barcelona,131,€55.00m,55000000,2024
+la_liga,Nico Williams,709187,https://www.transfermarkt.com/nico-williams/profil/spieler/709187,Left Winger,Spain,20,Athletic Bilbao,621,€50.00m,50000000,2024
+la_liga,Ferran Torres,398184,https://www.transfermarkt.com/ferran-torres/profil/spieler/398184,Centre-Forward,Spain,21,FC Barcelona,131,€50.00m,50000000,2024
+la_liga,Rodrygo,412363,https://www.transfermarkt.com/rodrygo/profil/spieler/412363,Right Winger,Brazil,22,Real Madrid,418,€50.00m,50000000,2024
+la_liga,Eduardo Camavinga,640428,https://www.transfermarkt.com/eduardo-camavinga/profil/spieler/640428,Central Midfield,France,23,Real Madrid,418,€50.00m,50000000,2024
+la_liga,Álex Baena,548111,https://www.transfermarkt.com/alex-baena/profil/spieler/548111,Left Winger,Spain,24,Atlético de Madrid,13,€45.00m,45000000,2024
+la_liga,Frenkie de Jong,326330,https://www.transfermarkt.com/frenkie-de-jong/profil/spieler/326330,Central Midfield,Netherlands,25,FC Barcelona,131,€45.00m,45000000,2024
+la_liga,Franco Mastantuono,1057316,https://www.transfermarkt.com/franco-mastantuono/profil/spieler/1057316,Right Winger,Argentina,26,Real Madrid,418,€45.00m,45000000,2024
+la_liga,Ademola Lookman,406040,https://www.transfermarkt.com/ademola-lookman/profil/spieler/406040,Left Winger,Nigeria,27,Atlético de Madrid,13,€40.00m,40000000,2024
+la_liga,Giuliano Simeone,742201,https://www.transfermarkt.com/giuliano-simeone/profil/spieler/742201,Right Winger,Argentina,28,Atlético de Madrid,13,€40.00m,40000000,2024
+la_liga,Marcus Rashford,258923,https://www.transfermarkt.com/marcus-rashford/profil/spieler/258923,Left Winger,England,29,FC Barcelona,131,€40.00m,40000000,2024
+la_liga,Joan García,561613,https://www.transfermarkt.com/joan-garcia/profil/spieler/561613,Goalkeeper,Spain,30,FC Barcelona,131,€40.00m,40000000,2024
+la_liga,Pape Gueye,485963,https://www.transfermarkt.com/pape-gueye/profil/spieler/485963,Central Midfield,Senegal,31,Villarreal CF,1050,€40.00m,40000000,2024
+la_liga,Alberto Moleiro,733576,https://www.transfermarkt.com/alberto-moleiro/profil/spieler/733576,Left Winger,Spain,32,Villarreal CF,1050,€40.00m,40000000,2024
+la_liga,Antony,602105,https://www.transfermarkt.com/antony/profil/spieler/602105,Right Winger,Brazil,33,Real Betis Balompié,150,€40.00m,40000000,2024
+la_liga,Mikel Jauregizar,938729,https://www.transfermarkt.com/mikel-jauregizar/profil/spieler/938729,Central Midfield,Spain,34,Athletic Bilbao,621,€35.00m,35000000,2024
+la_liga,Dávid Hancko,404418,https://www.transfermarkt.com/david-hancko/profil/spieler/404418,Centre-Back,Slovakia,35,Atlético de Madrid,13,€35.00m,35000000,2024
+la_liga,Oihan Sancet,571020,https://www.transfermarkt.com/oihan-sancet/profil/spieler/571020,Attacking Midfield,Spain,36,Athletic Bilbao,621,€35.00m,35000000,2024
+la_liga,Brahim Díaz,314678,https://www.transfermarkt.com/brahim-diaz/profil/spieler/314678,Right Winger,Morocco,37,Real Madrid,418,€35.00m,35000000,2024
+la_liga,Eric García,466794,https://www.transfermarkt.com/eric-garcia/profil/spieler/466794,Centre-Back,Spain,38,FC Barcelona,131,€35.00m,35000000,2024
+la_liga,Vitor Reis,1005575,https://www.transfermarkt.com/vitor-reis/profil/spieler/1005575,Centre-Back,Brazil,39,Girona FC,12321,€30.00m,30000000,2024
+la_liga,Takefusa Kubo,405398,https://www.transfermarkt.com/takefusa-kubo/profil/spieler/405398,Right Winger,Japan,40,Real Sociedad,681,€30.00m,30000000,2024
+la_liga,Gavi,646740,https://www.transfermarkt.com/gavi/profil/spieler/646740,Central Midfield,Spain,41,FC Barcelona,131,€30.00m,30000000,2024
+la_liga,Marc Bernal,1018920,https://www.transfermarkt.com/marc-bernal/profil/spieler/1018920,Defensive Midfield,Spain,42,FC Barcelona,131,€30.00m,30000000,2024
+la_liga,Abde Ezzalzouli,724520,https://www.transfermarkt.com/abde-ezzalzouli/profil/spieler/724520,Left Winger,Morocco,43,Real Betis Balompié,150,€30.00m,30000000,2024
+la_liga,Gonzalo García,935230,https://www.transfermarkt.com/gonzalo-garcia/profil/spieler/935230,Centre-Forward,Spain,44,Real Madrid,418,€30.00m,30000000,2024
+la_liga,Marc Pubill,844637,https://www.transfermarkt.com/marc-pubill/profil/spieler/844637,Centre-Back,Spain,45,Atlético de Madrid,13,€28.00m,28000000,2024
+la_liga,Georges Mikautadze,729814,https://www.transfermarkt.com/georges-mikautadze/profil/spieler/729814,Centre-Forward,Georgia,25,Villarreal CF,1050,€28.00m,28000000,2024
+la_liga,Mikel Oyarzabal,351478,https://www.transfermarkt.com/mikel-oyarzabal/profil/spieler/351478,Centre-Forward,Spain,29,Real Sociedad,681,€25.00m,25000000,2024
+la_liga,Robin Le Normand,351809,https://www.transfermarkt.com/robin-le-normand/profil/spieler/351809,Centre-Back,Spain,29,Atlético de Madrid,13,€25.00m,25000000,2024
+la_liga,Dani Vivian,524000,https://www.transfermarkt.com/dani-vivian/profil/spieler/524000,Centre-Back,Spain,26,Athletic Bilbao,621,€25.00m,25000000,2024
+la_liga,Gerard Martín,705395,https://www.transfermarkt.com/gerard-martin/profil/spieler/705395,Left-Back,Spain,24,FC Barcelona,131,€25.00m,25000000,2024
+la_liga,Unai Simón,262396,https://www.transfermarkt.com/unai-simon/profil/spieler/262396,Goalkeeper,Spain,28,Athletic Bilbao,621,€25.00m,25000000,2024
+la_liga,Javi Guerra,834764,https://www.transfermarkt.com/javi-guerra/profil/spieler/834764,Central Midfield,Spain,22,Valencia CF,1049,€25.00m,25000000,2024
+la_liga,Jon Gorrotxategi,711374,https://www.transfermarkt.com/jon-gorrotxategi/profil/spieler/711374,Defensive Midfield,Spain,24,Real Sociedad,681,€25.00m,25000000,2024
+la_liga,Renato Veiga,805714,https://www.transfermarkt.com/renato-veiga/profil/spieler/805714,Centre-Back,Portugal,22,Villarreal CF,1050,€25.00m,25000000,2024
+la_liga,Éder Militão,401530,https://www.transfermarkt.com/eder-militao/profil/spieler/401530,Centre-Back,Brazil,28,Real Madrid,418,€25.00m,25000000,2024
+la_liga,Raúl Asencio,935245,https://www.transfermarkt.com/raul-asencio/profil/spieler/935245,Centre-Back,Spain,23,Real Madrid,418,€25.00m,25000000,2024
+la_liga,Natan,735568,https://www.transfermarkt.com/natan/profil/spieler/735568,Centre-Back,Brazil,25,Real Betis Balompié,150,€25.00m,25000000,2024
+la_liga,Carlos Romero,709372,https://www.transfermarkt.com/carlos-romero/profil/spieler/709372,Left-Back,Spain,24,RCD Espanyol Barcelona,714,€25.00m,25000000,2024
+la_liga,Nico González,486031,https://www.transfermarkt.com/nico-gonzalez/profil/spieler/486031,Left Winger,Argentina,28,Atlético de Madrid,13,€24.00m,24000000,2024
+la_liga,Marcos Llorente,282411,https://www.transfermarkt.com/marcos-llorente/profil/spieler/282411,Right-Back,Spain,31,Atlético de Madrid,13,€22.00m,22000000,2024
+la_liga,Johnny Cardoso,689505,https://www.transfermarkt.com/johnny-cardoso/profil/spieler/689505,Central Midfield,United States,24,Atlético de Madrid,13,€22.00m,22000000,2024
+la_liga,Víctor Muñoz,935231,https://www.transfermarkt.com/victor-munoz/profil/spieler/935231,Left Winger,Spain,22,CA Osasuna,331,€20.00m,20000000,2024
+la_liga,Alexander Sørloth,238407,https://www.transfermarkt.com/alexander-sorloth/profil/spieler/238407,Centre-Forward,Norway,30,Atlético de Madrid,13,€20.00m,20000000,2024
+la_liga,Thiago Almada,576028,https://www.transfermarkt.com/thiago-almada/profil/spieler/576028,Left Winger,Argentina,25,Atlético de Madrid,13,€20.00m,20000000,2024
+la_liga,Matteo Ruggeri,616631,https://www.transfermarkt.com/matteo-ruggeri/profil/spieler/616631,Left-Back,Italy,23,Atlético de Madrid,13,€20.00m,20000000,2024
+la_liga,Rodrigo Mendoza,961297,https://www.transfermarkt.com/rodrigo-mendoza/profil/spieler/961297,Central Midfield,Spain,21,Atlético de Madrid,13,€20.00m,20000000,2024
+la_liga,Ronald Araujo,480267,https://www.transfermarkt.com/ronald-araujo/profil/spieler/480267,Centre-Back,Uruguay,27,FC Barcelona,131,€20.00m,20000000,2024
+la_liga,Marc Casadó,636695,https://www.transfermarkt.com/marc-casado/profil/spieler/636695,Defensive Midfield,Spain,22,FC Barcelona,131,€20.00m,20000000,2024
+la_liga,Enzo Boyomo,541555,https://www.transfermarkt.com/enzo-boyomo/profil/spieler/541555,Centre-Back,Cameroon,24,CA Osasuna,331,€20.00m,20000000,2024
+la_liga,Jon Martín,1018938,https://www.transfermarkt.com/jon-martin/profil/spieler/1018938,Centre-Back,Spain,20,Real Sociedad,681,€20.00m,20000000,2024
+la_liga,Thiago Pitarch,1375227,https://www.transfermarkt.com/thiago-pitarch/profil/spieler/1375227,Central Midfield,Spain,18,Real Madrid,418,€20.00m,20000000,2024
+la_liga,Sergi Altimira,466801,https://www.transfermarkt.com/sergi-altimira/profil/spieler/466801,Central Midfield,Spain,24,Real Betis Balompié,150,€20.00m,20000000,2024
+la_liga,Cucho Hernández,459463,https://www.transfermarkt.com/cucho-hernandez/profil/spieler/459463,Centre-Forward,Colombia,27,Real Betis Balompié,150,€18.00m,18000000,2024
+la_liga,Beñat Prados,625047,https://www.transfermarkt.com/benat-prados/profil/spieler/625047,Central Midfield,Spain,25,Athletic Bilbao,621,€18.00m,18000000,2024
+la_liga,Ander Barrenetxea,616369,https://www.transfermarkt.com/ander-barrenetxea/profil/spieler/616369,Left Winger,Spain,24,Real Sociedad,681,€18.00m,18000000,2024
+la_liga,Logan Costa,484988,https://www.transfermarkt.com/logan-costa/profil/spieler/484988,Centre-Back,Cape Verde,25,Villarreal CF,1050,€18.00m,18000000,2024
+la_liga,Andrei Rațiu,527966,https://www.transfermarkt.com/andrei-ratiu/profil/spieler/527966,Right-Back,Romania,27,Rayo Vallecano,367,€18.00m,18000000,2024
+la_liga,Thibaut Courtois,108390,https://www.transfermarkt.com/thibaut-courtois/profil/spieler/108390,Goalkeeper,Belgium,33,Real Madrid,418,€18.00m,18000000,2024
+la_liga,Óscar Mingueza,331505,https://www.transfermarkt.com/oscar-mingueza/profil/spieler/331505,Right-Back,Spain,26,Celta de Vigo,940,€18.00m,18000000,2024
+la_liga,Jan Oblak,121483,https://www.transfermarkt.com/jan-oblak/profil/spieler/121483,Goalkeeper,Slovenia,33,Atlético de Madrid,13,€17.00m,17000000,2024
+la_liga,Fer López,1064471,https://www.transfermarkt.com/fer-lopez/profil/spieler/1064471,Attacking Midfield,Spain,21,Celta de Vigo,940,€16.00m,16000000,2024
+la_liga,Samú Costa,657430,https://www.transfermarkt.com/samu-costa/profil/spieler/657430,Defensive Midfield,Portugal,25,RCD Mallorca,237,€15.00m,15000000,2024
+la_liga,Miguel Román,892932,https://www.transfermarkt.com/miguel-roman/profil/spieler/892932,Central Midfield,Spain,23,Celta de Vigo,940,€15.00m,15000000,2024
+la_liga,Jon Aramburu,661145,https://www.transfermarkt.com/jon-aramburu/profil/spieler/661145,Right-Back,Venezuela,23,Real Sociedad,681,€15.00m,15000000,2024
+la_liga,Juanlu Sánchez,676042,https://www.transfermarkt.com/juanlu-sanchez/profil/spieler/676042,Right-Back,Spain,22,Sevilla FC,368,€15.00m,15000000,2024
+la_liga,Claudio Echeverri,994536,https://www.transfermarkt.com/claudio-echeverri/profil/spieler/994536,Attacking Midfield,Argentina,20,Girona FC,12321,€15.00m,15000000,2024
+la_liga,Roony Bardghji,792331,https://www.transfermarkt.com/roony-bardghji/profil/spieler/792331,Right Winger,Sweden,20,FC Barcelona,131,€15.00m,15000000,2024
+la_liga,Jan Virgili,1301775,https://www.transfermarkt.com/jan-virgili/profil/spieler/1301775,Left Winger,Spain,19,RCD Mallorca,237,€15.00m,15000000,2024
+la_liga,Vladyslav Vanat,631821,https://www.transfermarkt.com/vladyslav-vanat/profil/spieler/631821,Centre-Forward,Ukraine,24,Girona FC,12321,€15.00m,15000000,2024
+la_liga,Nahuel Molina,424042,https://www.transfermarkt.com/nahuel-molina/profil/spieler/424042,Right-Back,Argentina,28,Atlético de Madrid,13,€15.00m,15000000,2024
+la_liga,Aitor Paredes,591916,https://www.transfermarkt.com/aitor-paredes/profil/spieler/591916,Centre-Back,Spain,26,Athletic Bilbao,621,€15.00m,15000000,2024
+la_liga,Sergio Gómez,366930,https://www.transfermarkt.com/sergio-gomez/profil/spieler/366930,Left-Back,Spain,25,Real Sociedad,681,€15.00m,15000000,2024
+la_liga,Javi Rodríguez,1076815,https://www.transfermarkt.com/javi-rodriguez/profil/spieler/1076815,Centre-Back,Spain,22,Celta de Vigo,940,€15.00m,15000000,2024
+la_liga,Andriy Lunin,404839,https://www.transfermarkt.com/andriy-lunin/profil/spieler/404839,Goalkeeper,Ukraine,27,Real Madrid,418,€15.00m,15000000,2024
+la_liga,Julen Agirrezabala,625014,https://www.transfermarkt.com/julen-agirrezabala/profil/spieler/625014,Goalkeeper,Spain,25,Valencia CF,1049,€15.00m,15000000,2024
+la_liga,Omar El Hilali,822331,https://www.transfermarkt.com/omar-el-hilali/profil/spieler/822331,Right-Back,Morocco,22,RCD Espanyol Barcelona,714,€15.00m,15000000,2024
+la_liga,Viktor Tsygankov,264372,https://www.transfermarkt.com/viktor-tsygankov/profil/spieler/264372,Right Winger,Ukraine,28,Girona FC,12321,€15.00m,15000000,2024
+la_liga,Williot Swedberg,764859,https://www.transfermarkt.com/williot-swedberg/profil/spieler/764859,Left Winger,Sweden,22,Celta de Vigo,940,€15.00m,15000000,2024
+la_liga,Álex Remiro,212862,https://www.transfermarkt.com/alex-remiro/profil/spieler/212862,Goalkeeper,Spain,31,Real Sociedad,681,€14.00m,14000000,2024
+la_liga,Brais Méndez,309110,https://www.transfermarkt.com/brais-mendez/profil/spieler/309110,Attacking Midfield,Spain,29,Real Sociedad,681,€12.00m,12000000,2024
+bundesliga,Michael Olise,566723,https://www.transfermarkt.com/michael-olise/profil/spieler/566723,Right Winger,France,24,Bayern Munich,27,€140.00m,140000000,2024
+bundesliga,Jamal Musiala,580195,https://www.transfermarkt.com/jamal-musiala/profil/spieler/580195,Attacking Midfield,Germany,23,Bayern Munich,27,€120.00m,120000000,2024
+bundesliga,Yan Diomande,1390649,https://www.transfermarkt.com/yan-diomande/profil/spieler/1390649,Left Winger,Cote d'Ivoire,19,RB Leipzig,23826,€75.00m,75000000,2024
+bundesliga,Aleksandar Pavlovic,792380,https://www.transfermarkt.com/aleksandar-pavlovic/profil/spieler/792380,Defensive Midfield,Germany,22,Bayern Munich,27,€75.00m,75000000,2024
+bundesliga,Luis Díaz,480692,https://www.transfermarkt.com/luis-diaz/profil/spieler/480692,Left Winger,Colombia,29,Bayern Munich,27,€70.00m,70000000,2024
+bundesliga,Dayot Upamecano,344695,https://www.transfermarkt.com/dayot-upamecano/profil/spieler/344695,Centre-Back,France,27,Bayern Munich,27,€70.00m,70000000,2024
+bundesliga,Harry Kane,132098,https://www.transfermarkt.com/harry-kane/profil/spieler/132098,Centre-Forward,England,32,Bayern Munich,27,€65.00m,65000000,2024
+bundesliga,Lennart Karl,1075147,https://www.transfermarkt.com/lennart-karl/profil/spieler/1075147,Attacking Midfield,Germany,18,Bayern Munich,27,€60.00m,60000000,2024
+bundesliga,Nico Schlotterbeck,388198,https://www.transfermarkt.com/nico-schlotterbeck/profil/spieler/388198,Centre-Back,Germany,26,Borussia Dortmund,16,€55.00m,55000000,2024
+bundesliga,Karim Adeyemi,496094,https://www.transfermarkt.com/karim-adeyemi/profil/spieler/496094,Right Winger,Germany,24,Borussia Dortmund,16,€50.00m,50000000,2024
+bundesliga,Felix Nmecha,406640,https://www.transfermarkt.com/felix-nmecha/profil/spieler/406640,Central Midfield,Germany,25,Borussia Dortmund,16,€50.00m,50000000,2024
+bundesliga,Angelo Stiller,443710,https://www.transfermarkt.com/angelo-stiller/profil/spieler/443710,Defensive Midfield,Germany,25,VfB Stuttgart,79,€45.00m,45000000,2024
+bundesliga,Castello Lukeba,618472,https://www.transfermarkt.com/castello-lukeba/profil/spieler/618472,Centre-Back,France,23,RB Leipzig,23826,€45.00m,45000000,2024
+bundesliga,Alphonso Davies,424204,https://www.transfermarkt.com/alphonso-davies/profil/spieler/424204,Left-Back,Canada,14,Bayern Munich,27,€45.00m,45000000,2024
+bundesliga,Jarell Quansah,632349,https://www.transfermarkt.com/jarell-quansah/profil/spieler/632349,Centre-Back,England,15,Bayer 04 Leverkusen,15,€45.00m,45000000,2024
+bundesliga,Can Uzun,816585,https://www.transfermarkt.com/can-uzun/profil/spieler/816585,Attacking Midfield,Türkiye,16,Eintracht Frankfurt,24,€45.00m,45000000,2024
+bundesliga,Nicolas Jackson,776890,https://www.transfermarkt.com/nicolas-jackson/profil/spieler/776890,Centre-Forward,Senegal,17,Bayern Munich,27,€40.00m,40000000,2024
+bundesliga,Jamie Leweling,518505,https://www.transfermarkt.com/jamie-leweling/profil/spieler/518505,Right Winger,Germany,18,VfB Stuttgart,79,€40.00m,40000000,2024
+bundesliga,Tom Bischof,822959,https://www.transfermarkt.com/tom-bischof/profil/spieler/822959,Central Midfield,Germany,19,Bayern Munich,27,€40.00m,40000000,2024
+bundesliga,Joshua Kimmich,161056,https://www.transfermarkt.com/joshua-kimmich/profil/spieler/161056,Defensive Midfield,Germany,20,Bayern Munich,27,€40.00m,40000000,2024
+bundesliga,Maximilian Beier,578392,https://www.transfermarkt.com/maximilian-beier/profil/spieler/578392,Centre-Forward,Germany,21,Borussia Dortmund,16,€40.00m,40000000,2024
+bundesliga,Serhou Guirassy,270541,https://www.transfermarkt.com/serhou-guirassy/profil/spieler/270541,Centre-Forward,Guinea,22,Borussia Dortmund,16,€40.00m,40000000,2024
+bundesliga,Gregor Kobel,257814,https://www.transfermarkt.com/gregor-kobel/profil/spieler/257814,Goalkeeper,Switzerland,23,Borussia Dortmund,16,€40.00m,40000000,2024
+bundesliga,Christian Kofane,1364454,https://www.transfermarkt.com/christian-kofane/profil/spieler/1364454,Centre-Forward,Cameroon,24,Bayer 04 Leverkusen,15,€40.00m,40000000,2024
+bundesliga,Ibrahim Maza,905011,https://www.transfermarkt.com/ibrahim-maza/profil/spieler/905011,Attacking Midfield,Algeria,25,Bayer 04 Leverkusen,15,€40.00m,40000000,2024
+bundesliga,Bazoumana Touré,1067904,https://www.transfermarkt.com/bazoumana-toure/profil/spieler/1067904,Left Winger,Cote d'Ivoire,26,TSG 1899 Hoffenheim,533,€35.00m,35000000,2024
+bundesliga,Johan Manzambi,927353,https://www.transfermarkt.com/johan-manzambi/profil/spieler/927353,Central Midfield,Switzerland,27,SC Freiburg,60,€35.00m,35000000,2024
+bundesliga,Edmond Tapsoba,564545,https://www.transfermarkt.com/edmond-tapsoba/profil/spieler/564545,Centre-Back,Burkina Faso,28,Bayer 04 Leverkusen,15,€35.00m,35000000,2024
+bundesliga,Josip Stanisic,483046,https://www.transfermarkt.com/josip-stanisic/profil/spieler/483046,Right-Back,Croatia,29,Bayern Munich,27,€35.00m,35000000,2024
+bundesliga,Nathaniel Brown,691892,https://www.transfermarkt.com/nathaniel-brown/profil/spieler/691892,Left-Back,Germany,30,Eintracht Frankfurt,24,€35.00m,35000000,2024
+bundesliga,Jonathan Burkardt,333647,https://www.transfermarkt.com/jonathan-burkardt/profil/spieler/333647,Centre-Forward,Germany,31,Eintracht Frankfurt,24,€35.00m,35000000,2024
+bundesliga,Bilal El Khannouss,654982,https://www.transfermarkt.com/bilal-el-khannouss/profil/spieler/654982,Attacking Midfield,Morocco,32,VfB Stuttgart,79,€32.00m,32000000,2024
+bundesliga,Konrad Laimer,223967,https://www.transfermarkt.com/konrad-laimer/profil/spieler/223967,Right-Back,Austria,33,Bayern Munich,27,€32.00m,32000000,2024
+bundesliga,Hugo Larsson,931838,https://www.transfermarkt.com/hugo-larsson/profil/spieler/931838,Central Midfield,Sweden,34,Eintracht Frankfurt,24,€32.00m,32000000,2024
+bundesliga,Antonio Nusa,894914,https://www.transfermarkt.com/antonio-nusa/profil/spieler/894914,Left Winger,Norway,35,RB Leipzig,23826,€32.00m,32000000,2024
+bundesliga,Rômulo,957874,https://www.transfermarkt.com/romulo/profil/spieler/957874,Centre-Forward,Brazil,36,RB Leipzig,23826,€30.00m,30000000,2024
+bundesliga,Jonathan Tah,196357,https://www.transfermarkt.com/jonathan-tah/profil/spieler/196357,Centre-Back,Germany,37,Bayern Munich,27,€30.00m,30000000,2024
+bundesliga,Exequiel Palacios,401578,https://www.transfermarkt.com/exequiel-palacios/profil/spieler/401578,Central Midfield,Argentina,38,Bayer 04 Leverkusen,15,€30.00m,30000000,2024
+bundesliga,Malik Tillman,467437,https://www.transfermarkt.com/malik-tillman/profil/spieler/467437,Attacking Midfield,United States,39,Bayer 04 Leverkusen,15,€30.00m,30000000,2024
+bundesliga,Jobe Bellingham,796297,https://www.transfermarkt.com/jobe-bellingham/profil/spieler/796297,Central Midfield,England,40,Borussia Dortmund,16,€30.00m,30000000,2024
+bundesliga,Christoph Baumgartner,324278,https://www.transfermarkt.com/christoph-baumgartner/profil/spieler/324278,Attacking Midfield,Austria,41,RB Leipzig,23826,€30.00m,30000000,2024
+bundesliga,Finn Jeltsch,924117,https://www.transfermarkt.com/finn-jeltsch/profil/spieler/924117,Centre-Back,Germany,42,VfB Stuttgart,79,€30.00m,30000000,2024
+bundesliga,Fisnik Asllani,524290,https://www.transfermarkt.com/fisnik-asllani/profil/spieler/524290,Centre-Forward,Kosovo,43,TSG 1899 Hoffenheim,533,€30.00m,30000000,2024
+bundesliga,Fábio Silva,505653,https://www.transfermarkt.com/fabio-silva/profil/spieler/505653,Centre-Forward,Portugal,44,Borussia Dortmund,16,€28.00m,28000000,2024
+bundesliga,Assan Ouédraogo,897424,https://www.transfermarkt.com/assan-ouedraogo/profil/spieler/897424,Central Midfield,Germany,45,RB Leipzig,23826,€28.00m,28000000,2024
+bundesliga,Brajan Gruda,700106,https://www.transfermarkt.com/brajan-gruda/profil/spieler/700106,Attacking Midfield,Germany,21,RB Leipzig,23826,€28.00m,28000000,2024
+bundesliga,Mohamed Amoura,746910,https://www.transfermarkt.com/mohamed-amoura/profil/spieler/746910,Centre-Forward,Algeria,25,VfL Wolfsburg,82,€27.00m,27000000,2024
+bundesliga,Julian Ryerson,370789,https://www.transfermarkt.com/julian-ryerson/profil/spieler/370789,Right-Back,Norway,28,Borussia Dortmund,16,€25.00m,25000000,2024
+bundesliga,Loïc Badé,730581,https://www.transfermarkt.com/loic-bade/profil/spieler/730581,Centre-Back,France,26,Bayer 04 Leverkusen,15,€25.00m,25000000,2024
+bundesliga,Ernest Poku,718303,https://www.transfermarkt.com/ernest-poku/profil/spieler/718303,Right Winger,Netherlands,22,Bayer 04 Leverkusen,15,€25.00m,25000000,2024
+bundesliga,Konstantinos Koulierakis,669380,https://www.transfermarkt.com/konstantinos-koulierakis/profil/spieler/669380,Centre-Back,Greece,22,VfL Wolfsburg,82,€25.00m,25000000,2024
+bundesliga,Kaishu Sano,643574,https://www.transfermarkt.com/kaishu-sano/profil/spieler/643574,Defensive Midfield,Japan,25,1.FSV Mainz 05,39,€25.00m,25000000,2024
+bundesliga,Min-jae Kim,503482,https://www.transfermarkt.com/min-jae-kim/profil/spieler/503482,Centre-Back,"Korea, South",29,Bayern Munich,27,€25.00m,25000000,2024
+bundesliga,Jean-Mattéo Bahoya,939964,https://www.transfermarkt.com/jean-matteo-bahoya/profil/spieler/939964,Left Winger,France,21,Eintracht Frankfurt,24,€25.00m,25000000,2024
+bundesliga,Arnaud Kalimuendo,585959,https://www.transfermarkt.com/arnaud-kalimuendo/profil/spieler/585959,Centre-Forward,France,24,Eintracht Frankfurt,24,€25.00m,25000000,2024
+bundesliga,Leon Avdullahu,667457,https://www.transfermarkt.com/leon-avdullahu/profil/spieler/667457,Defensive Midfield,Kosovo,22,TSG 1899 Hoffenheim,533,€25.00m,25000000,2024
+bundesliga,Alejandro Grimaldo,193082,https://www.transfermarkt.com/alejandro-grimaldo/profil/spieler/193082,Left-Back,Spain,30,Bayer 04 Leverkusen,15,€24.00m,24000000,2024
+bundesliga,Daniel Svensson,579287,https://www.transfermarkt.com/daniel-svensson/profil/spieler/579287,Left-Back,Sweden,24,Borussia Dortmund,16,€22.00m,22000000,2024
+bundesliga,Chrislain Matsima,569383,https://www.transfermarkt.com/chrislain-matsima/profil/spieler/569383,Centre-Back,France,23,FC Augsburg,167,€22.00m,22000000,2024
+bundesliga,Noahkai Banks,923945,https://www.transfermarkt.com/noahkai-banks/profil/spieler/923945,Centre-Back,United States,19,FC Augsburg,167,€22.00m,22000000,2024
+bundesliga,Equi Fernández,664708,https://www.transfermarkt.com/equi-fernandez/profil/spieler/664708,Defensive Midfield,Argentina,23,Bayer 04 Leverkusen,15,€22.00m,22000000,2024
+bundesliga,David Raum,318204,https://www.transfermarkt.com/david-raum/profil/spieler/318204,Left-Back,Germany,28,RB Leipzig,23826,€22.00m,22000000,2024
+bundesliga,Nicolas Seiwald,404950,https://www.transfermarkt.com/nicolas-seiwald/profil/spieler/404950,Defensive Midfield,Austria,25,RB Leipzig,23826,€22.00m,22000000,2024
+bundesliga,Johan Bakayoko,565424,https://www.transfermarkt.com/johan-bakayoko/profil/spieler/565424,Right Winger,Belgium,23,RB Leipzig,23826,€22.00m,22000000,2024
+bundesliga,Ermedin Demirovic,335457,https://www.transfermarkt.com/ermedin-demirovic/profil/spieler/335457,Centre-Forward,Bosnia-Herzegovina,28,VfB Stuttgart,79,€22.00m,22000000,2024
+bundesliga,Karim Coulibaly,1084638,https://www.transfermarkt.com/karim-coulibaly/profil/spieler/1084638,Centre-Back,Germany,18,SV Werder Bremen,86,€22.00m,22000000,2024
+bundesliga,Deniz Undav,339314,https://www.transfermarkt.com/deniz-undav/profil/spieler/339314,Centre-Forward,Germany,29,VfB Stuttgart,79,€22.00m,22000000,2024
+bundesliga,Noah Atubolu,526845,https://www.transfermarkt.com/noah-atubolu/profil/spieler/526845,Goalkeeper,Germany,23,SC Freiburg,60,€20.00m,20000000,2024
+bundesliga,Julian Brandt,187492,https://www.transfermarkt.com/julian-brandt/profil/spieler/187492,Attacking Midfield,Germany,30,Borussia Dortmund,16,€20.00m,20000000,2024
+bundesliga,Albian Hajdari,579459,https://www.transfermarkt.com/albian-hajdari/profil/spieler/579459,Centre-Back,Kosovo,22,TSG 1899 Hoffenheim,533,€20.00m,20000000,2024
+bundesliga,Eliesse Ben Seghir,810895,https://www.transfermarkt.com/eliesse-ben-seghir/profil/spieler/810895,Left Winger,Morocco,21,Bayer 04 Leverkusen,15,€20.00m,20000000,2024
+bundesliga,Serge Gnabry,159471,https://www.transfermarkt.com/serge-gnabry/profil/spieler/159471,Second Striker,Germany,30,Bayern Munich,27,€20.00m,20000000,2024
+bundesliga,Yan Couto,627228,https://www.transfermarkt.com/yan-couto/profil/spieler/627228,Right Midfield,Brazil,23,Borussia Dortmund,16,€20.00m,20000000,2024
+bundesliga,Carney Chukwuemeka,659459,https://www.transfermarkt.com/carney-chukwuemeka/profil/spieler/659459,Central Midfield,Austria,22,Borussia Dortmund,16,€20.00m,20000000,2024
+bundesliga,Conrad Harder,807386,https://www.transfermarkt.com/conrad-harder/profil/spieler/807386,Centre-Forward,Denmark,21,RB Leipzig,23826,€20.00m,20000000,2024
+bundesliga,Aleix García,261504,https://www.transfermarkt.com/aleix-garcia/profil/spieler/261504,Central Midfield,Spain,28,Bayer 04 Leverkusen,15,€20.00m,20000000,2024
+bundesliga,Nnamdi Collins,684315,https://www.transfermarkt.com/nnamdi-collins/profil/spieler/684315,Centre-Back,Germany,22,Eintracht Frankfurt,24,€20.00m,20000000,2024
+bundesliga,Patrik Schick,242086,https://www.transfermarkt.com/patrik-schick/profil/spieler/242086,Centre-Forward,Czech Republic,30,Bayer 04 Leverkusen,15,€20.00m,20000000,2024
+bundesliga,Rocco Reitz,467434,https://www.transfermarkt.com/rocco-reitz/profil/spieler/467434,Central Midfield,Germany,23,Borussia Mönchengladbach,18,€20.00m,20000000,2024
+bundesliga,Arthur Theate,368891,https://www.transfermarkt.com/arthur-theate/profil/spieler/368891,Centre-Back,Belgium,25,Eintracht Frankfurt,24,€20.00m,20000000,2024
+bundesliga,Ritsu Doan,358504,https://www.transfermarkt.com/ritsu-doan/profil/spieler/358504,Right Winger,Japan,27,Eintracht Frankfurt,24,€20.00m,20000000,2024
+bundesliga,Ramon Hendriks,436064,https://www.transfermarkt.com/ramon-hendriks/profil/spieler/436064,Centre-Back,Netherlands,24,VfB Stuttgart,79,€20.00m,20000000,2024
+bundesliga,Wouter Burger,412953,https://www.transfermarkt.com/wouter-burger/profil/spieler/412953,Defensive Midfield,Netherlands,25,TSG 1899 Hoffenheim,533,€20.00m,20000000,2024
+bundesliga,Yuito Suzuki,668606,https://www.transfermarkt.com/yuito-suzuki/profil/spieler/668606,Second Striker,Japan,24,SC Freiburg,60,€18.00m,18000000,2024
+bundesliga,Hiroki Ito,353892,https://www.transfermarkt.com/hiroki-ito/profil/spieler/353892,Centre-Back,Japan,26,Bayern Munich,27,€18.00m,18000000,2024
+bundesliga,Leopold Querfeld,597432,https://www.transfermarkt.com/leopold-querfeld/profil/spieler/597432,Centre-Back,Austria,22,1.FC Union Berlin,89,€18.00m,18000000,2024
+bundesliga,Waldemar Anton,193004,https://www.transfermarkt.com/waldemar-anton/profil/spieler/193004,Centre-Back,Germany,29,Borussia Dortmund,16,€18.00m,18000000,2024
+bundesliga,Maximilian Mittelstädt,282660,https://www.transfermarkt.com/maximilian-mittelstadt/profil/spieler/282660,Left-Back,Germany,29,VfB Stuttgart,79,€18.00m,18000000,2024
+bundesliga,Ezechiel Banzuzi,865682,https://www.transfermarkt.com/ezechiel-banzuzi/profil/spieler/865682,Central Midfield,Netherlands,21,RB Leipzig,23826,€18.00m,18000000,2024
+bundesliga,Nadiem Amiri,232454,https://www.transfermarkt.com/nadiem-amiri/profil/spieler/232454,Central Midfield,Germany,29,1.FSV Mainz 05,39,€17.00m,17000000,2024
+bundesliga,Tim Lemperle,553285,https://www.transfermarkt.com/tim-lemperle/profil/spieler/553285,Centre-Forward,Germany,24,TSG 1899 Hoffenheim,533,€15.00m,15000000,2024
+bundesliga,Tiago Tomás,616344,https://www.transfermarkt.com/tiago-tomas/profil/spieler/616344,Right Winger,Portugal,23,VfB Stuttgart,79,€15.00m,15000000,2024
+bundesliga,Leon Goretzka,153084,https://www.transfermarkt.com/leon-goretzka/profil/spieler/153084,Central Midfield,Germany,31,Bayern Munich,27,€15.00m,15000000,2024
+bundesliga,Patrick Wimmer,533295,https://www.transfermarkt.com/patrick-wimmer/profil/spieler/533295,Right Winger,Austria,24,VfL Wolfsburg,82,€15.00m,15000000,2024
+bundesliga,Nathan Tella,340322,https://www.transfermarkt.com/nathan-tella/profil/spieler/340322,Right Winger,Nigeria,26,Bayer 04 Leverkusen,15,€15.00m,15000000,2024
+bundesliga,Paul Nebel,503160,https://www.transfermarkt.com/paul-nebel/profil/spieler/503160,Attacking Midfield,Germany,23,1.FSV Mainz 05,39,€15.00m,15000000,2024
+bundesliga,Alexis Claude-Maurice,384593,https://www.transfermarkt.com/alexis-claude-maurice/profil/spieler/384593,Attacking Midfield,France,27,FC Augsburg,167,€15.00m,15000000,2024
+bundesliga,Farès Chaïbi,855015,https://www.transfermarkt.com/fares-chaibi/profil/spieler/855015,Attacking Midfield,Algeria,23,Eintracht Frankfurt,24,€15.00m,15000000,2024
+bundesliga,Jonas Urbig,607720,https://www.transfermarkt.com/jonas-urbig/profil/spieler/607720,Goalkeeper,Germany,22,Bayern Munich,27,€15.00m,15000000,2024
+bundesliga,Robin Koch,328784,https://www.transfermarkt.com/robin-koch/profil/spieler/328784,Centre-Back,Germany,29,Eintracht Frankfurt,24,€15.00m,15000000,2024
+serie_a,Lautaro Martínez,406625,https://www.transfermarkt.com/lautaro-martinez/profil/spieler/406625,Centre-Forward,Argentina,28,Inter Milan,46,€85.00m,85000000,2024
+serie_a,Kenan Yıldız,845654,https://www.transfermarkt.com/kenan-yildiz/profil/spieler/845654,Left Winger,Türkiye,21,Juventus FC,506,€75.00m,75000000,2024
+serie_a,Alessandro Bastoni,315853,https://www.transfermarkt.com/alessandro-bastoni/profil/spieler/315853,Centre-Back,Italy,27,Inter Milan,46,€70.00m,70000000,2024
+serie_a,Nico Paz,948294,https://www.transfermarkt.com/nico-paz/profil/spieler/948294,Attacking Midfield,Argentina,21,Como 1907,1047,€65.00m,65000000,2024
+serie_a,Rafael Leão,357164,https://www.transfermarkt.com/rafael-leao/profil/spieler/357164,Left Winger,Portugal,26,AC Milan,5,€65.00m,65000000,2024
+serie_a,Christian Pulisic,315779,https://www.transfermarkt.com/christian-pulisic/profil/spieler/315779,Right Winger,United States,27,AC Milan,5,€50.00m,50000000,2024
+serie_a,Rasmus Højlund,610442,https://www.transfermarkt.com/rasmus-hojlund/profil/spieler/610442,Centre-Forward,Denmark,23,SSC Napoli,6195,€50.00m,50000000,2024
+serie_a,Manu Koné,624690,https://www.transfermarkt.com/manu-kone/profil/spieler/624690,Central Midfield,France,24,AS Roma,12,€50.00m,50000000,2024
+serie_a,Federico Dimarco,198116,https://www.transfermarkt.com/federico-dimarco/profil/spieler/198116,Left-Back,Italy,28,Inter Milan,46,€50.00m,50000000,2024
+serie_a,Nicolò Barella,255942,https://www.transfermarkt.com/nicolo-barella/profil/spieler/255942,Central Midfield,Italy,29,Inter Milan,46,€50.00m,50000000,2024
+serie_a,Marcus Thuram,318528,https://www.transfermarkt.com/marcus-thuram/profil/spieler/318528,Centre-Forward,France,28,Inter Milan,46,€50.00m,50000000,2024
+serie_a,Pio Esposito,930781,https://www.transfermarkt.com/pio-esposito/profil/spieler/930781,Centre-Forward,Italy,20,Inter Milan,46,€45.00m,45000000,2024
+serie_a,Scott McTominay,315969,https://www.transfermarkt.com/scott-mctominay/profil/spieler/315969,Central Midfield,Scotland,29,SSC Napoli,6195,€45.00m,45000000,2024
+serie_a,Éderson,607854,https://www.transfermarkt.com/ederson/profil/spieler/607854,Central Midfield,Brazil,14,Atalanta BC,800,€40.00m,40000000,2024
+serie_a,Moise Kean,364135,https://www.transfermarkt.com/moise-kean/profil/spieler/364135,Centre-Forward,Italy,15,ACF Fiorentina,430,€40.00m,40000000,2024
+serie_a,Wesley,964580,https://www.transfermarkt.com/wesley/profil/spieler/964580,Right-Back,Brazil,16,AS Roma,12,€40.00m,40000000,2024
+serie_a,Yann Bisseck,441986,https://www.transfermarkt.com/yann-bisseck/profil/spieler/441986,Centre-Back,Germany,17,Inter Milan,46,€40.00m,40000000,2024
+serie_a,Khéphren Thuram,463618,https://www.transfermarkt.com/khephren-thuram/profil/spieler/463618,Central Midfield,France,18,Juventus FC,506,€40.00m,40000000,2024
+serie_a,Santiago Castro,849520,https://www.transfermarkt.com/santiago-castro/profil/spieler/849520,Centre-Forward,Argentina,19,Bologna FC 1909,1025,€35.00m,35000000,2024
+serie_a,Strahinja Pavlović,574671,https://www.transfermarkt.com/strahinja-pavlovic/profil/spieler/574671,Centre-Back,Serbia,20,AC Milan,5,€35.00m,35000000,2024
+serie_a,Charles De Ketelaere,435772,https://www.transfermarkt.com/charles-de-ketelaere/profil/spieler/435772,Attacking Midfield,Belgium,21,Atalanta BC,800,€35.00m,35000000,2024
+serie_a,Donyell Malen,326029,https://www.transfermarkt.com/donyell-malen/profil/spieler/326029,Centre-Forward,Netherlands,22,AS Roma,12,€35.00m,35000000,2024
+serie_a,Mile Svilar,338670,https://www.transfermarkt.com/mile-svilar/profil/spieler/338670,Goalkeeper,Serbia,23,AS Roma,12,€35.00m,35000000,2024
+serie_a,Evan Ndicka,371149,https://www.transfermarkt.com/evan-ndicka/profil/spieler/371149,Centre-Back,Cote d'Ivoire,24,AS Roma,12,€35.00m,35000000,2024
+serie_a,Dušan Vlahović,357498,https://www.transfermarkt.com/dusan-vlahovic/profil/spieler/357498,Centre-Forward,Serbia,25,Juventus FC,506,€35.00m,35000000,2024
+serie_a,Matías Soulé,668951,https://www.transfermarkt.com/matias-soule/profil/spieler/668951,Right Winger,Argentina,26,AS Roma,12,€35.00m,35000000,2024
+serie_a,Jonathan David,533738,https://www.transfermarkt.com/jonathan-david/profil/spieler/533738,Centre-Forward,Canada,27,Juventus FC,506,€35.00m,35000000,2024
+serie_a,Bremer,516716,https://www.transfermarkt.com/bremer/profil/spieler/516716,Centre-Back,Brazil,28,Juventus FC,506,€35.00m,35000000,2024
+serie_a,Ange-Yoan Bonny,827734,https://www.transfermarkt.com/ange-yoan-bonny/profil/spieler/827734,Centre-Forward,Cote d'Ivoire,29,Inter Milan,46,€35.00m,35000000,2024
+serie_a,Alessandro Buongiorno,386446,https://www.transfermarkt.com/alessandro-buongiorno/profil/spieler/386446,Centre-Back,Italy,30,SSC Napoli,6195,€35.00m,35000000,2024
+serie_a,Pierre Kalulu,585949,https://www.transfermarkt.com/pierre-kalulu/profil/spieler/585949,Centre-Back,France,31,Juventus FC,506,€32.00m,32000000,2024
+serie_a,Loïs Openda,368887,https://www.transfermarkt.com/lois-openda/profil/spieler/368887,Centre-Forward,Belgium,32,Juventus FC,506,€32.00m,32000000,2024
+serie_a,Máximo Perrone,668547,https://www.transfermarkt.com/maximo-perrone/profil/spieler/668547,Defensive Midfield,Argentina,33,Como 1907,1047,€30.00m,30000000,2024
+serie_a,Assane Diao,1061282,https://www.transfermarkt.com/assane-diao/profil/spieler/1061282,Left Winger,Senegal,34,Como 1907,1047,€30.00m,30000000,2024
+serie_a,Jesús Rodríguez,1190411,https://www.transfermarkt.com/jesus-rodriguez/profil/spieler/1190411,Left Winger,Spain,35,Como 1907,1047,€30.00m,30000000,2024
+serie_a,Ardon Jashari,608172,https://www.transfermarkt.com/ardon-jashari/profil/spieler/608172,Defensive Midfield,Switzerland,36,AC Milan,5,€30.00m,30000000,2024
+serie_a,Mario Gila,618341,https://www.transfermarkt.com/mario-gila/profil/spieler/618341,Centre-Back,Spain,37,SS Lazio,398,€30.00m,30000000,2024
+serie_a,Giorgio Scalvini,571604,https://www.transfermarkt.com/giorgio-scalvini/profil/spieler/571604,Centre-Back,Italy,38,Atalanta BC,800,€30.00m,30000000,2024
+serie_a,Marco Palestra,895937,https://www.transfermarkt.com/marco-palestra/profil/spieler/895937,Right-Back,Italy,39,Cagliari Calcio,1390,€30.00m,30000000,2024
+serie_a,Weston McKennie,332697,https://www.transfermarkt.com/weston-mckennie/profil/spieler/332697,Central Midfield,United States,40,Juventus FC,506,€30.00m,30000000,2024
+serie_a,Francisco Conceição,487474,https://www.transfermarkt.com/francisco-conceicao/profil/spieler/487474,Right Winger,Portugal,41,Juventus FC,506,€30.00m,30000000,2024
+serie_a,Petar Sučić,668207,https://www.transfermarkt.com/petar-sucic/profil/spieler/668207,Central Midfield,Croatia,42,Inter Milan,46,€30.00m,30000000,2024
+serie_a,Andrea Cambiaso,459658,https://www.transfermarkt.com/andrea-cambiaso/profil/spieler/459658,Left-Back,Italy,43,Juventus FC,506,€30.00m,30000000,2024
+serie_a,Christopher Nkunku,344381,https://www.transfermarkt.com/christopher-nkunku/profil/spieler/344381,Centre-Forward,France,44,AC Milan,5,€28.00m,28000000,2024
+serie_a,David Neres,469822,https://www.transfermarkt.com/david-neres/profil/spieler/469822,Right Winger,Brazil,45,SSC Napoli,6195,€28.00m,28000000,2024
+serie_a,Carlos Augusto,585982,https://www.transfermarkt.com/carlos-augusto/profil/spieler/585982,Left-Back,Brazil,27,Inter Milan,46,€26.00m,26000000,2024
+serie_a,Jhon Lucumí,413565,https://www.transfermarkt.com/jhon-lucumi/profil/spieler/413565,Centre-Back,Colombia,27,Bologna FC 1909,1025,€25.00m,25000000,2024
+serie_a,Mike Maignan,182906,https://www.transfermarkt.com/mike-maignan/profil/spieler/182906,Goalkeeper,France,30,AC Milan,5,€25.00m,25000000,2024
+serie_a,Jacobo Ramón,948278,https://www.transfermarkt.com/jacobo-ramon/profil/spieler/948278,Centre-Back,Spain,21,Como 1907,1047,€25.00m,25000000,2024
+serie_a,Alexis Saelemaekers,381950,https://www.transfermarkt.com/alexis-saelemaekers/profil/spieler/381950,Right Midfield,Belgium,26,AC Milan,5,€25.00m,25000000,2024
+serie_a,Samuele Ricci,467992,https://www.transfermarkt.com/samuele-ricci/profil/spieler/467992,Defensive Midfield,Italy,24,AC Milan,5,€25.00m,25000000,2024
+serie_a,Youssouf Fofana,569598,https://www.transfermarkt.com/youssouf-fofana/profil/spieler/569598,Defensive Midfield,France,27,AC Milan,5,€25.00m,25000000,2024
+serie_a,Honest Ahanor,1077175,https://www.transfermarkt.com/honest-ahanor/profil/spieler/1077175,Centre-Back,Italy,18,Atalanta BC,800,€25.00m,25000000,2024
+serie_a,Sam Beukema,433984,https://www.transfermarkt.com/sam-beukema/profil/spieler/433984,Centre-Back,Netherlands,27,SSC Napoli,6195,€25.00m,25000000,2024
+serie_a,Marco Carnesecchi,459763,https://www.transfermarkt.com/marco-carnesecchi/profil/spieler/459763,Goalkeeper,Italy,25,Atalanta BC,800,€25.00m,25000000,2024
+serie_a,Manuel Locatelli,265088,https://www.transfermarkt.com/manuel-locatelli/profil/spieler/265088,Defensive Midfield,Italy,28,Juventus FC,506,€25.00m,25000000,2024
+serie_a,Nikola Krstović,434433,https://www.transfermarkt.com/nikola-krstovic/profil/spieler/434433,Centre-Forward,Montenegro,26,Atalanta BC,800,€25.00m,25000000,2024
+serie_a,Gianluca Scamacca,315867,https://www.transfermarkt.com/gianluca-scamacca/profil/spieler/315867,Centre-Forward,Italy,27,Atalanta BC,800,€25.00m,25000000,2024
+serie_a,Evan Ferguson,648046,https://www.transfermarkt.com/evan-ferguson/profil/spieler/648046,Centre-Forward,Ireland,21,AS Roma,12,€25.00m,25000000,2024
+serie_a,Denzel Dumfries,321528,https://www.transfermarkt.com/denzel-dumfries/profil/spieler/321528,Right-Back,Netherlands,30,Inter Milan,46,€25.00m,25000000,2024
+serie_a,Martin Baturina,580451,https://www.transfermarkt.com/martin-baturina/profil/spieler/580451,Attacking Midfield,Croatia,23,Como 1907,1047,€24.00m,24000000,2024
+serie_a,Pietro Comuzzo,746712,https://www.transfermarkt.com/pietro-comuzzo/profil/spieler/746712,Centre-Back,Italy,21,ACF Fiorentina,430,€23.00m,23000000,2024
+serie_a,Nicolò Rovella,525704,https://www.transfermarkt.com/nicolo-rovella/profil/spieler/525704,Defensive Midfield,Italy,24,SS Lazio,398,€23.00m,23000000,2024
+serie_a,Luis Henrique,691316,https://www.transfermarkt.com/luis-henrique/profil/spieler/691316,Right Midfield,Brazil,24,Inter Milan,46,€23.00m,23000000,2024
+serie_a,Koni De Winter,490384,https://www.transfermarkt.com/koni-de-winter/profil/spieler/490384,Centre-Back,Belgium,23,AC Milan,5,€23.00m,23000000,2024
+serie_a,Davide Bartesaghi,887638,https://www.transfermarkt.com/davide-bartesaghi/profil/spieler/887638,Left-Back,Italy,20,AC Milan,5,€23.00m,23000000,2024
+serie_a,Davide Frattesi,394300,https://www.transfermarkt.com/davide-frattesi/profil/spieler/394300,Central Midfield,Italy,26,Inter Milan,46,€22.00m,22000000,2024
+serie_a,Isak Hien,503075,https://www.transfermarkt.com/isak-hien/profil/spieler/503075,Centre-Back,Sweden,27,Atalanta BC,800,€22.00m,22000000,2024
+serie_a,Giacomo Raspadori,405885,https://www.transfermarkt.com/giacomo-raspadori/profil/spieler/405885,Second Striker,Italy,26,Atalanta BC,800,€22.00m,22000000,2024
+serie_a,Jonathan Rowe,672381,https://www.transfermarkt.com/jonathan-rowe/profil/spieler/672381,Left Winger,England,23,Bologna FC 1909,1025,€20.00m,20000000,2024
+serie_a,Lloyd Kelly,480116,https://www.transfermarkt.com/lloyd-kelly/profil/spieler/480116,Centre-Back,England,27,Juventus FC,506,€20.00m,20000000,2024
+serie_a,Lucas Da Cunha,495667,https://www.transfermarkt.com/lucas-da-cunha/profil/spieler/495667,Central Midfield,France,24,Como 1907,1047,€20.00m,20000000,2024
+serie_a,Adrien Rabiot,182913,https://www.transfermarkt.com/adrien-rabiot/profil/spieler/182913,Central Midfield,France,31,AC Milan,5,€20.00m,20000000,2024
+serie_a,Jayden Addai,747720,https://www.transfermarkt.com/jayden-addai/profil/spieler/747720,Right Winger,Netherlands,20,Como 1907,1047,€20.00m,20000000,2024
+serie_a,Fikayo Tomori,303254,https://www.transfermarkt.com/fikayo-tomori/profil/spieler/303254,Centre-Back,England,28,AC Milan,5,€20.00m,20000000,2024
+serie_a,Matteo Gabbia,323167,https://www.transfermarkt.com/matteo-gabbia/profil/spieler/323167,Centre-Back,Italy,26,AC Milan,5,€20.00m,20000000,2024
+serie_a,Kenneth Taylor,470394,https://www.transfermarkt.com/kenneth-taylor/profil/spieler/470394,Central Midfield,Netherlands,23,SS Lazio,398,€20.00m,20000000,2024
+serie_a,Santiago Gimenez,552955,https://www.transfermarkt.com/santiago-gimenez/profil/spieler/552955,Centre-Forward,Mexico,25,AC Milan,5,€20.00m,20000000,2024
+serie_a,Nicola Zalewski,550108,https://www.transfermarkt.com/nicola-zalewski/profil/spieler/550108,Left Midfield,Poland,24,Atalanta BC,800,€20.00m,20000000,2024
+serie_a,Oumar Solet,463665,https://www.transfermarkt.com/oumar-solet/profil/spieler/463665,Centre-Back,France,26,Udinese Calcio,410,€20.00m,20000000,2024
+serie_a,Teun Koopmeiners,360518,https://www.transfermarkt.com/teun-koopmeiners/profil/spieler/360518,Defensive Midfield,Netherlands,28,Juventus FC,506,€20.00m,20000000,2024
+serie_a,Niccolò Pisilli,813137,https://www.transfermarkt.com/niccolo-pisilli/profil/spieler/813137,Central Midfield,Italy,21,AS Roma,12,€20.00m,20000000,2024
+serie_a,Neil El Aynaoui,901019,https://www.transfermarkt.com/neil-el-aynaoui/profil/spieler/901019,Central Midfield,Morocco,24,AS Roma,12,€20.00m,20000000,2024
+serie_a,Billy Gilmour,423744,https://www.transfermarkt.com/billy-gilmour/profil/spieler/423744,Defensive Midfield,Scotland,24,SSC Napoli,6195,€20.00m,20000000,2024
+serie_a,Frank Anguissa,354361,https://www.transfermarkt.com/frank-anguissa/profil/spieler/354361,Central Midfield,Cameroon,30,SSC Napoli,6195,€20.00m,20000000,2024
+serie_a,Zion Suzuki,432298,https://www.transfermarkt.com/zion-suzuki/profil/spieler/432298,Goalkeeper,Japan,23,Parma Calcio 1913,130,€20.00m,20000000,2024
+serie_a,Vanja Milinković-Savić,257474,https://www.transfermarkt.com/vanja-milinkovic-savic/profil/spieler/257474,Goalkeeper,Serbia,29,SSC Napoli,6195,€20.00m,20000000,2024
+serie_a,Manuel Akanji,284730,https://www.transfermarkt.com/manuel-akanji/profil/spieler/284730,Centre-Back,Switzerland,30,Inter Milan,46,€18.00m,18000000,2024
+serie_a,Robinio Vaz,1131161,https://www.transfermarkt.com/robinio-vaz/profil/spieler/1131161,Centre-Forward,France,19,AS Roma,12,€18.00m,18000000,2024
+serie_a,Morten Frendrup,503871,https://www.transfermarkt.com/morten-frendrup/profil/spieler/503871,Defensive Midfield,Denmark,25,Genoa CFC,252,€18.00m,18000000,2024
+serie_a,Kamaldeen Sulemana,746695,https://www.transfermarkt.com/kamaldeen-sulemana/profil/spieler/746695,Left Winger,Ghana,24,Atalanta BC,800,€18.00m,18000000,2024
+serie_a,Odilon Kossounou,644771,https://www.transfermarkt.com/odilon-kossounou/profil/spieler/644771,Centre-Back,Cote d'Ivoire,25,Atalanta BC,800,€18.00m,18000000,2024
+serie_a,Andy Diouf,711976,https://www.transfermarkt.com/andy-diouf/profil/spieler/711976,Central Midfield,France,22,Inter Milan,46,€18.00m,18000000,2024
+serie_a,Yunus Musah,503991,https://www.transfermarkt.com/yunus-musah/profil/spieler/503991,Central Midfield,United States,23,Atalanta BC,800,€18.00m,18000000,2024
+serie_a,Dodô,401529,https://www.transfermarkt.com/dodo/profil/spieler/401529,Right-Back,Brazil,27,ACF Fiorentina,430,€18.00m,18000000,2024
+serie_a,Hakan Çalhanoğlu,126414,https://www.transfermarkt.com/hakan-calhanoglu/profil/spieler/126414,Defensive Midfield,Türkiye,32,Inter Milan,46,€18.00m,18000000,2024
+serie_a,Riccardo Orsolini,368482,https://www.transfermarkt.com/riccardo-orsolini/profil/spieler/368482,Right Winger,Italy,29,Bologna FC 1909,1025,€18.00m,18000000,2024
+serie_a,Raoul Bellanova,357992,https://www.transfermarkt.com/raoul-bellanova/profil/spieler/357992,Right Midfield,Italy,25,Atalanta BC,800,€18.00m,18000000,2024
+serie_a,Lewis Ferguson,428563,https://www.transfermarkt.com/lewis-ferguson/profil/spieler/428563,Central Midfield,Scotland,26,Bologna FC 1909,1025,€18.00m,18000000,2024
+serie_a,Mandela Keita,707844,https://www.transfermarkt.com/mandela-keita/profil/spieler/707844,Defensive Midfield,Belgium,23,Parma Calcio 1913,130,€18.00m,18000000,2024
+ligue_1,Vitinha,487469,https://www.transfermarkt.com/vitinha/profil/spieler/487469,Defensive Midfield,Portugal,26,Paris Saint-Germain,583,€110.00m,110000000,2024
+ligue_1,João Neves,670681,https://www.transfermarkt.com/joao-neves/profil/spieler/670681,Central Midfield,Portugal,21,Paris Saint-Germain,583,€110.00m,110000000,2024
+ligue_1,Ousmane Dembélé,288230,https://www.transfermarkt.com/ousmane-dembele/profil/spieler/288230,Centre-Forward,France,28,Paris Saint-Germain,583,€100.00m,100000000,2024
+ligue_1,Khvicha Kvaratskhelia,502670,https://www.transfermarkt.com/khvicha-kvaratskhelia/profil/spieler/502670,Left Winger,Georgia,25,Paris Saint-Germain,583,€90.00m,90000000,2024
+ligue_1,Désiré Doué,914562,https://www.transfermarkt.com/desire-doue/profil/spieler/914562,Right Winger,France,20,Paris Saint-Germain,583,€90.00m,90000000,2024
+ligue_1,Achraf Hakimi,398073,https://www.transfermarkt.com/achraf-hakimi/profil/spieler/398073,Right-Back,Morocco,27,Paris Saint-Germain,583,€80.00m,80000000,2024
+ligue_1,Nuno Mendes,616341,https://www.transfermarkt.com/nuno-mendes/profil/spieler/616341,Left-Back,Portugal,23,Paris Saint-Germain,583,€75.00m,75000000,2024
+ligue_1,Willian Pacho,661171,https://www.transfermarkt.com/willian-pacho/profil/spieler/661171,Centre-Back,Ecuador,24,Paris Saint-Germain,583,€70.00m,70000000,2024
+ligue_1,Bradley Barcola,708265,https://www.transfermarkt.com/bradley-barcola/profil/spieler/708265,Left Winger,France,23,Paris Saint-Germain,583,€70.00m,70000000,2024
+ligue_1,Warren Zaïre-Emery,810092,https://www.transfermarkt.com/warren-zaire-emery/profil/spieler/810092,Central Midfield,France,20,Paris Saint-Germain,583,€60.00m,60000000,2024
+ligue_1,Mason Greenwood,532826,https://www.transfermarkt.com/mason-greenwood/profil/spieler/532826,Right Winger,England,24,Olympique Marseille,244,€55.00m,55000000,2024
+ligue_1,Jérémy Jacquet,1004301,https://www.transfermarkt.com/jeremy-jacquet/profil/spieler/1004301,Centre-Back,France,20,Stade Rennais FC,273,€55.00m,55000000,2024
+ligue_1,Maghnes Akliouche,745200,https://www.transfermarkt.com/maghnes-akliouche/profil/spieler/745200,Right Winger,France,24,AS Monaco,162,€50.00m,50000000,2024
+ligue_1,Ayyoub Bouaddi,1097139,https://www.transfermarkt.com/ayyoub-bouaddi/profil/spieler/1097139,Central Midfield,France,14,LOSC Lille,1082,€50.00m,50000000,2024
+ligue_1,Ilya Zabarnyi,659089,https://www.transfermarkt.com/ilya-zabarnyi/profil/spieler/659089,Centre-Back,Ukraine,15,Paris Saint-Germain,583,€45.00m,45000000,2024
+ligue_1,Ethan Nwaneri,890719,https://www.transfermarkt.com/ethan-nwaneri/profil/spieler/890719,Attacking Midfield,England,16,Olympique Marseille,244,€40.00m,40000000,2024
+ligue_1,Senny Mayulu,903693,https://www.transfermarkt.com/senny-mayulu/profil/spieler/903693,Central Midfield,France,17,Paris Saint-Germain,583,€40.00m,40000000,2024
+ligue_1,Fabián Ruiz,350219,https://www.transfermarkt.com/fabian-ruiz/profil/spieler/350219,Central Midfield,Spain,18,Paris Saint-Germain,583,€40.00m,40000000,2024
+ligue_1,Joaquín Panichelli,1064871,https://www.transfermarkt.com/joaquin-panichelli/profil/spieler/1064871,Centre-Forward,Argentina,19,RC Strasbourg Alsace,667,€35.00m,35000000,2024
+ligue_1,Lamine Camara,918969,https://www.transfermarkt.com/lamine-camara/profil/spieler/918969,Central Midfield,Senegal,20,AS Monaco,162,€35.00m,35000000,2024
+ligue_1,Gonçalo Ramos,550550,https://www.transfermarkt.com/goncalo-ramos/profil/spieler/550550,Centre-Forward,Portugal,21,Paris Saint-Germain,583,€35.00m,35000000,2024
+ligue_1,Valentín Barco,849410,https://www.transfermarkt.com/valentin-barco/profil/spieler/849410,Central Midfield,Argentina,22,RC Strasbourg Alsace,667,€35.00m,35000000,2024
+ligue_1,Igor Paixão,653610,https://www.transfermarkt.com/igor-paixao/profil/spieler/653610,Left Winger,Brazil,23,Olympique Marseille,244,€35.00m,35000000,2024
+ligue_1,Endrick,971570,https://www.transfermarkt.com/endrick/profil/spieler/971570,Centre-Forward,Brazil,24,Olympique Lyon,1041,€35.00m,35000000,2024
+ligue_1,Lucas Chevalier,463600,https://www.transfermarkt.com/lucas-chevalier/profil/spieler/463600,Goalkeeper,France,25,Paris Saint-Germain,583,€30.00m,30000000,2024
+ligue_1,Folarin Balogun,503770,https://www.transfermarkt.com/folarin-balogun/profil/spieler/503770,Centre-Forward,United States,26,AS Monaco,162,€30.00m,30000000,2024
+ligue_1,Marquinhos,181767,https://www.transfermarkt.com/marquinhos/profil/spieler/181767,Centre-Back,Brazil,27,Paris Saint-Germain,583,€30.00m,30000000,2024
+ligue_1,Malick Fofana,743386,https://www.transfermarkt.com/malick-fofana/profil/spieler/743386,Left Winger,Belgium,28,Olympique Lyon,1041,€30.00m,30000000,2024
+ligue_1,Matías Fernández-Pardo,724129,https://www.transfermarkt.com/matias-fernandez-pardo/profil/spieler/724129,Centre-Forward,Spain,29,LOSC Lille,1082,€30.00m,30000000,2024
+ligue_1,Mamadou Sangaré,808348,https://www.transfermarkt.com/mamadou-sangare/profil/spieler/808348,Central Midfield,Mali,30,RC Lens,826,€30.00m,30000000,2024
+ligue_1,Ibrahim Mbaye,1185888,https://www.transfermarkt.com/ibrahim-mbaye/profil/spieler/1185888,Right Winger,Senegal,31,Paris Saint-Germain,583,€30.00m,30000000,2024
+ligue_1,Kang-in Lee,557149,https://www.transfermarkt.com/kang-in-lee/profil/spieler/557149,Attacking Midfield,"Korea, South",32,Paris Saint-Germain,583,€28.00m,28000000,2024
+ligue_1,Amine Gouiri,418659,https://www.transfermarkt.com/amine-gouiri/profil/spieler/418659,Centre-Forward,Algeria,33,Olympique Marseille,244,€28.00m,28000000,2024
+ligue_1,Emmanuel Emegha,559328,https://www.transfermarkt.com/emmanuel-emegha/profil/spieler/559328,Centre-Forward,Netherlands,34,RC Strasbourg Alsace,667,€28.00m,28000000,2024
+ligue_1,Tylel Tati,1241207,https://www.transfermarkt.com/tylel-tati/profil/spieler/1241207,Centre-Back,France,35,FC Nantes,995,€25.00m,25000000,2024
+ligue_1,Denis Zakaria,334526,https://www.transfermarkt.com/denis-zakaria/profil/spieler/334526,Defensive Midfield,Switzerland,36,AS Monaco,162,€25.00m,25000000,2024
+ligue_1,Simon Adingra,658536,https://www.transfermarkt.com/simon-adingra/profil/spieler/658536,Left Winger,Cote d'Ivoire,37,AS Monaco,162,€25.00m,25000000,2024
+ligue_1,Quinten Timber,420213,https://www.transfermarkt.com/quinten-timber/profil/spieler/420213,Central Midfield,Netherlands,38,Olympique Marseille,244,€25.00m,25000000,2024
+ligue_1,Tyler Morton,618494,https://www.transfermarkt.com/tyler-morton/profil/spieler/618494,Defensive Midfield,England,39,Olympique Lyon,1041,€25.00m,25000000,2024
+ligue_1,Diego Moreira,655006,https://www.transfermarkt.com/diego-moreira/profil/spieler/655006,Left Midfield,Belgium,40,RC Strasbourg Alsace,667,€25.00m,25000000,2024
+ligue_1,Charlie Cresswell,597659,https://www.transfermarkt.com/charlie-cresswell/profil/spieler/597659,Centre-Back,England,41,FC Toulouse,415,€25.00m,25000000,2024
+ligue_1,Samson Baidoo,655217,https://www.transfermarkt.com/samson-baidoo/profil/spieler/655217,Centre-Back,Austria,42,RC Lens,826,€25.00m,25000000,2024
+ligue_1,Robin Risser,743515,https://www.transfermarkt.com/robin-risser/profil/spieler/743515,Goalkeeper,France,43,RC Lens,826,€25.00m,25000000,2024
+ligue_1,Mike Penders,834397,https://www.transfermarkt.com/mike-penders/profil/spieler/834397,Goalkeeper,Belgium,44,RC Strasbourg Alsace,667,€22.00m,22000000,2024
+ligue_1,Arthur Vermeeren,926694,https://www.transfermarkt.com/arthur-vermeeren/profil/spieler/926694,Defensive Midfield,Belgium,45,Olympique Marseille,244,€22.00m,22000000,2024
+ligue_1,Julio Enciso,660867,https://www.transfermarkt.com/julio-enciso/profil/spieler/660867,Attacking Midfield,Paraguay,22,RC Strasbourg Alsace,667,€22.00m,22000000,2024
+ligue_1,Hákon Arnar Haraldsson,652275,https://www.transfermarkt.com/hakon-arnar-haraldsson/profil/spieler/652275,Attacking Midfield,Iceland,23,LOSC Lille,1082,€22.00m,22000000,2024
+ligue_1,Matvey Safonov,318470,https://www.transfermarkt.com/matvey-safonov/profil/spieler/318470,Goalkeeper,Russia,27,Paris Saint-Germain,583,€22.00m,22000000,2024
+ligue_1,Vanderson,789082,https://www.transfermarkt.com/vanderson/profil/spieler/789082,Right-Back,Brazil,24,AS Monaco,162,€20.00m,20000000,2024
+ligue_1,Nayef Aguerd,361914,https://www.transfermarkt.com/nayef-aguerd/profil/spieler/361914,Centre-Back,Morocco,30,Olympique Marseille,244,€20.00m,20000000,2024
+ligue_1,Timothy Weah,370846,https://www.transfermarkt.com/timothy-weah/profil/spieler/370846,Right Midfield,United States,26,Olympique Marseille,244,€20.00m,20000000,2024
+ligue_1,Pavel Sulc,500053,https://www.transfermarkt.com/pavel-sulc/profil/spieler/500053,Attacking Midfield,Czech Republic,25,Olympique Lyon,1041,€20.00m,20000000,2024
+ligue_1,Ismaël Doukouré,786436,https://www.transfermarkt.com/ismael-doukoure/profil/spieler/786436,Centre-Back,France,22,RC Strasbourg Alsace,667,€20.00m,20000000,2024
+ligue_1,Estéban Lepaul,461607,https://www.transfermarkt.com/esteban-lepaul/profil/spieler/461607,Centre-Forward,France,26,Stade Rennais FC,273,€20.00m,20000000,2024
+ligue_1,Lucas Hernández,281963,https://www.transfermarkt.com/lucas-hernandez/profil/spieler/281963,Left-Back,France,30,Paris Saint-Germain,583,€20.00m,20000000,2024
+ligue_1,Lucas Beraldo,872171,https://www.transfermarkt.com/lucas-beraldo/profil/spieler/872171,Centre-Back,Brazil,22,Paris Saint-Germain,583,€20.00m,20000000,2024
+ligue_1,Nathan Ngoy,548254,https://www.transfermarkt.com/nathan-ngoy/profil/spieler/548254,Centre-Back,Belgium,22,LOSC Lille,1082,€20.00m,20000000,2024
+ligue_1,Patrick Zabi,1363293,https://www.transfermarkt.com/patrick-zabi/profil/spieler/1363293,Central Midfield,Cote d'Ivoire,19,Stade Reims,1421,€20.00m,20000000,2024
+ligue_1,Matthis Abline,659543,https://www.transfermarkt.com/matthis-abline/profil/spieler/659543,Centre-Forward,France,23,FC Nantes,995,€20.00m,20000000,2024
+ligue_1,Aleksandr Golovin,263918,https://www.transfermarkt.com/aleksandr-golovin/profil/spieler/263918,Attacking Midfield,Russia,29,AS Monaco,162,€18.00m,18000000,2024
+ligue_1,Mika Biereth,565821,https://www.transfermarkt.com/mika-biereth/profil/spieler/565821,Centre-Forward,Denmark,23,AS Monaco,162,€18.00m,18000000,2024
+ligue_1,Samir El Mourabet,1130514,https://www.transfermarkt.com/samir-el-mourabet/profil/spieler/1130514,Central Midfield,Morocco,20,RC Strasbourg Alsace,667,€18.00m,18000000,2024
+ligue_1,Martial Godo,992686,https://www.transfermarkt.com/martial-godo/profil/spieler/992686,Left Winger,Cote d'Ivoire,23,RC Strasbourg Alsace,667,€18.00m,18000000,2024
+ligue_1,Pierre-Emile Højbjerg,167799,https://www.transfermarkt.com/pierre-emile-hojbjerg/profil/spieler/167799,Defensive Midfield,Denmark,30,Olympique Marseille,244,€18.00m,18000000,2024
+ligue_1,Moussa Niakhaté,291200,https://www.transfermarkt.com/moussa-niakhate/profil/spieler/291200,Centre-Back,Senegal,30,Olympique Lyon,1041,€18.00m,18000000,2024
+ligue_1,Facundo Medina,474800,https://www.transfermarkt.com/facundo-medina/profil/spieler/474800,Centre-Back,Argentina,26,Olympique Marseille,244,€18.00m,18000000,2024
+ligue_1,Leonardo Balerdi,575998,https://www.transfermarkt.com/leonardo-balerdi/profil/spieler/575998,Centre-Back,Argentina,27,Olympique Marseille,244,€18.00m,18000000,2024
+ligue_1,Guéla Doué,711980,https://www.transfermarkt.com/guela-doue/profil/spieler/711980,Right-Back,Cote d'Ivoire,23,RC Strasbourg Alsace,667,€18.00m,18000000,2024
+ligue_1,Guillaume Restes,912902,https://www.transfermarkt.com/guillaume-restes/profil/spieler/912902,Goalkeeper,France,21,FC Toulouse,415,€18.00m,18000000,2024
+ligue_1,Hamza Igamane,885445,https://www.transfermarkt.com/hamza-igamane/profil/spieler/885445,Centre-Forward,Morocco,23,LOSC Lille,1082,€18.00m,18000000,2024
+ligue_1,Alexsandro,648020,https://www.transfermarkt.com/alexsandro/profil/spieler/648020,Centre-Back,Brazil,26,LOSC Lille,1082,€18.00m,18000000,2024
+ligue_1,Mohamed-Ali Cho,670847,https://www.transfermarkt.com/mohamed-ali-cho/profil/spieler/670847,Right Winger,France,22,OGC Nice,417,€15.00m,15000000,2024
+ligue_1,Thilo Kehrer,228948,https://www.transfermarkt.com/thilo-kehrer/profil/spieler/228948,Centre-Back,Germany,29,AS Monaco,162,€15.00m,15000000,2024
+ligue_1,Jordan Teze,364245,https://www.transfermarkt.com/jordan-teze/profil/spieler/364245,Right-Back,Netherlands,26,AS Monaco,162,€15.00m,15000000,2024
+ligue_1,Caio Henrique,420064,https://www.transfermarkt.com/caio-henrique/profil/spieler/420064,Left-Back,Brazil,28,AS Monaco,162,€15.00m,15000000,2024
+ligue_1,Ansu Fati,466810,https://www.transfermarkt.com/ansu-fati/profil/spieler/466810,Left Winger,Spain,23,AS Monaco,162,€15.00m,15000000,2024
+ligue_1,Mamadou Coulibaly,745173,https://www.transfermarkt.com/mamadou-coulibaly/profil/spieler/745173,Central Midfield,France,22,AS Monaco,162,€15.00m,15000000,2024
+ligue_1,Prosper Peter,1103958,https://www.transfermarkt.com/prosper-peter/profil/spieler/1103958,Centre-Forward,France,18,Angers SCO,1420,€15.00m,15000000,2024
+ligue_1,Christian Mawissa,1005240,https://www.transfermarkt.com/christian-mawissa/profil/spieler/1005240,Centre-Back,France,21,AS Monaco,162,€15.00m,15000000,2024
+ligue_1,Abdoul Ouattara,991487,https://www.transfermarkt.com/abdoul-ouattara/profil/spieler/991487,Right-Back,Cote d'Ivoire,20,RC Strasbourg Alsace,667,€15.00m,15000000,2024
+ligue_1,Lucas Høgsberg,926978,https://www.transfermarkt.com/lucas-hogsberg/profil/spieler/926978,Centre-Back,Denmark,19,RC Strasbourg Alsace,667,€15.00m,15000000,2024
+ligue_1,Benjamin Pavard,353366,https://www.transfermarkt.com/benjamin-pavard/profil/spieler/353366,Centre-Back,France,30,Olympique Marseille,244,€15.00m,15000000,2024
+ligue_1,Hamed Traoré,391065,https://www.transfermarkt.com/hamed-traore/profil/spieler/391065,Left Winger,Cote d'Ivoire,26,Olympique Marseille,244,€15.00m,15000000,2024
+ligue_1,Alexis Vossah,1200427,https://www.transfermarkt.com/alexis-vossah/profil/spieler/1200427,Central Midfield,France,18,FC Toulouse,415,€15.00m,15000000,2024
+ligue_1,Djaoui Cissé,931160,https://www.transfermarkt.com/djaoui-cisse/profil/spieler/931160,Central Midfield,France,22,Stade Rennais FC,273,€15.00m,15000000,2024
+ligue_1,Noah Nartey,802515,https://www.transfermarkt.com/noah-nartey/profil/spieler/802515,Attacking Midfield,Denmark,20,Olympique Lyon,1041,€15.00m,15000000,2024
+ligue_1,Malang Sarr,344596,https://www.transfermarkt.com/malang-sarr/profil/spieler/344596,Centre-Back,France,27,RC Lens,826,€15.00m,15000000,2024
+ligue_1,Yann Gboho,463613,https://www.transfermarkt.com/yann-gboho/profil/spieler/463613,Left Winger,France,25,FC Toulouse,415,€15.00m,15000000,2024
+ligue_1,Lucas Stassin,655012,https://www.transfermarkt.com/lucas-stassin/profil/spieler/655012,Centre-Forward,Belgium,21,AS Saint-Étienne,618,€15.00m,15000000,2024
+ligue_1,Abdoul Koné,1130445,https://www.transfermarkt.com/abdoul-kone/profil/spieler/1130445,Centre-Back,France,21,Stade Reims,1421,€15.00m,15000000,2024
+ligue_1,Louis Leroux,1119456,https://www.transfermarkt.com/louis-leroux/profil/spieler/1119456,Attacking Midfield,France,20,FC Nantes,995,€12.00m,12000000,2024
+ligue_1,Elye Wahi,659542,https://www.transfermarkt.com/elye-wahi/profil/spieler/659542,Centre-Forward,Cote d'Ivoire,23,OGC Nice,417,€12.00m,12000000,2024
+ligue_1,Sofiane Diop,569389,https://www.transfermarkt.com/sofiane-diop/profil/spieler/569389,Left Winger,Morocco,25,OGC Nice,417,€12.00m,12000000,2024
+ligue_1,Corentin Tolisso,190393,https://www.transfermarkt.com/corentin-tolisso/profil/spieler/190393,Central Midfield,France,31,Olympique Lyon,1041,€12.00m,12000000,2024
+ligue_1,Hicham Boudaoui,560593,https://www.transfermarkt.com/hicham-boudaoui/profil/spieler/560593,Central Midfield,Algeria,26,OGC Nice,417,€12.00m,12000000,2024
+ligue_1,Dayann Methalie,1191444,https://www.transfermarkt.com/dayann-methalie/profil/spieler/1191444,Left-Back,France,20,FC Toulouse,415,€12.00m,12000000,2024
+ligue_1,Ernest Nuamah,955070,https://www.transfermarkt.com/ernest-nuamah/profil/spieler/955070,Right Winger,Ghana,22,Olympique Lyon,1041,€12.00m,12000000,2024
+ligue_1,Odsonne Édouard,344152,https://www.transfermarkt.com/odsonne-edouard/profil/spieler/344152,Centre-Forward,France,28,RC Lens,826,€12.00m,12000000,2024
+ligue_1,Anthony Rouault,690799,https://www.transfermarkt.com/anthony-rouault/profil/spieler/690799,Centre-Back,France,24,Stade Rennais FC,273,€12.00m,12000000,2024
+ligue_1,Ben Chilwell,316125,https://www.transfermarkt.com/ben-chilwell/profil/spieler/316125,Left-Back,England,29,RC Strasbourg Alsace,667,€12.00m,12000000,2024
+liga_arg,Kevin Lomónaco,661136,https://www.transfermarkt.com/kevin-lomonaco/profil/spieler/661136,Centre-Back,Argentina,24,CA Independiente,1234,€9.00m,9000000,2024
+liga_arg,Kendry Páez,1052439,https://www.transfermarkt.com/kendry-paez/profil/spieler/1052439,Attacking Midfield,Ecuador,19,CA River Plate,209,€9.00m,9000000,2024
+liga_arg,Valentín Carboni,787618,https://www.transfermarkt.com/valentin-carboni/profil/spieler/787618,Attacking Midfield,Argentina,21,Racing Club,1444,€8.50m,8500000,2024
+liga_arg,Santiago Sosa,576026,https://www.transfermarkt.com/santiago-sosa/profil/spieler/576026,Defensive Midfield,Argentina,27,Racing Club,1444,€8.00m,8000000,2024
+liga_arg,Aníbal Moreno,642758,https://www.transfermarkt.com/anibal-moreno/profil/spieler/642758,Defensive Midfield,Argentina,26,CA River Plate,209,€8.00m,8000000,2024
+liga_arg,Alan Lescano,991134,https://www.transfermarkt.com/alan-lescano/profil/spieler/991134,Attacking Midfield,Argentina,24,AA Argentinos Juniors,1030,€7.50m,7500000,2024
+liga_arg,Santiago Ascacíbar,423436,https://www.transfermarkt.com/santiago-ascacibar/profil/spieler/423436,Defensive Midfield,Argentina,29,CA Boca Juniors,189,€7.00m,7000000,2024
+liga_arg,Exequiel Zeballos,661132,https://www.transfermarkt.com/exequiel-zeballos/profil/spieler/661132,Right Winger,Argentina,24,CA Boca Juniors,189,€7.00m,7000000,2024
+liga_arg,Milton Delgado,1236677,https://www.transfermarkt.com/milton-delgado/profil/spieler/1236677,Defensive Midfield,Argentina,20,CA Boca Juniors,189,€7.00m,7000000,2024
+liga_arg,Lautaro Rivero,1261395,https://www.transfermarkt.com/lautaro-rivero/profil/spieler/1261395,Centre-Back,Argentina,22,CA River Plate,209,€7.00m,7000000,2024
+liga_arg,Kevin Castaño,857948,https://www.transfermarkt.com/kevin-castano/profil/spieler/857948,Defensive Midfield,Colombia,25,CA River Plate,209,€6.50m,6500000,2024
+liga_arg,Sebastián Villa,493000,https://www.transfermarkt.com/sebastian-villa/profil/spieler/493000,Left Winger,Colombia,29,CS Independiente Rivadavia,12179,€6.00m,6000000,2024
+liga_arg,Jhohan Romaña,741963,https://www.transfermarkt.com/jhohan-romana/profil/spieler/741963,Centre-Back,Colombia,27,CA San Lorenzo de Almagro,1775,€6.00m,6000000,2024
+liga_arg,Marco Di Césare,839029,https://www.transfermarkt.com/marco-di-cesare/profil/spieler/839029,Centre-Back,Argentina,14,Racing Club,1444,€6.00m,6000000,2024
+liga_arg,Lautaro Di Lollo,1019744,https://www.transfermarkt.com/lautaro-di-lollo/profil/spieler/1019744,Centre-Back,Argentina,15,CA Boca Juniors,189,€6.00m,6000000,2024
+liga_arg,Miguel Merentiel,481367,https://www.transfermarkt.com/miguel-merentiel/profil/spieler/481367,Centre-Forward,Uruguay,16,CA Boca Juniors,189,€5.50m,5500000,2024
+liga_arg,Jáminton Campaz,491553,https://www.transfermarkt.com/jaminton-campaz/profil/spieler/491553,Left Winger,Colombia,17,CA Rosario Central,1418,€5.50m,5500000,2024
+liga_arg,Matías Galarza,909737,https://www.transfermarkt.com/matias-galarza/profil/spieler/909737,Defensive Midfield,Argentina,18,CA Talleres,3938,€5.50m,5500000,2024
+liga_arg,Marcelino Moreno,456617,https://www.transfermarkt.com/marcelino-moreno/profil/spieler/456617,Attacking Midfield,Argentina,19,CA Lanús,333,€5.00m,5000000,2024
+liga_arg,Facundo Cambeses,435001,https://www.transfermarkt.com/facundo-cambeses/profil/spieler/435001,Goalkeeper,Argentina,20,Racing Club,1444,€5.00m,5000000,2024
+liga_arg,Leandro Paredes,166237,https://www.transfermarkt.com/leandro-paredes/profil/spieler/166237,Defensive Midfield,Argentina,21,CA Boca Juniors,189,€5.00m,5000000,2024
+liga_arg,Alexis Cuello,636783,https://www.transfermarkt.com/alexis-cuello/profil/spieler/636783,Centre-Forward,Argentina,22,CA San Lorenzo de Almagro,1775,€5.00m,5000000,2024
+liga_arg,Orlando Gill,643259,https://www.transfermarkt.com/orlando-gill/profil/spieler/643259,Goalkeeper,Paraguay,23,CA San Lorenzo de Almagro,1775,€5.00m,5000000,2024
+liga_arg,Ayrton Costa,842910,https://www.transfermarkt.com/ayrton-costa/profil/spieler/842910,Centre-Back,Argentina,24,CA Boca Juniors,189,€5.00m,5000000,2024
+liga_arg,David Romero,668512,https://www.transfermarkt.com/david-romero/profil/spieler/668512,Centre-Forward,Argentina,25,Club Atlético Tigre,11831,€5.00m,5000000,2024
+liga_arg,Hernán López Muñoz,665309,https://www.transfermarkt.com/hernan-lopez-munoz/profil/spieler/665309,Attacking Midfield,Argentina,26,AA Argentinos Juniors,1030,€5.00m,5000000,2024
+liga_arg,Franco Ibarra,741685,https://www.transfermarkt.com/franco-ibarra/profil/spieler/741685,Defensive Midfield,Argentina,27,CA Rosario Central,1418,€5.00m,5000000,2024
+liga_arg,Matko Miljevic,632797,https://www.transfermarkt.com/matko-miljevic/profil/spieler/632797,Attacking Midfield,United States,28,Racing Club,1444,€5.00m,5000000,2024
+liga_arg,Maximiliano Salas,442231,https://www.transfermarkt.com/maximiliano-salas/profil/spieler/442231,Centre-Forward,Argentina,29,CA River Plate,209,€5.00m,5000000,2024
+liga_arg,Facundo Colidio,491705,https://www.transfermarkt.com/facundo-colidio/profil/spieler/491705,Centre-Forward,Argentina,30,CA River Plate,209,€5.00m,5000000,2024
+liga_arg,Baltasar Rodríguez,1015246,https://www.transfermarkt.com/baltasar-rodriguez/profil/spieler/1015246,Attacking Midfield,Argentina,31,Racing Club,1444,€4.50m,4500000,2024
+liga_arg,Mateo Del Blanco,984529,https://www.transfermarkt.com/mateo-del-blanco/profil/spieler/984529,Left-Back,Argentina,32,CA Unión (Santa Fe),7097,€4.50m,4500000,2024
+liga_arg,Tomás Palacios,993645,https://www.transfermarkt.com/tomas-palacios/profil/spieler/993645,Centre-Back,Argentina,33,Club Estudiantes de La Plata,288,€4.50m,4500000,2024
+liga_arg,Agustín Medina,1294453,https://www.transfermarkt.com/agustin-medina/profil/spieler/1294453,Defensive Midfield,Argentina,34,CA Lanús,333,€4.50m,4500000,2024
+liga_arg,Tiago Palacios,755457,https://www.transfermarkt.com/tiago-palacios/profil/spieler/755457,Right Winger,Uruguay,35,Club Estudiantes de La Plata,288,€4.50m,4500000,2024
+liga_arg,Gastón Martirena,744324,https://www.transfermarkt.com/gaston-martirena/profil/spieler/744324,Right-Back,Uruguay,36,Racing Club,1444,€4.50m,4500000,2024
+liga_arg,Kevin Zenón,829966,https://www.transfermarkt.com/kevin-zenon/profil/spieler/829966,Left Winger,Argentina,37,CA Boca Juniors,189,€4.50m,4500000,2024
+liga_arg,Sheyko Studer,1190390,https://www.transfermarkt.com/sheyko-studer/profil/spieler/1190390,Centre-Back,Argentina,38,CS Independiente Rivadavia,12179,€4.50m,4500000,2024
+liga_arg,Sebastián Driussi,294853,https://www.transfermarkt.com/sebastian-driussi/profil/spieler/294853,Centre-Forward,Argentina,39,CA River Plate,209,€4.50m,4500000,2024
+liga_arg,Lucas Martínez Quarta,373373,https://www.transfermarkt.com/lucas-martinez-quarta/profil/spieler/373373,Centre-Back,Argentina,40,CA River Plate,209,€4.50m,4500000,2024
+liga_arg,Gonzalo Montiel,402733,https://www.transfermarkt.com/gonzalo-montiel/profil/spieler/402733,Right-Back,Argentina,41,CA River Plate,209,€4.50m,4500000,2024
+liga_arg,Fausto Vera,491701,https://www.transfermarkt.com/fausto-vera/profil/spieler/491701,Defensive Midfield,Argentina,42,CA River Plate,209,€4.50m,4500000,2024
+liga_arg,Nicolás Barros Schelotto,1123309,https://www.transfermarkt.com/nicolas-barros-schelotto/profil/spieler/1123309,Defensive Midfield,Argentina,43,Club de Gimnasia y Esgrima La Plata,1106,€4.00m,4000000,2024
+liga_arg,Ignacio Russo,833130,https://www.transfermarkt.com/ignacio-russo/profil/spieler/833130,Centre-Forward,Argentina,44,Club Atlético Tigre,11831,€4.00m,4000000,2024
+liga_arg,Julián Fernández,984053,https://www.transfermarkt.com/julian-fernandez/profil/spieler/984053,Right Winger,Argentina,45,CA Rosario Central,1418,€4.00m,4000000,2024
+liga_arg,Franco Cristaldo,332259,https://www.transfermarkt.com/franco-cristaldo/profil/spieler/332259,Attacking Midfield,Argentina,29,CA Talleres,3938,€4.00m,4000000,2024
+liga_arg,Alex Luna,843126,https://www.transfermarkt.com/alex-luna/profil/spieler/843126,Attacking Midfield,Argentina,22,Instituto ACC,1829,€4.00m,4000000,2024
+liga_arg,Francisco Álvarez,565766,https://www.transfermarkt.com/francisco-alvarez/profil/spieler/565766,Centre-Back,Argentina,26,AA Argentinos Juniors,1030,€4.00m,4000000,2024
+liga_arg,Santiago Montiel,974336,https://www.transfermarkt.com/santiago-montiel/profil/spieler/974336,Right Winger,Argentina,25,CA Independiente,1234,€4.00m,4000000,2024
+liga_arg,Leandro Lozano,665101,https://www.transfermarkt.com/leandro-lozano/profil/spieler/665101,Right-Back,Uruguay,27,AA Argentinos Juniors,1030,€4.00m,4000000,2024
+liga_arg,Ronaldo Martínez,567736,https://www.transfermarkt.com/ronaldo-martinez/profil/spieler/567736,Centre-Forward,Paraguay,30,CA Talleres,3938,€4.00m,4000000,2024
+liga_arg,Matías Viña,439072,https://www.transfermarkt.com/matias-vina/profil/spieler/439072,Left-Back,Uruguay,28,CA River Plate,209,€4.00m,4000000,2024
+liga_arg,Williams Alarcón,599552,https://www.transfermarkt.com/williams-alarcon/profil/spieler/599552,Central Midfield,Chile,25,CA Boca Juniors,189,€4.00m,4000000,2024
+liga_arg,Giuliano Galoppo,567249,https://www.transfermarkt.com/giuliano-galoppo/profil/spieler/567249,Central Midfield,Argentina,26,CA River Plate,209,€4.00m,4000000,2024
+liga_arg,Adam Bareiro,514120,https://www.transfermarkt.com/adam-bareiro/profil/spieler/514120,Centre-Forward,Paraguay,29,CA Boca Juniors,189,€4.00m,4000000,2024
+liga_arg,Gabriel Rojas,471639,https://www.transfermarkt.com/gabriel-rojas/profil/spieler/471639,Left-Back,Argentina,28,Racing Club,1444,€4.00m,4000000,2024
+liga_arg,Lautaro Blanco,831161,https://www.transfermarkt.com/lautaro-blanco/profil/spieler/831161,Left-Back,Argentina,27,CA Boca Juniors,189,€3.80m,3800000,2024
+liga_arg,Gastón Lodico,563878,https://www.transfermarkt.com/gaston-lodico/profil/spieler/563878,Central Midfield,Argentina,27,Instituto ACC,1829,€3.80m,3800000,2024
+liga_arg,Brian Aguirre,668549,https://www.transfermarkt.com/brian-aguirre/profil/spieler/668549,Left Winger,Argentina,23,Club Estudiantes de La Plata,288,€3.80m,3800000,2024
+liga_arg,Gastón Hernández,665277,https://www.transfermarkt.com/gaston-hernandez/profil/spieler/665277,Centre-Back,Argentina,28,CA San Lorenzo de Almagro,1775,€3.70m,3700000,2024
+liga_arg,Juan Carlos Portillo,830842,https://www.transfermarkt.com/juan-carlos-portillo/profil/spieler/830842,Centre-Back,Argentina,25,CA River Plate,209,€3.50m,3500000,2024
+liga_arg,Nazareno Colombo,688207,https://www.transfermarkt.com/nazareno-colombo/profil/spieler/688207,Centre-Back,Argentina,27,Racing Club,1444,€3.50m,3500000,2024
+liga_arg,Ian Subiabre,1074969,https://www.transfermarkt.com/ian-subiabre/profil/spieler/1074969,Right Winger,Argentina,19,CA River Plate,209,€3.50m,3500000,2024
+liga_arg,Mateo Mendoza,1103933,https://www.transfermarkt.com/mateo-mendoza/profil/spieler/1103933,Centre-Back,Argentina,21,CD Godoy Cruz Antonio Tomba,12574,€3.50m,3500000,2024
+liga_arg,Nahuel Losada,323918,https://www.transfermarkt.com/nahuel-losada/profil/spieler/323918,Goalkeeper,Argentina,33,CA Lanús,333,€3.50m,3500000,2024
+liga_arg,Marco Pellegrino,776303,https://www.transfermarkt.com/marco-pellegrino/profil/spieler/776303,Centre-Back,Argentina,23,CA Boca Juniors,189,€3.50m,3500000,2024
+liga_arg,Felipe Zenobio,826527,https://www.transfermarkt.com/felipe-zenobio/profil/spieler/826527,Goalkeeper,Argentina,25,Club Atlético Tigre,11831,€3.50m,3500000,2024
+liga_arg,Juan Barinaga,701491,https://www.transfermarkt.com/juan-barinaga/profil/spieler/701491,Right-Back,Argentina,25,CA Boca Juniors,189,€3.50m,3500000,2024
+liga_arg,Matías Abaldo,928647,https://www.transfermarkt.com/matias-abaldo/profil/spieler/928647,Left Winger,Uruguay,22,CA Independiente,1234,€3.50m,3500000,2024
+liga_arg,Nicolás Fernández,333921,https://www.transfermarkt.com/nicolas-fernandez/profil/spieler/333921,Centre-Forward,Argentina,30,Club Atlético Belgrano,2417,€3.50m,3500000,2024
+liga_arg,Vicente Pizarro,662740,https://www.transfermarkt.com/vicente-pizarro/profil/spieler/662740,Defensive Midfield,Chile,23,CA Rosario Central,1418,€3.50m,3500000,2024
+liga_arg,Carlos Palacios,571219,https://www.transfermarkt.com/carlos-palacios/profil/spieler/571219,Attacking Midfield,Chile,25,CA Boca Juniors,189,€3.50m,3500000,2024
+liga_arg,Santiago Solari,866059,https://www.transfermarkt.com/santiago-solari/profil/spieler/866059,Right Winger,Argentina,28,Racing Club,1444,€3.50m,3500000,2024
+liga_arg,Ignacio Ovando,1297993,https://www.transfermarkt.com/ignacio-ovando/profil/spieler/1297993,Centre-Back,Argentina,18,CA Rosario Central,1418,€3.50m,3500000,2024
+liga_arg,Alejo Veliz,888493,https://www.transfermarkt.com/alejo-veliz/profil/spieler/888493,Centre-Forward,Argentina,22,CA Rosario Central,1418,€3.50m,3500000,2024
+liga_arg,Tomás Belmonte,483446,https://www.transfermarkt.com/tomas-belmonte/profil/spieler/483446,Defensive Midfield,Argentina,27,CA Boca Juniors,189,€3.50m,3500000,2024
+liga_arg,Matías Zaracho,480774,https://www.transfermarkt.com/matias-zaracho/profil/spieler/480774,Attacking Midfield,Argentina,28,Racing Club,1444,€3.50m,3500000,2024
+liga_arg,Adrián Martínez,598769,https://www.transfermarkt.com/adrian-martinez/profil/spieler/598769,Centre-Forward,Argentina,33,Racing Club,1444,€3.20m,3200000,2024
+liga_arg,Eros Mancuso,888545,https://www.transfermarkt.com/eros-mancuso/profil/spieler/888545,Right-Back,Argentina,27,Club Estudiantes de La Plata,288,€3.20m,3200000,2024
+liga_arg,Manuel Roffo,491687,https://www.transfermarkt.com/manuel-roffo/profil/spieler/491687,Goalkeeper,Argentina,26,Instituto ACC,1829,€3.00m,3000000,2024
+liga_arg,Tomás Galván,893850,https://www.transfermarkt.com/tomas-galvan/profil/spieler/893850,Attacking Midfield,Argentina,26,CA River Plate,209,€3.00m,3000000,2024
+liga_arg,Lucas Zelarayán,230030,https://www.transfermarkt.com/lucas-zelarayan/profil/spieler/230030,Attacking Midfield,Armenia,33,Club Atlético Belgrano,2417,€3.00m,3000000,2024
+liga_arg,Sasha Marcich,867621,https://www.transfermarkt.com/sasha-marcich/profil/spieler/867621,Left-Back,Argentina,27,CA Lanús,333,€3.00m,3000000,2024
+liga_arg,Lautaro Vargas,1159650,https://www.transfermarkt.com/lautaro-vargas/profil/spieler/1159650,Right-Back,Argentina,21,CA Unión (Santa Fe),7097,€3.00m,3000000,2024
+liga_arg,César Pérez,662746,https://www.transfermarkt.com/cesar-perez/profil/spieler/662746,Central Midfield,Chile,23,Defensa y Justicia,2402,€3.00m,3000000,2024
+liga_arg,Edwuin Cetré,470390,https://www.transfermarkt.com/edwuin-cetre/profil/spieler/470390,Left Winger,Colombia,28,Club Estudiantes de La Plata,288,€3.00m,3000000,2024
+liga_arg,Aarón Molinas,575999,https://www.transfermarkt.com/aaron-molinas/profil/spieler/575999,Attacking Midfield,Argentina,25,Defensa y Justicia,2402,€3.00m,3000000,2024
+liga_arg,Jabes Saralegui,1174943,https://www.transfermarkt.com/jabes-saralegui/profil/spieler/1174943,Central Midfield,Argentina,23,Club Atlético Tigre,11831,€3.00m,3000000,2024
+liga_arg,Tobías Andrada,1384266,https://www.transfermarkt.com/tobias-andrada/profil/spieler/1384266,Central Midfield,Argentina,19,CA Vélez Sarsfield,1029,€3.00m,3000000,2024
+liga_arg,Álex Arce,970518,https://www.transfermarkt.com/alex-arce/profil/spieler/970518,Centre-Forward,Paraguay,30,CS Independiente Rivadavia,12179,€3.00m,3000000,2024
+liga_arg,Matías Mansilla,731722,https://www.transfermarkt.com/matias-mansilla/profil/spieler/731722,Goalkeeper,Argentina,30,CA Unión (Santa Fe),7097,€2.80m,2800000,2024
+liga_arg,Ignacio Vázquez,552635,https://www.transfermarkt.com/ignacio-vazquez/profil/spieler/552635,Centre-Back,Argentina,28,Club Atlético Platense,928,€2.80m,2800000,2024
+liga_arg,Duván Vergara,413658,https://www.transfermarkt.com/duvan-vergara/profil/spieler/413658,Left Winger,Colombia,29,Racing Club,1444,€2.80m,2800000,2024
+liga_arg,Matías Borgogno,592427,https://www.transfermarkt.com/matias-borgogno/profil/spieler/592427,Goalkeeper,Argentina,27,Club Atlético Platense,928,€2.80m,2800000,2024
+liga_arg,Alan Velasco,661154,https://www.transfermarkt.com/alan-velasco/profil/spieler/661154,Left Winger,Argentina,23,CA Boca Juniors,189,€2.80m,2800000,2024
+liga_arg,Diego Valdés,249776,https://www.transfermarkt.com/diego-valdes/profil/spieler/249776,Attacking Midfield,Chile,32,CA Vélez Sarsfield,1029,€2.80m,2800000,2024
+liga_arg,Bruno Barticciotto,737920,https://www.transfermarkt.com/bruno-barticciotto/profil/spieler/737920,Centre-Forward,Chile,25,CA Talleres,3938,€2.80m,2800000,2024
+liga_arg,Thiago Cardozo,294843,https://www.transfermarkt.com/thiago-cardozo/profil/spieler/294843,Goalkeeper,Uruguay,29,Club Atlético Belgrano,2417,€2.70m,2700000,2024
+liga_arg,Joaquín García,829433,https://www.transfermarkt.com/joaquin-garcia/profil/spieler/829433,Right-Back,Argentina,24,CA Vélez Sarsfield,1029,€2.70m,2700000,2024
+liga_arg,Emanuel Coronel,565194,https://www.transfermarkt.com/emanuel-coronel/profil/spieler/565194,Right-Back,Argentina,29,CA Rosario Central,1418,€2.70m,2700000,2024
+brasileirao,Vitor Roque,943837,https://www.transfermarkt.com/vitor-roque/profil/spieler/943837,Centre-Forward,Brazil,21,Sociedade Esportiva Palmeiras,1023,€38.00m,38000000,2025
+brasileirao,Lucas Paquetá,444523,https://www.transfermarkt.com/lucas-paqueta/profil/spieler/444523,Attacking Midfield,Brazil,28,CR Flamengo,614,€35.00m,35000000,2025
+brasileirao,Kaio Jorge,620477,https://www.transfermarkt.com/kaio-jorge/profil/spieler/620477,Centre-Forward,Brazil,24,Cruzeiro Esporte Clube,609,€26.00m,26000000,2025
+brasileirao,Yuri Alberto,489893,https://www.transfermarkt.com/yuri-alberto/profil/spieler/489893,Centre-Forward,Brazil,25,Sport Club Corinthians Paulista,199,€25.00m,25000000,2025
+brasileirao,Danilo,808509,https://www.transfermarkt.com/danilo/profil/spieler/808509,Central Midfield,Brazil,25,Botafogo de Futebol e Regatas,537,€24.00m,24000000,2025
+brasileirao,Breno Bidon,1029227,https://www.transfermarkt.com/breno-bidon/profil/spieler/1029227,Central Midfield,Brazil,21,Sport Club Corinthians Paulista,199,€22.00m,22000000,2025
+brasileirao,José Manuel López,844797,https://www.transfermarkt.com/jose-manuel-lopez/profil/spieler/844797,Centre-Forward,Argentina,25,Sociedade Esportiva Palmeiras,1023,€22.00m,22000000,2025
+brasileirao,Gerson,341705,https://www.transfermarkt.com/gerson/profil/spieler/341705,Central Midfield,Brazil,28,Cruzeiro Esporte Clube,609,€20.00m,20000000,2025
+brasileirao,Samuel Lino,694928,https://www.transfermarkt.com/samuel-lino/profil/spieler/694928,Left Winger,Brazil,26,CR Flamengo,614,€17.00m,17000000,2025
+brasileirao,Pedro,432895,https://www.transfermarkt.com/pedro/profil/spieler/432895,Centre-Forward,Brazil,28,CR Flamengo,614,€17.00m,17000000,2025
+brasileirao,Martinelli,815558,https://www.transfermarkt.com/martinelli/profil/spieler/815558,Defensive Midfield,Brazil,24,Fluminense Football Club,2462,€16.00m,16000000,2025
+brasileirao,André,1221818,https://www.transfermarkt.com/andre/profil/spieler/1221818,Central Midfield,Brazil,19,Sport Club Corinthians Paulista,199,€16.00m,16000000,2025
+brasileirao,Giorgian de Arrascaeta,248410,https://www.transfermarkt.com/giorgian-de-arrascaeta/profil/spieler/248410,Attacking Midfield,Uruguay,31,CR Flamengo,614,€15.00m,15000000,2025
+brasileirao,Allan,1082631,https://www.transfermarkt.com/allan/profil/spieler/1082631,Right Winger,Brazil,14,Sociedade Esportiva Palmeiras,1023,€15.00m,15000000,2025
+brasileirao,Jhon Arias,588989,https://www.transfermarkt.com/jhon-arias/profil/spieler/588989,Right Winger,Colombia,15,Sociedade Esportiva Palmeiras,1023,€15.00m,15000000,2025
+brasileirao,Andreas Pereira,203394,https://www.transfermarkt.com/andreas-pereira/profil/spieler/203394,Central Midfield,Brazil,16,Sociedade Esportiva Palmeiras,1023,€15.00m,15000000,2025
+brasileirao,Léo Ortiz,374136,https://www.transfermarkt.com/leo-ortiz/profil/spieler/374136,Centre-Back,Brazil,17,CR Flamengo,614,€14.00m,14000000,2025
+brasileirao,Matheus Pereira,225984,https://www.transfermarkt.com/matheus-pereira/profil/spieler/225984,Attacking Midfield,Brazil,18,Cruzeiro Esporte Clube,609,€14.00m,14000000,2025
+brasileirao,Mauricio,678439,https://www.transfermarkt.com/mauricio/profil/spieler/678439,Attacking Midfield,Paraguay,19,Sociedade Esportiva Palmeiras,1023,€14.00m,14000000,2025
+brasileirao,Hércules,982617,https://www.transfermarkt.com/hercules/profil/spieler/982617,Central Midfield,Brazil,20,Fluminense Football Club,2462,€12.00m,12000000,2025
+brasileirao,Kaiki,879217,https://www.transfermarkt.com/kaiki/profil/spieler/879217,Left-Back,Brazil,21,Cruzeiro Esporte Clube,609,€12.00m,12000000,2025
+brasileirao,Fabrício Bruno,432773,https://www.transfermarkt.com/fabricio-bruno/profil/spieler/432773,Centre-Back,Brazil,22,Cruzeiro Esporte Clube,609,€12.00m,12000000,2025
+brasileirao,Marcos Antônio,468301,https://www.transfermarkt.com/marcos-antonio/profil/spieler/468301,Central Midfield,Brazil,23,São Paulo Futebol Clube,585,€12.00m,12000000,2025
+brasileirao,Jean Lucas,578872,https://www.transfermarkt.com/jean-lucas/profil/spieler/578872,Central Midfield,Brazil,24,Esporte Clube Bahia,10010,€12.00m,12000000,2025
+brasileirao,Gabriel Mec,1228661,https://www.transfermarkt.com/gabriel-mec/profil/spieler/1228661,Attacking Midfield,Brazil,25,Grêmio Foot-Ball Porto Alegrense,210,€12.00m,12000000,2025
+brasileirao,Gabriel Brazão,371247,https://www.transfermarkt.com/gabriel-brazao/profil/spieler/371247,Goalkeeper,Brazil,26,Santos FC,221,€12.00m,12000000,2025
+brasileirao,Santiago Ramos Mingo,688593,https://www.transfermarkt.com/santiago-ramos-mingo/profil/spieler/688593,Centre-Back,Argentina,27,Esporte Clube Bahia,10010,€12.00m,12000000,2025
+brasileirao,Joaquín Piquerez,496268,https://www.transfermarkt.com/joaquin-piquerez/profil/spieler/496268,Left-Back,Uruguay,28,Sociedade Esportiva Palmeiras,1023,€12.00m,12000000,2025
+brasileirao,Renan Lodi,476352,https://www.transfermarkt.com/renan-lodi/profil/spieler/476352,Left-Back,Brazil,29,Clube Atlético Mineiro,330,€12.00m,12000000,2025
+brasileirao,Rodrigo Garro,565009,https://www.transfermarkt.com/rodrigo-garro/profil/spieler/565009,Attacking Midfield,Argentina,30,Sport Club Corinthians Paulista,199,€11.00m,11000000,2025
+brasileirao,Hugo Souza,574901,https://www.transfermarkt.com/hugo-souza/profil/spieler/574901,Goalkeeper,Brazil,31,Sport Club Corinthians Paulista,199,€11.00m,11000000,2025
+brasileirao,Vitão,428783,https://www.transfermarkt.com/vitao/profil/spieler/428783,Centre-Back,Brazil,32,CR Flamengo,614,€11.00m,11000000,2025
+brasileirao,Jorge Carrascal,354145,https://www.transfermarkt.com/jorge-carrascal/profil/spieler/354145,Attacking Midfield,Colombia,33,CR Flamengo,614,€11.00m,11000000,2025
+brasileirao,Luis Sinisterra,512385,https://www.transfermarkt.com/luis-sinisterra/profil/spieler/512385,Left Winger,Colombia,34,Cruzeiro Esporte Clube,609,€11.00m,11000000,2025
+brasileirao,Tetê,371256,https://www.transfermarkt.com/tete/profil/spieler/371256,Right Winger,Brazil,35,Grêmio Foot-Ball Porto Alegrense,210,€11.00m,11000000,2025
+brasileirao,Luciano Juba,676035,https://www.transfermarkt.com/luciano-juba/profil/spieler/676035,Left-Back,Brazil,36,Esporte Clube Bahia,10010,€11.00m,11000000,2025
+brasileirao,Erick Pulga,936544,https://www.transfermarkt.com/erick-pulga/profil/spieler/936544,Left Winger,Brazil,37,Esporte Clube Bahia,10010,€11.00m,11000000,2025
+brasileirao,Paulinho,428791,https://www.transfermarkt.com/paulinho/profil/spieler/428791,Second Striker,Brazil,38,Sociedade Esportiva Palmeiras,1023,€11.00m,11000000,2025
+brasileirao,Agustín Rossi,352324,https://www.transfermarkt.com/agustin-rossi/profil/spieler/352324,Goalkeeper,Argentina,39,CR Flamengo,614,€10.00m,10000000,2025
+brasileirao,Léo Pereira,288431,https://www.transfermarkt.com/leo-pereira/profil/spieler/288431,Centre-Back,Brazil,40,CR Flamengo,614,€10.00m,10000000,2025
+brasileirao,Kauã Prates,1275068,https://www.transfermarkt.com/kaua-prates/profil/spieler/1275068,Left-Back,Brazil,41,Cruzeiro Esporte Clube,609,€10.00m,10000000,2025
+brasileirao,Christian,658678,https://www.transfermarkt.com/christian/profil/spieler/658678,Central Midfield,Brazil,42,Cruzeiro Esporte Clube,609,€10.00m,10000000,2025
+brasileirao,Juan Nardoni,689211,https://www.transfermarkt.com/juan-nardoni/profil/spieler/689211,Central Midfield,Argentina,43,Grêmio Foot-Ball Porto Alegrense,210,€10.00m,10000000,2025
+brasileirao,Álvaro Montoro,1228194,https://www.transfermarkt.com/alvaro-montoro/profil/spieler/1228194,Left Winger,Argentina,44,Botafogo de Futebol e Regatas,537,€10.00m,10000000,2025
+brasileirao,Neymar,68290,https://www.transfermarkt.com/neymar/profil/spieler/68290,Attacking Midfield,Brazil,45,Santos FC,221,€10.00m,10000000,2025
+brasileirao,Agustín Giay,849582,https://www.transfermarkt.com/agustin-giay/profil/spieler/849582,Right-Back,Argentina,22,Sociedade Esportiva Palmeiras,1023,€10.00m,10000000,2025
+brasileirao,Ramón Sosa,745191,https://www.transfermarkt.com/ramon-sosa/profil/spieler/745191,Second Striker,Paraguay,26,Sociedade Esportiva Palmeiras,1023,€10.00m,10000000,2025
+brasileirao,Robert Renan,958598,https://www.transfermarkt.com/robert-renan/profil/spieler/958598,Centre-Back,Brazil,22,Clube de Regatas Vasco da Gama,978,€10.00m,10000000,2025
+brasileirao,Nicolás de la Cruz,397458,https://www.transfermarkt.com/nicolas-de-la-cruz/profil/spieler/397458,Central Midfield,Uruguay,28,CR Flamengo,614,€9.00m,9000000,2025
+brasileirao,Keny Arroyo,1074584,https://www.transfermarkt.com/keny-arroyo/profil/spieler/1074584,Right Winger,Ecuador,20,Cruzeiro Esporte Clube,609,€9.00m,9000000,2025
+brasileirao,Cristian Medina,661133,https://www.transfermarkt.com/cristian-medina/profil/spieler/661133,Central Midfield,Argentina,23,Botafogo de Futebol e Regatas,537,€9.00m,9000000,2025
+brasileirao,Mateo Cassierra,362667,https://www.transfermarkt.com/mateo-cassierra/profil/spieler/362667,Centre-Forward,Colombia,29,Clube Atlético Mineiro,330,€9.00m,9000000,2025
+brasileirao,Memphis Depay,167850,https://www.transfermarkt.com/memphis-depay/profil/spieler/167850,Second Striker,Netherlands,32,Sport Club Corinthians Paulista,199,€8.00m,8000000,2025
+brasileirao,Gonzalo Plata,592735,https://www.transfermarkt.com/gonzalo-plata/profil/spieler/592735,Right Winger,Ecuador,25,CR Flamengo,614,€8.00m,8000000,2025
+brasileirao,Jefferson Savarino,309193,https://www.transfermarkt.com/jefferson-savarino/profil/spieler/309193,Attacking Midfield,Venezuela,29,Fluminense Football Club,2462,€8.00m,8000000,2025
+brasileirao,Gui Negão,1257133,https://www.transfermarkt.com/gui-negao/profil/spieler/1257133,Centre-Forward,Brazil,19,Sport Club Corinthians Paulista,199,€8.00m,8000000,2025
+brasileirao,Vitinho,468249,https://www.transfermarkt.com/vitinho/profil/spieler/468249,Right-Back,Brazil,26,Botafogo de Futebol e Regatas,537,€8.00m,8000000,2025
+brasileirao,Arthur Cabral,390638,https://www.transfermarkt.com/arthur-cabral/profil/spieler/390638,Centre-Forward,Brazil,28,Botafogo de Futebol e Regatas,537,€8.00m,8000000,2025
+brasileirao,Cuiabano,891353,https://www.transfermarkt.com/cuiabano/profil/spieler/891353,Left-Back,Brazil,23,Clube de Regatas Vasco da Gama,978,€8.00m,8000000,2025
+brasileirao,Emiliano Martínez,707447,https://www.transfermarkt.com/emiliano-martinez/profil/spieler/707447,Defensive Midfield,Uruguay,26,Sociedade Esportiva Palmeiras,1023,€8.00m,8000000,2025
+brasileirao,Andrés Gómez,957461,https://www.transfermarkt.com/andres-gomez/profil/spieler/957461,Left Winger,Colombia,23,Clube de Regatas Vasco da Gama,978,€8.00m,8000000,2025
+brasileirao,Ruan Pablo,1220614,https://www.transfermarkt.com/ruan-pablo/profil/spieler/1220614,Left Winger,Brazil,17,Esporte Clube Bahia,10010,€8.00m,8000000,2025
+brasileirao,Isidro Pitta,675178,https://www.transfermarkt.com/isidro-pitta/profil/spieler/675178,Centre-Forward,Paraguay,26,Red Bull Bragantino,8793,€7.50m,7500000,2025
+brasileirao,John Kennedy,856085,https://www.transfermarkt.com/john-kennedy/profil/spieler/856085,Centre-Forward,Brazil,23,Fluminense Football Club,2462,€7.00m,7000000,2025
+brasileirao,Andrew,610417,https://www.transfermarkt.com/andrew/profil/spieler/610417,Goalkeeper,Brazil,24,CR Flamengo,614,€7.00m,7000000,2025
+brasileirao,Emerson Royal,476344,https://www.transfermarkt.com/emerson-royal/profil/spieler/476344,Right-Back,Brazil,27,CR Flamengo,614,€7.00m,7000000,2025
+brasileirao,Luiz Araújo,435485,https://www.transfermarkt.com/luiz-araujo/profil/spieler/435485,Right Winger,Brazil,29,CR Flamengo,614,€7.00m,7000000,2025
+brasileirao,Matheuzinho,594226,https://www.transfermarkt.com/matheuzinho/profil/spieler/594226,Right-Back,Brazil,25,Sport Club Corinthians Paulista,199,€7.00m,7000000,2025
+brasileirao,Guilherme Arana,346766,https://www.transfermarkt.com/guilherme-arana/profil/spieler/346766,Left-Back,Brazil,29,Fluminense Football Club,2462,€7.00m,7000000,2025
+brasileirao,Everton,321239,https://www.transfermarkt.com/everton/profil/spieler/321239,Left Winger,Brazil,30,CR Flamengo,614,€7.00m,7000000,2025
+brasileirao,Francis Amuzu,423604,https://www.transfermarkt.com/francis-amuzu/profil/spieler/423604,Left Winger,Ghana,26,Grêmio Foot-Ball Porto Alegrense,210,€7.00m,7000000,2025
+brasileirao,Rodrigo Nestor,468304,https://www.transfermarkt.com/rodrigo-nestor/profil/spieler/468304,Central Midfield,Brazil,25,Esporte Clube Bahia,10010,€7.00m,7000000,2025
+brasileirao,Carlos Vinícius,525287,https://www.transfermarkt.com/carlos-vinicius/profil/spieler/525287,Centre-Forward,Brazil,31,Grêmio Foot-Ball Porto Alegrense,210,€7.00m,7000000,2025
+brasileirao,Artur,440658,https://www.transfermarkt.com/artur/profil/spieler/440658,Right Winger,Brazil,28,São Paulo Futebol Clube,585,€7.00m,7000000,2025
+brasileirao,Léo Jardim,288415,https://www.transfermarkt.com/leo-jardim/profil/spieler/288415,Goalkeeper,Brazil,31,Clube de Regatas Vasco da Gama,978,€7.00m,7000000,2025
+brasileirao,Carlos Cuesta,474589,https://www.transfermarkt.com/carlos-cuesta/profil/spieler/474589,Centre-Back,Colombia,27,Clube de Regatas Vasco da Gama,978,€7.00m,7000000,2025
+brasileirao,Lucas Piton,670201,https://www.transfermarkt.com/lucas-piton/profil/spieler/670201,Left-Back,Italy,25,Clube de Regatas Vasco da Gama,978,€7.00m,7000000,2025
+brasileirao,Matheus França,743597,https://www.transfermarkt.com/matheus-franca/profil/spieler/743597,Attacking Midfield,Brazil,22,Clube de Regatas Vasco da Gama,978,€7.00m,7000000,2025
+brasileirao,Benjamín Rollheiser,491704,https://www.transfermarkt.com/benjamin-rollheiser/profil/spieler/491704,Right Winger,Argentina,26,Santos FC,221,€7.00m,7000000,2025
+brasileirao,Caio Alexandre,727751,https://www.transfermarkt.com/caio-alexandre/profil/spieler/727751,Defensive Midfield,Brazil,27,Esporte Clube Bahia,10010,€7.00m,7000000,2025
+brasileirao,Gabriel Menino,608216,https://www.transfermarkt.com/gabriel-menino/profil/spieler/608216,Central Midfield,Brazil,25,Santos FC,221,€7.00m,7000000,2025
+brasileirao,Álvaro Barreal,613873,https://www.transfermarkt.com/alvaro-barreal/profil/spieler/613873,Left Winger,Argentina,25,Santos FC,221,€7.00m,7000000,2025
+brasileirao,Riquelme,1219749,https://www.transfermarkt.com/riquelme/profil/spieler/1219749,Right Winger,Brazil,19,Fluminense Football Club,2462,€6.00m,6000000,2025
+brasileirao,Rodriguinho,743593,https://www.transfermarkt.com/rodriguinho/profil/spieler/743593,Attacking Midfield,Brazil,22,Red Bull Bragantino,8793,€6.00m,6000000,2025
+brasileirao,Wallace Yan,1082602,https://www.transfermarkt.com/wallace-yan/profil/spieler/1082602,Centre-Forward,Brazil,21,CR Flamengo,614,€6.00m,6000000,2025
+brasileirao,Juninho Capixaba,406676,https://www.transfermarkt.com/juninho-capixaba/profil/spieler/406676,Left-Back,Brazil,28,Red Bull Bragantino,8793,€6.00m,6000000,2025
+brasileirao,Pablo Maia,892089,https://www.transfermarkt.com/pablo-maia/profil/spieler/892089,Defensive Midfield,Brazil,24,São Paulo Futebol Clube,585,€6.00m,6000000,2025
+brasileirao,Paulo Henrique,412594,https://www.transfermarkt.com/paulo-henrique/profil/spieler/412594,Right-Back,Brazil,29,Clube de Regatas Vasco da Gama,978,€6.00m,6000000,2025
+brasileirao,Nuno Moreira,461937,https://www.transfermarkt.com/nuno-moreira/profil/spieler/461937,Right Winger,Portugal,26,Clube de Regatas Vasco da Gama,978,€6.00m,6000000,2025
+brasileirao,Matheus Martins,668228,https://www.transfermarkt.com/matheus-martins/profil/spieler/668228,Left Winger,Brazil,22,Botafogo de Futebol e Regatas,537,€6.00m,6000000,2025
+brasileirao,Santiago Rodríguez,465819,https://www.transfermarkt.com/santiago-rodriguez/profil/spieler/465819,Attacking Midfield,Uruguay,26,Botafogo de Futebol e Regatas,537,€6.00m,6000000,2025
+brasileirao,Alexandro Bernabei,719635,https://www.transfermarkt.com/alexandro-bernabei/profil/spieler/719635,Left-Back,Argentina,25,Sport Club Internacional,6600,€6.00m,6000000,2025
+brasileirao,Alexsander,997714,https://www.transfermarkt.com/alexsander/profil/spieler/997714,Defensive Midfield,Brazil,22,Clube Atlético Mineiro,330,€6.00m,6000000,2025
+brasileirao,Tomás Cuello,503052,https://www.transfermarkt.com/tomas-cuello/profil/spieler/503052,Left Winger,Argentina,26,Clube Atlético Mineiro,330,€6.00m,6000000,2025
+brasileirao,Gabriel Bontempo,1089958,https://www.transfermarkt.com/gabriel-bontempo/profil/spieler/1089958,Central Midfield,Brazil,21,Santos FC,221,€6.00m,6000000,2025
+brasileirao,Marlon Freitas,364972,https://www.transfermarkt.com/marlon-freitas/profil/spieler/364972,Defensive Midfield,Brazil,31,Sociedade Esportiva Palmeiras,1023,€6.00m,6000000,2025
+brasileirao,Matheus Bidu,670021,https://www.transfermarkt.com/matheus-bidu/profil/spieler/670021,Left-Back,Brazil,27,Sport Club Corinthians Paulista,199,€6.00m,6000000,2025
+brasileirao,Facundo Bernal,898350,https://www.transfermarkt.com/facundo-bernal/profil/spieler/898350,Defensive Midfield,Uruguay,22,Fluminense Football Club,2462,€6.00m,6000000,2025
+brasileirao,Rodrigo Castillo,984416,https://www.transfermarkt.com/rodrigo-castillo/profil/spieler/984416,Centre-Forward,Argentina,27,Fluminense Football Club,2462,€6.00m,6000000,2025
+brasileirao,Khellven,653348,https://www.transfermarkt.com/khellven/profil/spieler/653348,Right-Back,Brazil,25,Sociedade Esportiva Palmeiras,1023,€6.00m,6000000,2025

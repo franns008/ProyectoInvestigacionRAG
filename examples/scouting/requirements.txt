@@ -1,0 +1,29 @@
+# Serialización
+pyarrow
+
+# RAG pipeline
+haystack-ai
+ollama-haystack
+pgvector-haystack
+openai
+
+# Document converters
+pypdf
+python-docx
+markdown-it-py
+mdit-plain
+
+# Scraping / data
+beautifulsoup4
+requests
+soccerdata
+pandas
+numpy
+
+# Utils
+python-dotenv
+rich
+ollama
+Unidecode
+thefuzz
+python-Levenshtein
