@@ -1,19 +1,103 @@
 # Infraestructura Básica para RAGs
-Este es un repositorio con ejemplos de infraestructura básica para RAGs.
-Incluye
-- **OpenWebUI**: es una interfaz web de código abierto, autohosteada y extensible diseñada para interactuar con grandes modelos de lenguaje (LLM) locales o en la nube, ofreciendo una experiencia similar a ChatGPT pero con control total sobre los datos. Funciona como un centro de mando que permite conectar con Ollama, APIs compatibles con OpenAI (como vLLM, LocalAI o proveedores en la nube) y gestionar flujos de trabajo de IA privados sin conexión a internet.
-- **Ollama**: Ollama es una plataforma de código abierto que permite descargar, ejecutar y gestionar modelos de lenguaje grandes (LLM) directamente en el ordenador local, sin depender de servicios en la nube. Fue lanzado en julio de 2023 por Jeffrey Morgan y está diseñado para ejecutarse en sistemas Windows, macOS y Linux, funcionando principalmente a través de la terminal o mediante una API para integraciones.
-- **pgvector**: es una extensión de código abierto para PostgreSQL que añade soporte nativo para el almacenamiento, indexación y búsqueda de similitud de vectores de alta dimensión, permitiendo integrar capacidades avanzadas de inteligencia artificial directamente en bases de datos relacionales existentes.
-- 
+
+Repositorio con infraestructura y ejemplos para construir sistemas RAG (Retrieval-Augmented Generation) locales.
+
+## Componentes
+
+- **OpenWebUI** — interfaz web para interactuar con LLMs, similar a ChatGPT pero autohosteada. Permite conectar con Ollama y APIs compatibles con OpenAI.
+- **Ollama** — plataforma para correr LLMs localmente sin depender de la nube. Soporta Windows, macOS y Linux.
+- **pgvector** — extensión de PostgreSQL para almacenar y buscar vectores de alta dimensión, usada como vector database del RAG.
+- **Pipelines (OpenWebUI)** — servidor donde viven los pipelines RAG. Los archivos `.py` en `infrastructure/appdata/pipelines/` se cargan automáticamente.
+
+## Requisitos
+
+- Docker y Docker Compose
+- GPU con soporte NVIDIA (opcional pero recomendado para Ollama)
+- En Fedora/RHEL: SELinux activo (los volúmenes ya están configurados con `:z`)
 
 ## Startup
-```
-git clone
+
+```bash
+git clone <repo>
 cd infrastructure
-docker compose pull
-docker compose run
+docker compose up -d
 ```
-And a bit of luck.
+
+Luego abrí OpenWebUI en `http://localhost:8180`.
+
+## Documentos para el RAG
+
+Colocá tus archivos (`.pdf`, `.docx`, `.md`, `.txt`) en:
+
+```
+infrastructure/appdata/rawdata/
+```
+
+Al iniciar el contenedor de pipelines, los documentos se indexan automáticamente en pgvector. Si agregás documentos nuevos, reiniciá el contenedor:
+
+```bash
+docker restart infrastructure-pipelines-1
+```
+
+Para re-indexar desde cero (por ejemplo al cambiar el splitter):
+
+```bash
+docker exec infrastructure-vdb-1 psql -U avdbuser -d pgvdb -c "TRUNCATE TABLE local_docs;"
+docker restart infrastructure-pipelines-1
+```
+
+## Pipeline RAG
+
+El pipeline principal está en `infrastructure/appdata/pipelines/pipeline_local_docs.py`. Usa:
+
+- **Embeddings**: `bge-m3` via Ollama
+- **LLM**: configurable via Valves en OpenWebUI (por defecto `llama3.2:3b`)
+- **Retrieval**: híbrido (embeddings + keywords) sobre pgvector
+- **Splitter**: `RecursiveDocumentSplitter` de Haystack
+
+Los parámetros (modelo, chunk size, overlap, top-k) se pueden ajustar desde **Admin Panel → Pipelines → Valves** en OpenWebUI sin reiniciar.
+
+## Inspección de Chunking
+
+Para comparar cómo distintos splitters dividen los documentos:
+
+```bash
+cd infrastructure
+
+# Splitter por defecto (recursive)
+./inspect.sh
+
+# Por oración (Haystack)
+./inspect.sh --splitter sentence --split_length 5
+
+# Por tokens respetando oraciones (LlamaIndex)
+./inspect.sh --splitter llama_sentence --split_length 256
+
+# Semántico por embeddings (LlamaIndex + bge-m3)
+./inspect.sh --splitter llama_semantic
+
+# Semántico con double merging (LlamaIndex)
+./inspect.sh --splitter llama_semantic_double
+
+# Recursivo por caracteres (LangChain)
+./inspect.sh --splitter langchain_recursive --split_length 150
+```
+
+Splitters disponibles:
+
+| Nombre | Librería | Descripción |
+|---|---|---|
+| `recursive` | Haystack | Separa por párrafos → oraciones → saltos de línea → palabras |
+| `word` | Haystack | Chunks de N palabras exactas |
+| `sentence` | Haystack | Chunks de N oraciones |
+| `passage` | Haystack | Chunks de N párrafos |
+| `llama_sentence` | LlamaIndex | Tokens respetando límites de oraciones |
+| `llama_semantic` | LlamaIndex | Corta donde cambia el tema (usa embeddings) |
+| `llama_semantic_double` | LlamaIndex | Semántico con merge doble, más fino |
+| `langchain_recursive` | LangChain | Recursivo por caracteres con separadores configurables |
+
+Los resultados se guardan en `infrastructure/appdata/pipelines/chunks_<splitter>_len<N>_overlap<N>.txt`.
 
 ## Creando tu propio RAG
-El código de tu RAG puede vivir en cualquier carpeta fuera de infrastructure e incluso fuera del repositorio. La carpeta `seven_wonders` tiene un ejemplo de RAG sencillo usando HayStack pero pueden crearse RAGs usando cualquier otra librería como LlamaIndex o LangChain. Sigue por el camino de tu arcoiris 🌈.
+
+El código de tu RAG puede vivir en cualquier carpeta fuera de `infrastructure` e incluso fuera del repositorio. La carpeta `examples/` tiene ejemplos usando Haystack, pero podés usar LlamaIndex, LangChain o cualquier otra librería. Sigue por el camino de tu arcoiris 🌈.
