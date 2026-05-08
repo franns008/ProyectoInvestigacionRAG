@@ -6,7 +6,7 @@ Uso (dentro del contenedor):
 
 Splitters disponibles:
     Haystack   : recursive, word, sentence, passage
-    LlamaIndex : llama_sentence, llama_semantic, llama_semantic_double
+    LlamaIndex : llama_sentence, llama_semantic, llama_semantic_double, llama_hierarchical
     LangChain  : langchain_recursive
 
 El output se guarda en /app/pipelines/chunks_<splitter>_len<N>_overlap<N>.txt
@@ -69,6 +69,12 @@ def build_splitter(name: str, split_length: int, split_overlap: int):
         from llama_index.embeddings.ollama import OllamaEmbedding
         embed = OllamaEmbedding(model_name=EMBED_MODEL, base_url=OLLAMA_URL)
         return "llama", SemanticDoubleMergingSplitterNodeParser.from_defaults(embed_model=embed)
+    if name == "llama_hierarchical":
+        from llama_index.core.node_parser import HierarchicalNodeParser
+        # split_length define el nivel hoja; los padres son 4x y 16x más grandes
+        return "llama_hierarchical", HierarchicalNodeParser.from_defaults(
+            chunk_sizes=[split_length * 16, split_length * 4, split_length]
+        )
     if name == "langchain_recursive":
         from langchain_text_splitters import RecursiveCharacterTextSplitter
         # split_length en palabras → multiplicamos x6 para aproximar caracteres
@@ -97,12 +103,62 @@ def run_splitter(kind: str, splitter, docs: list[Document]) -> list[tuple[str, s
             ) from e
         return [(n.metadata.get("file_path", "unknown"), n.text) for n in nodes]
 
+    if kind == "llama_hierarchical":
+        from llama_index.core import Document as LlamaDoc
+        from llama_index.core.node_parser import get_leaf_nodes
+        llama_docs = [LlamaDoc(text=d.content, metadata=d.meta) for d in docs]
+        all_nodes = splitter.get_nodes_from_documents(llama_docs, show_progress=False)
+        leaf_nodes = get_leaf_nodes(all_nodes)
+        # Devolvemos (file_path, contenido, nivel) como tuplas de 3 elementos
+        result = []
+        for node in all_nodes:
+            level = 0 if node.parent_node is None else (1 if node.parent_node and any(
+                n.node_id == node.parent_node.node_id and n.parent_node is None for n in all_nodes
+            ) else 2)
+            result.append((node.metadata.get("file_path", "unknown"), node.text, level, node.node_id, node.parent_node.node_id if node.parent_node else None))
+        return result
+
     if kind == "langchain":
         result = []
         for doc in docs:
             for chunk in splitter.split_text(doc.content or ""):
                 result.append((doc.meta.get("file_path", "unknown"), chunk))
         return result
+
+
+def write_hierarchical_output(nodes: list, output_path: str, args):
+    DIV1 = "=" * 60
+    DIV2 = "-" * 60
+
+    # Agrupar por archivo y nivel
+    by_file: dict[str, dict[int, list]] = {}
+    for fpath, content, level, node_id, parent_id in nodes:
+        fname = Path(fpath).name
+        by_file.setdefault(fname, {}).setdefault(level, []).append((content, node_id, parent_id))
+
+    chunk_sizes = [args.split_length * 16, args.split_length * 4, args.split_length]
+    total = len(nodes)
+
+    with open(output_path, "w") as f:
+        f.write(f"splitter=llama_hierarchical | chunk_sizes={chunk_sizes}\n")
+        f.write(f"Niveles: 0=raíz ({chunk_sizes[0]} tokens), 1=medio ({chunk_sizes[1]}), 2=hoja ({chunk_sizes[2]})\n\n")
+        for fname, levels in by_file.items():
+            f.write(f"{DIV1}\nARCHIVO: {fname}\n{DIV1}\n")
+            for level in sorted(levels):
+                label = ["RAÍZ", "MEDIO", "HOJA"][level]
+                chunks_at_level = levels[level]
+                wc = [len(c.split()) for c, _, _ in chunks_at_level]
+                f.write(f"\n  NIVEL {level} - {label} ({len(chunks_at_level)} chunks | min={min(wc)} avg={sum(wc)//len(wc)} max={max(wc)})\n")
+                f.write(f"  {DIV2}\n")
+                for i, (content, node_id, parent_id) in enumerate(chunks_at_level, 1):
+                    words = len(content.split())
+                    parent_str = f"  parent={parent_id[:8]}..." if parent_id else "  (sin padre)"
+                    f.write(f"\n  [L{level} CHUNK {i}/{len(chunks_at_level)} - {words} palabras |{parent_str}]\n")
+                    f.write(f"  {DIV2}\n")
+                    for line in content.splitlines():
+                        f.write(f"  {line}\n")
+                    f.write(f"  {DIV2}\n")
+        f.write(f"\nTOTAL: {total} nodos\n")
 
 
 def write_output(chunks: list[tuple[str, str]], output_path: str, args):
@@ -137,7 +193,7 @@ if __name__ == "__main__":
     parser.add_argument("--splitter", default="recursive",
         choices=["recursive", "word", "sentence", "passage",
                  "llama_sentence", "llama_semantic", "llama_semantic_double",
-                 "langchain_recursive"])
+                 "llama_hierarchical", "langchain_recursive"])
     parser.add_argument("--split_length", type=int, default=200)
     parser.add_argument("--split_overlap", type=int, default=0)
     args = parser.parse_args()
@@ -156,6 +212,9 @@ if __name__ == "__main__":
     chunks = run_splitter(kind, splitter, docs)
 
     output = f"/app/pipelines/splitter_{args.splitter}.txt"
-    write_output(chunks, output, args)
-    print(f"Guardado en: {output}  ({len(chunks)} chunks totales)")
+    if kind == "llama_hierarchical":
+        write_hierarchical_output(chunks, output, args)
+    else:
+        write_output(chunks, output, args)
+    print(f"Guardado en: {output}  ({len(chunks)} nodos totales)" if kind == "llama_hierarchical" else f"Guardado en: {output}  ({len(chunks)} chunks totales)")
 

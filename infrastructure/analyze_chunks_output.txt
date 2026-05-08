@@ -1,0 +1,16 @@
+
+Métricas de chunks (palabras)
+
+splitter             n    min  max   avg    std    <30p %  >300p %
+-------------------  ---  ---  ----  -----  -----  ------  -------
+langchain_recursive  316  1    158   97.2   37.5   10.1    0.0    
+llama_hierarchical   702  1    1813  67.3   186.0  66.7    6.6    
+llama_semantic       39   4    3956  787.7  856.2  5.1     66.7   
+llama_sentence       345  12   157   89.3   31.9   2.9     0.0    
+recursive            205  5    207   149.8  48.9   2.4     0.0    
+sentence             108  48   1630  284.4  270.7  0.0     25.9   
+
+  <30p  = % de chunks con menos de 30 palabras  (posible ruido)
+  >300p = % de chunks con más de 300 palabras   (posible exceso de contexto)
+
+  Más uniforme (menor std): llama_sentence  (std=31.9)

@@ -79,6 +79,9 @@ cd infrastructure
 # Semántico con double merging (LlamaIndex)
 ./inspect.sh --splitter llama_semantic_double
 
+# Jerárquico multinivel (LlamaIndex) — hoja=100, medio=400, raíz=1600
+./inspect.sh --splitter llama_hierarchical --split_length 100
+
 # Recursivo por caracteres (LangChain)
 ./inspect.sh --splitter langchain_recursive --split_length 150
 ```
@@ -94,9 +97,10 @@ Splitters disponibles:
 | `llama_sentence` | LlamaIndex | Tokens respetando límites de oraciones |
 | `llama_semantic` | LlamaIndex | Corta donde cambia el tema (usa embeddings) |
 | `llama_semantic_double` | LlamaIndex | Semántico con merge doble, más fino |
+| `llama_hierarchical` | LlamaIndex | Genera chunks en 3 niveles (hoja → medio → raíz). `--split_length` define el tamaño de la hoja; los niveles superiores escalan x4 y x16. Útil para small-to-big retrieval. |
 | `langchain_recursive` | LangChain | Recursivo por caracteres con separadores configurables |
 
-Los resultados se guardan en `infrastructure/appdata/pipelines/chunks_<splitter>_len<N>_overlap<N>.txt`.
+Los resultados se guardan en `infrastructure/splitter_<nombre>.txt`.
 
 ## Creando tu propio RAG
 

@@ -3,8 +3,8 @@ splitter=llama_semantic | split_length=200 | split_overlap=0
 ============================================================
 ARCHIVO: Agente Asistente Personal con Calendario.pdf  (12 chunks | min=142 avg=431 max=1090)
 ============================================================
-
 [CHUNK 1/12 - 1090 palabras]
+
 ------------------------------------------------------------
 Guía Arquitectónica y Tutorial: Desarrollo de un Agente Asistente Personal Autónomo con OpenClaw y Notion El desarrollo de la inteligencia artificial agentiva representa una transición arquitectónica fundamental en la ingeniería de software, marcando la evolución desde modelos generativos reactivos y sin estado hacia sistemas dirigidos por objetivos que son capaces de percibir, planificar, actuar y adaptarse a través de bucles de control iterativos.
 1 En el ámbito de la productividad personal y empresarial, la implementación de un agente autónomo que gestione calendarios, clasifique tareas, estructure itinerarios complejos y programe recordatorios dinámicos exige una orquestación sumamente precisa entre el Modelo de Lenguaje Grande (LLM), el marco de ejecución subyacente y las interfaces de programación de aplicaciones (API) externas.
