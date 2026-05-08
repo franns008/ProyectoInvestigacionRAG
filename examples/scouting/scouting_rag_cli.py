@@ -205,6 +205,12 @@ def get_document_store() -> PgvectorDocumentStore:
         connection_string=Secret.from_token(DB_CONNECTION),
         embedding_dimension=EMBEDDING_DIMENSION,
         table_name=DB_TABLE,
+        # "simple" evita stemming y stopwords específicos de idioma;
+        # correcto para docs en español + nombres propios + estadísticas.
+        # Si el índice GIN ya existe con 'english', dropearlo y recrearlo:
+        #   DROP INDEX haystack_keyword_index;
+        # El store lo recrea automáticamente al conectar.
+        language="simple",
     )
 
 
@@ -280,12 +286,22 @@ def index_new_documents(store: PgvectorDocumentStore, cfg: Config) -> tuple[list
     return docs, len(new_docs)
 
 
-def build_rag_pipeline(store: PgvectorDocumentStore, cfg: Config) -> Pipeline:
+def build_retrieval_pipeline(store: PgvectorDocumentStore, cfg: Config) -> Pipeline:
     pipeline = Pipeline()
     pipeline.add_component("text_embedder", OllamaTextEmbedder(model=EMBEDDING_MODEL, url=OLLAMA_BASE_URL))
     pipeline.add_component("embedding_retriever", PgvectorEmbeddingRetriever(document_store=store, top_k=cfg.top_k))
     pipeline.add_component("keyword_retriever", PgvectorKeywordRetriever(document_store=store, top_k=cfg.top_k))
     pipeline.add_component("document_joiner", DocumentJoiner())
+
+    pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
+    pipeline.connect("embedding_retriever", "document_joiner")
+    pipeline.connect("keyword_retriever", "document_joiner")
+
+    return pipeline
+
+
+def build_generation_pipeline(cfg: Config) -> Pipeline:
+    pipeline = Pipeline()
     pipeline.add_component("prompt_builder", PromptBuilder(template=PROMPT_TEMPLATE))
     pipeline.add_component("llm", OpenAIGenerator(
         api_key=Secret.from_env_var("GROQ_API_KEY"),
@@ -298,16 +314,135 @@ def build_rag_pipeline(store: PgvectorDocumentStore, cfg: Config) -> Pipeline:
         streaming_callback=stream_state.callback,
     ))
 
-    pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
-    pipeline.connect("embedding_retriever", "document_joiner")
-    pipeline.connect("keyword_retriever", "document_joiner")
-    pipeline.connect("document_joiner", "prompt_builder.documents")
     pipeline.connect("prompt_builder", "llm")
 
     return pipeline
 
 
-def run_interactive_loop(pipeline: Pipeline) -> None:
+def estimate_tokens(text: str) -> int:
+    """Estimación rápida: ~4 chars por token (válido para español e inglés)."""
+    return max(1, len(text) // 4)
+
+
+def log_retrieval(
+    semantic_docs: list[Document],
+    keyword_docs: list[Document],
+    final_docs: list[Document],
+) -> None:
+    semantic_ids = {d.id for d in semantic_docs}
+    keyword_ids  = {d.id for d in keyword_docs}
+
+    log(f"  Semántico : {len(semantic_docs)} docs")
+    log(f"  Keyword   : {len(keyword_docs)} docs")
+    log(f"  Final (joiner, dedup): {len(final_docs)} docs")
+    log("")
+
+    only_sem = sum(1 for d in final_docs if d.id in semantic_ids and d.id not in keyword_ids)
+    only_kw  = sum(1 for d in final_docs if d.id in keyword_ids  and d.id not in semantic_ids)
+    both     = sum(1 for d in final_docs if d.id in semantic_ids and d.id in keyword_ids)
+    log(f"  Origen: {only_sem} solo-semántico | {only_kw} solo-keyword | {both} en ambos")
+    log("")
+
+    file_counts: dict[str, int] = {}
+    for d in final_docs:
+        fname = Path(d.meta.get("file_path", "desconocido")).name
+        file_counts[fname] = file_counts.get(fname, 0) + 1
+    log(f"  Archivos fuente ({len(file_counts)} únicos):")
+    for fname, count in sorted(file_counts.items()):
+        log(f"    {fname}: {count} chunk(s)")
+    log("")
+
+    total_tokens = sum(estimate_tokens(d.content or "") for d in final_docs)
+    log(f"  Tokens estimados en contexto: ~{total_tokens}")
+    log("")
+
+    log("  Detalle de chunks:")
+    for i, d in enumerate(final_docs, 1):
+        fname    = Path(d.meta.get("file_path", "?")).name
+        split_id = d.meta.get("_split_id", "?")
+        score    = f"{d.score:.4f}" if d.score is not None else "N/A"
+        overlap  = d.meta.get("_split_overlap_unit_count", "?")
+        tokens   = estimate_tokens(d.content or "")
+
+        origins = []
+        if d.id in semantic_ids:
+            origins.append("sem")
+        if d.id in keyword_ids:
+            origins.append("kw")
+        origin_tag = "+".join(origins)
+
+        log(f"    [{i:02d}] {fname}  split={split_id}  overlap={overlap}  score={score}  ~{tokens}tok  [{origin_tag}]")
+
+
+def print_retrieval_summary(
+    semantic_docs: list[Document],
+    keyword_docs: list[Document],
+    final_docs: list[Document],
+) -> None:
+    semantic_ids = {d.id for d in semantic_docs}
+    keyword_ids  = {d.id for d in keyword_docs}
+
+    only_sem = sum(1 for d in final_docs if d.id in semantic_ids and d.id not in keyword_ids)
+    only_kw  = sum(1 for d in final_docs if d.id in keyword_ids  and d.id not in semantic_ids)
+    both     = sum(1 for d in final_docs if d.id in semantic_ids and d.id in keyword_ids)
+
+    file_counts: dict[str, int] = {}
+    for d in final_docs:
+        fname = Path(d.meta.get("file_path", "?")).name
+        file_counts[fname] = file_counts.get(fname, 0) + 1
+
+    files_str    = "  ".join(f"[cyan]{n}[/cyan]({c})" for n, c in sorted(file_counts.items()))
+    total_tokens = sum(estimate_tokens(d.content or "") for d in final_docs)
+
+    console.rule("[dim]Retrieval[/dim]")
+    console.print(
+        f"  [dim]{len(final_docs)} chunks[/dim]"
+        f"  [dim]·[/dim]"
+        f"  [green]{only_sem} sem[/green]"
+        f"  [yellow]{only_kw} kw[/yellow]"
+        f"  [blue]{both} ambos[/blue]"
+        f"  [dim]·[/dim]  {files_str}"
+        f"  [dim]·[/dim]  [dim]~{total_tokens} tok[/dim]"
+    )
+
+    for i, d in enumerate(final_docs, 1):
+        fname    = Path(d.meta.get("file_path", "?")).name
+        split_id = d.meta.get("_split_id", "?")
+        score    = f"{d.score:.3f}" if d.score is not None else "N/A"
+        tokens   = estimate_tokens(d.content or "")
+        origins  = []
+        if d.id in semantic_ids:
+            origins.append("[green]sem[/green]")
+        if d.id in keyword_ids:
+            origins.append("[yellow]kw[/yellow]")
+        console.print(
+            f"  [dim]{i:02d}[/dim]  {fname}  "
+            f"[dim]split={split_id}  score={score}  ~{tokens}tok[/dim]  "
+            + "+".join(origins)
+        )
+    console.rule()
+
+
+def log_session_start(cfg: Config) -> None:
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log("")
+    log("╔" + "═" * 58 + "╗")
+    log(f"║  NUEVA SESIÓN  —  {ts:<38}║")
+    log("╠" + "═" * 58 + "╣")
+    log(f"║  LLM            {cfg.llm_model:<41}║")
+    log(f"║  max_tokens     {cfg.max_tokens:<41}║")
+    log(f"║  top_k          {cfg.top_k:<41}║")
+    log(f"║  split_length   {cfg.split_length:<41}║")
+    log(f"║  split_overlap  {cfg.split_overlap:<41}║")
+    log(f"║  embedding      {EMBEDDING_MODEL:<41}║")
+    log("╚" + "═" * 58 + "╝")
+    log("")
+
+
+def run_interactive_loop(
+    retrieval_pipeline: Pipeline,
+    generation_pipeline: Pipeline,
+) -> None:
     console.print("\n[dim]Escribí [bold]exit[/bold] para salir.[/dim]\n")
 
     while True:
@@ -323,12 +458,24 @@ def run_interactive_loop(pipeline: Pipeline) -> None:
             console.print("[dim]Goodbye![/dim]")
             break
 
-        stream_state.reset()
-        result = pipeline.run(
+        ret_result = retrieval_pipeline.run(
             {
                 "text_embedder": {"text": question},
                 "keyword_retriever": {"query": question},
-                "prompt_builder": {"question": question},
+            },
+            include_outputs_from={"embedding_retriever", "keyword_retriever"},
+        )
+
+        semantic_docs = ret_result.get("embedding_retriever", {}).get("documents", [])
+        keyword_docs  = ret_result.get("keyword_retriever",  {}).get("documents", [])
+        final_docs    = ret_result.get("document_joiner",    {}).get("documents", [])
+
+        print_retrieval_summary(semantic_docs, keyword_docs, final_docs)
+
+        stream_state.reset()
+        gen_result = generation_pipeline.run(
+            {
+                "prompt_builder": {"documents": final_docs, "question": question},
             },
             include_outputs_from={"prompt_builder"},
         )
@@ -337,9 +484,12 @@ def run_interactive_loop(pipeline: Pipeline) -> None:
             console.print("\n[bold green]Respuesta:[/bold green] [dim]Sin respuesta.[/dim]")
         console.print("\n")
 
-        prompt = result.get("prompt_builder", {}).get("prompt", "")
+        prompt = gen_result.get("prompt_builder", {}).get("prompt", "")
+
         log("=" * 60)
         log(f"PREGUNTA: {question}")
+        log("-" * 40 + " RETRIEVAL")
+        log_retrieval(semantic_docs, keyword_docs, final_docs)
         log("-" * 40 + " PROMPT")
         log(prompt)
         log("-" * 40 + " RESPUESTA")
@@ -357,12 +507,14 @@ def unload_embedding_model() -> None:
 
 if __name__ == "__main__":
     cfg = run_setup()
+    log_session_start(cfg)
     store = get_document_store()
     docs, new_count = index_new_documents(store, cfg)
     print_setup_summary(cfg, docs, new_count)
-    pipeline = build_rag_pipeline(store, cfg)
+    retrieval_pipeline  = build_retrieval_pipeline(store, cfg)
+    generation_pipeline = build_generation_pipeline(cfg)
     try:
-        run_interactive_loop(pipeline)
+        run_interactive_loop(retrieval_pipeline, generation_pipeline)
     finally:
         console.rule("[bold cyan]Descargando modelos[/bold cyan]")
         unload_embedding_model()
