@@ -76,8 +76,8 @@ cd infrastructure
 # Semántico por embeddings (LlamaIndex + bge-m3)
 ./inspect.sh --splitter llama_semantic
 
-# Semántico con double merging (LlamaIndex)
-./inspect.sh --splitter llama_semantic_double
+# Semántico con threshold ajustado (menos chunks → más contexto por chunk)
+./inspect.sh --splitter llama_semantic --threshold 80
 
 # Jerárquico multinivel (LlamaIndex) — hoja=100, medio=400, raíz=1600
 ./inspect.sh --splitter llama_hierarchical --split_length 100
@@ -95,8 +95,7 @@ Splitters disponibles:
 | `sentence` | Haystack | Chunks de N oraciones |
 | `passage` | Haystack | Chunks de N párrafos |
 | `llama_sentence` | LlamaIndex | Tokens respetando límites de oraciones |
-| `llama_semantic` | LlamaIndex | Corta donde cambia el tema (usa embeddings) |
-| `llama_semantic_double` | LlamaIndex | Semántico con merge doble, más fino |
+| `llama_semantic` | LlamaIndex | Corta donde cambia el tema (usa embeddings). `--threshold` controla la sensibilidad (1-99, default 95). Menor = más cortes. |
 | `llama_hierarchical` | LlamaIndex | Genera chunks en 3 niveles (hoja → medio → raíz). `--split_length` define el tamaño de la hoja; los niveles superiores escalan x4 y x16. Útil para small-to-big retrieval. |
 | `langchain_recursive` | LangChain | Recursivo por caracteres con separadores configurables |
 

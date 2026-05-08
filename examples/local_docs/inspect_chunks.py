@@ -2,16 +2,12 @@
 Herramienta de inspección de estrategias de chunking para RAG.
 
 Uso (dentro del contenedor):
-    python /app/pipelines/inspect_chunks.py [--splitter TIPO] [--split_length N] [--split_overlap N]
+    python /app/pipelines/inspect_chunks.py [--splitter TIPO] [--split_length N] [--split_overlap N] [--threshold N]
 
 Splitters disponibles:
     Haystack   : recursive, word, sentence, passage
-    LlamaIndex : llama_sentence, llama_semantic, llama_semantic_double, llama_hierarchical
+    LlamaIndex : llama_sentence, llama_semantic, llama_hierarchical
     LangChain  : langchain_recursive
-
-El output se guarda en /app/pipelines/chunks_<splitter>_len<N>_overlap<N>.txt
-Para copiarlo a tu máquina:
-    docker cp infrastructure-pipelines-1:/app/pipelines/<archivo>.txt .
 """
 
 import argparse
@@ -42,7 +38,7 @@ def load_documents() -> list[Document]:
     return cleaner.run(documents=docs)["documents"]
 
 
-def build_splitter(name: str, split_length: int, split_overlap: int):
+def build_splitter(name: str, split_length: int, split_overlap: int, threshold: int):
     if name == "recursive":
         return "haystack", RecursiveDocumentSplitter(
             split_length=split_length,
@@ -63,21 +59,17 @@ def build_splitter(name: str, split_length: int, split_overlap: int):
         from llama_index.core.node_parser import SemanticSplitterNodeParser
         from llama_index.embeddings.ollama import OllamaEmbedding
         embed = OllamaEmbedding(model_name=EMBED_MODEL, base_url=OLLAMA_URL)
-        return "llama", SemanticSplitterNodeParser.from_defaults(embed_model=embed)
-    if name == "llama_semantic_double":
-        from llama_index.core.node_parser import SemanticDoubleMergingSplitterNodeParser
-        from llama_index.embeddings.ollama import OllamaEmbedding
-        embed = OllamaEmbedding(model_name=EMBED_MODEL, base_url=OLLAMA_URL)
-        return "llama", SemanticDoubleMergingSplitterNodeParser.from_defaults(embed_model=embed)
+        return "llama", SemanticSplitterNodeParser.from_defaults(
+            embed_model=embed,
+            breakpoint_percentile_threshold=threshold,
+        )
     if name == "llama_hierarchical":
         from llama_index.core.node_parser import HierarchicalNodeParser
-        # split_length define el nivel hoja; los padres son 4x y 16x más grandes
         return "llama_hierarchical", HierarchicalNodeParser.from_defaults(
             chunk_sizes=[split_length * 16, split_length * 4, split_length]
         )
     if name == "langchain_recursive":
         from langchain_text_splitters import RecursiveCharacterTextSplitter
-        # split_length en palabras → multiplicamos x6 para aproximar caracteres
         return "langchain", RecursiveCharacterTextSplitter(
             chunk_size=split_length * 6,
             chunk_overlap=split_overlap * 6,
@@ -85,8 +77,7 @@ def build_splitter(name: str, split_length: int, split_overlap: int):
     raise ValueError(f"Splitter desconocido: {name}")
 
 
-def run_splitter(kind: str, splitter, docs: list[Document]) -> list[tuple[str, str]]:
-    """Devuelve lista de (file_path, contenido_chunk)."""
+def run_splitter(kind: str, splitter, docs: list[Document]) -> list:
     if kind == "haystack":
         chunks = splitter.run(documents=docs)["documents"]
         return [(c.meta.get("file_path", "unknown"), c.content or "") for c in chunks]
@@ -97,10 +88,7 @@ def run_splitter(kind: str, splitter, docs: list[Document]) -> list[tuple[str, s
         try:
             nodes = splitter.get_nodes_from_documents(llama_docs, show_progress=False)
         except Exception as e:
-            raise RuntimeError(
-                f"Error al splitear con LlamaIndex: {e}\n"
-                "Tip: llama_semantic_double puede fallar con bge-m3 por NaN en embeddings de frases cortas."
-            ) from e
+            raise RuntimeError(f"Error al splitear con LlamaIndex: {e}") from e
         return [(n.metadata.get("file_path", "unknown"), n.text) for n in nodes]
 
     if kind == "llama_hierarchical":
@@ -108,8 +96,6 @@ def run_splitter(kind: str, splitter, docs: list[Document]) -> list[tuple[str, s
         from llama_index.core.node_parser import get_leaf_nodes
         llama_docs = [LlamaDoc(text=d.content, metadata=d.meta) for d in docs]
         all_nodes = splitter.get_nodes_from_documents(llama_docs, show_progress=False)
-        leaf_nodes = get_leaf_nodes(all_nodes)
-        # Devolvemos (file_path, contenido, nivel) como tuplas de 3 elementos
         result = []
         for node in all_nodes:
             level = 0 if node.parent_node is None else (1 if node.parent_node and any(
@@ -130,7 +116,6 @@ def write_hierarchical_output(nodes: list, output_path: str, args):
     DIV1 = "=" * 60
     DIV2 = "-" * 60
 
-    # Agrupar por archivo y nivel
     by_file: dict[str, dict[int, list]] = {}
     for fpath, content, level, node_id, parent_id in nodes:
         fname = Path(fpath).name
@@ -170,8 +155,13 @@ def write_output(chunks: list[tuple[str, str]], output_path: str, args):
         fname = Path(fpath).name
         by_file.setdefault(fname, []).append(content)
 
+    if args.splitter == "llama_semantic":
+        header = f"splitter={args.splitter} | threshold={args.threshold} (corte por similitud semántica)"
+    else:
+        header = f"splitter={args.splitter} | split_length={args.split_length} | split_overlap={args.split_overlap}"
+
     with open(output_path, "w") as f:
-        f.write(f"splitter={args.splitter} | split_length={args.split_length} | split_overlap={args.split_overlap}\n\n")
+        f.write(header + "\n\n")
         for fname, cs in by_file.items():
             wc = [len(c.split()) for c in cs]
             f.write(f"{DIV1}\n")
@@ -192,10 +182,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--splitter", default="recursive",
         choices=["recursive", "word", "sentence", "passage",
-                 "llama_sentence", "llama_semantic", "llama_semantic_double",
+                 "llama_sentence", "llama_semantic",
                  "llama_hierarchical", "langchain_recursive"])
     parser.add_argument("--split_length", type=int, default=200)
     parser.add_argument("--split_overlap", type=int, default=0)
+    parser.add_argument("--threshold", type=int, default=95,
+        help="Percentil de corte para llama_semantic (1-99). Menor = más chunks. Default: 95")
     args = parser.parse_args()
 
     print(f"Cargando documentos desde {INPUT_DIR}...")
@@ -203,10 +195,10 @@ if __name__ == "__main__":
     print(f"  {len(docs)} documentos cargados.")
 
     print(f"Construyendo splitter '{args.splitter}'...")
-    kind, splitter = build_splitter(args.splitter, args.split_length, args.split_overlap)
+    kind, splitter = build_splitter(args.splitter, args.split_length, args.split_overlap, args.threshold)
 
-    if args.splitter in ("llama_semantic", "llama_semantic_double"):
-        print("Spliteando... (generando embeddings con Ollama, puede tardar unos segundos)")
+    if args.splitter == "llama_semantic":
+        print(f"Spliteando... (threshold={args.threshold}, generando embeddings con Ollama)")
     else:
         print("Spliteando...")
     chunks = run_splitter(kind, splitter, docs)
@@ -216,5 +208,5 @@ if __name__ == "__main__":
         write_hierarchical_output(chunks, output, args)
     else:
         write_output(chunks, output, args)
-    print(f"Guardado en: {output}  ({len(chunks)} nodos totales)" if kind == "llama_hierarchical" else f"Guardado en: {output}  ({len(chunks)} chunks totales)")
-
+    total = len(chunks)
+    print(f"Guardado en: {output}  ({total} {'nodos' if kind == 'llama_hierarchical' else 'chunks'} totales)")
