@@ -27,7 +27,7 @@ from haystack.components.converters import (
 )
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
 from haystack_integrations.components.embedders.ollama import OllamaDocumentEmbedder
-from haystack.components.generators.openai import OpenAIGenerator
+from haystack_integrations.components.generators.ollama import OllamaGenerator
 import ollama
 
 from rich.console import Console
@@ -38,22 +38,25 @@ DB_TABLE            = "local_docs"
 EMBEDDING_MODEL     = "bge-m3"
 EMBEDDING_DIMENSION = 1024
 OLLAMA_BASE_URL     = "http://localhost:11434"
-GROQ_BASE_URL       = "https://api.groq.com/openai/v1"
 INPUT_DIR           = Path(__file__).parent / "rawdata/markdown"
 LOG_FILE            = Path(__file__).parent / "log.txt"
 
-GROQ_MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
-    "llama-3.1-70b-versatile",
-    "gemma2-9b-it",
-    "mixtral-8x7b-32768",
+# Modelos recomendados; se muestran primero si están instalados
+RECOMMENDED_MODELS = [
+    "llama3.2:3b",
+    "llama3.1:8b",
+    "llama3.3:70b",
+    "gemma3:4b",
+    "gemma3:12b",
+    "qwen2.5:7b",
+    "mistral:7b",
+    "phi4:14b",
 ]
 
 PROMPT_TEMPLATE = """
 Given the following information, answer the question.
 YOU SHOULD ANSWER IN THE LANGUAGE OF THE QUESTION, NOT THE LANGUAGE OF THE DOCUMENTS.
-if you dont know about the question, say you dont know. Do not try to make up an answer.
+If you don't know the answer, say you don't know. Do not try to make up an answer.
 
 Context:
 {% for document in documents %}
@@ -75,10 +78,12 @@ def log(msg: str) -> None:
     with LOG_FILE.open("a", encoding="utf-8") as f:
         f.write(f"[{ts}] {msg}\n")
 
+
 @dataclass
 class Config:
     llm_model:    str
-    max_tokens:   int
+    num_ctx:      int
+    num_predict:  int
     top_k:        int
     split_length: int
     split_overlap: int
@@ -87,7 +92,6 @@ class Config:
 # --- Setup helpers ---
 
 def pick(title: str, options: list[tuple[str, Any]], default: int) -> Any:
-    """Muestra una lista numerada y devuelve el valor elegido. Enter usa el default."""
     console.rule(f"[bold cyan]{title}[/bold cyan]")
     for i, (label, _) in enumerate(options, 1):
         marker = "  [dim]← predeterminado[/dim]" if i == default else ""
@@ -102,19 +106,46 @@ def pick(title: str, options: list[tuple[str, Any]], default: int) -> Any:
         console.print(f"[yellow]Ingresá un número entre 1 y {len(options)}, o Enter para el predeterminado.[/yellow]")
 
 
+def get_sorted_models(installed: list[str]) -> list[str]:
+    """Devuelve los modelos instalados: primero los recomendados, luego el resto."""
+    installed_set = set(installed)
+    ordered = [m for m in RECOMMENDED_MODELS if m in installed_set]
+    extras  = [m for m in installed if m not in set(RECOMMENDED_MODELS)]
+    return ordered + extras
+
+
 def run_setup() -> Config:
-    if not os.environ.get("GROQ_API_KEY"):
-        console.print("[red]GROQ_API_KEY no encontrada. Creá un archivo .env en el directorio con esa variable.[/red]")
+    try:
+        installed = [m.model for m in ollama.list().models]
+    except Exception:
+        console.print("[red]No se pudo conectar a Ollama. Verificá que esté corriendo en localhost:11434.[/red]")
         raise SystemExit(1)
 
+    if not installed:
+        console.print("[red]No hay modelos instalados en Ollama.[/red]")
+        raise SystemExit(1)
+
+    models = get_sorted_models(installed)
+
     llm_model = pick(
-        "Seleccioná un modelo Groq",
-        [(m, m) for m in GROQ_MODELS],
+        "Seleccioná un modelo LLM (Ollama)",
+        [(m, m) for m in models],
         default=1,
     )
 
-    max_tokens = pick(
-        "Longitud de respuesta (max_tokens)",
+    num_ctx = pick(
+        "Ventana de contexto del LLM (num_ctx)",
+        [
+            ("Pequeña  (2 048 tokens) — recomendado para modelos ≤3B", 2048),
+            ("Media    (4 096 tokens)", 4096),
+            ("Grande   (8 192 tokens)", 8192),
+            ("Muy grande (16 384 tokens) — solo modelos con capacidad suficiente", 16384),
+        ],
+        default=2,
+    )
+
+    num_predict = pick(
+        "Longitud de respuesta (num_predict)",
         [
             ("Corta          (256 tokens)", 256),
             ("Predeterminada (1 000 tokens)", 1000),
@@ -145,7 +176,8 @@ def run_setup() -> Config:
 
     return Config(
         llm_model=llm_model,
-        max_tokens=max_tokens,
+        num_ctx=num_ctx,
+        num_predict=num_predict,
         top_k=top_k,
         split_length=split_length,
         split_overlap=split_overlap,
@@ -155,7 +187,6 @@ def run_setup() -> Config:
 # --- Pipeline ---
 
 class StreamState:
-    """Coordina el streaming del LLM en el loop interactivo."""
     def __init__(self):
         self.started = False
         self._chunks: list[str] = []
@@ -210,8 +241,9 @@ def get_document_store() -> PgvectorDocumentStore:
 
 def print_setup_summary(cfg: Config, docs: list[Document], new_count: int) -> None:
     console.rule("[bold cyan]Configuración[/bold cyan]")
-    console.print(f"  [cyan]LLM[/cyan]                 {cfg.llm_model} (Groq)")
-    console.print(f"  [cyan]max_tokens[/cyan]           {cfg.max_tokens}")
+    console.print(f"  [cyan]LLM[/cyan]                 {cfg.llm_model} (Ollama)")
+    console.print(f"  [cyan]num_ctx[/cyan]              {cfg.num_ctx} tokens")
+    console.print(f"  [cyan]num_predict[/cyan]          {cfg.num_predict} tokens")
     console.print(f"  [cyan]temperature[/cyan]          {TEMPERATURE}")
     console.print(f"  [cyan]Retriever top-k[/cyan]      {cfg.top_k}")
     console.print(f"  [cyan]Split length[/cyan]         {cfg.split_length} palabras")
@@ -219,7 +251,6 @@ def print_setup_summary(cfg: Config, docs: list[Document], new_count: int) -> No
     console.print(f"  [cyan]Embedding model[/cyan]      {EMBEDDING_MODEL} (Ollama)")
     console.print(f"  [cyan]Embedding dimension[/cyan]  {EMBEDDING_DIMENSION}")
     console.print(f"  [cyan]Ollama URL[/cyan]           {OLLAMA_BASE_URL}")
-    console.print(f"  [cyan]Groq base URL[/cyan]        {GROQ_BASE_URL}")
     console.print(f"  [cyan]DB table[/cyan]             {DB_TABLE}")
     console.print(f"  [cyan]Input dir[/cyan]            {INPUT_DIR}")
 
@@ -236,13 +267,13 @@ def print_setup_summary(cfg: Config, docs: list[Document], new_count: int) -> No
         index_status = f"[green]{new_count} nuevos indexados[/green]" if new_count else "[yellow]sin cambios[/yellow]"
         console.print(f"\n  Total: [bold]{len(docs)}[/bold] fragmentos — {index_status}")
     else:
-        console.print("  [yellow]No se encontraron documentos en 'input/'[/yellow]")
+        console.print("  [yellow]No se encontraron documentos en 'rawdata/markdown/'[/yellow]")
 
 
 def index_new_documents(store: PgvectorDocumentStore, cfg: Config) -> tuple[list[Document], int]:
     if not INPUT_DIR.exists():
         console.print(f"[red]Directorio no encontrado:[/red] {INPUT_DIR}")
-        console.print("Creá la carpeta [bold]input/[/bold] junto al script y agregá tus documentos (pdf, docx, md, txt).")
+        console.print("Creá la carpeta [bold]rawdata/markdown/[/bold] junto al script y agregá tus documentos.")
         return [], 0
 
     docs = load_local_documents(INPUT_DIR)
@@ -287,14 +318,16 @@ def build_rag_pipeline(store: PgvectorDocumentStore, cfg: Config) -> Pipeline:
     pipeline.add_component("keyword_retriever", PgvectorKeywordRetriever(document_store=store, top_k=cfg.top_k))
     pipeline.add_component("document_joiner", DocumentJoiner())
     pipeline.add_component("prompt_builder", PromptBuilder(template=PROMPT_TEMPLATE))
-    pipeline.add_component("llm", OpenAIGenerator(
-        api_key=Secret.from_env_var("GROQ_API_KEY"),
-        api_base_url=GROQ_BASE_URL,
+    pipeline.add_component("llm", OllamaGenerator(
         model=cfg.llm_model,
+        url=OLLAMA_BASE_URL,
         generation_kwargs={
+            "num_predict": cfg.num_predict,
             "temperature": TEMPERATURE,
-            "max_tokens":  cfg.max_tokens,
+            "num_ctx":     cfg.num_ctx,
         },
+        keep_alive=-1,
+        timeout=450,
         streaming_callback=stream_state.callback,
     ))
 
@@ -347,12 +380,13 @@ def run_interactive_loop(pipeline: Pipeline) -> None:
         log("=" * 60 + "\n")
 
 
-def unload_embedding_model() -> None:
-    try:
-        ollama.generate(model=EMBEDDING_MODEL, prompt="", keep_alive=0)
-        console.print(f"  [dim]Embedding ({EMBEDDING_MODEL}) descargado[/dim]")
-    except Exception:
-        pass
+def unload_models(cfg: Config) -> None:
+    for model, label in [(cfg.llm_model, "LLM"), (EMBEDDING_MODEL, "Embedding")]:
+        try:
+            ollama.generate(model=model, prompt="", keep_alive=0)
+            console.print(f"  [dim]{label} ({model}) descargado[/dim]")
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
@@ -365,4 +399,4 @@ if __name__ == "__main__":
         run_interactive_loop(pipeline)
     finally:
         console.rule("[bold cyan]Descargando modelos[/bold cyan]")
-        unload_embedding_model()
+        unload_models(cfg)
