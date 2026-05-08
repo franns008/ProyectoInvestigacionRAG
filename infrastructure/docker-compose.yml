@@ -78,7 +78,7 @@ services:
         depends_on:
             - vdb
             - ollama
-        deploy:                         
+        deploy:
             resources:
                 reservations:
                     devices:
