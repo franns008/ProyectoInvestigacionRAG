@@ -65,6 +65,7 @@ services:
             - env/pipelines.env
         environment:
             PG_CONN_STR: postgresql://${PGVECTOR_USR}:${PGVECTOR_PASS}@vdb/pgvdb?sslmode=disable
+            TORCH_DEVICE: cuda  
         ports:
             - "${PIPELINES_PORT:-9099}:9099"
         extra_hosts:
@@ -72,7 +73,13 @@ services:
         volumes:
             - pipelines:/app/pipelines
             - rawdata:/app/pipelines/rawdata
-
+        deploy:                         
+            resources:
+                reservations:
+                    devices:
+                      - driver: nvidia
+                        count: 1
+                        capabilities: [gpu]
 volumes:
     ollama_data:
         driver: local
