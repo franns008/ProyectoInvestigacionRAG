@@ -116,4 +116,4 @@ volumes:
         driver_opts:
             type: 'none'
             o: 'bind'
-            device: ./appdata/rawdata/
+            device: ./appdata/pipelines/rawdata/
