@@ -1,30 +1,196 @@
-2026-05-29 21:46:00,979 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
-2026-05-29 21:46:02,457 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: Torch not compiled with CUDA enabled. Los PDFs serán ignorados.
-2026-05-29 21:46:02,510 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
-2026-05-29 21:46:02,512 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
-2026-05-29 21:46:02,513 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
-2026-05-29 21:46:02,513 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
-2026-05-29 21:46:02,518 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
-2026-05-29 21:47:58,648 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
-2026-05-29 21:48:00,957 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: Torch not compiled with CUDA enabled. Los PDFs serán ignorados.
-2026-05-29 21:48:01,034 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
-2026-05-29 21:48:01,036 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
-2026-05-29 21:48:01,036 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
-2026-05-29 21:48:01,036 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
-2026-05-29 21:48:01,041 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
-2026-05-29 21:48:21,123 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-29 21:48:21,123 - INFO - [HaystackRAG] - Ejecutando RAG para: *     
-    
-*   que buenas practicas puedo empezar a tener en cuenta para la arquitectura cloud?
-2026-05-29 21:48:27,234 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:27,234 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-29 21:48:27,234 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:27,234 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-29 21:48:27,235 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:27,235 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-29 21:48:27,235 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:27,311 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-29 21:48:27,311 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+2026-06-10 21:17:00,075 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-06-10 21:17:01,977 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: Could not import module 'PreTrainedModel'. Are this object's requirements defined correctly?. Los PDFs serán ignorados.
+2026-06-10 21:17:02,013 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-06-10 21:17:02,015 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:17:02,015 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:17:02,015 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:17:02,018 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:17:02,021 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-06-10 21:17:02,022 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:17:02,022 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:17:02,022 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:17:02,026 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:44:26,938 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-06-10 21:44:28,707 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: is_bf16_supported() got an unexpected keyword argument 'including_emulation'. Los PDFs serán ignorados.
+2026-06-10 21:44:28,743 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-06-10 21:44:28,745 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:44:28,746 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:44:28,746 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:44:28,750 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:44:28,754 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-06-10 21:44:28,755 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:44:28,756 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:44:28,756 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:44:28,760 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:51:09,287 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-06-10 21:51:11,157 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: is_bf16_supported() got an unexpected keyword argument 'including_emulation'. Los PDFs serán ignorados.
+2026-06-10 21:51:11,194 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-06-10 21:51:11,196 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:51:11,196 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:51:11,196 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:51:11,201 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:51:11,204 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-06-10 21:51:11,206 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:51:11,206 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:51:11,206 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:51:11,211 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:54:04,071 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-06-10 21:54:05,860 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: is_bf16_supported() got an unexpected keyword argument 'including_emulation'
+2026-06-10 21:54:05,862 - ERROR - [HaystackRAG] - Traceback completo:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 86, in __init__
+    self._marker_converter = PdfConverter(artifact_dict=create_model_dict())
+                                                        ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/marker/models.py", line 20, in create_model_dict
+    "layout_model": LayoutPredictor(FoundationPredictor(checkpoint=surya_settings.LAYOUT_MODEL_CHECKPOINT, attention_implementation=attention_implementation, device=device, dtype=dtype)),
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/surya/foundation/__init__.py", line 113, in __init__
+    super().__init__(checkpoint, device, dtype, attention_implementation)
+  File "/usr/local/lib/python3.11/site-packages/surya/common/predictor.py", line 37, in __init__
+    self.model = loader.model(device, dtype, attention_implementation)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/surya/foundation/loader.py", line 38, in model
+    if device == "cuda" and not torch.cuda.is_bf16_supported(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: is_bf16_supported() got an unexpected keyword argument 'including_emulation'
+
+2026-06-10 21:54:05,901 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-06-10 21:54:05,903 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:54:05,904 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:54:05,904 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:54:05,908 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:54:05,912 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-06-10 21:54:05,913 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:54:05,913 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:54:05,914 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:54:05,918 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:55:44,414 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-06-10 21:55:46,192 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: is_bf16_supported() got an unexpected keyword argument 'including_emulation'
+2026-06-10 21:55:46,193 - ERROR - [HaystackRAG] - Traceback completo:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 86, in __init__
+    self._marker_converter = PdfConverter(artifact_dict=create_model_dict())
+                                                        ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/marker/models.py", line 20, in create_model_dict
+    "layout_model": LayoutPredictor(FoundationPredictor(checkpoint=surya_settings.LAYOUT_MODEL_CHECKPOINT, attention_implementation=attention_implementation, device=device, dtype=dtype)),
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/surya/foundation/__init__.py", line 113, in __init__
+    super().__init__(checkpoint, device, dtype, attention_implementation)
+  File "/usr/local/lib/python3.11/site-packages/surya/common/predictor.py", line 37, in __init__
+    self.model = loader.model(device, dtype, attention_implementation)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/surya/foundation/loader.py", line 38, in model
+    if device == "cuda" and not torch.cuda.is_bf16_supported(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: is_bf16_supported() got an unexpected keyword argument 'including_emulation'
+
+2026-06-10 21:55:46,231 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-06-10 21:55:46,233 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:55:46,233 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:55:46,233 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:55:46,237 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:55:46,241 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-06-10 21:55:46,243 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:55:46,243 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:55:46,243 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:55:46,248 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:57:51,232 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-06-10 21:57:53,183 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: is_bf16_supported() got an unexpected keyword argument 'including_emulation'
+2026-06-10 21:57:53,185 - ERROR - [HaystackRAG] - Traceback completo:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 86, in __init__
+    self._marker_converter = PdfConverter(artifact_dict=create_model_dict())
+                                                        ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/marker/models.py", line 20, in create_model_dict
+    "layout_model": LayoutPredictor(FoundationPredictor(checkpoint=surya_settings.LAYOUT_MODEL_CHECKPOINT, attention_implementation=attention_implementation, device=device, dtype=dtype)),
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/surya/foundation/__init__.py", line 113, in __init__
+    super().__init__(checkpoint, device, dtype, attention_implementation)
+  File "/usr/local/lib/python3.11/site-packages/surya/common/predictor.py", line 37, in __init__
+    self.model = loader.model(device, dtype, attention_implementation)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/surya/foundation/loader.py", line 38, in model
+    if device == "cuda" and not torch.cuda.is_bf16_supported(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: is_bf16_supported() got an unexpected keyword argument 'including_emulation'
+
+2026-06-10 21:57:53,233 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-06-10 21:57:53,236 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:57:53,236 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:57:53,236 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:57:53,241 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 21:57:53,245 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-06-10 21:57:53,247 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 21:57:53,247 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 21:57:53,247 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 21:57:53,252 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 22:00:19,642 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-06-10 22:01:22,166 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-06-10 22:01:22,206 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-06-10 22:01:22,210 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:01:25,937 - ERROR - [HaystackRAG] - Error convirtiendo Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf: pad_sequence() got an unexpected keyword argument 'padding_side'
+2026-06-10 22:01:25,947 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:01:31,444 - ERROR - [HaystackRAG] - Error convirtiendo INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf: pad_sequence() got an unexpected keyword argument 'padding_side'
+2026-06-10 22:01:31,461 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:01:36,134 - ERROR - [HaystackRAG] - Error convirtiendo INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf: pad_sequence() got an unexpected keyword argument 'padding_side'
+2026-06-10 22:01:36,149 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 22:01:36,153 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-06-10 22:01:36,157 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:01:39,378 - ERROR - [HaystackRAG] - Error convirtiendo Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf: pad_sequence() got an unexpected keyword argument 'padding_side'
+2026-06-10 22:01:39,386 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:01:45,175 - ERROR - [HaystackRAG] - Error convirtiendo INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf: pad_sequence() got an unexpected keyword argument 'padding_side'
+2026-06-10 22:01:45,195 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:01:49,923 - ERROR - [HaystackRAG] - Error convirtiendo INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf: pad_sequence() got an unexpected keyword argument 'padding_side'
+2026-06-10 22:01:49,939 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
+2026-06-10 22:06:40,850 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-06-10 22:06:45,510 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-06-10 22:06:45,548 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-06-10 22:06:45,553 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:07:00,444 - INFO - [HaystackRAG] - Conversión exitosa → Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-06-10 22:07:00,446 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:10:50,836 - INFO - [HaystackRAG] - Conversión exitosa → INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-06-10 22:10:50,840 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:11:15,906 - INFO - [HaystackRAG] - Conversión exitosa → INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-06-10 22:11:16,076 - INFO - [HaystackRAG] - Embedding de 255 documentos nuevos...
+2026-06-10 22:12:04,745 - INFO - [HaystackRAG] - Indexación completa: 255 chunks agregados.
+2026-06-10 22:12:04,745 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-06-10 22:12:04,751 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-06-10 22:12:04,755 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-06-10 22:12:04,758 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-06-10 22:12:04,761 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-06-10 22:12:04,877 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-06-10 22:12:04,928 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-06-10 22:12:50,136 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-06-10 22:12:50,136 - INFO - [HaystackRAG] - Ejecutando RAG para: que practicas de ciberseguridad son importantes en arquitecturas cloud?
+2026-06-10 22:13:55,213 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:13:55,213 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-06-10 22:13:55,214 - INFO - [HaystackRAG] -   [1] score=0.6581 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,214 - INFO - [HaystackRAG] -         snippet: sensibilidad y su impacto en la organización, como por ejemplo datos personales, financieros o de propiedad intelectual. Por lo tanto, es fundamental que las organizaciones realicen diferentes evaluac...
+2026-06-10 22:13:55,214 - INFO - [HaystackRAG] -   [2] score=0.6549 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,214 - INFO - [HaystackRAG] -         snippet: que pueda producir problemas serios. Gestión de vulnerabilidades: es aconsejable estar atento a las nuevas vulnerabilidades que puedan afectar a la infraestructura ya que podrían ser una brecha de seg...
+2026-06-10 22:13:55,214 - INFO - [HaystackRAG] -   [3] score=0.6509 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,214 - INFO - [HaystackRAG] -         snippet: como el acceso no autorizado y la pérdida de datos, sino que también se adapta a las complejidades inherentes al entorno de la nube, como la compartición de recursos, la movilidad de datos y la gestió...
+2026-06-10 22:13:55,215 - INFO - [HaystackRAG] -   [4] score=0.6462 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,215 - INFO - [HaystackRAG] -         snippet: monitorización de actividades de usuario para detectar comportamientos sospechosos o no autorizados.          7. Buenas prácticas  Como se ha podido observar en los anteriores apartados, el nuevo uso ...
+2026-06-10 22:13:55,215 - INFO - [HaystackRAG] -   [5] score=0.6293 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,215 - INFO - [HaystackRAG] -         snippet: roles y responsabilidades clave que            desempeñan un papel fundamental en la protección de los sistemas y datos. Los roles más importantes son:  Administrador de seguridad en la nube: este rol...
+2026-06-10 22:13:55,215 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:13:55,216 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-06-10 22:13:55,216 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:13:55,216 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-06-10 22:13:55,216 - INFO - [HaystackRAG] -   [1] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,216 - INFO - [HaystackRAG] -         contenido: sensibilidad y su impacto en la organización, como por ejemplo datos personales, financieros o de propiedad intelectual. Por lo tanto, es fundamental que las organizaciones realicen diferentes evaluaciones exhaustivas de los tipos de datos que manejan y comprendan su sensibilidad para diseñar una ar...
+2026-06-10 22:13:55,216 - INFO - [HaystackRAG] -   [2] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,216 - INFO - [HaystackRAG] -         contenido: que pueda producir problemas serios. Gestión de vulnerabilidades: es aconsejable estar atento a las nuevas vulnerabilidades que puedan afectar a la infraestructura ya que podrían ser una brecha de seguridad que permitiría que los ciberdelincuentes puedan atacar. Para ello se recomienda aplicar los p...
+2026-06-10 22:13:55,217 - INFO - [HaystackRAG] -   [3] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,217 - INFO - [HaystackRAG] -         contenido: como el acceso no autorizado y la pérdida de datos, sino que también se adapta a las complejidades inherentes al entorno de la nube, como la compartición de recursos, la movilidad de datos y la gestión de identidades. En esta introducción, se explorarán los principios fundamentales de la arquitectur...
+2026-06-10 22:13:55,217 - INFO - [HaystackRAG] -   [4] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,217 - INFO - [HaystackRAG] -         contenido: monitorización de actividades de usuario para detectar comportamientos sospechosos o no autorizados.          7. Buenas prácticas  Como se ha podido observar en los anteriores apartados, el nuevo uso de las infraestructuras en la nube ha provocado en la forma en la que las organizaciones son capaces...
+2026-06-10 22:13:55,217 - INFO - [HaystackRAG] -   [5] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:13:55,217 - INFO - [HaystackRAG] -         contenido: roles y responsabilidades clave que            desempeñan un papel fundamental en la protección de los sistemas y datos. Los roles más importantes son:  Administrador de seguridad en la nube: este rol es responsable del diseño, la implementación y el mantenimiento de las políticas y controles de seg...
+2026-06-10 22:13:55,218 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:13:55,358 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-06-10 22:13:55,359 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
 Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
 ### Guidelines:
 - Write all follow-up questions from the user’s point of view, directed to the assistant.
@@ -37,604 +203,15 @@ Suggest 3-5 relevant follow-up questions or prompts that the user might naturall
 JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
 ### Chat History:
 <chat_history>
-USER: *     
-    
-*   que buenas practicas puedo empezar a tener en cuenta para la arquitectura cloud?
-ASSISTANT: Puedes considerar las siguientes buenas prácticas para la arquitectura cloud:
+USER: que practicas de ciberseguridad son importantes en arquitecturas cloud?
+ASSISTANT: La respuesta es:
 
-1.  **Diseño escalable**: Diseña tu aplicación y recursos de manera que puedan escalar fácilmente según sea necesario.
-2.  **Uso eficiente de recursos**: Utiliza los recursos de la nube de manera eficiente para evitar gastos innecesarios.
-3.  **Seguridad**: Implementa medidas de seguridad adecuadas para proteger tus datos y aplicaciones en la nube.
-4.  **Compliance**: Asegúrate de que tu aplicación cumpla con las regulaciones y leyes relevantes relacionadas con la privacidad de los datos y la seguridad en la nube.
-5.  **Migración planificada**: Planifica cuidadosamente la migración a la nube para evitar problemas durante el proceso.
-6.  **Monitorización y análisis**: Monitorea y analiza tu aplicación y recursos en la nube para identificar áreas de mejora y optimizar su desempeño.
-
-Estas son solo algunas de las buenas prácticas que puedes considerar al diseñar una arquitectura cloud eficiente.
+* Gestión de accesos
+* Cifrado de datos
+* Monitorización
+* Gestión de vulnerabilidades
+* Realización de backups
+* Concienciación en ciberseguridad
+* Gestión de identidades y accesos
+* Identificación y mitigación de amenazas y vulnerabilidades
 </chat_history>
-2026-05-29 21:48:30,156 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:30,156 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-29 21:48:30,156 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:30,156 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-29 21:48:30,156 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:30,157 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-29 21:48:30,157 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:30,218 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-29 21:48:30,218 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Generate a concise, 3-5 word title with an emoji summarizing the chat history.
-### Guidelines:
-- The title should clearly represent the main theme or subject of the conversation.
-- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
-- Write the title in the chat's primary language; default to English if multilingual.
-- Prioritize accuracy over excessive creativity; keep it clear and simple.
-- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
-- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
-- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
-### Output:
-JSON format: { "title": "your concise title here" }
-### Examples:
-- { "title": "📉 Stock Market Trends" },
-- { "title": "🍪 Perfect Chocolate Chip Recipe" },
-- { "title": "Evolution of Music Streaming" },
-- { "title": "Remote Work Productivity Tips" },
-- { "title": "Artificial Intelligence in Healthcare" },
-- { "title": "🎮 Video Game Development Insights" }
-### Chat History:
-<chat_history>
-USER: *     
-    
-*   que buenas practicas puedo empezar a tener en cuenta para la arquitectura cloud?
-ASSISTANT: Puedes considerar las siguientes buenas prácticas para la arquitectura cloud:
-
-1.  **Diseño escalable**: Diseña tu aplicación y recursos de manera que puedan escalar fácilmente según sea necesario.
-2.  **Uso eficiente de recursos**: Utiliza los recursos de la nube de manera eficiente para evitar gastos innecesarios.
-3.  **Seguridad**: Implementa medidas de seguridad adecuadas para proteger tus datos y aplicaciones en la nube.
-4.  **Compliance**: Asegúrate de que tu aplicación cumpla con las regulaciones y leyes relevantes relacionadas con la privacidad de los datos y la seguridad en la nube.
-5.  **Migración planificada**: Planifica cuidadosamente la migración a la nube para evitar problemas durante el proceso.
-6.  **Monitorización y análisis**: Monitorea y analiza tu aplicación y recursos en la nube para identificar áreas de mejora y optimizar su desempeño.
-
-Estas son solo algunas de las buenas prácticas que puedes considerar al diseñar una arquitectura cloud eficiente.
-</chat_history>
-2026-05-29 21:48:31,408 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:31,408 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-29 21:48:31,408 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:31,408 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-29 21:48:31,408 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:31,409 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-29 21:48:31,409 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:31,459 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-29 21:48:31,459 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
-
-### Guidelines:
-- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
-- Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
-- If content is too short (less than 3 messages) or too diverse, use only ["General"]
-- Use the chat's primary language; default to English if multilingual
-- Prioritize accuracy over specificity
-
-### Output:
-JSON format: { "tags": ["tag1", "tag2", "tag3"] }
-
-### Chat History:
-<chat_history>
-USER: *     
-    
-*   que buenas practicas puedo empezar a tener en cuenta para la arquitectura cloud?
-ASSISTANT: Puedes considerar las siguientes buenas prácticas para la arquitectura cloud:
-
-1.  **Diseño escalable**: Diseña tu aplicación y recursos de manera que puedan escalar fácilmente según sea necesario.
-2.  **Uso eficiente de recursos**: Utiliza los recursos de la nube de manera eficiente para evitar gastos innecesarios.
-3.  **Seguridad**: Implementa medidas de seguridad adecuadas para proteger tus datos y aplicaciones en la nube.
-4.  **Compliance**: Asegúrate de que tu aplicación cumpla con las regulaciones y leyes relevantes relacionadas con la privacidad de los datos y la seguridad en la nube.
-5.  **Migración planificada**: Planifica cuidadosamente la migración a la nube para evitar problemas durante el proceso.
-6.  **Monitorización y análisis**: Monitorea y analiza tu aplicación y recursos en la nube para identificar áreas de mejora y optimizar su desempeño.
-
-Estas son solo algunas de las buenas prácticas que puedes considerar al diseñar una arquitectura cloud eficiente.
-</chat_history>
-2026-05-29 21:48:33,237 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:33,238 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-29 21:48:33,238 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:33,238 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-29 21:48:33,238 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-29 21:48:33,239 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-29 21:48:33,239 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 21:54:03,698 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
-2026-05-30 21:54:07,711 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: Torch not compiled with CUDA enabled. Los PDFs serán ignorados.
-2026-05-30 21:54:07,761 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
-2026-05-30 21:54:07,763 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
-2026-05-30 21:54:07,763 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
-2026-05-30 21:54:07,764 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
-2026-05-30 21:54:07,769 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
-2026-05-30 22:10:35,243 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
-2026-05-30 22:11:08,734 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: Torch not compiled with CUDA enabled. Los PDFs serán ignorados.
-2026-05-30 22:11:08,790 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
-2026-05-30 22:11:08,798 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
-2026-05-30 22:14:02,086 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:14:02,087 - INFO - [HaystackRAG] - Ejecutando RAG para: hola, hablame buenas practias de ciberseguridad
-2026-05-30 22:15:47,915 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:47,915 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:15:47,916 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:47,916 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:15:47,916 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:47,916 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:15:47,916 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:48,004 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:15:48,004 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
-### Guidelines:
-- Write all follow-up questions from the user’s point of view, directed to the assistant.
-- Make questions concise, clear, and directly related to the discussed topic(s).
-- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
-- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
-- Use the conversation's primary language; default to English if multilingual.
-- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
-### Output:
-JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
-### Chat History:
-<chat_history>
-USER: hola, hablame buenas practias de ciberseguridad
-ASSISTANT: ¡Hola! Claro que sí. Aquí te presento algunas buenas prácticas de ciberseguridad:
-
-1. Utiliza contraseñas fuertes y únicas para cada cuenta.
-2. Activa la autenticación a dos factores (2FA) siempre que sea posible.
-3. Mantén actualizados tus software y sistemas operativos para evitar vulnerabilidades conocidas.
-4. Evita abrir archivos o enlaces sospechosos de correo electrónico o mensaje.
-5. Utiliza una VPN (Red Privada Virtual) al conectar a redes públicas o inseguras.
-6. No compartas información personal sensible en línea, como números de tarjeta de crédito o contraseñas.
-7. Utiliza un gestor de contraseñas seguro para almacenar y generar contraseñas.
-8. Establece un sistema de respaldo regular para tus datos importantes.
-
-Espero que estas recomendaciones te sean útiles. ¿Necesitas más información?
-</chat_history>
-2026-05-30 22:15:50,993 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:50,994 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:15:50,994 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:50,994 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:15:50,994 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:50,995 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:15:50,995 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:51,062 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:15:51,062 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Generate a concise, 3-5 word title with an emoji summarizing the chat history.
-### Guidelines:
-- The title should clearly represent the main theme or subject of the conversation.
-- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
-- Write the title in the chat's primary language; default to English if multilingual.
-- Prioritize accuracy over excessive creativity; keep it clear and simple.
-- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
-- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
-- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
-### Output:
-JSON format: { "title": "your concise title here" }
-### Examples:
-- { "title": "📉 Stock Market Trends" },
-- { "title": "🍪 Perfect Chocolate Chip Recipe" },
-- { "title": "Evolution of Music Streaming" },
-- { "title": "Remote Work Productivity Tips" },
-- { "title": "Artificial Intelligence in Healthcare" },
-- { "title": "🎮 Video Game Development Insights" }
-### Chat History:
-<chat_history>
-USER: hola, hablame buenas practias de ciberseguridad
-ASSISTANT: ¡Hola! Claro que sí. Aquí te presento algunas buenas prácticas de ciberseguridad:
-
-1. Utiliza contraseñas fuertes y únicas para cada cuenta.
-2. Activa la autenticación a dos factores (2FA) siempre que sea posible.
-3. Mantén actualizados tus software y sistemas operativos para evitar vulnerabilidades conocidas.
-4. Evita abrir archivos o enlaces sospechosos de correo electrónico o mensaje.
-5. Utiliza una VPN (Red Privada Virtual) al conectar a redes públicas o inseguras.
-6. No compartas información personal sensible en línea, como números de tarjeta de crédito o contraseñas.
-7. Utiliza un gestor de contraseñas seguro para almacenar y generar contraseñas.
-8. Establece un sistema de respaldo regular para tus datos importantes.
-
-Espero que estas recomendaciones te sean útiles. ¿Necesitas más información?
-</chat_history>
-2026-05-30 22:15:52,613 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:52,614 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:15:52,614 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:52,614 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:15:52,614 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:52,614 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:15:52,615 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:52,663 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:15:52,664 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
-
-### Guidelines:
-- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
-- Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
-- If content is too short (less than 3 messages) or too diverse, use only ["General"]
-- Use the chat's primary language; default to English if multilingual
-- Prioritize accuracy over specificity
-
-### Output:
-JSON format: { "tags": ["tag1", "tag2", "tag3"] }
-
-### Chat History:
-<chat_history>
-USER: hola, hablame buenas practias de ciberseguridad
-ASSISTANT: ¡Hola! Claro que sí. Aquí te presento algunas buenas prácticas de ciberseguridad:
-
-1. Utiliza contraseñas fuertes y únicas para cada cuenta.
-2. Activa la autenticación a dos factores (2FA) siempre que sea posible.
-3. Mantén actualizados tus software y sistemas operativos para evitar vulnerabilidades conocidas.
-4. Evita abrir archivos o enlaces sospechosos de correo electrónico o mensaje.
-5. Utiliza una VPN (Red Privada Virtual) al conectar a redes públicas o inseguras.
-6. No compartas información personal sensible en línea, como números de tarjeta de crédito o contraseñas.
-7. Utiliza un gestor de contraseñas seguro para almacenar y generar contraseñas.
-8. Establece un sistema de respaldo regular para tus datos importantes.
-
-Espero que estas recomendaciones te sean útiles. ¿Necesitas más información?
-</chat_history>
-2026-05-30 22:15:53,369 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:53,369 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:15:53,369 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:53,369 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:15:53,370 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:15:53,370 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:15:53,370 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:21:22,178 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
-2026-05-30 22:21:46,847 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: Torch not compiled with CUDA enabled. Los PDFs serán ignorados.
-2026-05-30 22:21:46,900 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
-2026-05-30 22:21:46,907 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
-2026-05-30 22:38:19,375 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
-2026-05-30 22:38:45,967 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: Torch not compiled with CUDA enabled. Los PDFs serán ignorados.
-2026-05-30 22:38:46,019 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
-2026-05-30 22:38:46,026 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
-2026-05-30 22:41:07,155 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
-2026-05-30 22:41:39,839 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: Torch not compiled with CUDA enabled. Los PDFs serán ignorados.
-2026-05-30 22:41:39,894 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
-2026-05-30 22:41:39,896 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
-2026-05-30 22:41:39,896 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
-2026-05-30 22:41:39,896 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
-2026-05-30 22:41:39,901 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
-2026-05-30 22:41:56,705 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:41:56,705 - INFO - [HaystackRAG] - Ejecutando RAG para: dame una guia de buenas practicas de ciberseguridad
-2026-05-30 22:43:46,046 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:46,047 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:43:46,047 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:46,047 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:43:46,047 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:46,047 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:43:46,048 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:46,206 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:43:46,206 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
-### Guidelines:
-- Write all follow-up questions from the user’s point of view, directed to the assistant.
-- Make questions concise, clear, and directly related to the discussed topic(s).
-- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
-- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
-- Use the conversation's primary language; default to English if multilingual.
-- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
-### Output:
-JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
-### Chat History:
-<chat_history>
-USER: dame una guia de buenas practicas de ciberseguridad
-ASSISTANT: Una guía de buenas prácticas de ciberseguridad es un conjunto de recomendaciones y procedimientos que ayudan a proteger la integridad y confidencialidad de la información en línea. A continuación, te proporciono una guía básica de buenas prácticas de ciberseguridad:
-
-**1. Autenticación y autorización**
-
-* Utiliza contraseñas fuertes y únicas para cada cuenta.
-* No compartas tus contraseñas con nadie.
-* Utiliza autenticación de dos factores (2FA) siempre que sea posible.
-
-**2. Protección contra malware y virus**
-
-* Mantén actualizados tus sistemas operativos y aplicaciones.
-* Utiliza un antivirus confiable y lo actualices regularmente.
-* No descargues software o archivos de fuentes desconocidas.
-
-**3. Redes y conexiones seguras**
-
-* Utiliza protocolos de encriptación (HTTPS) para todas las comunicaciones en línea.
-* Configura tus redes internas con firewalls y configuraciones de seguridad adecuadas.
-* No utilices redes públicas o Wi-Fi inseguros.
-
-**4. Gestión de contraseñas**
-
-* Utiliza una gestor de contraseñas confiable para generar y almacenar contraseñas.
-* Utiliza contraseñas diferentes para cada cuenta importante.
-* No compartas tus contraseñas con nadie, ni siquiera con tu administrador de sistemas.
-
-**5. Capacitación y conciencia**
-
-* Asegúrate de que todos los usuarios de la organización reciban capacitación en ciberseguridad.
-* Promueve una cultura de seguridad en la organización.
-* Esté atento a posibles amenazas y actualice tus conocimientos sobre ciberseguridad.
-
-**6. Monitoreo y respuesta**
-
-* Instala sistemas de monitoreo para detectar posible intrusión o actividad sospechosa.
-* Ten un plan de respuesta a incidentes de ciberseguridad establecido y ejecútalo en caso de necesidad.
-* Asegúrate de que todos los usuarios conozcan el procedimiento de respuesta ante una amenaza.
-
-**7. Evaluación y mejora continua**
-
-* Realiza evaluaciones periódicas de la seguridad de tu organización.
-* Identifica áreas de mejora y implementa medidas para corregirlas.
-* Asegúrate de que todos los cambios en la infraestructura o aplicaciones se realicen con un enfoque en la seguridad.
-
-Recuerda que esta es solo una guía básica, y es importante adaptarla a las necesidades específicas de tu organización.
-</chat_history>
-2026-05-30 22:43:49,716 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:49,716 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:43:49,717 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:49,717 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:43:49,717 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:49,717 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:43:49,717 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:49,778 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:43:49,778 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Generate a concise, 3-5 word title with an emoji summarizing the chat history.
-### Guidelines:
-- The title should clearly represent the main theme or subject of the conversation.
-- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
-- Write the title in the chat's primary language; default to English if multilingual.
-- Prioritize accuracy over excessive creativity; keep it clear and simple.
-- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
-- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
-- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
-### Output:
-JSON format: { "title": "your concise title here" }
-### Examples:
-- { "title": "📉 Stock Market Trends" },
-- { "title": "🍪 Perfect Chocolate Chip Recipe" },
-- { "title": "Evolution of Music Streaming" },
-- { "title": "Remote Work Productivity Tips" },
-- { "title": "Artificial Intelligence in Healthcare" },
-- { "title": "🎮 Video Game Development Insights" }
-### Chat History:
-<chat_history>
-USER: dame una guia de buenas practicas de ciberseguridad
-ASSISTANT: Una guía de buenas prácticas de ciberseguridad es un conjunto de recomendaciones y procedimientos que ayudan a proteger la integridad y confidencialidad de la información en línea. A continuación, te proporciono una guía básica de buenas prácticas de ciberseguridad:
-
-**1. Autenticación y autorización**
-
-* Utiliza contraseñas fuertes y únicas para cada cuenta.
-* No compartas tus contraseñas con nadie.
-* Utiliza autenticación de dos factores (2FA) siempre que sea posible.
-
-**2. Protección contra malware y virus**
-
-* Mantén actualizados tus sistemas operativos y aplicaciones.
-* Utiliza un antivirus confiable y lo actualices regularmente.
-* No descargues software o archivos de fuentes desconocidas.
-
-**3. Redes y conexiones seguras**
-
-* Utiliza protocolos de encriptación (HTTPS) para todas las comunicaciones en línea.
-* Configura tus redes internas con firewalls y configuraciones de seguridad adecuadas.
-* No utilices redes públicas o Wi-Fi inseguros.
-
-**4. Gestión de contraseñas**
-
-* Utiliza una gestor de contraseñas confiable para generar y almacenar contraseñas.
-* Utiliza contraseñas diferentes para cada cuenta importante.
-* No compartas tus contraseñas con nadie, ni siquiera con tu administrador de sistemas.
-
-**5. Capacitación y conciencia**
-
-* Asegúrate de que todos los usuarios de la organización reciban capacitación en ciberseguridad.
-* Promueve una cultura de seguridad en la organización.
-* Esté atento a posibles amenazas y actualice tus conocimientos sobre ciberseguridad.
-
-**6. Monitoreo y respuesta**
-
-* Instala sistemas de monitoreo para detectar posible intrusión o actividad sospechosa.
-* Ten un plan de respuesta a incidentes de ciberseguridad establecido y ejecútalo en caso de necesidad.
-* Asegúrate de que todos los usuarios conozcan el procedimiento de respuesta ante una amenaza.
-
-**7. Evaluación y mejora continua**
-
-* Realiza evaluaciones periódicas de la seguridad de tu organización.
-* Identifica áreas de mejora y implementa medidas para corregirlas.
-* Asegúrate de que todos los cambios en la infraestructura o aplicaciones se realicen con un enfoque en la seguridad.
-
-Recuerda que esta es solo una guía básica, y es importante adaptarla a las necesidades específicas de tu organización.
-</chat_history>
-2026-05-30 22:43:51,659 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:51,660 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:43:51,660 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:51,660 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:43:51,660 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:51,661 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:43:51,661 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:51,711 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:43:51,712 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
-
-### Guidelines:
-- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
-- Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
-- If content is too short (less than 3 messages) or too diverse, use only ["General"]
-- Use the chat's primary language; default to English if multilingual
-- Prioritize accuracy over specificity
-
-### Output:
-JSON format: { "tags": ["tag1", "tag2", "tag3"] }
-
-### Chat History:
-<chat_history>
-USER: dame una guia de buenas practicas de ciberseguridad
-ASSISTANT: Una guía de buenas prácticas de ciberseguridad es un conjunto de recomendaciones y procedimientos que ayudan a proteger la integridad y confidencialidad de la información en línea. A continuación, te proporciono una guía básica de buenas prácticas de ciberseguridad:
-
-**1. Autenticación y autorización**
-
-* Utiliza contraseñas fuertes y únicas para cada cuenta.
-* No compartas tus contraseñas con nadie.
-* Utiliza autenticación de dos factores (2FA) siempre que sea posible.
-
-**2. Protección contra malware y virus**
-
-* Mantén actualizados tus sistemas operativos y aplicaciones.
-* Utiliza un antivirus confiable y lo actualices regularmente.
-* No descargues software o archivos de fuentes desconocidas.
-
-**3. Redes y conexiones seguras**
-
-* Utiliza protocolos de encriptación (HTTPS) para todas las comunicaciones en línea.
-* Configura tus redes internas con firewalls y configuraciones de seguridad adecuadas.
-* No utilices redes públicas o Wi-Fi inseguros.
-
-**4. Gestión de contraseñas**
-
-* Utiliza una gestor de contraseñas confiable para generar y almacenar contraseñas.
-* Utiliza contraseñas diferentes para cada cuenta importante.
-* No compartas tus contraseñas con nadie, ni siquiera con tu administrador de sistemas.
-
-**5. Capacitación y conciencia**
-
-* Asegúrate de que todos los usuarios de la organización reciban capacitación en ciberseguridad.
-* Promueve una cultura de seguridad en la organización.
-* Esté atento a posibles amenazas y actualice tus conocimientos sobre ciberseguridad.
-
-**6. Monitoreo y respuesta**
-
-* Instala sistemas de monitoreo para detectar posible intrusión o actividad sospechosa.
-* Ten un plan de respuesta a incidentes de ciberseguridad establecido y ejecútalo en caso de necesidad.
-* Asegúrate de que todos los usuarios conozcan el procedimiento de respuesta ante una amenaza.
-
-**7. Evaluación y mejora continua**
-
-* Realiza evaluaciones periódicas de la seguridad de tu organización.
-* Identifica áreas de mejora y implementa medidas para corregirlas.
-* Asegúrate de que todos los cambios en la infraestructura o aplicaciones se realicen con un enfoque en la seguridad.
-
-Recuerda que esta es solo una guía básica, y es importante adaptarla a las necesidades específicas de tu organización.
-</chat_history>
-2026-05-30 22:43:54,252 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:54,252 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:43:54,252 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:54,252 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:43:54,253 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:43:54,253 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:43:54,253 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:49:37,382 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
-2026-05-30 22:49:39,154 - ERROR - [HaystackRAG] - No se pudo cargar marker-pdf: Could not import module 'PreTrainedModel'. Are this object's requirements defined correctly?. Los PDFs serán ignorados.
-2026-05-30 22:49:39,200 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
-2026-05-30 22:49:39,202 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
-2026-05-30 22:49:39,202 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
-2026-05-30 22:49:39,202 - WARNING - [HaystackRAG] - marker-pdf no disponible, salteando: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
-2026-05-30 22:49:39,207 - WARNING - [HaystackRAG] - No se encontraron documentos en rawdata/
-2026-05-30 22:50:04,457 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:50:04,457 - INFO - [HaystackRAG] - Ejecutando RAG para: *     
-    
-*   que buenas practicas puedo empezar a tener en cuenta para la arquitectura cloud?
-2026-05-30 22:51:03,208 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:03,209 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:51:03,209 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:03,209 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:51:03,209 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:03,210 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:51:03,210 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:03,316 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:51:03,317 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
-### Guidelines:
-- Write all follow-up questions from the user’s point of view, directed to the assistant.
-- Make questions concise, clear, and directly related to the discussed topic(s).
-- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
-- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
-- Use the conversation's primary language; default to English if multilingual.
-- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
-### Output:
-JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
-### Chat History:
-<chat_history>
-USER: *     
-    
-*   que buenas practicas puedo empezar a tener en cuenta para la arquitectura cloud?
-ASSISTANT: Puedes considerar las siguientes prácticas:
-
-*   Diseñar sistemas escalables y flexibles.
-*   Utilizar patrones de diseño y arquitecturas de microservicios.
-*   Implementar seguridad y autenticación adecuadas.
-*   Considerar la disponibilidad y el rendimiento.
-*   Utilizar herramientas de monitorización y seguimiento.
-*   Realizar pruebas exhaustivas antes del despliegue.
-</chat_history>
-2026-05-30 22:51:06,360 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:06,361 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:51:06,361 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:06,361 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:51:06,361 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:06,362 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:51:06,362 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:06,460 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:51:06,460 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Generate a concise, 3-5 word title with an emoji summarizing the chat history.
-### Guidelines:
-- The title should clearly represent the main theme or subject of the conversation.
-- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
-- Write the title in the chat's primary language; default to English if multilingual.
-- Prioritize accuracy over excessive creativity; keep it clear and simple.
-- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
-- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
-- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
-### Output:
-JSON format: { "title": "your concise title here" }
-### Examples:
-- { "title": "📉 Stock Market Trends" },
-- { "title": "🍪 Perfect Chocolate Chip Recipe" },
-- { "title": "Evolution of Music Streaming" },
-- { "title": "Remote Work Productivity Tips" },
-- { "title": "Artificial Intelligence in Healthcare" },
-- { "title": "🎮 Video Game Development Insights" }
-### Chat History:
-<chat_history>
-USER: *     
-    
-*   que buenas practicas puedo empezar a tener en cuenta para la arquitectura cloud?
-ASSISTANT: Puedes considerar las siguientes prácticas:
-
-*   Diseñar sistemas escalables y flexibles.
-*   Utilizar patrones de diseño y arquitecturas de microservicios.
-*   Implementar seguridad y autenticación adecuadas.
-*   Considerar la disponibilidad y el rendimiento.
-*   Utilizar herramientas de monitorización y seguimiento.
-*   Realizar pruebas exhaustivas antes del despliegue.
-</chat_history>
-2026-05-30 22:51:07,755 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:07,755 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:51:07,755 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:07,755 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:51:07,756 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:07,756 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:51:07,756 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:07,796 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 0
-2026-05-30 22:51:07,796 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
-Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
-
-### Guidelines:
-- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
-- Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
-- If content is too short (less than 3 messages) or too diverse, use only ["General"]
-- Use the chat's primary language; default to English if multilingual
-- Prioritize accuracy over specificity
-
-### Output:
-JSON format: { "tags": ["tag1", "tag2", "tag3"] }
-
-### Chat History:
-<chat_history>
-USER: *     
-    
-*   que buenas practicas puedo empezar a tener en cuenta para la arquitectura cloud?
-ASSISTANT: Puedes considerar las siguientes prácticas:
-
-*   Diseñar sistemas escalables y flexibles.
-*   Utilizar patrones de diseño y arquitecturas de microservicios.
-*   Implementar seguridad y autenticación adecuadas.
-*   Considerar la disponibilidad y el rendimiento.
-*   Utilizar herramientas de monitorización y seguimiento.
-*   Realizar pruebas exhaustivas antes del despliegue.
-</chat_history>
-2026-05-30 22:51:08,935 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:08,935 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:51:08,936 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:08,936 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
-2026-05-30 22:51:08,936 - INFO - [HaystackRAG] - ------------------------------------------------------------
-2026-05-30 22:51:08,936 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 0 documentos enviados al prompt:
-2026-05-30 22:51:08,936 - INFO - [HaystackRAG] - ------------------------------------------------------------

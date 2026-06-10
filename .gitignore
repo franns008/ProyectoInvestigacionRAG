@@ -5,11 +5,7 @@ infrastructure/appdata/*
 !infrastructure/appdata/pipelines/
 
 # Ignorar todo dentro de pipelines
-infrastructure/appdata/pipelines/*
-
-# Excepción específica para el archivo pipeline_local_docs.py
-!infrastructure/appdata/pipelines/pipeline_local_docs.py
-!infrastructure/appdata/pipelines/pipeline_lama_index.py
+!infrastructure/appdata/pipelines/*
 
 
 

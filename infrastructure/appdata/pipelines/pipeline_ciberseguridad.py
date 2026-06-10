@@ -2,8 +2,27 @@
 title: Rag de Ciberseguridad
 author: Francisco
 version: 1.3
-requirements: haystack-ai, pgvector-haystack, ollama-haystack, pypdf, python-docx, markdown-it-py, mdit-plain, marker-pdf
+requirements: haystack-ai, pgvector-haystack, ollama-haystack, pypdf, python-docx, markdown-it-py, mdit-plain
 """
+
+import torch as _torch
+import torch.nn.utils.rnn as _rnn
+
+# Patch 1: is_bf16_supported(including_emulation=...) agregado en torch 2.4
+if hasattr(_torch.cuda, 'is_bf16_supported'):
+    _orig_bf16 = _torch.cuda.is_bf16_supported
+    def _patched_bf16(*args, **kwargs):
+        kwargs.pop('including_emulation', None)
+        return _orig_bf16(*args, **kwargs)
+    _torch.cuda.is_bf16_supported = _patched_bf16
+
+# Patch 2: pad_sequence(padding_side=...) agregado en torch 2.5
+_orig_pad_sequence = _rnn.pad_sequence
+def _patched_pad_sequence(sequences, batch_first=False, padding_value=0.0, **kwargs):
+    kwargs.pop('padding_side', None)
+    return _orig_pad_sequence(sequences, batch_first=batch_first, padding_value=padding_value, **kwargs)
+_rnn.pad_sequence = _patched_pad_sequence
+_torch.nn.utils.rnn.pad_sequence = _patched_pad_sequence
 
 from typing import List, Union, Generator, Iterator
 from pathlib import Path
@@ -78,8 +97,7 @@ class Pipeline:
         self.name   = "RAG ciberseguridad"
         self.valves = self.Valves()
         self.store  = self._get_document_store()
-
-        # Inicializar marker-pdf una sola vez (carga modelos pesados en memoria/GPU)
+        
         logger.info("Cargando modelos de marker-pdf...")
         try:
             from marker.converters.pdf import PdfConverter
@@ -87,10 +105,14 @@ class Pipeline:
             self._marker_converter = PdfConverter(artifact_dict=create_model_dict())
             logger.info("marker-pdf cargado correctamente.")
         except Exception as e:
-            logger.error(f"No se pudo cargar marker-pdf: {e}. Los PDFs serán ignorados.")
+            import traceback
+            logger.error(f"No se pudo cargar marker-pdf: {e}")
+            logger.error(f"Traceback completo:\n{traceback.format_exc()}")
             self._marker_converter = None
 
         self.rag_pipeline = self._build_rag_pipeline()
+        logger.info("Indexando documentos en __init__...")
+        self._index_new_documents()
 
     async def on_startup(self):
         logger.info("Indexando documentos nuevos si los hay...")
