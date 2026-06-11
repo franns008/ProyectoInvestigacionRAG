@@ -1,6 +1,6 @@
 """
 title: Rag de Ciberseguridad
-author: Francisco
+author: Valentino, Miguel y Luca
 version: 1.3
 requirements: haystack-ai, pgvector-haystack, ollama-haystack, pypdf, python-docx, markdown-it-py, mdit-plain
 """

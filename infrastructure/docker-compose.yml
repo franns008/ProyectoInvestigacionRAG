@@ -116,10 +116,10 @@ volumes:
         driver_opts:
             type: 'none'
             o: 'bind'
-            device: ./appdata/pipelines/
+            device: ../src/pipeline/
     rawdata:
         driver: local
         driver_opts:
             type: 'none'
             o: 'bind'
-            device: ./appdata/pipelines/rawdata/
+            device: ../data/raw/

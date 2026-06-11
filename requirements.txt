@@ -6,3 +6,4 @@ pypdf
 python-docx
 markdown-it-py
 mdit-plain
+marker-pdf

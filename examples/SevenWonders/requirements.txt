@@ -1,4 +1,0 @@
-haystack-ai
-ollama-haystack
-pgvector-haystack
-datasets>=2.6.1
