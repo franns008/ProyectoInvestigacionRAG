@@ -215,3 +215,133 @@ ASSISTANT: La respuesta es:
 * Gestión de identidades y accesos
 * Identificación y mitigación de amenazas y vulnerabilidades
 </chat_history>
+2026-06-10 22:14:45,573 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:14:45,573 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-06-10 22:14:45,573 - INFO - [HaystackRAG] -   [1] score=0.5902 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:14:45,573 - INFO - [HaystackRAG] -         snippet: que pueda producir problemas serios. Gestión de vulnerabilidades: es aconsejable estar atento a las nuevas vulnerabilidades que puedan afectar a la infraestructura ya que podrían ser una brecha de seg...
+2026-06-10 22:14:45,574 - INFO - [HaystackRAG] -   [2] score=0.5870 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:14:45,574 - INFO - [HaystackRAG] -         snippet:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramien...
+2026-06-10 22:14:45,574 - INFO - [HaystackRAG] -   [3] score=0.5742 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:14:45,574 - INFO - [HaystackRAG] -         snippet: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contra...
+2026-06-10 22:14:45,574 - INFO - [HaystackRAG] -   [4] score=0.5680 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:14:45,574 - INFO - [HaystackRAG] -         snippet: estos fallos de seguridad.  La sección 5.- Preparación de un entorno de test guía sobre cómo configurar un entorno seguro y controlado para realizar pruebas de vulnerabilidades XSS, esencial para vali...
+2026-06-10 22:14:45,575 - INFO - [HaystackRAG] -   [5] score=0.5643 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:14:45,575 - INFO - [HaystackRAG] -         snippet: mantener la continuidad del negocio.  El presente estudio, dirigido tanto a desarrolladores como a entusiastas tecnológicos, destaca la necesidad de adoptar prácticas de seguridad en aplicaciones web....
+2026-06-10 22:14:45,575 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:14:45,575 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-06-10 22:14:45,575 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:14:45,575 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-06-10 22:14:45,576 - INFO - [HaystackRAG] -   [1] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-06-10 22:14:45,576 - INFO - [HaystackRAG] -         contenido: que pueda producir problemas serios. Gestión de vulnerabilidades: es aconsejable estar atento a las nuevas vulnerabilidades que puedan afectar a la infraestructura ya que podrían ser una brecha de seguridad que permitiría que los ciberdelincuentes puedan atacar. Para ello se recomienda aplicar los p...
+2026-06-10 22:14:45,576 - INFO - [HaystackRAG] -   [2] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:14:45,576 - INFO - [HaystackRAG] -         contenido:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramientas5. Preparación de un entorno de test6. Ejemplos de análisis de vulnerabilidades XSS7. Prevención ...
+2026-06-10 22:14:45,576 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:14:45,576 - INFO - [HaystackRAG] -         contenido: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contraseñas fuertes para prevenir ataques de fuerza bruta o adivinación.  o Ejemplo:  Definir requisitos d...
+2026-06-10 22:14:45,577 - INFO - [HaystackRAG] -   [4] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:14:45,577 - INFO - [HaystackRAG] -         contenido: estos fallos de seguridad.  La sección 5.- Preparación de un entorno de test guía sobre cómo configurar un entorno seguro y controlado para realizar pruebas de vulnerabilidades XSS, esencial para validar la efectividad de las medidas de seguridad implementadas sin comprometer los sistemas de nuestro...
+2026-06-10 22:14:45,577 - INFO - [HaystackRAG] -   [5] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:14:45,577 - INFO - [HaystackRAG] -         contenido: mantener la continuidad del negocio.  El presente estudio, dirigido tanto a desarrolladores como a entusiastas tecnológicos, destaca la necesidad de adoptar prácticas de seguridad en aplicaciones web. En él se abordan conceptos fundamentales y se guía a los lectores a través del proceso de configura...
+2026-06-10 22:14:45,577 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:14:45,688 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-06-10 22:14:45,688 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate a concise, 3-5 word title with an emoji summarizing the chat history.
+### Guidelines:
+- The title should clearly represent the main theme or subject of the conversation.
+- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
+- Write the title in the chat's primary language; default to English if multilingual.
+- Prioritize accuracy over excessive creativity; keep it clear and simple.
+- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
+- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
+- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
+### Output:
+JSON format: { "title": "your concise title here" }
+### Examples:
+- { "title": "📉 Stock Market Trends" },
+- { "title": "🍪 Perfect Chocolate Chip Recipe" },
+- { "title": "Evolution of Music Streaming" },
+- { "title": "Remote Work Productivity Tips" },
+- { "title": "Artificial Intelligence in Healthcare" },
+- { "title": "🎮 Video Game Development Insights" }
+### Chat History:
+<chat_history>
+USER: que practicas de ciberseguridad son importantes en arquitecturas cloud?
+ASSISTANT: La respuesta es:
+
+* Gestión de accesos
+* Cifrado de datos
+* Monitorización
+* Gestión de vulnerabilidades
+* Realización de backups
+* Concienciación en ciberseguridad
+* Gestión de identidades y accesos
+* Identificación y mitigación de amenazas y vulnerabilidades
+</chat_history>
+2026-06-10 22:15:39,208 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:15:39,209 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-06-10 22:15:39,209 - INFO - [HaystackRAG] -   [1] score=0.5394 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:15:39,209 - INFO - [HaystackRAG] -         snippet: estos fallos de seguridad.  La sección 5.- Preparación de un entorno de test guía sobre cómo configurar un entorno seguro y controlado para realizar pruebas de vulnerabilidades XSS, esencial para vali...
+2026-06-10 22:15:39,209 - INFO - [HaystackRAG] -   [2] score=0.5303 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:15:39,209 - INFO - [HaystackRAG] -         snippet: mantener la continuidad del negocio.  El presente estudio, dirigido tanto a desarrolladores como a entusiastas tecnológicos, destaca la necesidad de adoptar prácticas de seguridad en aplicaciones web....
+2026-06-10 22:15:39,209 - INFO - [HaystackRAG] -   [3] score=0.5294 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:15:39,210 - INFO - [HaystackRAG] -         snippet: de forma oportuna, mientras que las empresas deben aplicar las correcciones pertinentes lo antes posible, en función de la criticidad y la exposición descrita en los boletines de seguridad del proveed...
+2026-06-10 22:15:39,210 - INFO - [HaystackRAG] -   [4] score=0.5286 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:15:39,210 - INFO - [HaystackRAG] -         snippet: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contra...
+2026-06-10 22:15:39,210 - INFO - [HaystackRAG] -   [5] score=0.5254 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:15:39,210 - INFO - [HaystackRAG] -         snippet: de los dispositivos mediante medidas como la protección física, el fortalecimiento del sistema frente a vulnerabilidades y configuraciones débiles (system hardening) y la verificación de integridad de...
+2026-06-10 22:15:39,211 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:15:39,211 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-06-10 22:15:39,211 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:15:39,211 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-06-10 22:15:39,211 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:15:39,211 - INFO - [HaystackRAG] -         contenido: estos fallos de seguridad.  La sección 5.- Preparación de un entorno de test guía sobre cómo configurar un entorno seguro y controlado para realizar pruebas de vulnerabilidades XSS, esencial para validar la efectividad de las medidas de seguridad implementadas sin comprometer los sistemas de nuestro...
+2026-06-10 22:15:39,211 - INFO - [HaystackRAG] -   [2] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-06-10 22:15:39,212 - INFO - [HaystackRAG] -         contenido: mantener la continuidad del negocio.  El presente estudio, dirigido tanto a desarrolladores como a entusiastas tecnológicos, destaca la necesidad de adoptar prácticas de seguridad en aplicaciones web. En él se abordan conceptos fundamentales y se guía a los lectores a través del proceso de configura...
+2026-06-10 22:15:39,212 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:15:39,212 - INFO - [HaystackRAG] -         contenido: de forma oportuna, mientras que las empresas deben aplicar las correcciones pertinentes lo antes posible, en función de la criticidad y la exposición descrita en los boletines de seguridad del proveedor.  4.2.5 Gestión del ciclo de vida del producto  El fabricante debe definir un plan claro de gesti...
+2026-06-10 22:15:39,212 - INFO - [HaystackRAG] -   [4] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:15:39,212 - INFO - [HaystackRAG] -         contenido: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contraseñas fuertes para prevenir ataques de fuerza bruta o adivinación.  o Ejemplo:  Definir requisitos d...
+2026-06-10 22:15:39,212 - INFO - [HaystackRAG] -   [5] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-06-10 22:15:39,213 - INFO - [HaystackRAG] -         contenido: de los dispositivos mediante medidas como la protección física, el fortalecimiento del sistema frente a vulnerabilidades y configuraciones débiles (system hardening) y la verificación de integridad del software. Estas acciones constituyen la base de seguridad sobre la que se sostiene toda la red.  A...
+2026-06-10 22:15:39,213 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-06-10 22:15:39,321 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-06-10 22:15:39,322 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
+
+### Guidelines:
+- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
+- Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
+- If content is too short (less than 3 messages) or too diverse, use only ["General"]
+- Use the chat's primary language; default to English if multilingual
+- Prioritize accuracy over specificity
+
+### Output:
+JSON format: { "tags": ["tag1", "tag2", "tag3"] }
+
+### Chat History:
+<chat_history>
+USER: que practicas de ciberseguridad son importantes en arquitecturas cloud?
+ASSISTANT: La respuesta es:
+
+* Gestión de accesos
+* Cifrado de datos
+* Monitorización
+* Gestión de vulnerabilidades
+* Realización de backups
+* Concienciación en ciberseguridad
+* Gestión de identidades y accesos
+* Identificación y mitigación de amenazas y vulnerabilidades
+</chat_history>
+2026-06-12 18:27:49,065 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-06-12 18:27:56,694 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-06-12 18:27:56,729 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-06-12 18:27:56,733 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-06-12 18:27:56,736 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-06-12 18:27:56,738 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-06-12 18:27:57,039 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-06-12 18:27:57,081 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-06-12 18:27:57,086 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-06-12 18:27:57,090 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-06-12 18:27:57,092 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-06-12 18:27:57,095 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-06-12 18:27:57,207 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-06-12 18:27:57,248 - INFO - [HaystackRAG] - Total de documentos en el store: 255
