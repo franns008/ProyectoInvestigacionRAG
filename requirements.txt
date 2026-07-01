@@ -7,3 +7,5 @@ python-docx
 markdown-it-py
 mdit-plain
 marker-pdf
+requests
+python-dotenv
