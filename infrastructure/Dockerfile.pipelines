@@ -4,11 +4,18 @@ FROM ghcr.io/open-webui/pipelines:main
 RUN pip install --no-cache-dir marker-pdf
 
 # Forzar torch+torchvision compatibles DESPUÉS de marker
-# torch 2.7.0 es lo que surya-ocr requiere explícitamente
+# torch 2.7.0 es lo que surya-ocr requiere explícitamente.
+#
+# Por defecto se instala la build de CPU (corre en cualquier máquina; la
+# generación va por Groq y embeddings/marker-pdf en CPU son suficientes).
+# Para NVIDIA, buildear con:
+#   --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cu126
+# (lo hace automáticamente docker-compose.nvidia.yml)
+ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu
 RUN pip install --no-cache-dir --force-reinstall \
-    torch==2.7.0+cu121 \
-    torchvision==0.22.0+cu121 \
-    --index-url https://download.pytorch.org/whl/cu121
+    torch==2.7.0 \
+    torchvision==0.22.0 \
+    --index-url ${TORCH_INDEX_URL}
 
 # Verificaciones
 RUN python -c "import torch, torchvision; print('torch:', torch.__version__, '| torchvision:', torchvision.__version__)"

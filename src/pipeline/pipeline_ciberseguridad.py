@@ -55,12 +55,13 @@ from haystack.components.converters import (
     DOCXToDocument, MarkdownToDocument, TextFileToDocument
 )
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder, OllamaDocumentEmbedder
-from haystack_integrations.components.generators.ollama import OllamaGenerator
+from haystack.components.generators.openai import OpenAIGenerator
 from haystack.document_stores.types import DuplicatePolicy
 
 # --- Configuración fija de infraestructura ---
 DB_CONNECTION       = "postgresql://avdbuser:avdbpass@vdb:5432/pgvdb"
 OLLAMA_URL          = "http://ollama:11434"
+GROQ_BASE_URL       = "https://api.groq.com/openai/v1"
 DB_TABLE            = "ciberseguridad_docs"
 EMBEDDING_DIMENSION = 1024
 INPUT_DIR           = Path("/app/pipelines/rawdata")
@@ -84,11 +85,12 @@ Answer:
 class Pipeline:
 
     class Valves(BaseModel):
-        llm_model:       str   = "llama3.1"
+        # Generación por API (Groq, endpoint compatible con OpenAI)
+        llm_model:       str   = "llama-3.1-8b-instant"
+        # Embeddings locales en Ollama (bge-m3 = 1024 dims, coincide con EMBEDDING_DIMENSION)
         embedding_model: str   = "bge-m3"
         retriever_top_k: int   = 5
-        num_ctx:         int   = 8192 
-        num_predict:     int   = 1000
+        max_tokens:      int   = 1000
         temperature:     float = 0.5
         split_length:    int   = 200
         split_overlap:   int   = 20
@@ -347,13 +349,13 @@ class Pipeline:
             join_mode="reciprocal_rank_fusion",
         ))
         pipeline.add_component("prompt_builder",      PromptBuilder(template=PROMPT_TEMPLATE))
-        pipeline.add_component("llm", OllamaGenerator(
+        pipeline.add_component("llm", OpenAIGenerator(
+            api_key=Secret.from_env_var("GROQ_API_KEY"),
+            api_base_url=GROQ_BASE_URL,
             model=v.llm_model,
-            url=OLLAMA_URL,
             generation_kwargs={
-                "num_predict": v.num_predict,
+                "max_tokens":  v.max_tokens,
                 "temperature": v.temperature,
-                "num_ctx":     v.num_ctx,
             },
         ))
 

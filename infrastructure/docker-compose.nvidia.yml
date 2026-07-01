@@ -1,0 +1,29 @@
+# Override para máquinas con GPU NVIDIA.
+# Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.nvidia.yml up -d --build
+#
+# Requiere tener instalado el nvidia-container-toolkit en el host.
+# El compose base (docker-compose.yml) corre todo en CPU y no necesita esto.
+services:
+    ollama:
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                      - driver: nvidia
+                        count: 1
+                        capabilities: [gpu]
+
+    pipelines:
+        build:
+            args:
+                TORCH_INDEX_URL: https://download.pytorch.org/whl/cu126
+        environment:
+            TORCH_DEVICE: cuda
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                      - driver: nvidia
+                        count: 1
+                        capabilities: [gpu]

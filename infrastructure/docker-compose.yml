@@ -8,14 +8,6 @@ services:
            - "${OLLAMA_PORT:-11434}:11434"
         volumes:
             - ollama_data:/root/.ollama
-        deploy:
-            resources:
-               reservations:
-                    devices:
-                      - driver: nvidia
-                        count: 1
-                        #device_ids: ["1"]
-                        capabilities: [gpu]
 
     db:
         image: postgres:15-alpine
@@ -51,6 +43,7 @@ services:
         environment:
             DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASS}@db/owebuidb?sslmode=disable
             PGVECTOR_DB_URL: postgresql://${PGVECTOR_USR}:${PGVECTOR_PASS}@vdb/pgvdb?sslmode=disable
+            OPENAI_API_BASE_URL: http://pipelines:9099
             OPENAI_API_KEY: ${PIPESERVER_KEY}
         depends_on:
             - db
@@ -67,7 +60,9 @@ services:
             - env/pipelines.env
         environment:
             PG_CONN_STR: postgresql://${PGVECTOR_USR}:${PGVECTOR_PASS}@vdb/pgvdb?sslmode=disable
-            TORCH_DEVICE: cuda  
+            TORCH_DEVICE: cpu
+            GROQ_API_KEY: ${GROQ_API_KEY}
+            PIPELINES_API_KEY: ${PIPESERVER_KEY}
         ports:
             - "${PIPELINES_PORT:-9099}:9099"
         extra_hosts:
@@ -75,16 +70,10 @@ services:
         volumes:
             - pipelines:/app/pipelines
             - rawdata:/app/pipelines/rawdata
+            - marker_cache:/root/.cache
         depends_on:
             - vdb
             - ollama
-        deploy:                         
-            resources:
-                reservations:
-                    devices:
-                      - driver: nvidia
-                        count: 1
-                        capabilities: [gpu]
 
 volumes:
     ollama_data:
@@ -123,3 +112,6 @@ volumes:
             type: 'none'
             o: 'bind'
             device: ../data/raw/
+    # Caché de modelos de marker-pdf / huggingface (evita re-descargar en cada recreate)
+    marker_cache:
+        driver: local
