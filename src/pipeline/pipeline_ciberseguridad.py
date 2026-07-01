@@ -86,11 +86,11 @@ class Pipeline:
 
     class Valves(BaseModel):
         # Generación por API (Groq, endpoint compatible con OpenAI)
-        llm_model:       str   = "llama-3.1-8b-instant"
+        llm_model:       str   = "meta-llama/llama-4-scout-17b-16e-instruct"
         # Embeddings locales en Ollama (bge-m3 = 1024 dims, coincide con EMBEDDING_DIMENSION)
         embedding_model: str   = "bge-m3"
-        retriever_top_k: int   = 5
-        max_tokens:      int   = 1000
+        retriever_top_k: int   = 3
+        max_tokens:      int   = 512
         temperature:     float = 0.5
         split_length:    int   = 200
         split_overlap:   int   = 20
@@ -353,6 +353,8 @@ class Pipeline:
             api_key=Secret.from_env_var("GROQ_API_KEY"),
             api_base_url=GROQ_BASE_URL,
             model=v.llm_model,
+            max_retries=5,      # default 2 — el cliente respeta el retry-after de Groq ante 429
+            timeout=60.0,
             generation_kwargs={
                 "max_tokens":  v.max_tokens,
                 "temperature": v.temperature,

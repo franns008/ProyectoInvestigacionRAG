@@ -1,0 +1,394 @@
+2026-07-01 23:31:58,368 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:32:32,719 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:32:32,972 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:32:32,982 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:32:32,982 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:32:32,982 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:32:34,805 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-01 23:32:34,880 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-07-01 23:32:34,940 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-01 23:32:34,941 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:32:34,941 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:32:34,941 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:32:35,173 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-01 23:32:35,241 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-07-01 23:35:42,241 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:35:42,241 - INFO - [HaystackRAG] - Ejecutando RAG para: y que tipo de problemas hay?
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -   [1] score=0.5616 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -   [2] score=0.5616 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -   [3] score=0.5616 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -   [1] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -   [2] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-01 23:35:44,445 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-01 23:35:44,446 - INFO - [HaystackRAG] -   [3] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-01 23:35:44,446 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-01 23:35:44,446 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:35:44,576 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:35:44,576 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: que es la ciberseguridad
+ASSISTANT: La ciberseguridad es la disciplina de la seguridad que se centra en proteger los sistemas, redes, aplicaciones y datos de las amenazas cibernéticas, como los ciberataques, la suplantación de identidad y la pérdida de datos. Su objetivo es garantizar la confidencialidad, integridad y disponibilidad de los sistemas y datos, así como prevenir y detectar incidentes de seguridad.
+USER: y que tipo de problemas hay?
+ASSISTANT: No conozco el contexto, así que no puedo determinar el tipo de problemas que se refieren.
+</chat_history>
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -   [1] score=0.5859 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -         snippet: estos fallos de seguridad.  La sección 5.- Preparación de un entorno de test guía sobre cómo configurar un entorno seguro y controlado para realizar pruebas de vulnerabilidades XSS, esencial para vali...
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -   [2] score=0.5810 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -         snippet:                                                                                                                                             | 12141827 | | 7.1. Configuración de políticas seguras7.2. P...
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -   [3] score=0.5810 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -         snippet: mantener la continuidad del negocio.  El presente estudio, dirigido tanto a desarrolladores como a entusiastas tecnológicos, destaca la necesidad de adoptar prácticas de seguridad en aplicaciones web....
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -         contenido: estos fallos de seguridad.  La sección 5.- Preparación de un entorno de test guía sobre cómo configurar un entorno seguro y controlado para realizar pruebas de vulnerabilidades XSS, esencial para validar la efectividad de las medidas de seguridad implementadas sin comprometer los sistemas de nuestro...
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -   [2] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -         contenido:                                                                                                                                             | 12141827 | | 7.1. Configuración de políticas seguras7.2. Programación segura7.3. Pruebas continuas y auditorías de seguridad                                  ...
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] -         contenido: mantener la continuidad del negocio.  El presente estudio, dirigido tanto a desarrolladores como a entusiastas tecnológicos, destaca la necesidad de adoptar prácticas de seguridad en aplicaciones web. En él se abordan conceptos fundamentales y se guía a los lectores a través del proceso de configura...
+2026-07-01 23:35:47,279 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:39:17,769 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:39:49,740 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:39:49,931 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:39:49,956 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:39:49,956 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:39:49,957 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:39:50,571 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-01 23:39:50,643 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-07-01 23:39:50,766 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-01 23:39:50,767 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:39:50,767 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:39:50,767 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:39:50,964 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-01 23:39:51,034 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-07-01 23:40:58,428 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:40:58,429 - INFO - [HaystackRAG] - Ejecutando RAG para: QUe es la ciberseguridad?
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [1] score=0.6034 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         snippet: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la segu...
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [2] score=0.5632 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         snippet: que un atacante establece una presencia a largo plazo en una red para robar datos o espiar.  responsable de llevar a cabo la autenticación de un dispositivo, verificando sus credenciales para autoriza...
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [3] score=0.5588 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         snippet: la seguridad de las redes 5G, como IPsec o EAP-AKA'.  IETF (Internet Engineering Task Force / Grupo de Trabajo de Ingeniería de Internet): Organización que desarrolla y promueve estándares de Internet...
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [1] score=0.026300607 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         snippet: que pueda producir problemas serios. Gestión de vulnerabilidades: es aconsejable estar atento a las nuevas vulnerabilidades que puedan afectar a la infraestructura ya que podrían ser una brecha de seg...
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [2] score=0.006580087 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         snippet: Capítulos 4 y 5 abordan dos aspectos clave de la operación segura de redes privadas 5G. El capítulo 4 se centra en las dimensiones operativas y organizativas de la seguridad, con énfasis en la coopera...
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [3] score=0.0053333333 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         snippet: el núcleo 5G. Actúa como punto de entrada para la señalización de los dispositivos, gestionando su registro en la red, la conexión, la movilidad entre distintas zonas de cobertura y  la autenticación ...
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 6 documentos enviados al prompt:
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [1] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         contenido: que pueda producir problemas serios. Gestión de vulnerabilidades: es aconsejable estar atento a las nuevas vulnerabilidades que puedan afectar a la infraestructura ya que podrían ser una brecha de seguridad que permitiría que los ciberdelincuentes puedan atacar. Para ello se recomienda aplicar los p...
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         contenido: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena...
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         contenido: Capítulos 4 y 5 abordan dos aspectos clave de la operación segura de redes privadas 5G. El capítulo 4 se centra en las dimensiones operativas y organizativas de la seguridad, con énfasis en la cooperación entre múltiples actores y en las estrategias de protección durante todo el ciclo de vida. El ca...
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -   [4] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,362 - INFO - [HaystackRAG] -         contenido: que un atacante establece una presencia a largo plazo en una red para robar datos o espiar.  responsable de llevar a cabo la autenticación de un dispositivo, verificando sus credenciales para autorizar su acceso a la red. Colabora con la UDM para este fin. • CCB (Change Control Board / Comité de Rev...
+2026-07-01 23:41:01,363 - INFO - [HaystackRAG] -   [5] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,363 - INFO - [HaystackRAG] -         contenido: el núcleo 5G. Actúa como punto de entrada para la señalización de los dispositivos, gestionando su registro en la red, la conexión, la movilidad entre distintas zonas de cobertura y  la autenticación inicial.  células 5G.  • AP (Access Point / Punto de Acceso): Dispositivo que crea una red de área l...
+2026-07-01 23:41:01,363 - INFO - [HaystackRAG] -   [6] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:01,363 - INFO - [HaystackRAG] -         contenido: la seguridad de las redes 5G, como IPsec o EAP-AKA'.  IETF (Internet Engineering Task Force / Grupo de Trabajo de Ingeniería de Internet): Organización que desarrolla y promueve estándares de Internet, muchos de los cuales son fundamentales para el a dispositivos no autorizados acceder a la red. • I...
+2026-07-01 23:41:01,363 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:01,598 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:41:01,598 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: QUe es la ciberseguridad?
+ASSISTANT: La ciberseguridad se refiere a la protección de la infraestructura, los sistemas y los datos frente a ataques cibernéticos, amenazas y vulnerabilidades. Implica la aplicación de medidas y técnicas para prevenir, detectar y responder a incidentes de seguridad en el ámbito digital. En el contexto de las redes 5G, la ciberseguridad es fundamental para garantizar la integridad y la disponibilidad de la infraestructura y los servicios.
+</chat_history>
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -   [1] score=0.5868 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -         snippet: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contra...
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -   [2] score=0.5808 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -         snippet: el núcleo 5G. Actúa como punto de entrada para la señalización de los dispositivos, gestionando su registro en la red, la conexión, la movilidad entre distintas zonas de cobertura y  la autenticación ...
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -   [3] score=0.5801 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -         snippet: 5G. Los pasos recomendados incluyen:  Análisis de requisitos de cumplimiento: Identificar las obligaciones legales y regulatorias aplicables, como el Reglamento General de Protección de Datos (GDPR) e...
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -         contenido: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contraseñas fuertes para prevenir ataques de fuerza bruta o adivinación.  o Ejemplo:  Definir requisitos d...
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -         contenido: el núcleo 5G. Actúa como punto de entrada para la señalización de los dispositivos, gestionando su registro en la red, la conexión, la movilidad entre distintas zonas de cobertura y  la autenticación inicial.  células 5G.  • AP (Access Point / Punto de Acceso): Dispositivo que crea una red de área l...
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] -         contenido: 5G. Los pasos recomendados incluyen:  Análisis de requisitos de cumplimiento: Identificar las obligaciones legales y regulatorias aplicables, como el Reglamento General de Protección de Datos (GDPR) el Esquema Nacional de Seguridad (ENS, RD 311/2022) y el Esquema Nacional de Seguridad específico de ...
+2026-07-01 23:41:04,019 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:04,139 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:41:04,139 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate a concise, 3-5 word title with an emoji summarizing the chat history.
+### Guidelines:
+- The title should clearly represent the main theme or subject of the conversation.
+- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
+- Write the title in the chat's primary language; default to English if multilingual.
+- Prioritize accuracy over excessive creativity; keep it clear and simple.
+- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
+- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
+- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
+### Output:
+JSON format: { "title": "your concise title here" }
+### Examples:
+- { "title": "📉 Stock Market Trends" },
+- { "title": "🍪 Perfect Chocolate Chip Recipe" },
+- { "title": "Evolution of Music Streaming" },
+- { "title": "Remote Work Productivity Tips" },
+- { "title": "Artificial Intelligence in Healthcare" },
+- { "title": "🎮 Video Game Development Insights" }
+### Chat History:
+<chat_history>
+USER: QUe es la ciberseguridad?
+ASSISTANT: La ciberseguridad se refiere a la protección de la infraestructura, los sistemas y los datos frente a ataques cibernéticos, amenazas y vulnerabilidades. Implica la aplicación de medidas y técnicas para prevenir, detectar y responder a incidentes de seguridad en el ámbito digital. En el contexto de las redes 5G, la ciberseguridad es fundamental para garantizar la integridad y la disponibilidad de la infraestructura y los servicios.
+</chat_history>
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -   [1] score=0.5247 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -         snippet: de la configuración de seguridad para la implementación de una red privada 5G, que incluye cuatro partes: planificación de la gestión de la configuración de seguridad, gestión de activos y análisis de...
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -   [2] score=0.5223 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -         snippet: de forma oportuna, mientras que las empresas deben aplicar las correcciones pertinentes lo antes posible, en función de la criticidad y la exposición descrita en los boletines de seguridad del proveed...
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -   [3] score=0.5210 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -         snippet: regulaciones aplicables, las estrategias generales de seguridad de la empresa, los requerimientos del cliente, los estándares de seguridad de la industria y las mejores prácticas.            • Propósi...
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -         contenido: de la configuración de seguridad para la implementación de una red privada 5G, que incluye cuatro partes: planificación de la gestión de la configuración de seguridad, gestión de activos y análisis de requisitos de seguridad, gestión de la línea base de la configuración de seguridad, e implementació...
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -         contenido: de forma oportuna, mientras que las empresas deben aplicar las correcciones pertinentes lo antes posible, en función de la criticidad y la exposición descrita en los boletines de seguridad del proveedor.  4.2.5 Gestión del ciclo de vida del producto  El fabricante debe definir un plan claro de gesti...
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] -         contenido: regulaciones aplicables, las estrategias generales de seguridad de la empresa, los requerimientos del cliente, los estándares de seguridad de la industria y las mejores prácticas.            • Propósito  Se deben determinar los objetivos de la política de gestión de la configuración de seguridad y d...
+2026-07-01 23:41:07,085 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:07,189 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:41:07,189 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
+
+### Guidelines:
+- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
+- Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
+- If content is too short (less than 3 messages) or too diverse, use only ["General"]
+- Use the chat's primary language; default to English if multilingual
+- Prioritize accuracy over specificity
+
+### Output:
+JSON format: { "tags": ["tag1", "tag2", "tag3"] }
+
+### Chat History:
+<chat_history>
+USER: QUe es la ciberseguridad?
+ASSISTANT: La ciberseguridad se refiere a la protección de la infraestructura, los sistemas y los datos frente a ataques cibernéticos, amenazas y vulnerabilidades. Implica la aplicación de medidas y técnicas para prevenir, detectar y responder a incidentes de seguridad en el ámbito digital. En el contexto de las redes 5G, la ciberseguridad es fundamental para garantizar la integridad y la disponibilidad de la infraestructura y los servicios.
+</chat_history>
+2026-07-01 23:41:09,209 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -   [1] score=0.5859 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -         snippet: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la segu...
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -   [2] score=0.5854 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -         snippet: 5G. Los pasos recomendados incluyen:  Análisis de requisitos de cumplimiento: Identificar las obligaciones legales y regulatorias aplicables, como el Reglamento General de Protección de Datos (GDPR) e...
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -   [3] score=0.5836 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -         snippet: regulaciones aplicables, las estrategias generales de seguridad de la empresa, los requerimientos del cliente, los estándares de seguridad de la industria y las mejores prácticas.            • Propósi...
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -         contenido: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena...
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -         contenido: 5G. Los pasos recomendados incluyen:  Análisis de requisitos de cumplimiento: Identificar las obligaciones legales y regulatorias aplicables, como el Reglamento General de Protección de Datos (GDPR) el Esquema Nacional de Seguridad (ENS, RD 311/2022) y el Esquema Nacional de Seguridad específico de ...
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] -         contenido: regulaciones aplicables, las estrategias generales de seguridad de la empresa, los requerimientos del cliente, los estándares de seguridad de la industria y las mejores prácticas.            • Propósito  Se deben determinar los objetivos de la política de gestión de la configuración de seguridad y d...
+2026-07-01 23:41:09,210 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:10,571 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:42:10,572 - INFO - [HaystackRAG] - Ejecutando RAG para: ¿Cuáles son las principales amenazas de ciberseguridad en las redes 5G?
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] -   [1] score=0.7078 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] -         snippet: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la segu...
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] -   [2] score=0.6737 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] -         snippet: la superficie de ataque en entornos de alta densidad de dispositivos  Las redes 5G están diseñadas para ofrecer una conectividad masiva y segura a un número sin precedentes de dispositivos. Esta capac...
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] -   [3] score=0.6713 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] -         snippet: seguridad podría tener graves consecuencias para la seguridad pública y la economía. Amenazas como la manipulación de datos en tiempo real, antes consideradas teóricas, se vuelven críticas en entornos...
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] -         contenido: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena...
+2026-07-01 23:42:12,638 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:12,639 - INFO - [HaystackRAG] -         contenido: la superficie de ataque en entornos de alta densidad de dispositivos  Las redes 5G están diseñadas para ofrecer una conectividad masiva y segura a un número sin precedentes de dispositivos. Esta capacidad, si bien es una de sus grandes ventajas, amplía la superficie de ataque potencial de una organi...
+2026-07-01 23:42:12,639 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:12,639 - INFO - [HaystackRAG] -         contenido: seguridad podría tener graves consecuencias para la seguridad pública y la economía. Amenazas como la manipulación de datos en tiempo real, antes consideradas teóricas, se vuelven críticas en entornos URLLC (comunicaciones ultrafiables y de baja latencia), donde un vehículo autónomo o un robot quirú...
+2026-07-01 23:42:12,639 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:12,784 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:42:12,785 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: QUe es la ciberseguridad?
+ASSISTANT: La ciberseguridad se refiere a la protección de la infraestructura, los sistemas y los datos frente a ataques cibernéticos, amenazas y vulnerabilidades. Implica la aplicación de medidas y técnicas para prevenir, detectar y responder a incidentes de seguridad en el ámbito digital. En el contexto de las redes 5G, la ciberseguridad es fundamental para garantizar la integridad y la disponibilidad de la infraestructura y los servicios.
+USER: ¿Cuáles son las principales amenazas de ciberseguridad en las redes 5G?
+ASSISTANT: Las principales amenazas de ciberseguridad en las redes 5G incluyen:
+
+1. Ampliación de la superficie de ataque debido a la proliferación de dispositivos IoT con capacidades de seguridad limitadas.
+2. Integración con infraestructuras críticas nacionales, lo que podría tener graves consecuencias para la seguridad pública y la economía en caso de un incidente de seguridad.
+3. Manipulación de datos en tiempo real, especialmente en entornos de comunicaciones ultrafiables y de baja latencia (URLLC).
+4. Vulnerabilidades en el kernel del sistema operativo de los dispositivos, la capa de virtualización de los servidores de red y centros de datos, o en las aplicaciones que se ejecutan en ellos.
+5. Configuración inadecuada de los dispositivos, como el uso de contraseñas débiles y predecibles.
+6. Complejidad de la arquitectura 5G, basada en la virtualización, las redes definidas por software (SDN) y el uso de software de múltiples proveedores, lo que aumenta el riesgo de errores y malas configuraciones.
+
+Estas amenazas requieren una gestión proactiva de la seguridad en todos los niveles del ecosistema, incluyendo la aplicación oportuna de parches y una configuración segura.
+</chat_history>
+2026-07-01 23:42:17,898 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -   [1] score=0.6580 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -         snippet: como el tráfico y los registros de eventos generados por los distintos dispositivos. Esto facilita la detección de amenazas avanzadas persistentes (APT) y, en combinación con los sistemas de protecció...
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -   [2] score=0.6501 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -         snippet: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la segu...
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -   [3] score=0.6382 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -         snippet: el núcleo 5G. Actúa como punto de entrada para la señalización de los dispositivos, gestionando su registro en la red, la conexión, la movilidad entre distintas zonas de cobertura y  la autenticación ...
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -         contenido: como el tráfico y los registros de eventos generados por los distintos dispositivos. Esto facilita la detección de amenazas avanzadas persistentes (APT) y, en combinación con los sistemas de protección ya instalados, mejora la capacidad de respuesta ante incidentes de seguridad.            Capítulo ...
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -         contenido: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena...
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] -         contenido: el núcleo 5G. Actúa como punto de entrada para la señalización de los dispositivos, gestionando su registro en la red, la conexión, la movilidad entre distintas zonas de cobertura y  la autenticación inicial.  células 5G.  • AP (Access Point / Punto de Acceso): Dispositivo que crea una red de área l...
+2026-07-01 23:42:17,899 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:21,529 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:42:21,529 - INFO - [HaystackRAG] - Ejecutando RAG para: ¿Cómo pueden las empresas proteger sus redes 5G contra estas amenazas?
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -   [1] score=0.7103 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -         snippet: la superficie de ataque en entornos de alta densidad de dispositivos  Las redes 5G están diseñadas para ofrecer una conectividad masiva y segura a un número sin precedentes de dispositivos. Esta capac...
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -   [2] score=0.6950 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -         snippet: de seguridad  A medida que se integra un gran número de dispositivos en las redes empresariales, aumenta la posibilidad de vulnerabilidades en el kernel del sistema operativo de los dispositivos y ser...
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -   [3] score=0.6706 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -         snippet: la red de transmisión y los canales de operación y mantenimiento (O&M)—, lo que incrementa el riesgo de ataques de tipo man-in-the-middle sobre los enlaces de datos, al ampliar la superficie de exposi...
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -         contenido: la superficie de ataque en entornos de alta densidad de dispositivos  Las redes 5G están diseñadas para ofrecer una conectividad masiva y segura a un número sin precedentes de dispositivos. Esta capacidad, si bien es una de sus grandes ventajas, amplía la superficie de ataque potencial de una organi...
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -         contenido: de seguridad  A medida que se integra un gran número de dispositivos en las redes empresariales, aumenta la posibilidad de vulnerabilidades en el kernel del sistema operativo de los dispositivos y servidores, la capa de virtualización de los servidores usados tanto en la red como en los centros de d...
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] -         contenido: la red de transmisión y los canales de operación y mantenimiento (O&M)—, lo que incrementa el riesgo de ataques de tipo man-in-the-middle sobre los enlaces de datos, al ampliar la superficie de exposición a interceptaciones y manipulaciones no autorizadas.            3.1.2 El acceso inalámbrico de u...
+2026-07-01 23:42:23,066 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:23,218 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 255
+2026-07-01 23:42:23,219 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: QUe es la ciberseguridad?
+ASSISTANT: La ciberseguridad se refiere a la protección de la infraestructura, los sistemas y los datos frente a ataques cibernéticos, amenazas y vulnerabilidades. Implica la aplicación de medidas y técnicas para prevenir, detectar y responder a incidentes de seguridad en el ámbito digital. En el contexto de las redes 5G, la ciberseguridad es fundamental para garantizar la integridad y la disponibilidad de la infraestructura y los servicios.
+USER: ¿Cuáles son las principales amenazas de ciberseguridad en las redes 5G?
+ASSISTANT: Las principales amenazas de ciberseguridad en las redes 5G incluyen:
+
+1. Ampliación de la superficie de ataque debido a la proliferación de dispositivos IoT con capacidades de seguridad limitadas.
+2. Integración con infraestructuras críticas nacionales, lo que podría tener graves consecuencias para la seguridad pública y la economía en caso de un incidente de seguridad.
+3. Manipulación de datos en tiempo real, especialmente en entornos de comunicaciones ultrafiables y de baja latencia (URLLC).
+4. Vulnerabilidades en el kernel del sistema operativo de los dispositivos, la capa de virtualización de los servidores de red y centros de datos, o en las aplicaciones que se ejecutan en ellos.
+5. Configuración inadecuada de los dispositivos, como el uso de contraseñas débiles y predecibles.
+6. Complejidad de la arquitectura 5G, basada en la virtualización, las redes definidas por software (SDN) y el uso de software de múltiples proveedores, lo que aumenta el riesgo de errores y malas configuraciones.
+
+Estas amenazas requieren una gestión proactiva de la seguridad en todos los niveles del ecosistema, incluyendo la aplicación oportuna de parches y una configuración segura.
+USER: ¿Cómo pueden las empresas proteger sus redes 5G contra estas amenazas?
+ASSISTANT: Para proteger sus redes 5G contra las amenazas mencionadas, las empresas pueden implementar varias medidas de seguridad:
+
+1. **Gestión proactiva de la seguridad**: Implementar un ciclo de vida de seguridad riguroso que incluya la aplicación oportuna de parches de seguridad para mitigar el riesgo de explotación de vulnerabilidades.
+
+2. **Configuración segura**: Evitar el uso de contraseñas débiles y predecibles en los dispositivos. En su lugar, utilizar credenciales robustas y únicas para cada dispositivo.
+
+3. **Protección en todos los niveles**: Asegurar la seguridad en todos los niveles del ecosistema, incluyendo el kernel del sistema operativo de los dispositivos, la capa de virtualización de los servidores de red y centros de datos, y las aplicaciones que se ejecutan en ellos.
+
+4. **Autenticación y autorización**: Implementar mecanismos de autenticación y autorización robustos para evitar el acceso no autorizado a la red, incluyendo la verificación de identidades de dispositivos a través de métodos como el IMSI y las direcciones MAC.
+
+5. **Cifrado y autenticación en protocolos**: Implementar cifrado y autenticación en los protocolos industriales y de comunicación para proteger la información transmitida.
+
+6. **Monitoreo y análisis de seguridad**: Monitorear constantemente la red para detectar actividades sospechosas y analizar los riesgos de seguridad potenciales.
+
+7. **Capacidades de protección de seguridad**: Asegurarse de que los dispositivos tengan capacidades básicas de protección de seguridad para evitar la propagación de riesgos dentro de la red.
+
+8. **Seguridad en la interfaz de radio**: Implementar medidas de seguridad específicas para proteger la interfaz de radio y evitar ataques de suplantación de identidades y acceso no autorizado.
+
+Al implementar estas medidas, las empresas pueden reducir significativamente los riesgos asociados con la seguridad en las redes 5G y proteger sus activos de información contra amenazas potenciales.
+</chat_history>
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -   [1] score=0.6963 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -         snippet: como el tráfico y los registros de eventos generados por los distintos dispositivos. Esto facilita la detección de amenazas avanzadas persistentes (APT) y, en combinación con los sistemas de protecció...
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -   [2] score=0.6789 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -         snippet: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la segu...
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -   [3] score=0.6629 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -         snippet: 5G. Los pasos recomendados incluyen:  Análisis de requisitos de cumplimiento: Identificar las obligaciones legales y regulatorias aplicables, como el Reglamento General de Protección de Datos (GDPR) e...
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -         contenido: como el tráfico y los registros de eventos generados por los distintos dispositivos. Esto facilita la detección de amenazas avanzadas persistentes (APT) y, en combinación con los sistemas de protección ya instalados, mejora la capacidad de respuesta ante incidentes de seguridad.            Capítulo ...
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -         contenido: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena...
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -         contenido: 5G. Los pasos recomendados incluyen:  Análisis de requisitos de cumplimiento: Identificar las obligaciones legales y regulatorias aplicables, como el Reglamento General de Protección de Datos (GDPR) el Esquema Nacional de Seguridad (ENS, RD 311/2022) y el Esquema Nacional de Seguridad específico de ...
+2026-07-01 23:42:31,948 - INFO - [HaystackRAG] - ------------------------------------------------------------
