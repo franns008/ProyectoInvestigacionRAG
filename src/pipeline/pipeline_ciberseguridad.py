@@ -80,6 +80,87 @@ Question: {{question}}
 Answer:
 """
 
+class XMLCWEConverter:
+    def run(self, sources: list[Path]):
+        import xml.etree.ElementTree as ET
+        from haystack import Document
+
+        documents = []
+        skipped = 0
+        ns = {'cwe': 'http://cwe.mitre.org/cwe-7'}
+
+        for file_path in sources:
+            try:
+                tree = ET.parse(file_path)
+            except ET.ParseError as e:
+                logger.error(f"[XMLCWE] No se pudo parsear {file_path.name}: {e}")
+                continue
+
+            root = tree.getroot()
+
+            for weakness in root.findall('.//cwe:Weakness', ns):
+                cwe_id = weakness.get('ID')
+                name = weakness.get('Name')
+
+                # Si falta el ID, no podemos generar un doc.id único ni confiable — se descarta
+                if not cwe_id:
+                    skipped += 1
+                    continue
+
+                desc_elem = weakness.find('cwe:Description', ns)
+                description = self._extract_text(desc_elem)
+
+                # Fallback: si Description viene vacía, probamos con Extended_Description
+                if not description:
+                    ext_elem = weakness.find('cwe:Extended_Description', ns)
+                    description = self._extract_text(ext_elem)
+
+                name = (name or "").strip()
+                description = (description or "").strip()
+
+                content = f"Vulnerabilidad CWE-{cwe_id}: {name}\nDescripción: {description}".strip()
+
+                # Filtro de calidad: descarta chunks sin sustancia real
+                # (sin nombre Y sin descripción, o contenido alfanumérico insuficiente)
+                alnum_chars = sum(c.isalnum() for c in content)
+                if alnum_chars < 20:
+                    logger.warning(
+                        f"[XMLCWE] Descartado CWE-{cwe_id} por contenido insuficiente "
+                        f"(alnum_chars={alnum_chars}): '{content[:80]}'"
+                    )
+                    skipped += 1
+                    continue
+
+                doc = Document(
+                    id=f"cwe-{cwe_id}",
+                    content=content,
+                    meta={
+                        "cwe_id": int(cwe_id) if cwe_id.isdigit() else cwe_id,
+                        "name": name or "Sin nombre",
+                        "source_file": str(file_path),
+                    }
+                )
+                documents.append(doc)
+
+        logger.info(
+            f"[XMLCWE] {len(documents)} documentos CWE generados, "
+            f"{skipped} descartados por datos insuficientes."
+        )
+        return {"documents": documents}
+
+    @staticmethod
+    def _extract_text(elem) -> str:
+        """
+        Extrae todo el texto de un elemento XML, incluyendo el de sub-tags anidados
+        (ej. <xhtml:p>, <xhtml:div> dentro de <Description>). A diferencia de
+        elem.text (que solo trae el texto directo del nodo), esto recorre todo
+        el árbol y concatena cada fragmento de texto encontrado.
+        """
+        if elem is None:
+            return ""
+        parts = [t.strip() for t in elem.itertext() if t and t.strip()]
+        return " ".join(parts)
+
 
 class Pipeline:
 
@@ -111,12 +192,23 @@ class Pipeline:
             self._marker_converter = None
 
         self.rag_pipeline = self._build_rag_pipeline()
+        
         logger.info("Indexando documentos en __init__...")
-        self._index_new_documents()
+        try:
+            self._index_new_documents()
+        except Exception as e:
+            import traceback
+            logger.error(f"Fallo la indexación inicial, la pipeline sigue disponible: {e}")
+            logger.error(f"Traceback:\n{traceback.format_exc()}")
 
     async def on_startup(self):
         logger.info("Indexando documentos nuevos si los hay...")
-        self._index_new_documents()
+        try:
+            self._index_new_documents()
+        except Exception as e:
+            import traceback
+            logger.error(f"Fallo la indexación en on_startup, el server sigue disponible: {e}")
+            logger.error(f"Traceback:\n{traceback.format_exc()}")
 
     async def on_valves_updated(self):
         logger.info("Valves actualizados — reconstruyendo pipeline...")
@@ -192,7 +284,7 @@ class Pipeline:
     # ------------------------------------------------------------------
     # Infraestructura
     # ------------------------------------------------------------------
-
+    
     def _get_document_store(self) -> PgvectorDocumentStore:
         return PgvectorDocumentStore(
             connection_string=Secret.from_token(DB_CONNECTION),
@@ -204,7 +296,7 @@ class Pipeline:
     # ------------------------------------------------------------------
     # Conversión de PDFs con marker-pdf
     # ------------------------------------------------------------------
-
+   
     def _convert_pdf_with_marker(self, pdf_path: Path) -> Path | None:
         """
         Convierte un PDF a Markdown usando marker-pdf y lo guarda en CONVERTED_DIR.
@@ -268,6 +360,7 @@ class Pipeline:
             ("*.docx", DOCXToDocument()),
             ("*.md",   MarkdownToDocument()),
             ("*.txt",  TextFileToDocument()),
+            ("*.xml",  XMLCWEConverter()),
         ]
         for pattern, converter in other_converters:
             # Excluir los .md generados por marker (viven en CONVERTED_DIR, no en INPUT_DIR)
@@ -282,7 +375,7 @@ class Pipeline:
     # ------------------------------------------------------------------
     # Indexación incremental
     # ------------------------------------------------------------------
-
+    
     def _index_new_documents(self) -> None:
         if not INPUT_DIR.exists():
             logger.error(f"Directorio de entrada no encontrado: {INPUT_DIR}")
@@ -318,12 +411,14 @@ class Pipeline:
             return
 
         logger.info(f"Embedding de {len(new_docs)} documentos nuevos...")
-        doc_embedder = OllamaDocumentEmbedder(
-            model=self.valves.embedding_model,
-            url=OLLAMA_URL,
-            batch_size=32,
-        )
-        docs_with_embeddings = doc_embedder.run(new_docs)
+        #doc_embedder = OllamaDocumentEmbedder(
+        #    model=self.valves.embedding_model,
+        #    url=OLLAMA_URL,
+        #    batch_size=32,
+        #)
+        #docs_with_embeddings = doc_embedder.run(new_docs)
+        embedded_docs = self._embed_documents_safely(new_docs, batch_size=32)
+        docs_with_embeddings = {"documents": embedded_docs}
         self.store.write_documents(
             docs_with_embeddings["documents"],
             policy=DuplicatePolicy.OVERWRITE,
@@ -331,6 +426,43 @@ class Pipeline:
         total = len(self.store.filter_documents())
         logger.info(f"Indexación completa: {len(new_docs)} chunks agregados.")
         logger.info(f"Total de documentos en el store: {total}")
+
+    def _embed_documents_safely(self, docs: list[Document], batch_size: int = 32) -> list[Document]:
+        """
+        Embeddea documentos en batches. Si un batch falla (ej. por NaN en la
+        respuesta de Ollama), reintenta ese batch de a un documento por vez
+        para aislar y descartar solo el chunk problemático, sin perder el resto.
+        """
+        embedder_batch = OllamaDocumentEmbedder(
+            model=self.valves.embedding_model,
+            url=OLLAMA_URL,
+            batch_size=batch_size,
+        )
+        embedder_single = OllamaDocumentEmbedder(
+            model=self.valves.embedding_model,
+            url=OLLAMA_URL,
+            batch_size=1,
+        )
+
+        result_docs = []
+        for i in range(0, len(docs), batch_size):
+            batch = docs[i:i + batch_size]
+            try:
+                embedded = embedder_batch.run(batch)["documents"]
+                result_docs.extend(embedded)
+            except Exception:
+                logger.warning(f"Batch {i}-{i+len(batch)} falló, aislando de a uno...")
+                for doc in batch:
+                    try:
+                        embedded_doc = embedder_single.run([doc])["documents"]
+                        result_docs.extend(embedded_doc)
+                    except Exception as e:
+                        source = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
+                        preview = (doc.content or "")[:150].replace("\n", "\\n")
+                        logger.error(
+                            f"[CHUNK DESCARTADO] fuente={source} | contenido='{preview}' | error={e}"
+                        )
+        return result_docs
 
     # ------------------------------------------------------------------
     # Pipeline de RAG

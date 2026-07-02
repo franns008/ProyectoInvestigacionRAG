@@ -1,0 +1,1163 @@
+2026-07-01 23:08:28,645 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:09:39,294 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:09:39,339 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:09:39,343 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-01 23:09:54,808 - INFO - [HaystackRAG] - Conversión exitosa → Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:09:54,811 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-01 23:13:46,544 - INFO - [HaystackRAG] - Conversión exitosa → INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:13:46,547 - INFO - [HaystackRAG] - Convirtiendo con marker-pdf: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-01 23:14:11,879 - INFO - [HaystackRAG] - Conversión exitosa → INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:14:12,160 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-01 23:14:12,202 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-07-01 23:14:12,207 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-01 23:14:12,211 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:14:12,214 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:14:12,216 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:14:12,330 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-01 23:14:12,370 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-07-01 23:19:25,503 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:19:30,656 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:19:30,691 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:19:30,695 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:19:30,698 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:19:30,700 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:19:31,804 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:25:26,753 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:25:31,914 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:25:31,950 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:25:31,955 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:25:31,957 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:25:31,960 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:25:32,958 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:28:03,051 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:28:06,165 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:28:06,200 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:28:06,204 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:28:06,206 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:28:06,209 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:28:07,110 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:34:44,340 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:34:47,765 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:34:47,801 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:34:47,804 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:34:47,806 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:34:47,808 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:34:48,707 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:36:01,815 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:36:05,222 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:36:05,257 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:36:05,261 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:36:05,263 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:36:05,265 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:36:06,155 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:39:26,133 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:39:29,459 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:39:29,499 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:39:29,503 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:39:29,506 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:39:29,509 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:39:30,349 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:46:11,563 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:47:14,646 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:47:14,685 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:47:14,689 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:47:14,692 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:47:14,694 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:47:15,679 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:47:47,192 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-01 23:47:47,196 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 150, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 366, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-01 23:47:47,201 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-01 23:47:47,205 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:47:47,207 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:47:47,209 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:47:48,051 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:48:05,840 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:48:09,283 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:48:09,317 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:48:09,322 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:48:09,324 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:48:09,327 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:48:10,217 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:48:12,285 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-01 23:48:12,287 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 150, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 366, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-01 23:48:12,292 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-01 23:48:12,296 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:48:12,299 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:48:12,301 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:48:13,134 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:48:30,446 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:48:33,819 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:48:33,854 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:48:33,858 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:48:33,860 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:48:33,863 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:48:34,792 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:48:37,123 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-01 23:48:37,125 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 150, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 366, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-01 23:48:37,130 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-01 23:48:37,134 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:48:37,136 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:48:37,139 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:48:37,981 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:48:55,559 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-01 23:48:58,782 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-01 23:48:58,818 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-01 23:48:58,822 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:48:58,825 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:48:58,827 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:48:59,761 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-01 23:49:01,976 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-01 23:49:01,978 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 150, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 366, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-01 23:49:01,982 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-01 23:49:01,986 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-01 23:49:01,989 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-01 23:49:01,991 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-01 23:49:02,894 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:42:20,124 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:42:28,258 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:42:28,293 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:42:28,297 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:42:28,300 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:42:28,303 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:42:29,239 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:42:29,446 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:42:42,492 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:42:42,495 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 414, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:42:42,500 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:42:42,504 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:42:42,507 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:42:42,509 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:42:43,370 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:42:43,438 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:43:02,492 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:43:06,308 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:43:06,345 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:43:06,350 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:43:06,353 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:43:06,355 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:43:07,225 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:43:07,330 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:43:09,554 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:43:09,556 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 414, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:43:09,562 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:43:09,566 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:43:09,569 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:43:09,571 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:43:10,411 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:43:10,476 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:43:26,418 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:43:29,654 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:43:29,690 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:43:29,695 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:43:29,698 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:43:29,700 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:43:30,544 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:43:30,643 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:43:32,861 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:43:32,862 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 414, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:43:32,867 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:43:32,872 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:43:32,874 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:43:32,877 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:43:33,675 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:43:33,738 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:43:50,334 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:43:53,925 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:43:53,964 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:43:53,968 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:43:53,970 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:43:53,972 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:43:54,932 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:43:55,038 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:43:57,326 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:43:57,328 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 414, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:43:57,334 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:43:57,338 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:43:57,341 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:43:57,344 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:43:58,186 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:43:58,255 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:44:16,677 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:44:17,616 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:44:17,650 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:44:17,653 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:44:17,655 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:44:17,656 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:44:18,440 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:44:18,538 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:44:20,491 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:44:20,493 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 414, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:44:20,497 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:44:20,501 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:44:20,504 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:44:20,506 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:44:21,265 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:44:21,324 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:44:39,086 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:44:42,403 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:44:42,440 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:44:42,444 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:44:42,445 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:44:42,447 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:44:43,312 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:44:43,414 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:44:45,642 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:44:45,644 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 414, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:44:45,649 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:44:45,652 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:44:45,655 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:44:45,660 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:44:44,974 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:44:45,039 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:45:03,557 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:45:06,931 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:45:06,969 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:45:06,973 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:45:06,976 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:45:06,978 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:45:07,841 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:45:07,945 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:45:10,165 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:45:10,166 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 414, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:45:10,172 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:45:10,177 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:45:10,179 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:45:10,182 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:45:11,027 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:45:11,095 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:45:27,108 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:45:30,848 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:45:30,886 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:45:30,890 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:45:30,893 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:45:30,896 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:45:31,786 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:45:31,891 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:45:34,206 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:45:34,210 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 414, in _index_new_documents
+    doc_embedder = OllamaDocumentEmbedder(
+                           ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:45:34,216 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:45:34,220 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:45:34,223 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:45:34,225 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:45:35,057 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:45:35,124 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:45:52,139 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:45:55,634 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:45:55,673 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:45:55,677 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:45:55,680 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:45:55,682 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:45:56,539 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:45:56,642 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:45:58,811 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:45:58,813 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 419, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:45:58,818 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:45:58,822 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:45:58,825 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:45:58,828 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:45:59,677 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:45:59,744 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:46:01,939 - ERROR - [HaystackRAG] - Fallo la indexación en on_startup, el server sigue disponible: failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:46:01,941 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 207, in on_startup
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 419, in _index_new_documents
+    docs_with_embeddings = doc_embedder.run(new_docs)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 218, in run
+    embeddings = self._embed_batch(
+                 ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/haystack_integrations/components/embedders/ollama/document_embedder.py", line 150, in _embed_batch
+    result = self._client.embed(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 415, in embed
+    return self._request(
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 199, in _request
+    return cls(**self._request_raw(*args, **kwargs).json())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/ollama/_client.py", line 143, in _request_raw
+    raise ResponseError(e.response.text, e.response.status_code) from None
+ollama._types.ResponseError: failed to encode response: json: unsupported value: NaN (status code: 500)
+
+2026-07-02 18:47:56,663 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:48:00,246 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:48:00,285 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:48:00,290 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:48:00,293 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:48:00,295 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:48:01,191 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:48:01,298 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:48:01,298 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: 'Pipeline' object has no attribute '_embed_documents_safely'
+2026-07-02 18:48:01,300 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 420, in _index_new_documents
+    embedded_docs = self._embed_documents_safely(new_docs, batch_size=32)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Pipeline' object has no attribute '_embed_documents_safely'
+
+2026-07-02 18:48:01,305 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:48:01,309 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:48:01,312 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:48:01,314 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:48:02,111 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:48:02,178 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:48:02,179 - ERROR - [HaystackRAG] - Fallo la indexación en on_startup, el server sigue disponible: 'Pipeline' object has no attribute '_embed_documents_safely'
+2026-07-02 18:48:02,180 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 207, in on_startup
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 420, in _index_new_documents
+    embedded_docs = self._embed_documents_safely(new_docs, batch_size=32)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Pipeline' object has no attribute '_embed_documents_safely'
+
+2026-07-02 18:49:16,104 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:49:19,413 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:49:19,451 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:49:19,455 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:49:19,457 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:49:19,460 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:49:20,329 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:49:20,435 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:49:20,435 - ERROR - [HaystackRAG] - Fallo la indexación inicial, la pipeline sigue disponible: 'Pipeline' object has no attribute '_embed_documents_safely'
+2026-07-02 18:49:20,437 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 198, in __init__
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 420, in _index_new_documents
+    embedded_docs = self._embed_documents_safely(new_docs, batch_size=32)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Pipeline' object has no attribute '_embed_documents_safely'
+
+2026-07-02 18:49:20,442 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:49:20,446 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:49:20,449 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:49:20,452 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:49:21,291 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:49:21,355 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:49:21,355 - ERROR - [HaystackRAG] - Fallo la indexación en on_startup, el server sigue disponible: 'Pipeline' object has no attribute '_embed_documents_safely'
+2026-07-02 18:49:21,356 - ERROR - [HaystackRAG] - Traceback:
+Traceback (most recent call last):
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 207, in on_startup
+    self._index_new_documents()
+  File "/app/./pipelines/pipeline_ciberseguridad.py", line 420, in _index_new_documents
+    embedded_docs = self._embed_documents_safely(new_docs, batch_size=32)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Pipeline' object has no attribute '_embed_documents_safely'
+
+2026-07-02 18:51:36,893 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-02 18:51:40,357 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-02 18:51:40,395 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-02 18:51:40,400 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:51:40,402 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:51:40,405 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:51:41,284 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:51:41,393 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:51:43,876 - WARNING - [HaystackRAG] - Batch 96-128 falló, aislando de a uno...
+2026-07-02 18:51:45,472 - ERROR - [HaystackRAG] - [CHUNK DESCARTADO] fuente=desconocido | contenido='Vulnerabilidad CWE-561: Dead Code\nDescripción: The product contains dead code, which can never be executed.' | error=failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:51:59,837 - WARNING - [HaystackRAG] - Batch 576-608 falló, aislando de a uno...
+2026-07-02 18:52:05,660 - ERROR - [HaystackRAG] - [CHUNK DESCARTADO] fuente=desconocido | contenido='Vulnerabilidad CWE-561: Dead Code\nDescripción: The product contains dead code, which can never be executed.' | error=failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:52:12,555 - INFO - [HaystackRAG] - Indexación completa: 789 chunks agregados.
+2026-07-02 18:52:12,555 - INFO - [HaystackRAG] - Total de documentos en el store: 1042
+2026-07-02 18:52:12,564 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-02 18:52:12,569 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-02 18:52:12,572 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-02 18:52:12,574 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-02 18:52:13,430 - INFO - [HaystackRAG] - [XMLCWE] 789 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-02 18:52:13,220 - INFO - [HaystackRAG] - Embedding de 789 documentos nuevos...
+2026-07-02 18:52:13,889 - WARNING - [HaystackRAG] - Batch 96-128 falló, aislando de a uno...
+2026-07-02 18:52:16,585 - ERROR - [HaystackRAG] - [CHUNK DESCARTADO] fuente=desconocido | contenido='Vulnerabilidad CWE-561: Dead Code\nDescripción: The product contains dead code, which can never be executed.' | error=failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:52:30,955 - WARNING - [HaystackRAG] - Batch 576-608 falló, aislando de a uno...
+2026-07-02 18:52:36,554 - ERROR - [HaystackRAG] - [CHUNK DESCARTADO] fuente=desconocido | contenido='Vulnerabilidad CWE-561: Dead Code\nDescripción: The product contains dead code, which can never be executed.' | error=failed to encode response: json: unsupported value: NaN (status code: 500)
+2026-07-02 18:52:41,425 - INFO - [HaystackRAG] - Indexación completa: 789 chunks agregados.
+2026-07-02 18:52:41,425 - INFO - [HaystackRAG] - Total de documentos en el store: 1042
+2026-07-02 19:07:42,398 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:07:42,399 - INFO - [HaystackRAG] - Ejecutando RAG para: que es es la CWE-652?
+2026-07-02 19:08:52,393 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:08:52,393 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:08:52,393 - INFO - [HaystackRAG] -   [1] score=0.4196 | fuente=desconocido
+2026-07-02 19:08:52,393 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-642: External Control of Critical State Data Descripción: The product stores security-critical state information about its users, or the product itself, in a location that is access...
+2026-07-02 19:08:52,394 - INFO - [HaystackRAG] -   [2] score=0.3989 | fuente=desconocido
+2026-07-02 19:08:52,394 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-602: Client-Side Enforcement of Server-Side Security Descripción: The product is composed of a server that relies on the client to implement a mechanism that is intended to protect ...
+2026-07-02 19:08:52,394 - INFO - [HaystackRAG] -   [3] score=0.3922 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:08:52,394 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-02 19:08:52,395 - INFO - [HaystackRAG] -   [4] score=0.3922 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:08:52,395 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-02 19:08:52,395 - INFO - [HaystackRAG] -   [5] score=0.3922 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:08:52,395 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-02 19:08:52,395 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:08:52,395 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:08:52,396 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:08:52,396 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:08:52,396 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:08:52,396 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-642: External Control of Critical State Data Descripción: The product stores security-critical state information about its users, or the product itself, in a location that is accessible to unauthorized actors....
+2026-07-02 19:08:52,396 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:08:52,397 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-602: Client-Side Enforcement of Server-Side Security Descripción: The product is composed of a server that relies on the client to implement a mechanism that is intended to protect the server....
+2026-07-02 19:08:52,397 - INFO - [HaystackRAG] -   [3] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:08:52,397 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-02 19:08:52,397 - INFO - [HaystackRAG] -   [4] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:08:52,397 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-02 19:08:52,397 - INFO - [HaystackRAG] -   [5] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:08:52,398 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-02 19:08:52,398 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:08:52,671 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:08:52,672 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: que es es la CWE-652?
+ASSISTANT: Lo siento, pero no tengo información sobre la CWE-652 en el contexto proporcionado. ¿Podrías proporcionar más detalles o especificaciones sobre esta vulnerabilidad? De esa manera podré ayudarte mejor a encontrar la respuesta a tu pregunta.
+</chat_history>
+2026-07-02 19:09:30,238 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:09:30,238 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:09:30,239 - INFO - [HaystackRAG] -   [1] score=0.5643 | fuente=desconocido
+2026-07-02 19:09:30,239 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-447: Unimplemented or Unsupported Feature in UI Descripción: A UI function for a security feature appears to be supported and gives feedback to the user that suggests that it is sup...
+2026-07-02 19:09:30,239 - INFO - [HaystackRAG] -   [2] score=0.5629 | fuente=desconocido
+2026-07-02 19:09:30,239 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:09:30,239 - INFO - [HaystackRAG] -   [3] score=0.5608 | fuente=desconocido
+2026-07-02 19:09:30,239 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-450: Multiple Interpretations of UI Input Descripción: The UI has multiple interpretations of user input but does not prompt the user when it selects the less secure interpretation....
+2026-07-02 19:09:30,240 - INFO - [HaystackRAG] -   [4] score=0.5550 | fuente=desconocido
+2026-07-02 19:09:30,240 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-512: Spyware Descripción: The product collects personally identifiable information about a human user or the user's activities, but the product accesses this information using other...
+2026-07-02 19:09:30,240 - INFO - [HaystackRAG] -   [5] score=0.5534 | fuente=desconocido
+2026-07-02 19:09:30,240 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the in...
+2026-07-02 19:09:30,240 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:09:30,240 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:09:30,241 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:09:30,241 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:09:30,241 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:09:30,241 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-447: Unimplemented or Unsupported Feature in UI Descripción: A UI function for a security feature appears to be supported and gives feedback to the user that suggests that it is supported, but the underlying functionality is not implemented....
+2026-07-02 19:09:30,241 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:09:30,242 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:09:30,242 - INFO - [HaystackRAG] -   [3] fuente=desconocido
+2026-07-02 19:09:30,242 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-450: Multiple Interpretations of UI Input Descripción: The UI has multiple interpretations of user input but does not prompt the user when it selects the less secure interpretation....
+2026-07-02 19:09:30,242 - INFO - [HaystackRAG] -   [4] fuente=desconocido
+2026-07-02 19:09:30,242 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-512: Spyware Descripción: The product collects personally identifiable information about a human user or the user's activities, but the product accesses this information using other resources besides itself, and it does not require that user's explicit approval or direct input int...
+2026-07-02 19:09:30,242 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:09:30,243 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the information - or its source - to be obscured or spoofed. This is often a component in phishing attacks...
+2026-07-02 19:09:30,243 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:09:30,496 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:09:30,497 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate a concise, 3-5 word title with an emoji summarizing the chat history.
+### Guidelines:
+- The title should clearly represent the main theme or subject of the conversation.
+- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
+- Write the title in the chat's primary language; default to English if multilingual.
+- Prioritize accuracy over excessive creativity; keep it clear and simple.
+- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
+- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
+- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
+### Output:
+JSON format: { "title": "your concise title here" }
+### Examples:
+- { "title": "📉 Stock Market Trends" },
+- { "title": "🍪 Perfect Chocolate Chip Recipe" },
+- { "title": "Evolution of Music Streaming" },
+- { "title": "Remote Work Productivity Tips" },
+- { "title": "Artificial Intelligence in Healthcare" },
+- { "title": "🎮 Video Game Development Insights" }
+### Chat History:
+<chat_history>
+USER: que es es la CWE-652?
+ASSISTANT: Lo siento, pero no tengo información sobre la CWE-652 en el contexto proporcionado. ¿Podrías proporcionar más detalles o especificaciones sobre esta vulnerabilidad? De esa manera podré ayudarte mejor a encontrar la respuesta a tu pregunta.
+</chat_history>
+2026-07-02 19:10:03,635 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:10:03,635 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:10:03,636 - INFO - [HaystackRAG] -   [1] score=0.5148 | fuente=desconocido
+2026-07-02 19:10:03,636 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-1117: Callable with Insufficient Behavioral Summary Descripción: The code contains a function or method whose signature and/or associated 					inline documentation does not sufficie...
+2026-07-02 19:10:03,636 - INFO - [HaystackRAG] -   [2] score=0.5117 | fuente=desconocido
+2026-07-02 19:10:03,636 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniff...
+2026-07-02 19:10:03,636 - INFO - [HaystackRAG] -   [3] score=0.5117 | fuente=desconocido
+2026-07-02 19:10:03,637 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniff...
+2026-07-02 19:10:03,637 - INFO - [HaystackRAG] -   [4] score=0.5027 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-02 19:10:03,637 - INFO - [HaystackRAG] -         snippet: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberame...
+2026-07-02 19:10:03,637 - INFO - [HaystackRAG] -   [5] score=0.5009 | fuente=desconocido
+2026-07-02 19:10:03,637 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-555: J2EE Misconfiguration: Plaintext Password in Configuration File Descripción: The J2EE application stores a plaintext password in a configuration file....
+2026-07-02 19:10:03,637 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:10:03,638 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:10:03,638 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:10:03,638 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:10:03,638 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:10:03,638 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-1117: Callable with Insufficient Behavioral Summary Descripción: The code contains a function or method whose signature and/or associated 					inline documentation does not sufficiently describe the callable's inputs, outputs, 					side effects, assumptions, or return codes....
+2026-07-02 19:10:03,638 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:10:03,639 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniffed by unauthorized actors....
+2026-07-02 19:10:03,639 - INFO - [HaystackRAG] -   [3] fuente=desconocido
+2026-07-02 19:10:03,639 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniffed by unauthorized actors....
+2026-07-02 19:10:03,639 - INFO - [HaystackRAG] -   [4] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-02 19:10:03,639 - INFO - [HaystackRAG] -         contenido: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberamenazas. La seguridad de las aplicaciones web, frente a vulnerabilidades como XSS, no es solo un desaf...
+2026-07-02 19:10:03,639 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:10:03,640 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-555: J2EE Misconfiguration: Plaintext Password in Configuration File Descripción: The J2EE application stores a plaintext password in a configuration file....
+2026-07-02 19:10:03,640 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:10:03,901 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:10:03,901 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
+
+### Guidelines:
+- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
+- Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
+- If content is too short (less than 3 messages) or too diverse, use only ["General"]
+- Use the chat's primary language; default to English if multilingual
+- Prioritize accuracy over specificity
+
+### Output:
+JSON format: { "tags": ["tag1", "tag2", "tag3"] }
+
+### Chat History:
+<chat_history>
+USER: que es es la CWE-652?
+ASSISTANT: Lo siento, pero no tengo información sobre la CWE-652 en el contexto proporcionado. ¿Podrías proporcionar más detalles o especificaciones sobre esta vulnerabilidad? De esa manera podré ayudarte mejor a encontrar la respuesta a tu pregunta.
+</chat_history>
+2026-07-02 19:10:17,800 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:10:17,801 - INFO - [HaystackRAG] - Ejecutando RAG para: que es el cwe-652?
+2026-07-02 19:10:36,383 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:10:36,383 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:10:36,384 - INFO - [HaystackRAG] -   [1] score=0.5485 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-02 19:10:36,384 - INFO - [HaystackRAG] -         snippet:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramien...
+2026-07-02 19:10:36,384 - INFO - [HaystackRAG] -   [2] score=0.5459 | fuente=desconocido
+2026-07-02 19:10:36,384 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:10:36,384 - INFO - [HaystackRAG] -   [3] score=0.5428 | fuente=desconocido
+2026-07-02 19:10:36,385 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniff...
+2026-07-02 19:10:36,385 - INFO - [HaystackRAG] -   [4] score=0.5428 | fuente=desconocido
+2026-07-02 19:10:36,385 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniff...
+2026-07-02 19:10:36,385 - INFO - [HaystackRAG] -   [5] score=0.5380 | fuente=desconocido
+2026-07-02 19:10:36,385 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-396: Declaration of Catch for Generic Exception Descripción: Catching overly broad exceptions promotes complex error handling code that is more likely to contain security vulnerabil...
+2026-07-02 19:10:36,385 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:10:36,386 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:10:36,386 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:10:36,386 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:10:36,386 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-02 19:10:36,386 - INFO - [HaystackRAG] -         contenido:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramientas5. Preparación de un entorno de test6. Ejemplos de análisis de vulnerabilidades XSS7. Prevención ...
+2026-07-02 19:10:36,387 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:10:36,387 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:10:36,387 - INFO - [HaystackRAG] -   [3] fuente=desconocido
+2026-07-02 19:10:36,387 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniffed by unauthorized actors....
+2026-07-02 19:10:36,387 - INFO - [HaystackRAG] -   [4] fuente=desconocido
+2026-07-02 19:10:36,388 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniffed by unauthorized actors....
+2026-07-02 19:10:36,388 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:10:36,388 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-396: Declaration of Catch for Generic Exception Descripción: Catching overly broad exceptions promotes complex error handling code that is more likely to contain security vulnerabilities....
+2026-07-02 19:10:36,388 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:11:09,882 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:11:09,883 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:11:09,883 - INFO - [HaystackRAG] -   [1] score=0.4090 | fuente=desconocido
+2026-07-02 19:11:09,883 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-642: External Control of Critical State Data Descripción: The product stores security-critical state information about its users, or the product itself, in a location that is access...
+2026-07-02 19:11:09,883 - INFO - [HaystackRAG] -   [2] score=0.3846 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:11:09,884 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-02 19:11:09,884 - INFO - [HaystackRAG] -   [3] score=0.3846 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:11:09,884 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-02 19:11:09,884 - INFO - [HaystackRAG] -   [4] score=0.3846 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:11:09,884 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-02 19:11:09,884 - INFO - [HaystackRAG] -   [5] score=0.3846 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:11:09,885 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-02 19:11:09,885 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:11:09,885 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:11:09,885 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:11:09,885 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:11:09,885 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:11:09,886 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-642: External Control of Critical State Data Descripción: The product stores security-critical state information about its users, or the product itself, in a location that is accessible to unauthorized actors....
+2026-07-02 19:11:09,886 - INFO - [HaystackRAG] -   [2] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:11:09,886 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-02 19:11:09,886 - INFO - [HaystackRAG] -   [3] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:11:09,886 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-02 19:11:09,887 - INFO - [HaystackRAG] -   [4] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:11:09,887 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-02 19:11:09,887 - INFO - [HaystackRAG] -   [5] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-02 19:11:09,887 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-02 19:11:09,887 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:11:10,128 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:11:10,128 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: que es es la CWE-652?
+ASSISTANT: Lo siento, pero no tengo información sobre la CWE-652 en el contexto proporcionado. ¿Podrías proporcionar más detalles o especificaciones sobre esta vulnerabilidad? De esa manera podré ayudarte mejor a encontrar la respuesta a tu pregunta.
+USER: que es el cwe-652?
+ASSISTANT: Lo siento, pero no tengo información sobre el CWE-652. ¿Puedes proporcionar más contexto o detalles?
+</chat_history>
+2026-07-02 19:11:44,057 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:11:44,058 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:11:44,058 - INFO - [HaystackRAG] -   [1] score=0.5609 | fuente=desconocido
+2026-07-02 19:11:44,058 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-450: Multiple Interpretations of UI Input Descripción: The UI has multiple interpretations of user input but does not prompt the user when it selects the less secure interpretation....
+2026-07-02 19:11:44,058 - INFO - [HaystackRAG] -   [2] score=0.5577 | fuente=desconocido
+2026-07-02 19:11:44,058 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:11:44,059 - INFO - [HaystackRAG] -   [3] score=0.5576 | fuente=desconocido
+2026-07-02 19:11:44,059 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-447: Unimplemented or Unsupported Feature in UI Descripción: A UI function for a security feature appears to be supported and gives feedback to the user that suggests that it is sup...
+2026-07-02 19:11:44,059 - INFO - [HaystackRAG] -   [4] score=0.5535 | fuente=desconocido
+2026-07-02 19:11:44,059 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-512: Spyware Descripción: The product collects personally identifiable information about a human user or the user's activities, but the product accesses this information using other...
+2026-07-02 19:11:44,059 - INFO - [HaystackRAG] -   [5] score=0.5456 | fuente=desconocido
+2026-07-02 19:11:44,060 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the in...
+2026-07-02 19:11:44,060 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:11:44,060 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:11:44,060 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:11:44,060 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:11:44,061 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:11:44,061 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-450: Multiple Interpretations of UI Input Descripción: The UI has multiple interpretations of user input but does not prompt the user when it selects the less secure interpretation....
+2026-07-02 19:11:44,061 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:11:44,061 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:11:44,061 - INFO - [HaystackRAG] -   [3] fuente=desconocido
+2026-07-02 19:11:44,061 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-447: Unimplemented or Unsupported Feature in UI Descripción: A UI function for a security feature appears to be supported and gives feedback to the user that suggests that it is supported, but the underlying functionality is not implemented....
+2026-07-02 19:11:44,062 - INFO - [HaystackRAG] -   [4] fuente=desconocido
+2026-07-02 19:11:44,062 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-512: Spyware Descripción: The product collects personally identifiable information about a human user or the user's activities, but the product accesses this information using other resources besides itself, and it does not require that user's explicit approval or direct input int...
+2026-07-02 19:11:44,062 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:11:44,062 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the information - or its source - to be obscured or spoofed. This is often a component in phishing attacks...
+2026-07-02 19:11:44,062 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:14:20,208 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:14:20,209 - INFO - [HaystackRAG] - Ejecutando RAG para: que es CWE-451?
+2026-07-02 19:14:55,505 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:14:55,505 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:14:55,505 - INFO - [HaystackRAG] -   [1] score=0.4555 | fuente=desconocido
+2026-07-02 19:14:55,506 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditio...
+2026-07-02 19:14:55,506 - INFO - [HaystackRAG] -   [2] score=0.4356 | fuente=desconocido
+2026-07-02 19:14:55,506 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-440: Expected Behavior Violation Descripción: A feature, API, or function does not perform according to its specification....
+2026-07-02 19:14:55,506 - INFO - [HaystackRAG] -   [3] score=0.4279 | fuente=desconocido
+2026-07-02 19:14:55,507 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-941: Incorrectly Specified Destination in a Communication Channel Descripción: The product creates a communication channel to initiate an outgoing request to an actor, but it does n...
+2026-07-02 19:14:55,507 - INFO - [HaystackRAG] -   [4] score=0.4267 | fuente=desconocido
+2026-07-02 19:14:55,507 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-211: Externally-Generated Error Message Containing Sensitive Information Descripción: The product performs an operation that triggers an external diagnostic or error message that is...
+2026-07-02 19:14:55,507 - INFO - [HaystackRAG] -   [5] score=0.4128 | fuente=desconocido
+2026-07-02 19:14:55,507 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-501: Trust Boundary Violation Descripción: The product mixes trusted and untrusted data in the same data structure or structured message....
+2026-07-02 19:14:55,508 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:14:55,508 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:14:55,508 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:14:55,508 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:14:55,509 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:14:55,509 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditions may allow an attacker to induce unexpected behavior unnoticed....
+2026-07-02 19:14:55,509 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:14:55,509 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-440: Expected Behavior Violation Descripción: A feature, API, or function does not perform according to its specification....
+2026-07-02 19:14:55,509 - INFO - [HaystackRAG] -   [3] fuente=desconocido
+2026-07-02 19:14:55,510 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-941: Incorrectly Specified Destination in a Communication Channel Descripción: The product creates a communication channel to initiate an outgoing request to an actor, but it does not correctly specify the intended destination for that actor....
+2026-07-02 19:14:55,510 - INFO - [HaystackRAG] -   [4] fuente=desconocido
+2026-07-02 19:14:55,510 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-211: Externally-Generated Error Message Containing Sensitive Information Descripción: The product performs an operation that triggers an external diagnostic or error message that is not directly generated or controlled by the product, such as an error generated by the programming ...
+2026-07-02 19:14:55,510 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:14:55,510 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-501: Trust Boundary Violation Descripción: The product mixes trusted and untrusted data in the same data structure or structured message....
+2026-07-02 19:14:55,511 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:14:55,790 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:14:55,791 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: que es CWE-451?
+ASSISTANT: Lo siento, pero no hay información sobre la vulnerabilidad CWE-451 en el contexto proporcionado. La respuesta debe ser "No sé" ya que no se menciona CWE-451 en las descripciones de las vulnerabilidades.
+</chat_history>
+2026-07-02 19:15:27,133 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:15:27,133 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:15:27,134 - INFO - [HaystackRAG] -   [1] score=0.5990 | fuente=desconocido
+2026-07-02 19:15:27,134 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-447: Unimplemented or Unsupported Feature in UI Descripción: A UI function for a security feature appears to be supported and gives feedback to the user that suggests that it is sup...
+2026-07-02 19:15:27,134 - INFO - [HaystackRAG] -   [2] score=0.5989 | fuente=desconocido
+2026-07-02 19:15:27,134 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the in...
+2026-07-02 19:15:27,134 - INFO - [HaystackRAG] -   [3] score=0.5886 | fuente=desconocido
+2026-07-02 19:15:27,135 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-450: Multiple Interpretations of UI Input Descripción: The UI has multiple interpretations of user input but does not prompt the user when it selects the less secure interpretation....
+2026-07-02 19:15:27,135 - INFO - [HaystackRAG] -   [4] score=0.5870 | fuente=desconocido
+2026-07-02 19:15:27,135 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-941: Incorrectly Specified Destination in a Communication Channel Descripción: The product creates a communication channel to initiate an outgoing request to an actor, but it does n...
+2026-07-02 19:15:27,135 - INFO - [HaystackRAG] -   [5] score=0.5814 | fuente=desconocido
+2026-07-02 19:15:27,135 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:15:27,135 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:15:27,136 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:15:27,136 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:15:27,136 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:15:27,136 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:15:27,136 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-447: Unimplemented or Unsupported Feature in UI Descripción: A UI function for a security feature appears to be supported and gives feedback to the user that suggests that it is supported, but the underlying functionality is not implemented....
+2026-07-02 19:15:27,137 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:15:27,137 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the information - or its source - to be obscured or spoofed. This is often a component in phishing attacks...
+2026-07-02 19:15:27,137 - INFO - [HaystackRAG] -   [3] fuente=desconocido
+2026-07-02 19:15:27,137 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-450: Multiple Interpretations of UI Input Descripción: The UI has multiple interpretations of user input but does not prompt the user when it selects the less secure interpretation....
+2026-07-02 19:15:27,137 - INFO - [HaystackRAG] -   [4] fuente=desconocido
+2026-07-02 19:15:27,138 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-941: Incorrectly Specified Destination in a Communication Channel Descripción: The product creates a communication channel to initiate an outgoing request to an actor, but it does not correctly specify the intended destination for that actor....
+2026-07-02 19:15:27,138 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:15:27,138 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:15:27,138 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:15:27,387 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:15:27,387 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate a concise, 3-5 word title with an emoji summarizing the chat history.
+### Guidelines:
+- The title should clearly represent the main theme or subject of the conversation.
+- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
+- Write the title in the chat's primary language; default to English if multilingual.
+- Prioritize accuracy over excessive creativity; keep it clear and simple.
+- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
+- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
+- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
+### Output:
+JSON format: { "title": "your concise title here" }
+### Examples:
+- { "title": "📉 Stock Market Trends" },
+- { "title": "🍪 Perfect Chocolate Chip Recipe" },
+- { "title": "Evolution of Music Streaming" },
+- { "title": "Remote Work Productivity Tips" },
+- { "title": "Artificial Intelligence in Healthcare" },
+- { "title": "🎮 Video Game Development Insights" }
+### Chat History:
+<chat_history>
+USER: que es CWE-451?
+ASSISTANT: Lo siento, pero no hay información sobre la vulnerabilidad CWE-451 en el contexto proporcionado. La respuesta debe ser "No sé" ya que no se menciona CWE-451 en las descripciones de las vulnerabilidades.
+</chat_history>
+2026-07-02 19:15:30,859 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:15:30,859 - INFO - [HaystackRAG] - Ejecutando RAG para: what is CWE-698?
+2026-07-02 19:15:59,630 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:15:59,631 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:15:59,631 - INFO - [HaystackRAG] -   [1] score=0.5222 | fuente=desconocido
+2026-07-02 19:15:59,631 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-1117: Callable with Insufficient Behavioral Summary Descripción: The code contains a function or method whose signature and/or associated 					inline documentation does not sufficie...
+2026-07-02 19:15:59,631 - INFO - [HaystackRAG] -   [2] score=0.5204 | fuente=desconocido
+2026-07-02 19:15:59,631 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the in...
+2026-07-02 19:15:59,632 - INFO - [HaystackRAG] -   [3] score=0.5192 | fuente=desconocido
+2026-07-02 19:15:59,632 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniff...
+2026-07-02 19:15:59,632 - INFO - [HaystackRAG] -   [4] score=0.5192 | fuente=desconocido
+2026-07-02 19:15:59,632 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniff...
+2026-07-02 19:15:59,632 - INFO - [HaystackRAG] -   [5] score=0.5063 | fuente=desconocido
+2026-07-02 19:15:59,632 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-555: J2EE Misconfiguration: Plaintext Password in Configuration File Descripción: The J2EE application stores a plaintext password in a configuration file....
+2026-07-02 19:15:59,633 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:15:59,633 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:15:59,633 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:15:59,633 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:15:59,633 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:15:59,633 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-1117: Callable with Insufficient Behavioral Summary Descripción: The code contains a function or method whose signature and/or associated 					inline documentation does not sufficiently describe the callable's inputs, outputs, 					side effects, assumptions, or return codes....
+2026-07-02 19:15:59,634 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:15:59,634 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the information - or its source - to be obscured or spoofed. This is often a component in phishing attacks...
+2026-07-02 19:15:59,634 - INFO - [HaystackRAG] -   [3] fuente=desconocido
+2026-07-02 19:15:59,634 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniffed by unauthorized actors....
+2026-07-02 19:15:59,634 - INFO - [HaystackRAG] -   [4] fuente=desconocido
+2026-07-02 19:15:59,635 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniffed by unauthorized actors....
+2026-07-02 19:15:59,635 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:15:59,635 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-555: J2EE Misconfiguration: Plaintext Password in Configuration File Descripción: The J2EE application stores a plaintext password in a configuration file....
+2026-07-02 19:15:59,635 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:15:59,919 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:15:59,919 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
+
+### Guidelines:
+- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
+- Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
+- If content is too short (less than 3 messages) or too diverse, use only ["General"]
+- Use the chat's primary language; default to English if multilingual
+- Prioritize accuracy over specificity
+
+### Output:
+JSON format: { "tags": ["tag1", "tag2", "tag3"] }
+
+### Chat History:
+<chat_history>
+USER: que es CWE-451?
+ASSISTANT: Lo siento, pero no hay información sobre la vulnerabilidad CWE-451 en el contexto proporcionado. La respuesta debe ser "No sé" ya que no se menciona CWE-451 en las descripciones de las vulnerabilidades.
+</chat_history>
+2026-07-02 19:16:00,021 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:00,021 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:16:00,022 - INFO - [HaystackRAG] -   [1] score=0.3962 | fuente=desconocido
+2026-07-02 19:16:00,022 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditio...
+2026-07-02 19:16:00,022 - INFO - [HaystackRAG] -   [2] score=0.3941 | fuente=desconocido
+2026-07-02 19:16:00,022 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-211: Externally-Generated Error Message Containing Sensitive Information Descripción: The product performs an operation that triggers an external diagnostic or error message that is...
+2026-07-02 19:16:00,022 - INFO - [HaystackRAG] -   [3] score=0.3885 | fuente=desconocido
+2026-07-02 19:16:00,023 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-498: Cloneable Class Containing Sensitive Information Descripción: The code contains a class with sensitive data, but the class is cloneable. The data can then be accessed by clonin...
+2026-07-02 19:16:00,023 - INFO - [HaystackRAG] -   [4] score=0.3885 | fuente=desconocido
+2026-07-02 19:16:00,023 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-498: Cloneable Class Containing Sensitive Information Descripción: The code contains a class with sensitive data, but the class is cloneable. The data can then be accessed by clonin...
+2026-07-02 19:16:00,023 - INFO - [HaystackRAG] -   [5] score=0.3839 | fuente=desconocido
+2026-07-02 19:16:00,023 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-210: Self-generated Error Message Containing Sensitive Information Descripción: The product identifies an error condition and creates its own diagnostic or error messages that conta...
+2026-07-02 19:16:00,024 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:00,024 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 2 documentos recuperados:
+2026-07-02 19:16:00,024 - INFO - [HaystackRAG] -   [1] score=0.1 | fuente=desconocido
+2026-07-02 19:16:00,024 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-698: Execution After Redirect (EAR) Descripción: The web application sends a redirect to another location, but instead of exiting, it executes additional code....
+2026-07-02 19:16:00,025 - INFO - [HaystackRAG] -   [2] score=0.1 | fuente=desconocido
+2026-07-02 19:16:00,025 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-698: Execution After Redirect (EAR) Descripción: The web application sends a redirect to another location, but instead of exiting, it executes additional code....
+2026-07-02 19:16:00,025 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:00,025 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 7 documentos enviados al prompt:
+2026-07-02 19:16:00,025 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:16:00,025 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-698: Execution After Redirect (EAR) Descripción: The web application sends a redirect to another location, but instead of exiting, it executes additional code....
+2026-07-02 19:16:00,026 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:16:00,026 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditions may allow an attacker to induce unexpected behavior unnoticed....
+2026-07-02 19:16:00,026 - INFO - [HaystackRAG] -   [3] fuente=desconocido
+2026-07-02 19:16:00,026 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-698: Execution After Redirect (EAR) Descripción: The web application sends a redirect to another location, but instead of exiting, it executes additional code....
+2026-07-02 19:16:00,027 - INFO - [HaystackRAG] -   [4] fuente=desconocido
+2026-07-02 19:16:00,027 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-211: Externally-Generated Error Message Containing Sensitive Information Descripción: The product performs an operation that triggers an external diagnostic or error message that is not directly generated or controlled by the product, such as an error generated by the programming ...
+2026-07-02 19:16:00,027 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:16:00,027 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-498: Cloneable Class Containing Sensitive Information Descripción: The code contains a class with sensitive data, but the class is cloneable. The data can then be accessed by cloning the class....
+2026-07-02 19:16:00,027 - INFO - [HaystackRAG] -   [6] fuente=desconocido
+2026-07-02 19:16:00,028 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-498: Cloneable Class Containing Sensitive Information Descripción: The code contains a class with sensitive data, but the class is cloneable. The data can then be accessed by cloning the class....
+2026-07-02 19:16:00,028 - INFO - [HaystackRAG] -   [7] fuente=desconocido
+2026-07-02 19:16:00,028 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-210: Self-generated Error Message Containing Sensitive Information Descripción: The product identifies an error condition and creates its own diagnostic or error messages that contain sensitive information....
+2026-07-02 19:16:00,028 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:00,304 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 1042
+2026-07-02 19:16:00,304 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: que es CWE-451?
+ASSISTANT: Lo siento, pero no hay información sobre la vulnerabilidad CWE-451 en el contexto proporcionado. La respuesta debe ser "No sé" ya que no se menciona CWE-451 en las descripciones de las vulnerabilidades.
+USER: what is CWE-698?
+ASSISTANT: Execution After Redirect (EAR)
+</chat_history>
+2026-07-02 19:16:31,552 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:31,553 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:16:31,553 - INFO - [HaystackRAG] -   [1] score=0.5673 | fuente=desconocido
+2026-07-02 19:16:31,553 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the in...
+2026-07-02 19:16:31,553 - INFO - [HaystackRAG] -   [2] score=0.5606 | fuente=desconocido
+2026-07-02 19:16:31,553 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:16:31,554 - INFO - [HaystackRAG] -   [3] score=0.5600 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-02 19:16:31,554 - INFO - [HaystackRAG] -         snippet:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramien...
+2026-07-02 19:16:31,554 - INFO - [HaystackRAG] -   [4] score=0.5571 | fuente=desconocido
+2026-07-02 19:16:31,554 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniff...
+2026-07-02 19:16:31,554 - INFO - [HaystackRAG] -   [5] score=0.5571 | fuente=desconocido
+2026-07-02 19:16:31,555 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniff...
+2026-07-02 19:16:31,555 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:31,555 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:16:31,555 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:31,555 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:16:31,556 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:16:31,556 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the information - or its source - to be obscured or spoofed. This is often a component in phishing attacks...
+2026-07-02 19:16:31,556 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:16:31,556 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-546: Suspicious Comment Descripción: The code contains comments that suggest the presence of bugs, incomplete functionality, or weaknesses....
+2026-07-02 19:16:31,556 - INFO - [HaystackRAG] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-02 19:16:31,557 - INFO - [HaystackRAG] -         contenido:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramientas5. Preparación de un entorno de test6. Ejemplos de análisis de vulnerabilidades XSS7. Prevención ...
+2026-07-02 19:16:31,557 - INFO - [HaystackRAG] -   [4] fuente=desconocido
+2026-07-02 19:16:31,557 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniffed by unauthorized actors....
+2026-07-02 19:16:31,557 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:16:31,557 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniffed by unauthorized actors....
+2026-07-02 19:16:31,557 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:33,271 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:33,271 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 5 documentos recuperados:
+2026-07-02 19:16:33,272 - INFO - [HaystackRAG] -   [1] score=0.5941 | fuente=desconocido
+2026-07-02 19:16:33,272 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-447: Unimplemented or Unsupported Feature in UI Descripción: A UI function for a security feature appears to be supported and gives feedback to the user that suggests that it is sup...
+2026-07-02 19:16:33,272 - INFO - [HaystackRAG] -   [2] score=0.5924 | fuente=desconocido
+2026-07-02 19:16:33,272 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the in...
+2026-07-02 19:16:33,272 - INFO - [HaystackRAG] -   [3] score=0.5873 | fuente=desconocido
+2026-07-02 19:16:33,273 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-450: Multiple Interpretations of UI Input Descripción: The UI has multiple interpretations of user input but does not prompt the user when it selects the less secure interpretation....
+2026-07-02 19:16:33,273 - INFO - [HaystackRAG] -   [4] score=0.5853 | fuente=desconocido
+2026-07-02 19:16:33,273 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-941: Incorrectly Specified Destination in a Communication Channel Descripción: The product creates a communication channel to initiate an outgoing request to an actor, but it does n...
+2026-07-02 19:16:33,273 - INFO - [HaystackRAG] -   [5] score=0.5785 | fuente=desconocido
+2026-07-02 19:16:33,273 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-536: Servlet Runtime Error Message Containing Sensitive Information Descripción: A servlet error message indicates that there exists an unhandled exception in the web application co...
+2026-07-02 19:16:33,274 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:33,274 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-02 19:16:33,274 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-02 19:16:33,274 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 5 documentos enviados al prompt:
+2026-07-02 19:16:33,274 - INFO - [HaystackRAG] -   [1] fuente=desconocido
+2026-07-02 19:16:33,274 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-447: Unimplemented or Unsupported Feature in UI Descripción: A UI function for a security feature appears to be supported and gives feedback to the user that suggests that it is supported, but the underlying functionality is not implemented....
+2026-07-02 19:16:33,275 - INFO - [HaystackRAG] -   [2] fuente=desconocido
+2026-07-02 19:16:33,275 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-451: User Interface (UI) Misrepresentation of Critical Information Descripción: The user interface (UI) does not properly represent critical information to the user, allowing the information - or its source - to be obscured or spoofed. This is often a component in phishing attacks...
+2026-07-02 19:16:33,275 - INFO - [HaystackRAG] -   [3] fuente=desconocido
+2026-07-02 19:16:33,275 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-450: Multiple Interpretations of UI Input Descripción: The UI has multiple interpretations of user input but does not prompt the user when it selects the less secure interpretation....
+2026-07-02 19:16:33,275 - INFO - [HaystackRAG] -   [4] fuente=desconocido
+2026-07-02 19:16:33,276 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-941: Incorrectly Specified Destination in a Communication Channel Descripción: The product creates a communication channel to initiate an outgoing request to an actor, but it does not correctly specify the intended destination for that actor....
+2026-07-02 19:16:33,276 - INFO - [HaystackRAG] -   [5] fuente=desconocido
+2026-07-02 19:16:33,276 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-536: Servlet Runtime Error Message Containing Sensitive Information Descripción: A servlet error message indicates that there exists an unhandled exception in the web application code and may provide useful information to an attacker....
+2026-07-02 19:16:33,276 - INFO - [HaystackRAG] - ------------------------------------------------------------
