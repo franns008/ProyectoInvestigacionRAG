@@ -22,19 +22,20 @@ Documentos relacionados (leer si hace falta más contexto):
 ## 1) Qué hay hecho
 
 - `src/ingestion/fetch_nvd.py`: script que trae CVEs desde la API 2.0 de NVD y
-  guarda el JSON crudo en `data/raw/nvd/`. **Esto es lo único que corre hoy.**
-  No normaliza, no indexa, no toca Postgres/pgvector todavía.
+  guarda el JSON crudo en `data/raw/nvd/`. No normaliza ni indexa; solo trae y persiste.
+- `src/ingestion/index_nvd.py`: **implementado (2026-07-02).** Lee los
+  `data/raw/nvd/**/cves_page_*.json`, arma un `Document` de Haystack por CVE (sin
+  chunkear) y lo embebe/escribe en la tabla pgvector `ciberseguridad_docs` que ya usa
+  el pipeline. Ver sección 6 para el detalle. Probado con `--dry-run` sobre los datos
+  crudos existentes (parseo OK); el embed+write end-to-end requiere Docker levantado.
 - Entorno local (`.venv/`) preparado para correr scripts de ingestion.
 - `infrastructure/.env.example` actualizado con la variable `NVD_API_KEY`.
 
 ## 2) Qué falta (a propósito, no es un olvido)
 
-- **Indexado en el RAG**: falta el script (`src/ingestion/index_nvd.py`, todavía no
-  escrito) que lea `data/raw/nvd/**/cves_page_*.json`, arme un `Document` de Haystack
-  por CVE y lo embeba/guarde en la tabla pgvector que ya usa
-  `src/pipeline/pipeline_ciberseguridad.py`. El diseño ya está acordado (ver sección 6)
-  pero no implementado — si alguien retoma esto, ese es el próximo paso, no hay que
-  rediscutir el diseño salvo que algo no cierre.
+- **Correr el indexado completo**: tras el fix de flash attention (ver sección 9),
+  Ollama ya embebe `bge-m3` sin NaN. Falta confirmar la corrida `--limit 200`
+  completa en pgvector y después la corrida sin `--limit` (todos los CVEs crudos).
 - **Las otras 4 fuentes de Capa 1** (ATT&CK, CWE, EPSS, CISA KEV): investigadas en
   `docs/data_sourcing_research.md`, sin script de fetch todavía.
 - **Tabla SQL relacional `cves`** (la que describe `docs/data_transform_spec.md` con
@@ -144,9 +145,15 @@ completo. Progreso aproximado: ~20-30s por página, 182 páginas totales → ~70
 Si se cortó o no terminó, simplemente correr de nuevo `--full` (no importa si ya hay
 carpetas parciales de una corrida anterior, cada corrida es independiente).
 
-## 6) Diseño acordado para el paso de indexado (no implementado)
+## 6) Diseño del paso de indexado (implementado en `src/ingestion/index_nvd.py`)
 
-Cuando se retome, el próximo script (`src/ingestion/index_nvd.py`, a crear) debe:
+El script sigue este diseño (ver también `docs/indexing_design_capa1.md` para el
+"por qué" de JSON->Document directo). Se conecta por variables de entorno con
+defaults apuntando a los puertos que el `docker-compose` expone al host
+(`PGVECTOR_HOST=localhost`, `PGVECTOR_PORT=5433`, `OLLAMA_URL=http://localhost:11434`,
+`EMBEDDING_MODEL=bge-m3`), así corre en local sin cambiar código; dentro de la red
+Docker se sobreescriben esas vars. Tiene `--dry-run` (parsea y reporta, sin tocar
+Ollama/pgvector) y `--limit N` (prueba rápida). El script:
 
 1. Ser standalone, sin tocar `src/pipeline/pipeline_ciberseguridad.py` (ese archivo
    ya sirve el RAG en producción vía OpenWebUI Pipelines; menor riesgo si el indexado
@@ -178,6 +185,7 @@ Cuando se retome, el próximo script (`src/ingestion/index_nvd.py`, a crear) deb
 | Archivo | Qué cambió |
 |---|---|
 | `src/ingestion/fetch_nvd.py` | nuevo — fetch de CVEs desde NVD (ver sección 5) |
+| `src/ingestion/index_nvd.py` | nuevo (2026-07-02) — JSON crudo -> Document Haystack -> pgvector (ver sección 6) |
 | `docs/data_sourcing_research.md` | nuevo — investigación de las 5 fuentes Capa 1 |
 | `docs/ingestion_nvd_setup.md` | nuevo — este documento |
 | `requirements.txt` | + `requests`, `python-dotenv` |
@@ -201,7 +209,70 @@ python3 -m venv .venv
 # sección "Consideraciones transversales" para la justificación de la cadencia)
 .venv/bin/python src/ingestion/fetch_nvd.py
 
+# Indexar los CVEs crudos en pgvector (requiere Docker arriba + modelo bge-m3 en Ollama)
+.venv/bin/python src/ingestion/index_nvd.py --dry-run   # verificar parseo sin tocar la DB
+.venv/bin/python src/ingestion/index_nvd.py             # embeber + escribir en pgvector
+
 # Ver progreso de una corrida en curso
 ps aux | grep fetch_nvd
 find data/raw/nvd -name "cves_page_*.json" | wc -l
 ```
+
+## 9) Gotcha resuelto — embeddings NaN de bge-m3 (flash attention)
+
+**Síntoma:** al correr `index_nvd.py` (o al indexar PDFs en el pipeline principal,
+que usa el mismo `bge-m3`), Ollama devuelve `500` con
+`failed to encode response: json: unsupported value: NaN` en la etapa de embedding.
+El error se dispara solo con **algunos** inputs (texto normal y corto, no vacío),
+y es **reproducible** para esos inputs.
+
+**Causa:** bug numérico del kernel de flash attention de Ollama (0.20.x) con `bge-m3`
+en ciertas GPUs. No es la data ni el parser — un `curl` de embedding con el texto
+que falla lo reproduce aislado, y un texto trivial ("hello world") embebe bien.
+
+**Fix aplicado:** desactivar flash attention en Ollama. Ya está en
+`infrastructure/env/ollama.env`:
+```
+OLLAMA_FLASH_ATTENTION=0
+```
+Requiere recrear el contenedor de Ollama para tomar la variable:
+```bash
+cd infrastructure && docker compose up -d ollama
+# verificar: docker compose exec ollama env | grep -i flash  -> OLLAMA_FLASH_ATTENTION=0
+```
+Verificado: tras el fix, el mismo input que daba NaN embebe bien, y la corrida
+`index_nvd.py --limit 200` completó los 200 CVEs (7 batches) sin errores.
+
+**Cómo diagnosticarlo si reaparece:**
+```bash
+# ¿el modelo embebe algo trivial?  (si esto también da NaN, no es flash attention)
+curl -s http://localhost:11434/api/embed -d '{"model":"bge-m3","input":"hello world"}'
+# ¿flash attention está desactivado?
+docker compose exec ollama env | grep -i flash
+```
+
+**Nota:** este fix también sanea el indexado de PDFs del pipeline principal
+(`pipeline_ciberseguridad.py` embebe con el mismo `bge-m3`), que probablemente
+venía fallando de forma silenciosa para los mismos inputs problemáticos.
+
+## 10) Verificación en la base (post-indexado)
+
+Para confirmar que los CVEs quedaron indexados con su vector y metadata:
+```bash
+cd infrastructure
+# cuántos CVEs hay en la tabla
+docker compose exec -T vdb psql -U avdbuser -d pgvdb -t -c \
+  "SELECT count(*) FROM ciberseguridad_docs WHERE meta->>'source_type' = 'nvd_cve';"
+# muestra: cve_id, severity, si tiene embedding, y un preview de la descripción
+docker compose exec -T vdb psql -U avdbuser -d pgvdb -c \
+  "SELECT meta->>'cve_id' AS cve, meta->>'severity' AS sev, (embedding IS NOT NULL) AS tiene_vector, left(content,60) AS desc FROM ciberseguridad_docs WHERE meta->>'source_type'='nvd_cve' LIMIT 5;"
+```
+Resultado esperado: el count coincide con lo que reportó `index_nvd.py`, y
+`tiene_vector` es `t` en todas las filas.
+
+**Prueba end-to-end (OpenWebUI):** entrar a `http://localhost:8180`, seleccionar el
+pipeline "RAG ciberseguridad" y preguntar por un CVE que esté indexado. Ojo: si el
+fetch `--full` se cortó, los CVEs cargados son los más antiguos del catálogo
+(1999-2000), así que hay que preguntar por esos (ej. "¿Qué es CVE-1999-0095?"), no
+por CVEs modernos que todavía no se descargaron. El pipeline loguea qué documentos
+recuperó en `src/pipeline/logCiberseguridad.txt`.

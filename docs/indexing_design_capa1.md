@@ -92,8 +92,56 @@ acordado en `docs/ingestion_nvd_setup.md` para NVD. EPSS y CISA KEV no
 generan Document propio, se implementan como upsert de `meta` sobre
 Documents existentes.
 
+## Hallazgo (2026-07-02) — las queries por identificador no recuperan el CVE correcto
+
+**Estado: limitación conocida, NO corregida todavía** (se dejó para la fase de
+Mejoras del cronograma; corregirla ahora excedía el scope de "primer prototipo E2E").
+
+**Qué se observó:** tras indexar 200 CVEs y preguntar en OpenWebUI
+"¿Qué es CVE-1999-0095?", el sistema respondió con datos de OTROS CVEs (unos
+"Rejected reason: DO NOT USE THIS CANDIDATE NUMBER..."), no del CVE-1999-0095 real
+(el de Sendmail que sí está indexado). El circuito E2E funciona (fetch → index →
+retrieval → LLM sin errores), pero el retrieval trajo los documentos equivocados.
+
+**Evidencia (de `src/pipeline/logCiberseguridad.txt`):**
+- `KEYWORD RETRIEVER: 0 documentos recuperados`.
+- `EMBEDDING RETRIEVER`: top-5 = CVEs "rejected/duplicate" semánticamente parecidos
+  entre sí, ninguno el CVE-1999-0095 buscado.
+- El LLM contestó fielmente sobre el contexto equivocado que le llegó.
+
+**Causa raíz:** el `content` indexado es **solo la descripción**; el `cve_id` vive
+únicamente en `meta` (que se filtra pero NO se busca por texto ni se embebe).
+Entonces:
+- BM25 (keyword) busca sobre `content` → como "CVE-1999-0095" no está ahí, 0 matches.
+- El embedding compara el significado de la pregunta contra las descripciones → un ID
+  es un token opaco, no se parece semánticamente a "debug command in Sendmail" → el
+  doc correcto no entra al top-k.
+
+Esto es exactamente el desafío que `plan_de_trabajo.md` anticipa en "Terminología
+multi-vocabulario": *los embeddings genéricos fallan en exact-match de identificadores
+→ hybrid retrieval (BM25 + denso)*. El hybrid ya está armado, pero no alcanza si el
+identificador no está en el texto buscable. Afecta al tipo de query **factual**
+(fila 1 de la taxonomía del plan).
+
+**Fix propuesto (no implementado):** incluir el `cve_id` (y a evaluar: vendor/producto)
+dentro del `content` que se embebe/indexa, p.ej.:
+```
+content = "CVE-1999-0095: The debug command in Sendmail is enabled, allowing attackers to execute commands as root."
+```
+Así BM25 puede matchear el ID exacto y el embedding lo incluye. Trade-off a medir:
+cuánto identificador agregar sin diluir la señal semántica de la descripción
+(decisión abierta para la fase de Mejoras).
+
+**Nota de implementación para cuando se retome:** cambiar el formato del `content`
+cambia el embedding, así que hay que **re-indexar**. Pero el skip actual de
+`index_nvd.py` compara `last_modified` y saltearía los CVEs "sin cambios" aunque el
+formato del content haya cambiado → hará falta un `--force` (o versionar el formato
+del content en `meta` y comparar eso también) para forzar el re-embed.
+
 ## Próximos pasos (no implementados todavía)
 
+- **(Fase Mejoras)** Aplicar el fix del hallazgo de arriba (cve_id en el content) y
+  medir el impacto en Hit Rate@k / MRR sobre las queries factuales por ID.
 - Definir el "adapter" por fuente: cada fuente tendrá su propio parser
   (`fetch_nvd.py` ya existe; faltan `fetch_attack.py`, `fetch_cwe.py`,
   `fetch_epss.py`, `fetch_kev.py`) que devuelva un dict normalizado, más una
@@ -101,8 +149,7 @@ Documents existentes.
   pendiente de decidir si se comparte código entre fuentes desde el día uno
   o se empieza con scripts independientes y se refactoriza si aparece
   duplicación real (pregunta abierta, sin resolver aún con el equipo).
-- Implementar `src/ingestion/index_nvd.py` según el diseño ya descripto en
-  `docs/ingestion_nvd_setup.md` sección 6 (primero, porque NVD es la única
-  fuente con fetch ya funcionando).
+- Completar el fetch (`fetch_nvd.py --full` se cortó en ~62 páginas / CVEs viejos)
+  y correr `index_nvd.py` sin `--limit` para indexar el catálogo completo.
 - Implementar el resto de los fetchers de Capa 1 según
   `docs/data_sourcing_research.md`.
