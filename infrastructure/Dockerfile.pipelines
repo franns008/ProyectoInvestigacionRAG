@@ -6,8 +6,7 @@ RUN pip install --no-cache-dir marker-pdf
 # Forzar torch+torchvision compatibles DESPUÉS de marker
 # torch 2.7.0 es lo que surya-ocr requiere explícitamente
 RUN pip install --no-cache-dir --force-reinstall \
-    torch==2.7.0+cu121 \
-    torchvision==0.22.0+cu121 \
+    torch torchvision \
     --index-url https://download.pytorch.org/whl/cu121
 
 # Verificaciones
