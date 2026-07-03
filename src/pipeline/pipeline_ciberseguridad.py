@@ -445,6 +445,62 @@ def build_keyword_query(user_message: str) -> str:
     return " ".join(keywords) or text
 
 
+# ======================================================================
+# Factories del pipeline (módulo-level)
+#
+# Extraídas de los métodos de Pipeline para poder instanciar el store y el
+# pipeline de query SIN arrastrar el runtime de Open WebUI (Valves, carga de
+# marker-pdf, indexación). Las usa el harness de evaluación (eval/) para correr
+# headless. La clase Pipeline delega en ellas → el runtime no cambia.
+# Ver docs/eval_harness.md.
+# ======================================================================
+
+def get_document_store() -> PgvectorDocumentStore:
+    return PgvectorDocumentStore(
+        connection_string=Secret.from_token(DB_CONNECTION),
+        embedding_dimension=EMBEDDING_DIMENSION,
+        table_name=DB_TABLE,
+        keyword_index_name="ciberseguridad_keyword_index",
+    )
+
+
+def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline:
+    """Arma el pipeline de query: retrievers híbridos + joiner (RRF) + prompt + LLM.
+
+    `valves` es cualquier objeto con los atributos de Pipeline.Valves que usa el
+    pipeline: embedding_model, retriever_top_k, llm_model, max_tokens, temperature.
+    """
+    v = valves
+    pipeline = HaystackPipeline()
+
+    pipeline.add_component("text_embedder",       OllamaTextEmbedder(model=v.embedding_model, url=OLLAMA_URL))
+    pipeline.add_component("embedding_retriever", PgvectorEmbeddingRetriever(document_store=store, top_k=v.retriever_top_k))
+    pipeline.add_component("keyword_retriever",   PgvectorKeywordRetriever(document_store=store, top_k=v.retriever_top_k))
+    pipeline.add_component("document_joiner",     DocumentJoiner(
+        join_mode="reciprocal_rank_fusion",
+    ))
+    pipeline.add_component("prompt_builder",      PromptBuilder(template=PROMPT_TEMPLATE))
+    pipeline.add_component("llm", OpenAIGenerator(
+        api_key=Secret.from_env_var("GROQ_API_KEY"),
+        api_base_url=GROQ_BASE_URL,
+        model=v.llm_model,
+        max_retries=5,      # default 2 — el cliente respeta el retry-after de Groq ante 429
+        timeout=60.0,
+        generation_kwargs={
+            "max_tokens":  v.max_tokens,
+            "temperature": v.temperature,
+        },
+    ))
+
+    pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
+    pipeline.connect("embedding_retriever",     "document_joiner")
+    pipeline.connect("keyword_retriever",       "document_joiner")
+    pipeline.connect("document_joiner",         "prompt_builder.documents")
+    pipeline.connect("prompt_builder",          "llm")
+
+    return pipeline
+
+
 class Pipeline:
 
     class Valves(BaseModel):
@@ -564,12 +620,7 @@ class Pipeline:
     # ------------------------------------------------------------------
 
     def _get_document_store(self) -> PgvectorDocumentStore:
-        return PgvectorDocumentStore(
-            connection_string=Secret.from_token(DB_CONNECTION),
-            embedding_dimension=EMBEDDING_DIMENSION,
-            table_name=DB_TABLE,
-            keyword_index_name="ciberseguridad_keyword_index",
-        )
+        return get_document_store()
 
     # ------------------------------------------------------------------
     # Conversión de PDFs con marker-pdf
@@ -746,32 +797,4 @@ class Pipeline:
     # ------------------------------------------------------------------
 
     def _build_rag_pipeline(self) -> HaystackPipeline:
-        v = self.valves
-        pipeline = HaystackPipeline()
-
-        pipeline.add_component("text_embedder",       OllamaTextEmbedder(model=v.embedding_model, url=OLLAMA_URL))
-        pipeline.add_component("embedding_retriever", PgvectorEmbeddingRetriever(document_store=self.store, top_k=v.retriever_top_k))
-        pipeline.add_component("keyword_retriever",   PgvectorKeywordRetriever(document_store=self.store, top_k=v.retriever_top_k))
-        pipeline.add_component("document_joiner",     DocumentJoiner(
-            join_mode="reciprocal_rank_fusion",
-        ))
-        pipeline.add_component("prompt_builder",      PromptBuilder(template=PROMPT_TEMPLATE))
-        pipeline.add_component("llm", OpenAIGenerator(
-            api_key=Secret.from_env_var("GROQ_API_KEY"),
-            api_base_url=GROQ_BASE_URL,
-            model=v.llm_model,
-            max_retries=5,      # default 2 — el cliente respeta el retry-after de Groq ante 429
-            timeout=60.0,
-            generation_kwargs={
-                "max_tokens":  v.max_tokens,
-                "temperature": v.temperature,
-            },
-        ))
-
-        pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
-        pipeline.connect("embedding_retriever",     "document_joiner")
-        pipeline.connect("keyword_retriever",       "document_joiner")
-        pipeline.connect("document_joiner",         "prompt_builder.documents")
-        pipeline.connect("prompt_builder",          "llm")
-
-        return pipeline
+        return build_rag_pipeline(self.store, self.valves)

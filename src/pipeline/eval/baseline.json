@@ -1,0 +1,739 @@
+{
+  "timestamp": "2026-07-03T21:01:22.678814+00:00",
+  "config": {
+    "top_k": 3,
+    "temperature": 0.0,
+    "llm_model": "meta-llama/llama-4-scout-17b-16e-instruct",
+    "embedding_model": "bge-m3"
+  },
+  "overall": {
+    "recall_at_k": 0.8409,
+    "hit_rate": 0.8636,
+    "mrr": 0.6932,
+    "n": 22
+  },
+  "sas": {
+    "sas": 0.7549,
+    "n": 14
+  },
+  "by_category": {
+    "bilingue": {
+      "recall_at_k": 1.0,
+      "hit_rate": 1.0,
+      "mrr": 1.0,
+      "n": 2
+    },
+    "comparativa": {
+      "recall_at_k": 1.0,
+      "hit_rate": 1.0,
+      "mrr": 1.0,
+      "n": 1
+    },
+    "concepto_es": {
+      "recall_at_k": 0.3333,
+      "hit_rate": 0.3333,
+      "mrr": 0.3333,
+      "n": 3
+    },
+    "desarrollar": {
+      "recall_at_k": 1.0,
+      "hit_rate": 1.0,
+      "mrr": 0.375,
+      "n": 2
+    },
+    "fuera_dominio": {
+      "recall_at_k": null,
+      "hit_rate": null,
+      "mrr": null,
+      "n": 0
+    },
+    "id_cwe": {
+      "recall_at_k": 1.0,
+      "hit_rate": 1.0,
+      "mrr": 1.0,
+      "n": 3
+    },
+    "id_inexistente": {
+      "recall_at_k": null,
+      "hit_rate": null,
+      "mrr": null,
+      "n": 0
+    },
+    "id_variantes": {
+      "recall_at_k": 1.0,
+      "hit_rate": 1.0,
+      "mrr": 1.0,
+      "n": 2
+    },
+    "multi_doc": {
+      "recall_at_k": 0.25,
+      "hit_rate": 0.5,
+      "mrr": 0.5,
+      "n": 2
+    },
+    "nombre_cwe": {
+      "recall_at_k": 1.0,
+      "hit_rate": 1.0,
+      "mrr": 0.6111,
+      "n": 3
+    },
+    "procedimental": {
+      "recall_at_k": 1.0,
+      "hit_rate": 1.0,
+      "mrr": 0.6667,
+      "n": 2
+    },
+    "regresion": {
+      "recall_at_k": 1.0,
+      "hit_rate": 1.0,
+      "mrr": 0.6667,
+      "n": 2
+    }
+  },
+  "per_question": [
+    {
+      "id": "cwe89-por-numero",
+      "category": "id_cwe",
+      "question": "Explicame la vulnerabilidad CWE-89 y cómo prevenirla.",
+      "expected_doc_ids": [
+        "cwe-89"
+      ],
+      "retrieved_ids": [
+        "cwe-89",
+        "cwe-391",
+        "cwe-1295",
+        "cwe-290"
+      ],
+      "answer": "La vulnerabilidad CWE-89 se refiere a la falta de neutralización adecuada de elementos especiales utilizados en un comando SQL, también conocida como 'SQL Injection' (inyección SQL). Esto ocurre cuando un producto construye total o parcialmente un comando SQL utilizando entradas influenciadas externamente desde un componente aguas arriba, sin neutralizar o neutralizar incorrectamente los elementos especiales que podrían modificar el comando SQL previsto cuando se envía a un componente aguas abajo.\n\nPara prevenir la vulnerabilidad CWE-89, es crucial eliminar o citar adecuadamente la sintaxis SQL en las entradas controlables por el usuario. Esto puede lograrse mediante:\n\n- Utilizar consultas parametrizadas o preparadas en lugar de construir consultas SQL concatenando entradas de usuario.\n- Escapar los caracteres especiales en las entradas de usuario para evitar que sean interpretados como parte del comando SQL.\n- Validar y limitar las entradas de usuario para asegurarse de que se ajusten a lo esperado y no contengan sintaxis SQL maliciosa.\n\nDe esta manera, se puede evitar que las entradas de usuario sean interpretadas como SQL en lugar de datos normales, mitigando así el riesgo de ataques de inyección SQL.",
+      "reference_answer": "CWE-89 es SQL Injection: ocurre cuando entrada no sanitizada se interpola en\nuna consulta SQL y altera su lógica, permitiendo leer o modificar datos no\nautorizados. Se previene con consultas parametrizadas / prepared statements,\nORMs seguros, validación de entrada y el principio de menor privilegio en la BD.\n",
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": false,
+        "keyword": true
+      },
+      "sas": 0.8289
+    },
+    {
+      "id": "cwe79-por-numero",
+      "category": "id_cwe",
+      "question": "¿Qué describe la CWE-79?",
+      "expected_doc_ids": [
+        "cwe-79"
+      ],
+      "retrieved_ids": [
+        "cwe-79",
+        "d7a4f30a69654f1d628d48ccfb811c6fed062e1847fc87edd564f693aa609d51",
+        "cwe-74",
+        "cwe-754"
+      ],
+      "answer": "La CWE-79 describe la \"Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')\" o \"No neutralización adecuada de la entrada durante la generación de páginas web (Cross-site Scripting)\". Esto ocurre cuando un producto no neutraliza o neutraliza incorrectamente la entrada de usuario que se puede controlar antes de colocarla en una salida que se utiliza como una página web que se sirve a otros usuarios.",
+      "reference_answer": "CWE-79 es Cross-Site Scripting (XSS): neutralización incorrecta de la entrada\nal generar una página web, lo que permite inyectar scripts que se ejecutan en\nel navegador de otros usuarios.\n",
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": true,
+        "keyword": true
+      },
+      "sas": 0.8368
+    },
+    {
+      "id": "cwe798-por-numero",
+      "category": "id_cwe",
+      "question": "¿Qué riesgo de seguridad describe CWE-798?",
+      "expected_doc_ids": [
+        "cwe-798"
+      ],
+      "retrieved_ids": [
+        "cwe-798",
+        "cwe-357",
+        "cwe-1276",
+        "cwe-391"
+      ],
+      "answer": "El producto contiene credenciales codificadas, como una contraseña o una clave criptográfica.",
+      "reference_answer": "CWE-798 es el uso de credenciales embebidas (hard-coded) en el código o la\nconfiguración: contraseñas, claves o tokens fijos que un atacante puede\ndescubrir y reutilizar. Se mitiga externalizando secretos a un gestor de\nsecretos o variables de entorno y rotándolos.\n",
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": false,
+        "keyword": true
+      },
+      "sas": 0.6838
+    },
+    {
+      "id": "cwe89-variante-espacio",
+      "category": "id_variantes",
+      "question": "que es cwe 89",
+      "expected_doc_ids": [
+        "cwe-89"
+      ],
+      "retrieved_ids": [
+        "cwe-89",
+        "cwe-391",
+        "cwe-209"
+      ],
+      "answer": "CWE-89 se refiere a la vulnerabilidad de \"Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')\". Esto ocurre cuando un producto construye total o parcialmente un comando SQL utilizando entradas influenciadas externamente de un componente ascendente, pero no neutraliza o neutraliza incorrectamente los elementos especiales que podrían modificar el comando SQL previsto cuando se envía a un componente descendente. \n\nEn otras palabras, si no se eliminan o citan suficientemente los elementos de sintaxis SQL en las entradas controlables por el usuario, la consulta SQL generada puede hacer que esas entradas sean interpretadas como SQL en lugar de datos de usuario normales, lo que puede permitir ataques de inyección SQL.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": true,
+        "keyword": true
+      },
+      "sas": null
+    },
+    {
+      "id": "cwe79-variante-junto",
+      "category": "id_variantes",
+      "question": "explicame cwe79",
+      "expected_doc_ids": [
+        "cwe-79"
+      ],
+      "retrieved_ids": [
+        "cwe-79",
+        "cwe-1117",
+        "d7a4f30a69654f1d628d48ccfb811c6fed062e1847fc87edd564f693aa609d51",
+        "cwe-439",
+        "cwe-449"
+      ],
+      "answer": "Según CWE-79, la vulnerabilidad se conoce como \"Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')\". Esto significa que un producto no neutraliza o incorrectamente neutraliza la entrada de usuario que puede ser controlada antes de colocarla en la salida que se utiliza como una página web que se sirve a otros usuarios.\n\nEn otras palabras, CWE-79 se refiere a la falta de validación o saneamiento adecuado de la entrada de usuario, lo que puede permitir que un atacante inyecte código malicioso en una página web, lo que puede conducir a ataques de Cross-Site Scripting (XSS).",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": false,
+        "keyword": true
+      },
+      "sas": null
+    },
+    {
+      "id": "sqli-en",
+      "category": "nombre_cwe",
+      "question": "What is SQL injection and how do I prevent it?",
+      "expected_doc_ids": [
+        "cwe-89"
+      ],
+      "retrieved_ids": [
+        "cwe-564",
+        "cwe-89",
+        "cwe-566"
+      ],
+      "answer": "SQL injection occurs when a product constructs all or part of an SQL command using externally-influenced input, without neutralizing or incorrectly neutralizing special elements that could modify the intended SQL command. This is identified as CWE-89.\n\nTo prevent SQL injection, you should ensure that user-controlled inputs are properly neutralized or quoted to prevent them from being interpreted as SQL syntax. \n\nAdditionally, using prepared statements with parameterized queries, which separate code from user data, can help prevent SQL injection. \n\nIt's also important to limit database privileges to the minimum required for the application to function properly, and to regularly update and patch your database management system.\n\n Other related weaknesses are CWE-564, which involves using Hibernate to execute dynamic SQL statements built with user-controlled input, and CWE-566, which involves an authorization bypass through user-controlled SQL primary keys.",
+      "reference_answer": "SQL injection (CWE-89) happens when unsanitized input is concatenated into a\nSQL query, letting an attacker change its logic. Prevent it with parameterized\nqueries / prepared statements, input validation and least-privilege DB accounts.\n",
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 0.5,
+      "hit_source": {
+        "embedding": true,
+        "keyword": true
+      },
+      "sas": 0.8728
+    },
+    {
+      "id": "buffer-overflow-nombre",
+      "category": "nombre_cwe",
+      "question": "¿Qué es un buffer overflow?",
+      "expected_doc_ids": [
+        "cwe-120"
+      ],
+      "retrieved_ids": [
+        "cwe-122",
+        "cwe-121",
+        "cwe-120"
+      ],
+      "answer": "Un buffer overflow, también conocido como desbordamiento de búfer, se refiere a una condición en la que se escribe más datos en un búfer de lo que puede contener. Esto puede ocurrir en diferentes partes de la memoria, como la pila (stack) o el montón (heap).\n\nExisten diferentes tipos de buffer overflows, como:\n\n- Desbordamiento de búfer basado en pila (Stack-based Buffer Overflow, CWE-121): ocurre cuando el búfer que se puede sobrescribir se asigna en la pila.\n- Desbordamiento de búfer basado en montón (Heap-based Buffer Overflow, CWE-122): ocurre cuando el búfer que se puede sobrescribir se asigna en el montón.\n- Copia de búfer sin verificar el tamaño de la entrada (Buffer Copy without Checking Size of Input, CWE-120): ocurre cuando se copia un búfer de entrada a un búfer de salida sin verificar que el tamaño del búfer de entrada sea menor que el tamaño del búfer de salida.\n\nEn general, un buffer overflow puede permitir que un atacante ejecute código malicioso o cause otros problemas de seguridad.",
+      "reference_answer": "Un buffer overflow (CWE-120) ocurre al copiar datos a un búfer sin verificar\nsu tamaño, sobrescribiendo memoria adyacente. Puede corromper datos, provocar\ncaídas o ejecución de código.\n",
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 0.3333333333333333,
+      "hit_source": {
+        "embedding": true,
+        "keyword": true
+      },
+      "sas": 0.831
+    },
+    {
+      "id": "ssrf-nombre",
+      "category": "nombre_cwe",
+      "question": "¿Qué es un ataque SSRF?",
+      "expected_doc_ids": [
+        "cwe-918"
+      ],
+      "retrieved_ids": [
+        "cwe-918",
+        "1fee7109f477c28a94d6bc2f538b58f2d2e06d010ce5c5de26d3f316b303091a",
+        "54cd6eade1871ee2417cd9d44060f0362555331c38b4c9a4ebad16ec4868d1c7",
+        "d7a4f30a69654f1d628d48ccfb811c6fed062e1847fc87edd564f693aa609d51",
+        "3c9dd03a4d548e2d9ea877b1c8a58b8eeaeb537edabd78909611ba5e15834bc7"
+      ],
+      "answer": "Un ataque SSRF (Server-Side Request Forgery) es una vulnerabilidad que se describe en CWE-918. Esta vulnerabilidad ocurre cuando un servidor web recibe una URL o solicitud similar de un componente aguas arriba y recupera el contenido de esta URL, pero no asegura suficientemente que la solicitud se está enviando al destino esperado. Esto permite a un atacante realizar solicitudes al servidor web para que interactúe con otros servicios internos o externos, expandiendo potencialmente el alcance de un ataque más allá de la aplicación web inicialmente comprometida.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": true,
+        "keyword": true
+      },
+      "sas": null
+    },
+    {
+      "id": "inyeccion-sql-es",
+      "category": "concepto_es",
+      "question": "¿Cómo funciona una inyección SQL?",
+      "expected_doc_ids": [
+        "cwe-89"
+      ],
+      "retrieved_ids": [
+        "cwe-89",
+        "cwe-564",
+        "391bca300f07a01126fa624e8c76dd90e699568349b727e28b22eda07580d178"
+      ],
+      "answer": "Una inyección SQL (SQL Injection) ocurre cuando un producto construye total o parcialmente un comando SQL utilizando entrada externa influenciada desde un componente aguas arriba, pero no neutraliza o neutraliza incorrectamente los elementos especiales que podrían modificar el comando SQL previsto cuando se envía a un componente aguas abajo.\n\nSegún CWE-89, la falta de eliminación o cotización suficiente de la sintaxis SQL en entradas controlables por el usuario puede hacer que las consultas SQL generadas interpreten esas entradas como SQL en lugar de datos de usuario normales.\n\nAdemás, como se describe en CWE-564, el uso de Hibernate para ejecutar una declaración SQL dinámica construida con entrada controlada por el usuario puede permitir a un atacante modificar el significado de la declaración o ejecutar comandos SQL arbitrarios.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": true,
+        "keyword": false
+      },
+      "sas": null
+    },
+    {
+      "id": "credenciales-en-codigo",
+      "category": "concepto_es",
+      "question": "¿Qué problema hay en dejar credenciales escritas en el código fuente?",
+      "expected_doc_ids": [
+        "cwe-798"
+      ],
+      "retrieved_ids": [
+        "82c3aef97ba4f3321f019c742d20e0d0275cc096e6c9cc042f4646760db18bff",
+        "cwe-540",
+        "f9812752d75ab28e2410b273a0ce3413ae0191b35c70dc1de84d0c9f0ba522e3",
+        "cwe-1392",
+        "b5cb0ad012fd26527c9b30f2278f6ded90a4dda9a349517c37fc43642cb0dc05",
+        "cwe-522"
+      ],
+      "answer": "El problema es que el código fuente en un servidor web o repositorio a menudo contiene información sensible y generalmente no debería ser accesible para los usuarios, lo cual se relaciona con la vulnerabilidad CWE-540: Inclusion of Sensitive Information in Source Code.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 0.0,
+      "hit": 0.0,
+      "rr": 0.0,
+      "hit_source": {
+        "embedding": false,
+        "keyword": false
+      },
+      "sas": null
+    },
+    {
+      "id": "desbordamiento-bufer-es",
+      "category": "concepto_es",
+      "question": "¿Qué es un desbordamiento de búfer?",
+      "expected_doc_ids": [
+        "cwe-120"
+      ],
+      "retrieved_ids": [
+        "cwe-121",
+        "cwe-122",
+        "391bca300f07a01126fa624e8c76dd90e699568349b727e28b22eda07580d178"
+      ],
+      "answer": "Un desbordamiento de búfer (buffer overflow) es una condición en la que se escribe más datos en un búfer de lo que está diseñado para contener. \n\nExisten dos tipos principales: \n\n- Desbordamiento de búfer basado en pila (CWE-121: Stack-based Buffer Overflow): se produce cuando el búfer que se está sobrescribiendo se asigna en la pila, es decir, es una variable local o, rara vez, un parámetro de una función.\n\n- Desbordamiento de búfer basado en heap (CWE-122: Heap-based Buffer Overflow): se produce cuando el búfer que se puede sobrescribir se asigna en la parte de memoria del heap, generalmente significa que el búfer se asignó utilizando una rutina como malloc().",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 0.0,
+      "hit": 0.0,
+      "rr": 0.0,
+      "hit_source": {
+        "embedding": false,
+        "keyword": false
+      },
+      "sas": null
+    },
+    {
+      "id": "xss-explicar-prevenir",
+      "category": "desarrollar",
+      "question": "¿Qué es el Cross-Site Scripting y cómo se previene?",
+      "expected_doc_ids": [
+        "cwe-79"
+      ],
+      "retrieved_ids": [
+        "f704ac9abf3589b636d2c49db7fbb82be0050ebf861769d35252259006df7aea",
+        "d7a4f30a69654f1d628d48ccfb811c6fed062e1847fc87edd564f693aa609d51",
+        "e7f5137a4bd6b23c30dcc50916bbd4cb4d2e780ce49c5b8c1365700842df35e5",
+        "cwe-79",
+        "73c4ac5e395706e79bb06ca258528dd5f7eac5e4477ce8efce9732f864c06f16"
+      ],
+      "answer": "El Cross-Site Scripting (XSS) es una vulnerabilidad de seguridad que ocurre cuando una aplicación web no neutraliza o sanitiza correctamente la información suministrada por los usuarios antes de integrarla en el contenido de una página web que posteriormente es renderizada por el navegador.\n\nSegún la CWE-79, esta vulnerabilidad se conoce como \"Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')\".\n\nPara prevenir el XSS, se pueden utilizar mecanismos como la política de mismo origen (SOP), compartición de recursos de orígenes cruzados (CORS) y políticas de seguridad de contenido (CSP). Además, es importante implementar prácticas de codificación segura y utilizar herramientas avanzadas de seguridad.\n\nOWASP y Portswigger ofrecen recursos útiles para prevenir y detectar XSS, como la guía de Cross-Site Scripting (XSS) de OWASP y la hoja de trucos de Cross-site Scripting (XSS) de Portswigger.\n\nEs importante mencionar que la prevención, detección y remediación de vulnerabilidades de XSS son ejes centrales en el desarrollo seguro de las aplicaciones web.",
+      "reference_answer": "El Cross-Site Scripting (XSS, CWE-79) permite inyectar scripts maliciosos en\npáginas que otros usuarios visitan, porque la entrada no se neutraliza al\ngenerar el HTML. Los tipos habituales son reflejado, almacenado y basado en\nDOM. Se previene escapando/encodeando la salida según el contexto, validando\nla entrada, usando Content-Security-Policy y frameworks que escapan por defecto.\n",
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 0.25,
+      "hit_source": {
+        "embedding": false,
+        "keyword": true
+      },
+      "sas": 0.8396
+    },
+    {
+      "id": "path-traversal-detalle",
+      "category": "desarrollar",
+      "question": "Explicá en detalle cómo funciona un ataque de path traversal y sus mitigaciones.",
+      "expected_doc_ids": [
+        "cwe-22"
+      ],
+      "retrieved_ids": [
+        "cwe-36",
+        "cwe-22",
+        "cwe-23",
+        "cwe-1299"
+      ],
+      "answer": "Un ataque de path traversal se produce cuando un producto utiliza entrada externa para construir un camino de archivo que se supone que debe estar dentro de un directorio restringido, pero no neutraliza adecuadamente secuencias especiales que pueden hacer que el camino se resuelva en una ubicación fuera del directorio restringido.\n\nExisten varias clases de debilidades relacionadas con path traversal:\n\n- **CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')**: se produce cuando el producto no neutraliza adecuadamente los elementos especiales dentro del camino de archivo que pueden hacer que se resuelva en una ubicación fuera del directorio restringido.\n\n- **CWE-23: Relative Path Traversal**: ocurre cuando el producto no neutraliza adecuadamente secuencias como \"..\" que pueden hacer que el camino se resuelva en una ubicación fuera del directorio.\n\n- **CWE-36: Absolute Path Traversal**: sucede cuando el producto utiliza entrada externa para construir un camino de archivo que debe estar dentro de un directorio restringido, pero no neutraliza adecuadamente secuencias de ruta absoluta como \"/abs/path\" que pueden resolverse en una ubicación fuera de ese directorio.\n\nPara mitigar estos ataques, se recomienda:\n\n- **Validar y sanitizar la entrada del usuario**: asegurarse de que la entrada proporcionada por el usuario sea válida y no contenga secuencias especiales maliciosas.\n\n- **Utilizar rutas absolutas**: en lugar de utilizar rutas relativas, usar rutas absolutas para evitar la interpretación de secuencias especiales.\n\n- **Limitar el acceso a directorios**: restringir el acceso a directorios específicos y evitar que los usuarios puedan acceder a directorios superiores o externos.\n\n- **Implementar mecanismos de protección**: utilizar mecanismos de protección como listas de control de acceso (ACL) o sistemas de archivos cifrados para proteger los activos.\n\nEn resumen, un ataque de path traversal puede ser mitigado implementando una combinación de validación y sanitización de entrada, utilizando rutas absolutas, limitando el acceso a directorios y mecanismos de protección para evitar que los atacantes puedan acceder a ubicaciones no autorizadas.",
+      "reference_answer": "El path traversal (CWE-22) abusa de una limitación insuficiente de rutas para\nacceder a archivos fuera del directorio previsto usando secuencias como ../.\nSe mitiga canonicalizando y validando rutas contra una allowlist, evitando\npasar entrada del usuario directo al filesystem y aplicando permisos mínimos.\n",
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 0.5,
+      "hit_source": {
+        "embedding": true,
+        "keyword": true
+      },
+      "sas": 0.8032
+    },
+    {
+      "id": "comparar-oob-read-write",
+      "category": "comparativa",
+      "question": "¿En qué se diferencian una lectura fuera de límites y una escritura fuera de límites?",
+      "expected_doc_ids": [
+        "cwe-125",
+        "cwe-787"
+      ],
+      "retrieved_ids": [
+        "cwe-787",
+        "cwe-125",
+        "391bca300f07a01126fa624e8c76dd90e699568349b727e28b22eda07580d178"
+      ],
+      "answer": "Una lectura fuera de límites (CWE-125) se diferencia de una escritura fuera de límites (CWE-787) en que la primera implica leer datos más allá del final o antes del comienzo del búfer previsto, mientras que la segunda implica escribir datos más allá del final o antes del comienzo del búfer previsto.\n\nEn otras palabras, CWE-125 (Out-of-bounds Read) se enfoca en la lectura de datos fuera del rango válido del búfer, mientras que CWE-787 (Out-of-bounds Write) se enfoca en la escritura de datos fuera del rango válido del búfer.",
+      "reference_answer": "La lectura fuera de límites (CWE-125) accede a memoria fuera del búfer y suele\nfiltrar información; la escritura fuera de límites (CWE-787) escribe fuera del\nbúfer y puede corromper memoria o permitir ejecución de código. Ambas nacen de\nno validar índices o tamaños.\n",
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": true,
+        "keyword": false
+      },
+      "sas": 0.8939
+    },
+    {
+      "id": "tipos-inyeccion-comandos",
+      "category": "multi_doc",
+      "question": "¿Qué tipos de inyección de comandos existen?",
+      "expected_doc_ids": [
+        "cwe-77",
+        "cwe-78"
+      ],
+      "retrieved_ids": [
+        "cwe-77",
+        "391bca300f07a01126fa624e8c76dd90e699568349b727e28b22eda07580d178",
+        "39b853758f5a0df3078e7b84e542f50f50a14a3f733a31c1a11d9ab955376bff"
+      ],
+      "answer": "Según el contexto proporcionado, existe la vulnerabilidad CWE-77: Improper Neutralization of Special Elements used in a Command ('Command Injection'). Esta vulnerabilidad se refiere a la inyección de comandos, específicamente cuando un producto construye total o parcialmente un comando utilizando entrada influenciada externamente de un componente ascendente, pero no neutraliza o neutraliza incorrectamente los elementos especiales que podrían modificar el comando previsto cuando se envía a un componente descendente.\n\nPor lo tanto, puedo mencionar al menos un tipo de inyección de comandos: Command Injection (CWE-77). \n\nNo tengo más información sobre otros tipos de inyección de comandos en el contexto proporcionado.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 0.5,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": true,
+        "keyword": false
+      },
+      "sas": null
+    },
+    {
+      "id": "control-acceso-varios",
+      "category": "multi_doc",
+      "question": "Nombrá vulnerabilidades relacionadas con fallas de control de acceso.",
+      "expected_doc_ids": [
+        "cwe-306",
+        "cwe-862",
+        "cwe-269"
+      ],
+      "retrieved_ids": [
+        "cwe-1220",
+        "cwe-1022",
+        "cwe-1048"
+      ],
+      "answer": "Se pueden mencionar las siguientes vulnerabilidades relacionadas con fallas de control de acceso:\n\n- CWE-1220: Insufficient Granularity of Access Control, que se refiere a la implementación de controles de acceso con una política o característica destinada a desactivar o restringir accesos a activos en un sistema por parte de agentes no confiables, pero que carece de la granularidad necesaria.\n\n- CWE-1022: Use of Web Link to Untrusted Target with window.opener Access, que implica la creación de enlaces a sitios externos no confiables fuera del ámbito de control de la aplicación web, sin impedir adecuadamente que el sitio externo modifique propiedades de seguridad críticas del objeto window.opener. \n\nAmbas se relacionan con fallas en el control de acceso, aunque de maneras diferentes.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 0.0,
+      "hit": 0.0,
+      "rr": 0.0,
+      "hit_source": {
+        "embedding": false,
+        "keyword": false
+      },
+      "sas": null
+    },
+    {
+      "id": "mitigar-csrf",
+      "category": "procedimental",
+      "question": "¿Cómo mitigar un CSRF paso a paso?",
+      "expected_doc_ids": [
+        "cwe-352"
+      ],
+      "retrieved_ids": [
+        "3cec8962824a3b78b9f0ec8c8695e607f71bd6e7d6953349dbba6988f270e7e6",
+        "de67284cb8492cdce31157561d6def31799e529bff37686bdc568b68bf34fbca",
+        "cwe-352",
+        "dd52da996b7a72213b274f5a148dad618f7ce01f1523759f693e7ddf40041a75",
+        "f919c4453b61301751735a2adb89d42bab9a9e4db07f3fc9fe1d450abca8c8ab",
+        "0ca32d02af600ac65e149adef7a567f64d5925cffe9d4d89f5278a3669e5c3de"
+      ],
+      "answer": "Para mitigar un CSRF (Cross-Site Request Forgery), algunas medidas incluyen:\n\n1. **Uso de tokens CSRF**: asegurarse de que la aplicación web utilice tokens CSRF para verificar la validez de las solicitudes. Estos tokens deben ser generados por la aplicación y enviados al cliente, quien luego los devuelve con la solicitud.\n\n2. **Incluir una cadena de caracteres aleatoria**: incluir una cadena de caracteres aleatoria, conocida como token, que se genera en el lado del servidor y se envía al cliente. El cliente debe devolver este token con la solicitud.\n\n3. **Verificar la cabecera de origen**: verificar la cabecera de origen (`Origin` o `Referer`) de la solicitud para asegurarse de que proviene de un origen legítimo.\n\n4. **Uso de la cabecera SameSite**: configurar la cabecera `SameSite` en las cookies para evitar que sean enviadas con solicitudes que provienen de orígenes diferentes.\n\n5. **Uso de métodos seguros**: restringir el uso de métodos HTTP a aquellos que sean seguros para las operaciones sensibles, como `POST` en lugar de `GET`.\n\nSegún INCIBE, otra recomendación es **utilizar una guía de configuración de seguridad** y **gestionar vulnerabilidades**. \n\nAdemás, **CWE-352: Cross-Site Request Forgery (CSRF)** describe esta vulnerabilidad como la incapacidad de la aplicación web para verificar de manera suficiente si una solicitud fue proporcionada intencionalmente por el usuario que envió la solicitud.",
+      "reference_answer": "Para mitigar CSRF (CWE-352): usar tokens anti-CSRF por sesión/solicitud,\nvalidar el token en cada acción que cambie estado, usar cookies SameSite,\nverificar cabeceras Origin/Referer y requerir reautenticación en acciones\nsensibles.\n",
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 0.3333333333333333,
+      "hit_source": {
+        "embedding": false,
+        "keyword": true
+      },
+      "sas": 0.8491
+    },
+    {
+      "id": "prevenir-deserializacion",
+      "category": "procedimental",
+      "question": "¿Cómo prevenir la deserialización insegura de datos?",
+      "expected_doc_ids": [
+        "cwe-502"
+      ],
+      "retrieved_ids": [
+        "cwe-502",
+        "90f649fb5a4017e07ea96545b0db84c1558c8ae8db7f42d9956e5e68e180c5fb",
+        "0ca32d02af600ac65e149adef7a567f64d5925cffe9d4d89f5278a3669e5c3de"
+      ],
+      "answer": "Según CWE-502: Deserialization of Untrusted Data, la deserialización insegura de datos se puede prevenir asegurándose de que los datos que se deserializan sean de confianza y estén validados adecuadamente. En otras palabras, el producto debe deserializar datos de confianza o asegurarse de que los datos deserializados sean válidos. \n\nNo tengo más información para dar una respuesta más detallada.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": true,
+        "keyword": false
+      },
+      "sas": null
+    },
+    {
+      "id": "open-redirect-es",
+      "category": "bilingue",
+      "question": "¿Qué es una vulnerabilidad de open redirect?",
+      "expected_doc_ids": [
+        "cwe-601"
+      ],
+      "retrieved_ids": [
+        "cwe-601",
+        "cwe-1022",
+        "cwe-8"
+      ],
+      "answer": "Una vulnerabilidad de \"open redirect\" se conoce como CWE-601: URL Redirection to Untrusted Site ('Open Redirect'). Esta vulnerabilidad ocurre cuando una aplicación web acepta una entrada controlada por el usuario que especifica un enlace a un sitio externo y utiliza ese enlace en un redireccionamiento.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": true,
+        "keyword": true
+      },
+      "sas": null
+    },
+    {
+      "id": "open-redirect-en",
+      "category": "bilingue",
+      "question": "what is an open redirect vulnerability",
+      "expected_doc_ids": [
+        "cwe-601"
+      ],
+      "retrieved_ids": [
+        "cwe-601",
+        "cwe-1022",
+        "cwe-8"
+      ],
+      "answer": "An open redirect vulnerability is CWE-601: URL Redirection to Untrusted Site ('Open Redirect'). It occurs when a web application accepts a user-controlled input that specifies a link to an external site and uses that link in a redirect.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": true,
+        "keyword": true
+      },
+      "sas": null
+    },
+    {
+      "id": "xxe-conceptual",
+      "category": "regresion",
+      "question": "¿Qué es un ataque XML External Entity (XXE)?",
+      "expected_doc_ids": [
+        "cwe-611"
+      ],
+      "retrieved_ids": [
+        "cwe-611",
+        "cwe-652",
+        "cwe-643",
+        "cwe-91"
+      ],
+      "answer": "Un ataque XML External Entity (XXE) se relaciona con la vulnerabilidad CWE-611: Improper Restriction of XML External Entity Reference. Este tipo de ataque ocurre cuando un producto procesa un documento XML que contiene entidades XML con URIs que se resuelven en documentos fuera del ámbito de control previsto, lo que causa que el producto incorpore documentos incorrectos en su salida.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 1.0,
+      "hit_source": {
+        "embedding": false,
+        "keyword": true
+      },
+      "sas": null
+    },
+    {
+      "id": "privilegios-conceptual",
+      "category": "regresion",
+      "question": "¿Qué es la gestión incorrecta de privilegios?",
+      "expected_doc_ids": [
+        "cwe-269"
+      ],
+      "retrieved_ids": [
+        "cwe-266",
+        "cwe-270",
+        "cwe-269"
+      ],
+      "answer": "La gestión incorrecta de privilegios se refiere a varias debilidades relacionadas con el manejo de privilegios en un producto o sistema. \n\nSegún CWE-269: Improper Privilege Management, la gestión incorrecta de privilegios ocurre cuando el producto no asigna, modifica, rastrea o verifica adecuadamente los privilegios de un actor, lo que crea una esfera de control no prevista para ese actor.\n\nOtras debilidades relacionadas son:\n- CWE-266: Incorrect Privilege Assignment, cuando un producto asigna incorrectamente un privilegio a un actor específico.\n- CWE-270: Privilege Context Switching Error, cuando un producto no gestiona adecuadamente los privilegios al cambiar entre diferentes contextos con distintos privilegios o esferas de control. \n\nEstas CWE describen diferentes aspectos de la gestión incorrecta de privilegios.",
+      "reference_answer": null,
+      "status": "ok",
+      "recall": 1.0,
+      "hit": 1.0,
+      "rr": 0.3333333333333333,
+      "hit_source": {
+        "embedding": true,
+        "keyword": false
+      },
+      "sas": null
+    },
+    {
+      "id": "capital-francia",
+      "category": "fuera_dominio",
+      "question": "¿Cuál es la capital de Francia?",
+      "expected_doc_ids": [],
+      "retrieved_ids": [
+        "39b853758f5a0df3078e7b84e542f50f50a14a3f733a31c1a11d9ab955376bff",
+        "391bca300f07a01126fa624e8c76dd90e699568349b727e28b22eda07580d178",
+        "6f8f9d1765364e33eb13821f29a1210ca3c1340a45a8068b663eebd44d7a042e"
+      ],
+      "answer": "Lo siento, no sé.",
+      "reference_answer": "No lo sé: esa pregunta está fuera del alcance de la base de ciberseguridad.",
+      "status": "ok",
+      "recall": null,
+      "hit": null,
+      "rr": null,
+      "hit_source": null,
+      "sas": 0.6373
+    },
+    {
+      "id": "receta-tarta",
+      "category": "fuera_dominio",
+      "question": "Dame una receta de tarta de manzana.",
+      "expected_doc_ids": [],
+      "retrieved_ids": [
+        "39b853758f5a0df3078e7b84e542f50f50a14a3f733a31c1a11d9ab955376bff",
+        "391bca300f07a01126fa624e8c76dd90e699568349b727e28b22eda07580d178",
+        "6f8f9d1765364e33eb13821f29a1210ca3c1340a45a8068b663eebd44d7a042e"
+      ],
+      "answer": "Lo siento, no tengo información sobre recetas de tarta de manzana en el contexto proporcionado. Mi función se limita a responder preguntas relacionadas con la ciberseguridad según la información proporcionada. Si necesitas una receta, te recomiendo buscar en un libro de cocina o en un sitio web de recetas.",
+      "reference_answer": "No lo sé: la base solo contiene información de ciberseguridad.",
+      "status": "ok",
+      "recall": null,
+      "hit": null,
+      "rr": null,
+      "hit_source": null,
+      "sas": 0.4959
+    },
+    {
+      "id": "cve-log4shell-numero",
+      "category": "id_inexistente",
+      "question": "¿Qué es la vulnerabilidad CVE-2021-44228?",
+      "expected_doc_ids": [],
+      "retrieved_ids": [
+        "cwe-8",
+        "cwe-1328",
+        "cwe-1428"
+      ],
+      "answer": "Lo siento, no tengo información sobre la vulnerabilidad CVE-2021-44228 en el contexto proporcionado.",
+      "reference_answer": "No dispongo de información sobre ese CVE en la base.",
+      "status": "ok",
+      "recall": null,
+      "hit": null,
+      "rr": null,
+      "hit_source": null,
+      "sas": 0.7002
+    },
+    {
+      "id": "cve-log4j-nombre",
+      "category": "id_inexistente",
+      "question": "Contame sobre las vulnerabilidades de Log4Shell en Log4j.",
+      "expected_doc_ids": [],
+      "retrieved_ids": [
+        "cwe-779",
+        "cwe-464",
+        "cwe-244"
+      ],
+      "answer": "Lo siento, pero no tengo información sobre vulnerabilidades específicas de Log4Shell en Log4j en el contexto proporcionado. Sin embargo, puedo decir que el contexto menciona algunas vulnerabilidades como CWE-779, CWE-464 y CWE-244, pero no proporciona información sobre Log4Shell o vulnerabilidades específicas en Log4j. \n\nSi buscas información sobre Log4Shell, te recomiendo buscar en fuentes actualizadas de seguridad informática o en bases de datos de vulnerabilidades como NVD (National Vulnerability Database) para obtener información precisa y actualizada sobre este tema.",
+      "reference_answer": "No dispongo de información específica sobre Log4Shell en la base.",
+      "status": "ok",
+      "recall": null,
+      "hit": null,
+      "rr": null,
+      "hit_source": null,
+      "sas": 0.6684
+    },
+    {
+      "id": "cve-inexistente",
+      "category": "id_inexistente",
+      "question": "¿Qué es CVE-9999-99999?",
+      "expected_doc_ids": [],
+      "retrieved_ids": [
+        "39b853758f5a0df3078e7b84e542f50f50a14a3f733a31c1a11d9ab955376bff",
+        "391bca300f07a01126fa624e8c76dd90e699568349b727e28b22eda07580d178",
+        "6f8f9d1765364e33eb13821f29a1210ca3c1340a45a8068b663eebd44d7a042e"
+      ],
+      "answer": "No sé.",
+      "reference_answer": "No existe / no dispongo de información sobre ese identificador.",
+      "status": "ok",
+      "recall": null,
+      "hit": null,
+      "rr": null,
+      "hit_source": null,
+      "sas": 0.6274
+    }
+  ]
+}

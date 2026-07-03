@@ -1,5 +1,20 @@
 # Plan de diseño: harness de evaluación del RAG
 
+> **Estado (2026-07-03): IMPLEMENTADO y verificado.** El harness vive en
+> [../src/pipeline/eval/](../src/pipeline/eval/) y corre dentro del container `pipelines`.
+> Las tres fases (0–3) están operativas. Baseline inicial (27 preguntas, `top_k=3`, `temp=0`):
+> **recall@k=0.841, hit_rate=0.864, MRR=0.693** (Tier 1, n=22 con ground truth) y
+> **SAS=0.755** (Tier 2, n=14). Tier 3 (juez Groq) probado sobre subsets.
+>
+> **Hallazgos del baseline:** las categorías débiles son `concepto_es` (recall 0.333) y
+> `multi_doc` (0.250) — la brecha es→en descrita en
+> [optimizacion_keyword_retrieval.md](optimizacion_keyword_retrieval.md). Subir `top_k` a 8 **no**
+> las mejora → el cuello de botella es el preprocesado de la query, no `k`.
+>
+> **Corpus actual:** 710 CWE, **0 CVE** (la ingesta NVD aún no se corrió). Por eso las preguntas
+> de CVE del dataset son hoy tests de robustez (el RAG debe decir "no sé"); cuando se indexen
+> CVEs, cambiarles `expected_doc_ids` al `sha256(cve_id)` real.
+
 ## Contexto y objetivo
 
 Hoy, cuando se cambia una pieza del pipeline (retriever, chunking, modelo de embeddings,
@@ -262,18 +277,45 @@ docker compose exec pipelines python /app/pipelines/eval/run_eval_llm.py
 Loop de trabajo: cambio algo (retriever, chunking, prompt, LLM, valves) → `run_eval` → leo el
 delta por categoría → decido si el cambio entra.
 
-## Fases de implementación (cuando se decida codear)
+## ¿Cuándo se ejecuta? — decisión: manual, antes de mergear
 
-1. **Fase 0 — Habilitar headless.** Verificar el auto-load de subdirectorios del pipelines
-   server. Extraer `get_document_store` y `build_rag_pipeline` a funciones módulo-level y
-   confirmar que el runtime de Open WebUI sigue idéntico.
-2. **Fase 1 — Tier 1.** `dataset.yaml` semilla + `metrics.py` + `run_eval.py` con retrieval.
-   Correr y ver recall/MRR por categoría.
-3. **Fase 2 — Tier 2 + reporte.** SAS local + `report.py` con baseline y delta. Acá ya queda
-   cerrado el loop "cambio → script → delta".
-4. **Fase 3 — Tier 3.** `run_eval_llm.py` con evaluators de Haystack sobre Groq.
+El harness **no es un test unitario**: necesita el stack docker levantado (pgvector poblado,
+Ollama, `GROQ_API_KEY`) y gasta llamadas a Groq. No corre en cada save.
 
-Con Fases 1-2 el harness ya es usable; la Fase 3 es la capa profunda opcional.
+**Decisión adoptada:** ejecución **manual, antes de mergear un cambio.** Se toca una pieza
+(retriever / chunking / prompt / LLM / valves), se corre `run_eval.py` a mano, se lee el delta
+por categoría y recién ahí se decide si el cambio entra y se commitea/mergea. Es el piso: cero
+infra extra y da el grueso del valor ("cambio → script → delta").
+
+Descartado por ahora (se puede reconsiderar más adelante):
+- **Git hook `pre-push`:** el hook corre en el host pero el eval necesita el container arriba;
+  frágil si el stack no está levantado. Quedaría como opcional no bloqueante para Tier 1+2.
+- **CI en cada PR:** levantar y **poblar** pgvector + Ollama en el runner es pesado, y Groq en
+  CI arriesga 429. Fuera de alcance por ahora; si algún día entra, solo Tier 1+2, nunca el juez.
+
+**Orden crítico si el cambio implica reindexar** (chunking, converters, modelo de embeddings):
+primero **reindexar el store**, después correr el eval. Si no, se estaría midiendo el retriever
+nuevo contra chunks viejos. Para cambios que no tocan la indexación (prompt, LLM, `top_k`, RRF,
+`build_keyword_query`) se corre directo.
+
+Por tier: **Tier 1 + 2** se corren juntos en cada evaluación (barato, ~1 call Groq/pregunta).
+**Tier 3** (juez LLM) se corre aparte y puntual, antes de un merge grande, por el riesgo de 429.
+
+## Fases de implementación — estado
+
+1. **Fase 0 — Habilitar headless. ✅** Verificado que el pipelines-server usa `os.listdir` (no
+   escanea subdirs, así que `eval/` no se auto-carga). `get_document_store` y `build_rag_pipeline`
+   extraídas a funciones módulo-level; la clase `Pipeline` delega → runtime idéntico.
+2. **Fase 1 — Tier 1. ✅** `dataset.yaml` (27 preguntas) + `metrics.py` + `run_eval.py` con
+   retrieval, desglose por categoría y contribución por retriever.
+3. **Fase 2 — Tier 2 + reporte. ✅** SAS local (bge-m3 vía Ollama) + `report.py` con baseline y
+   delta (global, por categoría y regresiones por pregunta). Loop "cambio → script → delta" cerrado.
+4. **Fase 3 — Tier 3. ✅** `run_eval_llm.py` con `FaithfulnessEvaluator` y
+   `ContextRelevanceEvaluator` de Haystack, usando Groq como juez en modo JSON. Manual, con `--limit`.
+
+Umbral de regresión de SAS: `SAS_REGRESSION_THRESHOLD = 0.05` en `report.py`. Se observó que las
+negativas tienen SAS algo ruidoso aun con `temp=0` (variación ~0.06 en la respuesta del LLM), así
+que ese umbral puede necesitar subirse si genera falsos positivos.
 
 ## Decisiones abiertas
 
