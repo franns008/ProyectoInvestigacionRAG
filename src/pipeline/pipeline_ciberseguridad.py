@@ -71,13 +71,25 @@ INPUT_DIR           = Path("/app/pipelines/rawdata")
 CONVERTED_DIR       = INPUT_DIR / "_converted_md"   # caché de PDFs ya convertidos
 
 PROMPT_TEMPLATE = """
-Given the following information, answer the question.
-YOU SHOULD ANSWER IN THE LANGUAGE OF THE QUESTION, NOT THE LANGUAGE OF THE DOCUMENTS.
-If you don't know the answer, say you don't know. Do not make up an answer.
+You are a cybersecurity assistant. Answer strictly from the provided context.
+
+The context may contain three kinds of sources:
+- CWE entries (MITRE): generic weakness *classes*, identified as CWE-<number>.
+- CVE entries (NVD): specific, dated vulnerabilities in concrete products, identified as
+  CVE-YYYY-NNNN, often with a CVSS score, severity and affected vendors/products.
+- INCIBE guides: prose from cybersecurity best-practice reports.
+
+Rules:
+- Do NOT confuse a CWE (category) with a CVE (concrete instance).
+- Cite the exact identifier (CWE-x / CVE-x) whenever a statement comes from such an entry.
+- NEVER invent CVE/CWE identifiers, CVSS scores or severities. Use only values present in the context.
+- If the context does not contain the answer, say you don't know. Do not make one up.
+- Answer in the language of the question, NOT the language of the documents.
 
 Context:
 {% for document in documents %}
-    {{ document.content }}
+- {% if document.meta.cve_id %}[{{ document.meta.cve_id }}]{% if document.meta.severity %} severity={{ document.meta.severity }}{% endif %}{% if document.meta.cvss_v3_score %} CVSS={{ document.meta.cvss_v3_score }}{% endif %}{% if document.meta.cwe_ids %} (related: {{ document.meta.cwe_ids | join(", ") }}){% endif %}{% if document.meta.products %} affects: {{ document.meta.products | join(", ") }}{% endif %}
+  {% endif %}{{ document.content }}
 {% endfor %}
 
 Question: {{question}}
