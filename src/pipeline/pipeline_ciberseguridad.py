@@ -320,6 +320,119 @@ class NVDJsonConverter:
         return {"documents": documents}
 
 
+# ======================================================================
+# Detector estático de keywords para el retriever full-text
+#
+# El PgvectorKeywordRetriever ANDea todos los términos de la query, así que
+# pasarle la pregunta cruda en lenguaje natural da 0 hits: ninguna frase en
+# español matchea un doc CWE en inglés (ver docs/optimizacion_keyword_retrieval.md).
+# Este preprocesador reduce la query a señal de alta precisión, priorizando:
+#   1) IDs de vulnerabilidad (CWE-/CVE-): exactos y ultra-distintivos.
+#   2) Términos de seguridad conocidos (XSS, SQL injection, ...).
+#   3) Fallback: tokens de contenido sin stopwords ni ruido de dominio.
+# ======================================================================
+
+# IDs de vulnerabilidad, tolerante a variantes: "CWE-89", "cwe 89", "cwe89".
+_CWE_ID_RE = re.compile(r"cwe[\s\-_]?(\d{1,5})", re.IGNORECASE)
+_CVE_ID_RE = re.compile(r"cve[\s\-_]?(\d{4})[\s\-_]?(\d{4,7})", re.IGNORECASE)
+
+# Términos de seguridad de alta señal (bilingüe). Se permiten multi-palabra: el
+# full-text ANDea sus tokens, que co-ocurren en el doc objetivo. Ampliable.
+_SECURITY_TERMS = (
+    "cross-site scripting", "cross site scripting", "xss",
+    "cross-site request forgery", "csrf", "ssrf",
+    "sql injection", "inyección sql", "inyeccion sql", "sqli",
+    "command injection", "code injection", "os command injection",
+    "buffer overflow", "desbordamiento de búfer", "desbordamiento de buffer",
+    "integer overflow", "use after free", "null pointer",
+    "remote code execution", "rce", "xxe", "xml external entity",
+    "path traversal", "directory traversal", "lfi", "rfi",
+    "open redirect", "idor", "insecure deserialization", "deserialization",
+    "privilege escalation", "escalada de privilegios",
+    "authentication bypass", "hardcoded credentials", "credenciales",
+    "information disclosure", "sensitive information", "información sensible",
+    "denial of service", "ddos", "race condition",
+    "clickjacking", "phishing", "ransomware", "malware",
+    "man-in-the-middle", "mitm", "spoofing",
+)
+
+# Stopwords ES/EN + ruido de dominio (palabras presentes en casi todos los docs,
+# que no discriminan y sólo rompen el AND del full-text).
+_STOPWORDS = {
+    # español
+    "el", "la", "los", "las", "un", "una", "unos", "unas", "de", "del", "al", "a", "ante",
+    "con", "contra", "en", "entre", "hacia", "hasta", "para", "por", "según", "sin", "sobre",
+    "tras", "y", "o", "u", "e", "que", "qué", "cual", "cuál", "cuales", "cuáles", "como",
+    "cómo", "cuando", "cuándo", "donde", "dónde", "es", "son", "ser", "está", "están", "hay",
+    "tiene", "tienen", "puede", "pueden", "más", "muy", "me", "te", "se", "le", "lo", "su",
+    "sus", "mi", "tu", "este", "esta", "esto", "estos", "estas", "eso", "existen", "tipos",
+    "explicame", "explícame", "dame", "decime", "contame", "quiero", "saber", "prevenirla",
+    "prevenir", "acerca", "información", "informacion",
+    # inglés
+    "the", "a", "an", "of", "to", "in", "on", "for", "and", "or", "is", "are", "be", "what",
+    "which", "how", "when", "where", "why", "can", "could", "does", "do", "about", "tell",
+    "give", "explain", "types", "exist",
+    # ruido de dominio (en casi todos los docs)
+    "vulnerabilidad", "vulnerabilidades", "vulnerability", "descripcion", "descripción",
+    "description", "cwe", "cve", "weakness", "debilidad",
+}
+
+
+def _extract_vuln_ids(text: str) -> list[str]:
+    """IDs CWE/CVE normalizados a forma canónica (CWE-89, CVE-2023-1234), únicos y en orden."""
+    ids: list[str] = []
+    for m in _CWE_ID_RE.finditer(text):
+        ids.append(f"CWE-{int(m.group(1))}")
+    for m in _CVE_ID_RE.finditer(text):
+        ids.append(f"CVE-{m.group(1)}-{m.group(2)}")
+    seen, out = set(), []
+    for i in ids:
+        if i not in seen:
+            seen.add(i)
+            out.append(i)
+    return out
+
+
+def _find_security_terms(text_low: str) -> list[str]:
+    """Términos de _SECURITY_TERMS presentes en el texto (ya en minúsculas)."""
+    found = []
+    for term in _SECURITY_TERMS:
+        if " " in term or "-" in term:
+            if term in text_low:
+                found.append(term)
+        elif re.search(rf"\b{re.escape(term)}\b", text_low):
+            # límite de palabra para siglas cortas (dos/rce/lfi) y evitar substrings
+            found.append(term)
+    return found
+
+
+def build_keyword_query(user_message: str) -> str:
+    """Transforma la pregunta del usuario en una query de alta precisión para el
+    keyword retriever (que ANDea todos los términos). Ver el encabezado de sección
+    y docs/optimizacion_keyword_retrieval.md.
+    """
+    text = user_message.strip()
+
+    ids = _extract_vuln_ids(text)
+    if ids:
+        # Un ID basta y da precisión máxima; con varios se toma el primero para no
+        # romper el AND del full-text (una pregunta suele apuntar a un único ID).
+        return ids[0]
+
+    low = text.lower()
+    terms = _find_security_terms(low)
+    if terms:
+        # El término más específico = el más largo (colapsa "xss" y su forma larga
+        # en una sola frase coherente que co-ocurre en el doc objetivo).
+        return max(terms, key=len)
+
+    # Fallback: contenido sin stopwords ni ruido de dominio. Si queda vacío se
+    # devuelve el texto original (comportamiento no peor que antes).
+    tokens = re.findall(r"[a-záéíóúñü0-9][a-záéíóúñü0-9\-]*", low)
+    keywords = [t for t in tokens if len(t) > 2 and t not in _STOPWORDS]
+    return " ".join(keywords) or text
+
+
 class Pipeline:
 
     class Valves(BaseModel):
@@ -373,10 +486,15 @@ class Pipeline:
         logger.info(f"Documentos en store al momento de la query: {total}")
         logger.info(f"Ejecutando RAG para: {user_message}")
 
+        # El keyword retriever recibe una query depurada (IDs / términos de
+        # seguridad / contenido sin stopwords), no la pregunta cruda.
+        keyword_query = build_keyword_query(user_message)
+        logger.info(f"[KEYWORD QUERY] -> {keyword_query!r}")
+
         result = self.rag_pipeline.run(
             {
                 "text_embedder":     {"text": user_message},
-                "keyword_retriever": {"query": user_message},
+                "keyword_retriever": {"query": keyword_query},
                 "prompt_builder":    {"question": user_message},
             },
             include_outputs_from={

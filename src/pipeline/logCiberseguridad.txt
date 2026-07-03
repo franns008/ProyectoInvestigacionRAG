@@ -392,3 +392,740 @@ Al implementar estas medidas, las empresas pueden reducir significativamente los
 2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
 2026-07-01 23:42:31,948 - INFO - [HaystackRAG] -         contenido: 5G. Los pasos recomendados incluyen:  Análisis de requisitos de cumplimiento: Identificar las obligaciones legales y regulatorias aplicables, como el Reglamento General de Protección de Datos (GDPR) el Esquema Nacional de Seguridad (ENS, RD 311/2022) y el Esquema Nacional de Seguridad específico de ...
 2026-07-01 23:42:31,948 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 18:08:38,544 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-03 18:09:26,888 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-03 18:09:27,221 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-03 18:09:27,225 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-03 18:09:27,226 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-03 18:09:27,226 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-03 18:09:28,765 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-03 18:09:28,834 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-07-03 18:09:28,886 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-03 18:09:28,886 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-03 18:09:28,886 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-03 18:09:28,886 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-03 18:09:29,074 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-03 18:09:29,141 - INFO - [HaystackRAG] - Total de documentos en el store: 255
+2026-07-03 18:44:59,973 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-03 18:45:38,249 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-03 18:54:38,047 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-03 18:55:03,668 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-03 18:55:03,918 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-03 18:55:03,921 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-03 18:55:03,921 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-03 18:55:03,921 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-03 18:55:09,257 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-03 18:55:09,752 - INFO - [HaystackRAG] - Embedding de 710 documentos nuevos (0 chunks + 710 atómicos)...
+2026-07-03 18:57:29,038 - INFO - [HaystackRAG] - Indexación completa: 710 documentos agregados.
+2026-07-03 18:57:29,040 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-03 18:57:29,051 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-03 18:57:29,051 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-03 18:57:29,051 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-03 18:57:29,051 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-03 18:57:30,332 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-03 18:57:30,596 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-03 18:57:30,597 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-03 19:03:39,988 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:03:39,989 - INFO - [HaystackRAG] - Ejecutando RAG para: que contexto tenés?
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] -   [1] score=0.4974 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                     |   ...
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] -   [2] score=0.4974 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] -         snippet:                                                                                                                                 |...
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] -   [3] score=0.4974 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                     |   ...
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:41,134 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:03:41,135 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:41,135 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:03:41,135 - INFO - [HaystackRAG] -   [1] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:03:41,135 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                     |    ...
+2026-07-03 19:03:41,135 - INFO - [HaystackRAG] -   [2] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:03:41,135 - INFO - [HaystackRAG] -         contenido:                                                                                                                                 |...
+2026-07-03 19:03:41,135 - INFO - [HaystackRAG] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:03:41,135 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                     |    ...
+2026-07-03 19:03:41,135 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:41,434 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:03:41,434 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: que contexto tenés?
+ASSISTANT: No tengo contexto, parece que solo hay caracteres vacíos y espacios en blanco.
+</chat_history>
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -   [1] score=0.5330 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -         snippet:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramien...
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -   [2] score=0.5309 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -         snippet:                                       | |----------------|-----------------------------------------------------------------------------|-------------------------|--------------------------------------...
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -   [3] score=0.5028 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -         snippet: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contra...
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -         contenido:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramientas5. Preparación de un entorno de test6. Ejemplos de análisis de vulnerabilidades XSS7. Prevención ...
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:03:43,328 - INFO - [HaystackRAG] -         contenido:                                       | |----------------|-----------------------------------------------------------------------------|-------------------------|---------------------------------------------------------------------| | Latencia       | Muy baja (<5 ms)                                ...
+2026-07-03 19:03:43,329 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:03:43,329 - INFO - [HaystackRAG] -         contenido: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contraseñas fuertes para prevenir ataques de fuerza bruta o adivinación.  o Ejemplo:  Definir requisitos d...
+2026-07-03 19:03:43,329 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:43,620 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:03:43,620 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate a concise, 3-5 word title with an emoji summarizing the chat history.
+### Guidelines:
+- The title should clearly represent the main theme or subject of the conversation.
+- Use emojis that enhance understanding of the topic, but avoid quotation marks or special formatting.
+- Write the title in the chat's primary language; default to English if multilingual.
+- Prioritize accuracy over excessive creativity; keep it clear and simple.
+- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
+- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
+- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
+### Output:
+JSON format: { "title": "your concise title here" }
+### Examples:
+- { "title": "📉 Stock Market Trends" },
+- { "title": "🍪 Perfect Chocolate Chip Recipe" },
+- { "title": "Evolution of Music Streaming" },
+- { "title": "Remote Work Productivity Tips" },
+- { "title": "Artificial Intelligence in Healthcare" },
+- { "title": "🎮 Video Game Development Insights" }
+### Chat History:
+<chat_history>
+USER: que contexto tenés?
+ASSISTANT: No tengo contexto, parece que solo hay caracteres vacíos y espacios en blanco.
+</chat_history>
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -   [1] score=0.4834 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -         snippet:                                                         | Descripción                                                                                                                                   ...
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -   [2] score=0.4623 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -   [3] score=0.4623 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                         ...
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -         contenido:                                                         | Descripción                                                                                                                                               ...
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -   [2] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -   [3] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                         ...
+2026-07-03 19:03:45,643 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:45,918 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:03:45,918 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Generate 1-3 broad tags categorizing the main themes of the chat history, along with 1-3 more specific subtopic tags.
+
+### Guidelines:
+- Start with high-level domains (e.g. Science, Technology, Philosophy, Arts, Politics, Business, Health, Sports, Entertainment, Education)
+- Consider including relevant subfields/subdomains if they are strongly represented throughout the conversation
+- If content is too short (less than 3 messages) or too diverse, use only ["General"]
+- Use the chat's primary language; default to English if multilingual
+- Prioritize accuracy over specificity
+
+### Output:
+JSON format: { "tags": ["tag1", "tag2", "tag3"] }
+
+### Chat History:
+<chat_history>
+USER: que contexto tenés?
+ASSISTANT: No tengo contexto, parece que solo hay caracteres vacíos y espacios en blanco.
+</chat_history>
+2026-07-03 19:03:48,009 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:48,009 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -   [1] score=0.5329 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -         snippet:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramien...
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -   [2] score=0.5093 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -         snippet:                                       | |----------------|-----------------------------------------------------------------------------|-------------------------|--------------------------------------...
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -   [3] score=0.4932 | fuente=CWE-615
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-615: Inclusion of Sensitive Information in Source Code Comments Descripción: While adding general comments is very useful, some programmers tend to leave important data, such as: fi...
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -         contenido:                                                                                                                                             | 710              | | 4. Tipologías de análisis y herramientas5. Preparación de un entorno de test6. Ejemplos de análisis de vulnerabilidades XSS7. Prevención ...
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -         contenido:                                       | |----------------|-----------------------------------------------------------------------------|-------------------------|---------------------------------------------------------------------| | Latencia       | Muy baja (<5 ms)                                ...
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -   [3] fuente=CWE-615
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-615: Inclusion of Sensitive Information in Source Code Comments Descripción: While adding general comments is very useful, some programmers tend to leave important data, such as: filenames related to the web application, old links or links which were not meant to be browsed by use...
+2026-07-03 19:03:48,010 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:06:50,629 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:06:50,629 - INFO - [HaystackRAG] - Ejecutando RAG para: Puedes proporcionar más información sobre el contexto de seguridad de redes?
+2026-07-03 19:06:51,625 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:06:51,625 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:06:51,625 - INFO - [HaystackRAG] -   [1] score=0.5661 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:51,625 - INFO - [HaystackRAG] -         snippet: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la segu...
+2026-07-03 19:06:51,625 - INFO - [HaystackRAG] -   [2] score=0.5600 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:51,625 - INFO - [HaystackRAG] -         snippet: Guía de buenas prácticas de ciberseguridad para redes privadas 5G                              Guía de buenas prácticas de ciberseguridad para redes privadas 5G  Diciembre 2025  La presente publicació...
+2026-07-03 19:06:51,625 - INFO - [HaystackRAG] -   [3] score=0.5581 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:51,625 - INFO - [HaystackRAG] -         snippet: en las actividades de prevención, protección, detección y respuesta ante amenazas, incidentes y ciberataques que afecten a los sistemas, redes y servicios 5G.  1.8 Objetivos y estructura de la guía  E...
+2026-07-03 19:06:51,625 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] -         contenido: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena...
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] -         contenido: Guía de buenas prácticas de ciberseguridad para redes privadas 5G                              Guía de buenas prácticas de ciberseguridad para redes privadas 5G  Diciembre 2025  La presente publicación pertenece a INCIBE (Instituto Nacional de Ciberseguridad) y está bajo una licencia Atribución/ Rec...
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] -         contenido: en las actividades de prevención, protección, detección y respuesta ante amenazas, incidentes y ciberataques que afecten a los sistemas, redes y servicios 5G.  1.8 Objetivos y estructura de la guía  El objetivo de esta guía es proporcionar un marco de buenas prácticas, con un enfoque didáctico, pero...
+2026-07-03 19:06:51,626 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:06:51,966 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:06:51,967 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: que contexto tenés?
+ASSISTANT: No tengo contexto, parece que solo hay caracteres vacíos y espacios en blanco.
+USER: Puedes proporcionar más información sobre el contexto de seguridad de redes?
+ASSISTANT: La ciberseguridad en las redes 5G es crucial debido a la convergencia de tecnologías de información (TI) y telecomunicaciones, lo que amplía la superficie de ataque. La integración con infraestructuras críticas nacionales, como redes eléctricas, sistemas de transporte o instalaciones sanitarias, aumenta el impacto potencial de un ciberataque. La proliferación de dispositivos IoT con capacidades de seguridad limitadas crea puntos de entrada potenciales para atacantes. Por tanto, la ciberseguridad en redes 5G requiere un enfoque integral que incluya la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena de suministro de software, además del conocimiento de los estándares 3GPP.
+</chat_history>
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -   [1] score=0.6366 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -         snippet: como el tráfico y los registros de eventos generados por los distintos dispositivos. Esto facilita la detección de amenazas avanzadas persistentes (APT) y, en combinación con los sistemas de protecció...
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -   [2] score=0.6365 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -         snippet: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la segu...
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -   [3] score=0.6319 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -         snippet: complejos como en redes anteriores, la comunicación entre funciones en 5GC se realiza mayoritariamente a través de estas APIs, que suelen ser RESTful y emplear protocolos estándar de Internet como HTT...
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -         contenido: como el tráfico y los registros de eventos generados por los distintos dispositivos. Esto facilita la detección de amenazas avanzadas persistentes (APT) y, en combinación con los sistemas de protección ya instalados, mejora la capacidad de respuesta ante incidentes de seguridad.            Capítulo ...
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -         contenido: suministro del software. Por tanto, la ciberseguridad en redes 5G no puede abordarse únicamente desde el conocimiento de los estándares 3GPP; requiere también la aplicación de disciplinas como la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena...
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] -         contenido: complejos como en redes anteriores, la comunicación entre funciones en 5GC se realiza mayoritariamente a través de estas APIs, que suelen ser RESTful y emplear protocolos estándar de Internet como HTTP/2 sobre TCP/IP.            • Diseño Nativo en la Nube y Microservicios: Las funciones de red en 5G...
+2026-07-03 19:06:55,029 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:15,396 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:07:15,396 - INFO - [HaystackRAG] - Ejecutando RAG para: Explicame la vulnerabilidad CWE-89 y cómo prevenirla.
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -   [1] score=0.6313 | fuente=CWE-391
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditio...
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -   [2] score=0.6182 | fuente=CWE-1295
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-1295: Debug Messages Revealing Unnecessary Information Descripción: The product fails to adequately prevent the revealing of unnecessary and potentially sensitive system information...
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -   [3] score=0.6166 | fuente=CWE-290
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-290: Authentication Bypass by Spoofing Descripción: This attack-focused weakness is caused by incorrectly implemented authentication schemes that are subject to spoofing attacks....
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -   [1] fuente=CWE-391
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditions may allow an attacker to induce unexpected behavior unnoticed....
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -   [2] fuente=CWE-1295
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-1295: Debug Messages Revealing Unnecessary Information Descripción: The product fails to adequately prevent the revealing of unnecessary and potentially sensitive system information within debugging messages....
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -   [3] fuente=CWE-290
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-290: Authentication Bypass by Spoofing Descripción: This attack-focused weakness is caused by incorrectly implemented authentication schemes that are subject to spoofing attacks....
+2026-07-03 19:07:16,484 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:16,791 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:07:16,791 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: que contexto tenés?
+ASSISTANT: No tengo contexto, parece que solo hay caracteres vacíos y espacios en blanco.
+USER: Puedes proporcionar más información sobre el contexto de seguridad de redes?
+ASSISTANT: La ciberseguridad en las redes 5G es crucial debido a la convergencia de tecnologías de información (TI) y telecomunicaciones, lo que amplía la superficie de ataque. La integración con infraestructuras críticas nacionales, como redes eléctricas, sistemas de transporte o instalaciones sanitarias, aumenta el impacto potencial de un ciberataque. La proliferación de dispositivos IoT con capacidades de seguridad limitadas crea puntos de entrada potenciales para atacantes. Por tanto, la ciberseguridad en redes 5G requiere un enfoque integral que incluya la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena de suministro de software, además del conocimiento de los estándares 3GPP.
+USER: Explicame la vulnerabilidad CWE-89 y cómo prevenirla.
+ASSISTANT: Lo siento, pero no conozco la información sobre la vulnerabilidad CWE-89. Sin embargo, puedo sugerir que busques en una base de datos de vulnerabilidades conocida como CWE (Common Weakness Enumeration) o en otros recursos de seguridad informática para obtener información precisa sobre dicha vulnerabilidad.
+
+Si lo que deseas es información sobre cómo prevenir vulnerabilidades en general, puedo ofrecerte algunos consejos básicos:
+
+1. **Mantén actualizado tu sistema y aplicaciones**: Asegúrate de tener instaladas las últimas actualizaciones de seguridad.
+2. **Utiliza prácticas de codificación seguras**: Evita prácticas de codificación que puedan generar vulnerabilidades, como la inyección SQL o la ejecución de código malicioso.
+3. **Implementa autenticación y autorización adecuadas**: Asegúrate de que tus sistemas de autenticación y autorización sean robustos y estén correctamente implementados.
+4. **Realiza pruebas de seguridad**: Regularmente realiza pruebas de seguridad para identificar y corregir vulnerabilidades.
+
+Si necesitas información específica sobre una vulnerabilidad, te recomendaría buscar en fuentes confiables como CWE o NVD (National Vulnerability Database).
+</chat_history>
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -   [1] score=0.6413 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -         snippet: como el tráfico y los registros de eventos generados por los distintos dispositivos. Esto facilita la detección de amenazas avanzadas persistentes (APT) y, en combinación con los sistemas de protecció...
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -   [2] score=0.6400 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -         snippet: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contra...
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -   [3] score=0.6227 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -         snippet: 5G. Los pasos recomendados incluyen:  Análisis de requisitos de cumplimiento: Identificar las obligaciones legales y regulatorias aplicables, como el Reglamento General de Protección de Datos (GDPR) e...
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -         contenido: como el tráfico y los registros de eventos generados por los distintos dispositivos. Esto facilita la detección de amenazas avanzadas persistentes (APT) y, en combinación con los sistemas de protección ya instalados, mejora la capacidad de respuesta ante incidentes de seguridad.            Capítulo ...
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -   [2] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -         contenido: usar túneles VPN cifrados para proteger los datos en tránsito.  5. Políticas de contraseñas robustas  o Descripción:  Todas las cuentas de acceso a dispositivos de red y aplicaciones deben usar contraseñas fuertes para prevenir ataques de fuerza bruta o adivinación.  o Ejemplo:  Definir requisitos d...
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -   [3] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] -         contenido: 5G. Los pasos recomendados incluyen:  Análisis de requisitos de cumplimiento: Identificar las obligaciones legales y regulatorias aplicables, como el Reglamento General de Protección de Datos (GDPR) el Esquema Nacional de Seguridad (ENS, RD 311/2022) y el Esquema Nacional de Seguridad específico de ...
+2026-07-03 19:07:21,150 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:36,586 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:07:36,587 - INFO - [HaystackRAG] - Ejecutando RAG para: ¿Qué es un Cross-Site Scripting (XSS) según CWE y qué tipos existen?
+2026-07-03 19:07:37,783 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -   [1] score=0.7087 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -         snippet: vulnerabilidades de seguridad, hay un conjunto persistente de 15 que continúa desafiando a la comunidad de la ciberseguridad a lo largo del tiempo. Estas vulnerabilidades, que han sido identificadas y...
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -   [2] score=0.7073 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -         snippet: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Curre...
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -   [3] score=0.6797 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -         snippet: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberame...
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -         contenido: vulnerabilidades de seguridad, hay un conjunto persistente de 15 que continúa desafiando a la comunidad de la ciberseguridad a lo largo del tiempo. Estas vulnerabilidades, que han sido identificadas y clasificadas anualmente en el CWE Top 25 desde 2019 hasta 20231, representan fallos críticos que, a...
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -   [2] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -         contenido: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Current state of research on Cross-Site Scripting (XSS) – A systematic literature review, I Hydara, ABM S...
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] -         contenido: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberamenazas. La seguridad de las aplicaciones web, frente a vulnerabilidades como XSS, no es solo un desaf...
+2026-07-03 19:07:37,784 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:38,116 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:07:38,117 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: Puedes proporcionar más información sobre el contexto de seguridad de redes?
+ASSISTANT: La ciberseguridad en las redes 5G es crucial debido a la convergencia de tecnologías de información (TI) y telecomunicaciones, lo que amplía la superficie de ataque. La integración con infraestructuras críticas nacionales, como redes eléctricas, sistemas de transporte o instalaciones sanitarias, aumenta el impacto potencial de un ciberataque. La proliferación de dispositivos IoT con capacidades de seguridad limitadas crea puntos de entrada potenciales para atacantes. Por tanto, la ciberseguridad en redes 5G requiere un enfoque integral que incluya la seguridad de aplicaciones (AppSec), la seguridad en la nube (Cloud Security) y la seguridad de la cadena de suministro de software, además del conocimiento de los estándares 3GPP.
+USER: Explicame la vulnerabilidad CWE-89 y cómo prevenirla.
+ASSISTANT: Lo siento, pero no conozco la información sobre la vulnerabilidad CWE-89. Sin embargo, puedo sugerir que busques en una base de datos de vulnerabilidades conocida como CWE (Common Weakness Enumeration) o en otros recursos de seguridad informática para obtener información precisa sobre dicha vulnerabilidad.
+
+Si lo que deseas es información sobre cómo prevenir vulnerabilidades en general, puedo ofrecerte algunos consejos básicos:
+
+1. **Mantén actualizado tu sistema y aplicaciones**: Asegúrate de tener instaladas las últimas actualizaciones de seguridad.
+2. **Utiliza prácticas de codificación seguras**: Evita prácticas de codificación que puedan generar vulnerabilidades, como la inyección SQL o la ejecución de código malicioso.
+3. **Implementa autenticación y autorización adecuadas**: Asegúrate de que tus sistemas de autenticación y autorización sean robustos y estén correctamente implementados.
+4. **Realiza pruebas de seguridad**: Regularmente realiza pruebas de seguridad para identificar y corregir vulnerabilidades.
+
+Si necesitas información específica sobre una vulnerabilidad, te recomendaría buscar en fuentes confiables como CWE o NVD (National Vulnerability Database).
+USER: ¿Qué es un Cross-Site Scripting (XSS) según CWE y qué tipos existen?
+ASSISTANT: Según CWE (Common Weakness Enumeration), un Cross-Site Scripting (XSS) se define como una vulnerabilidad que ocurre cuando una aplicación web no logra neutralizar o sanitizar de forma segura la información suministrada por los usuarios antes de integrarla en el contenido de una página web que posteriormente es renderizada por el navegador.
+
+Existen varios tipos de XSS, aunque no se mencionan explícitamente en el texto proporcionado, generalmente se clasifican en:
+
+- Stored XSS (XSS almacenado): El script malicioso se almacena en la base de datos del servidor y se ejecuta cada vez que un usuario visita la página afectada.
+- Reflected XSS (XSS reflejado): El script malicioso se refleja desde el servidor web al navegador del usuario, sin ser almacenado en la base de datos.
+- DOM-based XSS (XSS basado en DOM): La vulnerabilidad se encuentra en el lado del cliente, donde el navegador (y no el servidor) procesa la entrada maliciosa.
+
+Sin embargo, dado que el texto no proporciona una clasificación detallada de los tipos de XSS según CWE, la definición general proporcionada es la información más precisa que se puede ofrecer.
+</chat_history>
+2026-07-03 19:07:44,352 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:44,352 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:07:44,352 - INFO - [HaystackRAG] -   [1] score=0.7197 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:44,352 - INFO - [HaystackRAG] -         snippet: vulnerabilidades de seguridad, hay un conjunto persistente de 15 que continúa desafiando a la comunidad de la ciberseguridad a lo largo del tiempo. Estas vulnerabilidades, que han sido identificadas y...
+2026-07-03 19:07:44,352 - INFO - [HaystackRAG] -   [2] score=0.7156 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:44,352 - INFO - [HaystackRAG] -         snippet: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberame...
+2026-07-03 19:07:44,352 - INFO - [HaystackRAG] -   [3] score=0.7025 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:44,352 - INFO - [HaystackRAG] -         snippet: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Curre...
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] -         contenido: vulnerabilidades de seguridad, hay un conjunto persistente de 15 que continúa desafiando a la comunidad de la ciberseguridad a lo largo del tiempo. Estas vulnerabilidades, que han sido identificadas y clasificadas anualmente en el CWE Top 25 desde 2019 hasta 20231, representan fallos críticos que, a...
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] -   [2] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] -         contenido: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberamenazas. La seguridad de las aplicaciones web, frente a vulnerabilidades como XSS, no es solo un desaf...
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] -         contenido: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Current state of research on Cross-Site Scripting (XSS) – A systematic literature review, I Hydara, ABM S...
+2026-07-03 19:07:44,353 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:08:05,980 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:08:05,980 - INFO - [HaystackRAG] - Ejecutando RAG para: ¿Qué técnicas de prevención de XSS aparecen tanto en el catálogo CWE como en el estudio de INCIBE?
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] -   [1] score=0.5297 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] -         snippet: Estudio Vulnerabilidades persistentes - XSS                  Marzo 2026  INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0  La presente publicación pertenece a INCIBE (Instituto Nacional de C...
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] -   [2] score=0.5282 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] -         snippet: contenido (CSP). Estos enfoques técnicos, junto con la implementación de prácticas de codificación segura y la utilización de herramientas avanzadas de análisis y pruebas, conforman un escudo que pued...
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] -   [3] score=0.5214 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] -         snippet: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Curre...
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:08:07,193 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:08:07,194 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:08:07,194 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:07,194 - INFO - [HaystackRAG] -         contenido: Estudio Vulnerabilidades persistentes - XSS                  Marzo 2026  INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0  La presente publicación pertenece a INCIBE (Instituto Nacional de Ciberseguridad) y está bajo una licencia Atribución/ Reconocimiento-NoComercial-CompartirIgual 4.0 In...
+2026-07-03 19:08:07,194 - INFO - [HaystackRAG] -   [2] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:07,194 - INFO - [HaystackRAG] -         contenido: contenido (CSP). Estos enfoques técnicos, junto con la implementación de prácticas de codificación segura y la utilización de herramientas avanzadas de análisis y pruebas, conforman un escudo que puede reducir la brecha contra las amenazas de XSS.  La capacitación continua en prácticas de desarrollo...
+2026-07-03 19:08:07,194 - INFO - [HaystackRAG] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:07,194 - INFO - [HaystackRAG] -         contenido: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Current state of research on Cross-Site Scripting (XSS) – A systematic literature review, I Hydara, ABM S...
+2026-07-03 19:08:07,194 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:08:07,517 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:08:07,518 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: Explicame la vulnerabilidad CWE-89 y cómo prevenirla.
+ASSISTANT: Lo siento, pero no conozco la información sobre la vulnerabilidad CWE-89. Sin embargo, puedo sugerir que busques en una base de datos de vulnerabilidades conocida como CWE (Common Weakness Enumeration) o en otros recursos de seguridad informática para obtener información precisa sobre dicha vulnerabilidad.
+
+Si lo que deseas es información sobre cómo prevenir vulnerabilidades en general, puedo ofrecerte algunos consejos básicos:
+
+1. **Mantén actualizado tu sistema y aplicaciones**: Asegúrate de tener instaladas las últimas actualizaciones de seguridad.
+2. **Utiliza prácticas de codificación seguras**: Evita prácticas de codificación que puedan generar vulnerabilidades, como la inyección SQL o la ejecución de código malicioso.
+3. **Implementa autenticación y autorización adecuadas**: Asegúrate de que tus sistemas de autenticación y autorización sean robustos y estén correctamente implementados.
+4. **Realiza pruebas de seguridad**: Regularmente realiza pruebas de seguridad para identificar y corregir vulnerabilidades.
+
+Si necesitas información específica sobre una vulnerabilidad, te recomendaría buscar en fuentes confiables como CWE o NVD (National Vulnerability Database).
+USER: ¿Qué es un Cross-Site Scripting (XSS) según CWE y qué tipos existen?
+ASSISTANT: Según CWE (Common Weakness Enumeration), un Cross-Site Scripting (XSS) se define como una vulnerabilidad que ocurre cuando una aplicación web no logra neutralizar o sanitizar de forma segura la información suministrada por los usuarios antes de integrarla en el contenido de una página web que posteriormente es renderizada por el navegador.
+
+Existen varios tipos de XSS, aunque no se mencionan explícitamente en el texto proporcionado, generalmente se clasifican en:
+
+- Stored XSS (XSS almacenado): El script malicioso se almacena en la base de datos del servidor y se ejecuta cada vez que un usuario visita la página afectada.
+- Reflected XSS (XSS reflejado): El script malicioso se refleja desde el servidor web al navegador del usuario, sin ser almacenado en la base de datos.
+- DOM-based XSS (XSS basado en DOM): La vulnerabilidad se encuentra en el lado del cliente, donde el navegador (y no el servidor) procesa la entrada maliciosa.
+
+Sin embargo, dado que el texto no proporciona una clasificación detallada de los tipos de XSS según CWE, la definición general proporcionada es la información más precisa que se puede ofrecer.
+USER: ¿Qué técnicas de prevención de XSS aparecen tanto en el catálogo CWE como en el estudio de INCIBE?
+ASSISTANT: No puedo proporcionar una respuesta específica a la pregunta sobre las técnicas de prevención de XSS que aparecen tanto en el catálogo CWE como en el estudio de INCIBE, ya que la información proporcionada no detalla explícitamente dichas técnicas. Sin embargo, puedo mencionar que el estudio de INCIBE y el catálogo CWE (Common Weakness Enumeration) generalmente abordan medidas de prevención para ataques de Cross-Site Scripting (XSS) que incluyen:
+
+1. **Validación y Sanitización de Entradas**: Asegurarse de que los datos introducidos por los usuarios sean válidos y libres de código malicioso.
+2. **Uso de Encoding**: Codificar los datos de salida para evitar que el navegador los interprete como código.
+3. **Content Security Policy (CSP)**: Implementar políticas de seguridad de contenido para definir qué fuentes de contenido son aprobadas.
+4. **Headers de Seguridad**: Configurar headers de seguridad en el servidor para protegerse contra ataques XSS.
+
+Para una respuesta más precisa, se necesitaría revisar directamente el contenido del estudio de INCIBE y las descripciones en el catálogo CWE relacionados con la prevención de XSS.
+</chat_history>
+2026-07-03 19:08:15,028 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:08:15,028 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -   [1] score=0.7260 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -         snippet: vulnerabilidades de seguridad, hay un conjunto persistente de 15 que continúa desafiando a la comunidad de la ciberseguridad a lo largo del tiempo. Estas vulnerabilidades, que han sido identificadas y...
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -   [2] score=0.7173 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -         snippet: las vulnerabilidades XSS más obvias y contribuye a que los equipos puedan identificar y abordar las vulnerabilidades antes de que el código llegue a producción.  Además, la realización de auditorías d...
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -   [3] score=0.7112 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -         snippet: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberame...
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -         contenido: vulnerabilidades de seguridad, hay un conjunto persistente de 15 que continúa desafiando a la comunidad de la ciberseguridad a lo largo del tiempo. Estas vulnerabilidades, que han sido identificadas y clasificadas anualmente en el CWE Top 25 desde 2019 hasta 20231, representan fallos críticos que, a...
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -   [2] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -         contenido: las vulnerabilidades XSS más obvias y contribuye a que los equipos puedan identificar y abordar las vulnerabilidades antes de que el código llegue a producción.  Además, la realización de auditorías de seguridad, tanto internamente como a través de terceros especializados, añade una capa adicional d...
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] -         contenido: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberamenazas. La seguridad de las aplicaciones web, frente a vulnerabilidades como XSS, no es solo un desaf...
+2026-07-03 19:08:15,029 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:51:06,491 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-03 19:51:31,488 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-03 19:51:31,716 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-03 19:51:31,784 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-03 19:51:31,785 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-03 19:51:31,785 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-03 19:51:34,506 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-03 19:51:35,024 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-03 19:51:35,024 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-03 19:51:35,099 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-03 19:51:35,100 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-03 19:51:35,100 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-03 19:51:35,100 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-03 19:51:36,073 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-03 19:51:36,346 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-03 19:51:36,346 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-03 19:52:22,878 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:52:22,878 - INFO - [HaystackRAG] - Ejecutando RAG para: dame un resumen del contexto
+2026-07-03 19:52:30,899 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -   [1] score=0.6186 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -         snippet:                                                         | Descripción                                                                                                                                   ...
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -   [2] score=0.5359 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -         snippet:                                                                                                                                 |...
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -   [3] score=0.5359 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -         snippet:                                                                                                                                                                                                     |   ...
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -   [1] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -         contenido:                                                         | Descripción                                                                                                                                               ...
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -   [2] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -         contenido:                                                                                                                                 |...
+2026-07-03 19:52:30,900 - INFO - [HaystackRAG] -   [3] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+2026-07-03 19:52:30,901 - INFO - [HaystackRAG] -         contenido:                                                                                                                                                                                                     |    ...
+2026-07-03 19:52:30,901 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:52:31,279 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 19:52:31,279 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: ¿Qué es un Cross-Site Scripting (XSS) según CWE y qué tipos existen?
+ASSISTANT: Según CWE (Common Weakness Enumeration), un Cross-Site Scripting (XSS) se define como una vulnerabilidad que ocurre cuando una aplicación web no logra neutralizar o sanitizar de forma segura la información suministrada por los usuarios antes de integrarla en el contenido de una página web que posteriormente es renderizada por el navegador.
+
+Existen varios tipos de XSS, aunque no se mencionan explícitamente en el texto proporcionado, generalmente se clasifican en:
+
+- Stored XSS (XSS almacenado): El script malicioso se almacena en la base de datos del servidor y se ejecuta cada vez que un usuario visita la página afectada.
+- Reflected XSS (XSS reflejado): El script malicioso se refleja desde el servidor web al navegador del usuario, sin ser almacenado en la base de datos.
+- DOM-based XSS (XSS basado en DOM): La vulnerabilidad se encuentra en el lado del cliente, donde el navegador (y no el servidor) procesa la entrada maliciosa.
+
+Sin embargo, dado que el texto no proporciona una clasificación detallada de los tipos de XSS según CWE, la definición general proporcionada es la información más precisa que se puede ofrecer.
+USER: ¿Qué técnicas de prevención de XSS aparecen tanto en el catálogo CWE como en el estudio de INCIBE?
+ASSISTANT: No puedo proporcionar una respuesta específica a la pregunta sobre las técnicas de prevención de XSS que aparecen tanto en el catálogo CWE como en el estudio de INCIBE, ya que la información proporcionada no detalla explícitamente dichas técnicas. Sin embargo, puedo mencionar que el estudio de INCIBE y el catálogo CWE (Common Weakness Enumeration) generalmente abordan medidas de prevención para ataques de Cross-Site Scripting (XSS) que incluyen:
+
+1. **Validación y Sanitización de Entradas**: Asegurarse de que los datos introducidos por los usuarios sean válidos y libres de código malicioso.
+2. **Uso de Encoding**: Codificar los datos de salida para evitar que el navegador los interprete como código.
+3. **Content Security Policy (CSP)**: Implementar políticas de seguridad de contenido para definir qué fuentes de contenido son aprobadas.
+4. **Headers de Seguridad**: Configurar headers de seguridad en el servidor para protegerse contra ataques XSS.
+
+Para una respuesta más precisa, se necesitaría revisar directamente el contenido del estudio de INCIBE y las descripciones en el catálogo CWE relacionados con la prevención de XSS.
+USER: dame un resumen del contexto
+ASSISTANT: No hay contexto proporcionado.
+</chat_history>
+2026-07-03 19:52:40,209 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:52:40,257 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 19:52:40,257 - INFO - [HaystackRAG] -   [1] score=0.7224 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:52:40,257 - INFO - [HaystackRAG] -         snippet: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Curre...
+2026-07-03 19:52:40,257 - INFO - [HaystackRAG] -   [2] score=0.7210 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:52:40,257 - INFO - [HaystackRAG] -         snippet: las vulnerabilidades XSS más obvias y contribuye a que los equipos puedan identificar y abordar las vulnerabilidades antes de que el código llegue a producción.  Además, la realización de auditorías d...
+2026-07-03 19:52:40,257 - INFO - [HaystackRAG] -   [3] score=0.7185 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:52:40,257 - INFO - [HaystackRAG] -         snippet: vulnerabilidades de seguridad, hay un conjunto persistente de 15 que continúa desafiando a la comunidad de la ciberseguridad a lo largo del tiempo. Estas vulnerabilidades, que han sido identificadas y...
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 0 documentos recuperados:
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 3 documentos enviados al prompt:
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] -   [1] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] -         contenido: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Current state of research on Cross-Site Scripting (XSS) – A systematic literature review, I Hydara, ABM S...
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] -   [2] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] -         contenido: las vulnerabilidades XSS más obvias y contribuye a que los equipos puedan identificar y abordar las vulnerabilidades antes de que el código llegue a producción.  Además, la realización de auditorías de seguridad, tanto internamente como a través de terceros especializados, añade una capa adicional d...
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] -         contenido: vulnerabilidades de seguridad, hay un conjunto persistente de 15 que continúa desafiando a la comunidad de la ciberseguridad a lo largo del tiempo. Estas vulnerabilidades, que han sido identificadas y clasificadas anualmente en el CWE Top 25 desde 2019 hasta 20231, representan fallos críticos que, a...
+2026-07-03 19:52:40,258 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:03:21,301 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-03 20:03:50,098 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-03 20:03:50,459 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-03 20:03:50,469 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-03 20:03:50,469 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-03 20:03:50,469 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-03 20:03:53,743 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-03 20:03:55,416 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-03 20:03:55,416 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-03 20:03:55,430 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-03 20:03:55,430 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-03 20:03:55,430 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-03 20:03:55,430 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-03 20:03:56,448 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-03 20:03:56,715 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-03 20:03:56,715 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-03 20:13:53,516 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 20:13:53,518 - INFO - [HaystackRAG] - Ejecutando RAG para: CWE-798 que es
+2026-07-03 20:13:53,518 - INFO - [HaystackRAG] - [KEYWORD QUERY] -> 'CWE-798'
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] -   [1] score=0.4309 | fuente=CWE-211
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-211: Externally-Generated Error Message Containing Sensitive Information Descripción: The product performs an operation that triggers an external diagnostic or error message that is...
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] -   [2] score=0.4291 | fuente=CWE-391
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditio...
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] -   [3] score=0.4206 | fuente=CWE-319
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniff...
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 1 documentos recuperados:
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] -   [1] score=0.1 | fuente=CWE-798
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-798: Use of Hard-coded Credentials Descripción: The product contains hard-coded credentials, such as a password or cryptographic key....
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 4 documentos enviados al prompt:
+2026-07-03 20:13:55,583 - INFO - [HaystackRAG] -   [1] fuente=CWE-798
+2026-07-03 20:13:55,584 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-798: Use of Hard-coded Credentials Descripción: The product contains hard-coded credentials, such as a password or cryptographic key....
+2026-07-03 20:13:55,584 - INFO - [HaystackRAG] -   [2] fuente=CWE-211
+2026-07-03 20:13:55,584 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-211: Externally-Generated Error Message Containing Sensitive Information Descripción: The product performs an operation that triggers an external diagnostic or error message that is not directly generated or controlled by the product, such as an error generated by the programming ...
+2026-07-03 20:13:55,584 - INFO - [HaystackRAG] -   [3] fuente=CWE-391
+2026-07-03 20:13:55,584 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditions may allow an attacker to induce unexpected behavior unnoticed....
+2026-07-03 20:13:55,584 - INFO - [HaystackRAG] -   [4] fuente=CWE-319
+2026-07-03 20:13:55,584 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-319: Cleartext Transmission of Sensitive Information Descripción: The product transmits sensitive or security-critical data in cleartext in a communication channel that can be sniffed by unauthorized actors....
+2026-07-03 20:13:55,584 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:13:56,322 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 20:13:56,323 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: ¿Qué técnicas de prevención de XSS aparecen tanto en el catálogo CWE como en el estudio de INCIBE?
+ASSISTANT: No puedo proporcionar una respuesta específica a la pregunta sobre las técnicas de prevención de XSS que aparecen tanto en el catálogo CWE como en el estudio de INCIBE, ya que la información proporcionada no detalla explícitamente dichas técnicas. Sin embargo, puedo mencionar que el estudio de INCIBE y el catálogo CWE (Common Weakness Enumeration) generalmente abordan medidas de prevención para ataques de Cross-Site Scripting (XSS) que incluyen:
+
+1. **Validación y Sanitización de Entradas**: Asegurarse de que los datos introducidos por los usuarios sean válidos y libres de código malicioso.
+2. **Uso de Encoding**: Codificar los datos de salida para evitar que el navegador los interprete como código.
+3. **Content Security Policy (CSP)**: Implementar políticas de seguridad de contenido para definir qué fuentes de contenido son aprobadas.
+4. **Headers de Seguridad**: Configurar headers de seguridad en el servidor para protegerse contra ataques XSS.
+
+Para una respuesta más precisa, se necesitaría revisar directamente el contenido del estudio de INCIBE y las descripciones en el catálogo CWE relacionados con la prevención de XSS.
+USER: dame un resumen del contexto
+ASSISTANT: No hay contexto proporcionado.
+USER: CWE-798 que es
+ASSISTANT: CWE-798 se refiere a "Uso de credenciales codificadas" (Use of Hard-coded Credentials). Describe una situación en la que un producto contiene credenciales codificadas, como una contraseña o una clave criptográfica.
+</chat_history>
+2026-07-03 20:13:56,323 - INFO - [HaystackRAG] - [KEYWORD QUERY] -> 'CWE-798'
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] -   [1] score=0.6642 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] -         snippet: las vulnerabilidades XSS más obvias y contribuye a que los equipos puedan identificar y abordar las vulnerabilidades antes de que el código llegue a producción.  Además, la realización de auditorías d...
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] -   [2] score=0.6575 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] -         snippet: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberame...
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] -   [3] score=0.6544 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] -         snippet: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Curre...
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 1 documentos recuperados:
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] -   [1] score=0.1 | fuente=CWE-798
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-798: Use of Hard-coded Credentials Descripción: The product contains hard-coded credentials, such as a password or cryptographic key....
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:00,969 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 4 documentos enviados al prompt:
+2026-07-03 20:14:00,970 - INFO - [HaystackRAG] -   [1] fuente=CWE-798
+2026-07-03 20:14:00,970 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-798: Use of Hard-coded Credentials Descripción: The product contains hard-coded credentials, such as a password or cryptographic key....
+2026-07-03 20:14:00,970 - INFO - [HaystackRAG] -   [2] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 20:14:00,970 - INFO - [HaystackRAG] -         contenido: las vulnerabilidades XSS más obvias y contribuye a que los equipos puedan identificar y abordar las vulnerabilidades antes de que el código llegue a producción.  Además, la realización de auditorías de seguridad, tanto internamente como a través de terceros especializados, añade una capa adicional d...
+2026-07-03 20:14:00,970 - INFO - [HaystackRAG] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 20:14:00,970 - INFO - [HaystackRAG] -         contenido: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberamenazas. La seguridad de las aplicaciones web, frente a vulnerabilidades como XSS, no es solo un desaf...
+2026-07-03 20:14:00,970 - INFO - [HaystackRAG] -   [4] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+2026-07-03 20:14:00,970 - INFO - [HaystackRAG] -         contenido: MITRE,https://cwe.mitre.org/data/definitions/79.html [Ref.- 4] Cross-site Scripting (XSS) cheat sheet, Portswigger, https://portswigger.net/websecurity/cross-site-scripting/cheat-sheet [Ref.- 5] Current state of research on Cross-Site Scripting (XSS) – A systematic literature review, I Hydara, ABM S...
+2026-07-03 20:14:00,970 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:33,902 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 20:14:33,902 - INFO - [HaystackRAG] - Ejecutando RAG para: Explicame la vulnerabilidad CWE-89 y cómo prevenirla.
+2026-07-03 20:14:33,902 - INFO - [HaystackRAG] - [KEYWORD QUERY] -> 'CWE-89'
+2026-07-03 20:14:35,682 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:35,682 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 20:14:35,682 - INFO - [HaystackRAG] -   [1] score=0.6313 | fuente=CWE-391
+2026-07-03 20:14:35,682 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditio...
+2026-07-03 20:14:35,682 - INFO - [HaystackRAG] -   [2] score=0.6182 | fuente=CWE-1295
+2026-07-03 20:14:35,682 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-1295: Debug Messages Revealing Unnecessary Information Descripción: The product fails to adequately prevent the revealing of unnecessary and potentially sensitive system information...
+2026-07-03 20:14:35,682 - INFO - [HaystackRAG] -   [3] score=0.6166 | fuente=CWE-290
+2026-07-03 20:14:35,682 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-290: Authentication Bypass by Spoofing Descripción: This attack-focused weakness is caused by incorrectly implemented authentication schemes that are subject to spoofing attacks....
+2026-07-03 20:14:35,682 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 1 documentos recuperados:
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -   [1] score=0.1 | fuente=CWE-89
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') Descripción: The product constructs all or part of an SQL command using externally-influence...
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 4 documentos enviados al prompt:
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -   [1] fuente=CWE-89
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') Descripción: The product constructs all or part of an SQL command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special el...
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -   [2] fuente=CWE-391
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-391: Unchecked Error Condition Descripción: [PLANNED FOR DEPRECATION. SEE MAINTENANCE NOTES AND CONSIDER CWE-252, CWE-248, OR CWE-1069.] Ignoring exceptions and other error conditions may allow an attacker to induce unexpected behavior unnoticed....
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -   [3] fuente=CWE-1295
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-1295: Debug Messages Revealing Unnecessary Information Descripción: The product fails to adequately prevent the revealing of unnecessary and potentially sensitive system information within debugging messages....
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -   [4] fuente=CWE-290
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-290: Authentication Bypass by Spoofing Descripción: This attack-focused weakness is caused by incorrectly implemented authentication schemes that are subject to spoofing attacks....
+2026-07-03 20:14:35,683 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:35,997 - INFO - [HaystackRAG] - Documentos en store al momento de la query: 965
+2026-07-03 20:14:35,998 - INFO - [HaystackRAG] - Ejecutando RAG para: ### Task:
+Suggest 3-5 relevant follow-up questions or prompts that the user might naturally ask next in this conversation as a **user**, based on the chat history, to help continue or deepen the discussion.
+### Guidelines:
+- Write all follow-up questions from the user’s point of view, directed to the assistant.
+- Make questions concise, clear, and directly related to the discussed topic(s).
+- Only suggest follow-ups that make sense given the chat content and do not repeat what was already covered.
+- If the conversation is very short or not specific, suggest more general (but relevant) follow-ups the user might ask.
+- Use the conversation's primary language; default to English if multilingual.
+- Response must be a JSON object with a "follow_ups" key containing an array of strings, no extra text or formatting.
+### Output:
+JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
+### Chat History:
+<chat_history>
+USER: dame un resumen del contexto
+ASSISTANT: No hay contexto proporcionado.
+USER: CWE-798 que es
+ASSISTANT: CWE-798 se refiere a "Uso de credenciales codificadas" (Use of Hard-coded Credentials). Describe una situación en la que un producto contiene credenciales codificadas, como una contraseña o una clave criptográfica.
+USER: Explicame la vulnerabilidad CWE-89 y cómo prevenirla.
+ASSISTANT: La vulnerabilidad CWE-89 se refiere a la falta de neutralización adecuada de elementos especiales utilizados en un comando SQL, lo que puede llevar a una inyección SQL (SQL Injection). Esto ocurre cuando un producto construye total o parcialmente un comando SQL utilizando entradas influenciadas externamente desde un componente aguas arriba, sin neutralizar o neutralizar incorrectamente los elementos especiales que podrían modificar el comando SQL previsto cuando se envía a un componente aguas abajo.
+
+Para prevenir la vulnerabilidad CWE-89, se pueden tomar las siguientes medidas:
+
+1. **Validación y saneamiento de entradas**: Verificar y limpiar adecuadamente todas las entradas de usuario para asegurarse de que no contengan caracteres especiales maliciosos que puedan ser interpretados como código SQL.
+
+2. **Uso de consultas parametrizadas**: Utilizar consultas SQL parametrizadas, que separan el código SQL de los datos de entrada. De esta manera, los datos se tratan como datos y no como parte del código SQL.
+
+3. **Uso de procedimientos almacenados**: Cuando sea posible, utilizar procedimientos almacenados para encapsular la lógica de acceso a la base de datos y reducir la exposición a ataques de inyección SQL.
+
+4. **Escapado de caracteres**: Si no es posible utilizar consultas parametrizadas, asegurarse de escapar adecuadamente los caracteres especiales en las entradas de usuario para evitar que sean interpretados como código SQL.
+
+5. **Limitar los privilegios de la base de datos**: Asegurarse de que la cuenta de usuario utilizada por la aplicación tenga solo los privilegios necesarios para realizar sus funciones, limitando así el daño potencial en caso de una inyección SQL exitosa.
+
+6. **Monitoreo y auditoría**: Regularmente monitorear y auditar la actividad de la base de datos para detectar y responder a posibles ataques de inyección SQL.
+
+Al implementar estas medidas, se puede reducir significativamente el riesgo de vulnerabilidad CWE-89 y proteger la aplicación contra ataques de inyección SQL.
+</chat_history>
+2026-07-03 20:14:35,998 - INFO - [HaystackRAG] - [KEYWORD QUERY] -> 'CWE-798'
+2026-07-03 20:14:42,654 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:42,654 - INFO - [HaystackRAG] - [EMBEDDING RETRIEVER] 3 documentos recuperados:
+2026-07-03 20:14:42,654 - INFO - [HaystackRAG] -   [1] score=0.6109 | fuente=CWE-564
+2026-07-03 20:14:42,654 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-564: SQL Injection: Hibernate Descripción: Using Hibernate to execute a dynamic SQL statement built with user-controlled input can allow an attacker to modify the statement's meanin...
+2026-07-03 20:14:42,654 - INFO - [HaystackRAG] -   [2] score=0.6063 | fuente=CWE-89
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') Descripción: The product constructs all or part of an SQL command using externally-influence...
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -   [3] score=0.5953 | fuente=CWE-1067
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-1067: Excessive Execution of Sequential Searches of Data Resource Descripción: The product contains a data query against an SQL table or view 					that is configured in a way that d...
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] - [KEYWORD RETRIEVER] 1 documentos recuperados:
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -   [1] score=0.1 | fuente=CWE-798
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -         snippet: Vulnerabilidad CWE-798: Use of Hard-coded Credentials Descripción: The product contains hard-coded credentials, such as a password or cryptographic key....
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] - [DOCUMENT JOINER] 4 documentos enviados al prompt:
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -   [1] fuente=CWE-798
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-798: Use of Hard-coded Credentials Descripción: The product contains hard-coded credentials, such as a password or cryptographic key....
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -   [2] fuente=CWE-564
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-564: SQL Injection: Hibernate Descripción: Using Hibernate to execute a dynamic SQL statement built with user-controlled input can allow an attacker to modify the statement's meaning or to execute arbitrary SQL commands....
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -   [3] fuente=CWE-89
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') Descripción: The product constructs all or part of an SQL command using externally-influenced input from an upstream component, but it does not neutralize or incorrectly neutralizes special el...
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -   [4] fuente=CWE-1067
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-1067: Excessive Execution of Sequential Searches of Data Resource Descripción: The product contains a data query against an SQL table or view 					that is configured in a way that does not utilize an index and may cause 					sequential searches to be performed....
+2026-07-03 20:14:42,655 - INFO - [HaystackRAG] - ------------------------------------------------------------
