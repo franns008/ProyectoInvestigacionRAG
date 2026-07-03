@@ -1,7 +1,7 @@
 """
 title: Rag de Ciberseguridad
 author: Valentino, Miguel y Luca
-version: 1.3
+version: 1.4
 requirements: haystack-ai, pgvector-haystack, ollama-haystack, pypdf, python-docx, markdown-it-py, mdit-plain
 """
 
@@ -27,7 +27,10 @@ _torch.nn.utils.rnn.pad_sequence = _patched_pad_sequence
 from typing import List, Union, Generator, Iterator
 from pathlib import Path
 from pydantic import BaseModel
+import hashlib
+import json
 import logging
+import re
 
 # Configurar el logger específico para nuestra app
 logger = logging.getLogger("HaystackRAG")
@@ -80,6 +83,241 @@ Context:
 Question: {{question}}
 Answer:
 """
+
+
+# ======================================================================
+# Converters de fuentes de ciberseguridad → haystack.Document
+#
+# Ambos producen documentos ATÓMICOS (un CWE / un CVE = un Document, con id
+# determinístico). NO se chunkean con el DocumentSplitter y se deduplican por
+# id, a diferencia de PDFs/DOCX/MD/TXT. Ver docs/indexing_design_capa1.md.
+# ======================================================================
+
+class XMLCWEConverter:
+    """XML de MITRE (esquema CWE, namespace cwe-7) → un Document por Weakness."""
+
+    def run(self, sources: list[Path]):
+        import xml.etree.ElementTree as ET
+        from haystack import Document
+
+        documents = []
+        skipped = 0
+        ns = {'cwe': 'http://cwe.mitre.org/cwe-7'}
+
+        for file_path in sources:
+            try:
+                tree = ET.parse(file_path)
+            except ET.ParseError as e:
+                logger.error(f"[XMLCWE] No se pudo parsear {file_path.name}: {e}")
+                continue
+
+            root = tree.getroot()
+
+            for weakness in root.findall('.//cwe:Weakness', ns):
+                cwe_id = weakness.get('ID')
+                name = weakness.get('Name')
+
+                # Si falta el ID, no podemos generar un doc.id único ni confiable — se descarta
+                if not cwe_id:
+                    skipped += 1
+                    continue
+
+                desc_elem = weakness.find('cwe:Description', ns)
+                description = self._extract_text(desc_elem)
+
+                # Fallback: si Description viene vacía, probamos con Extended_Description
+                if not description:
+                    ext_elem = weakness.find('cwe:Extended_Description', ns)
+                    description = self._extract_text(ext_elem)
+
+                name = (name or "").strip()
+                description = (description or "").strip()
+
+                content = f"Vulnerabilidad CWE-{cwe_id}: {name}\nDescripción: {description}".strip()
+
+                # Filtro de calidad: descarta chunks sin sustancia real
+                # (sin nombre Y sin descripción, o contenido alfanumérico insuficiente)
+                alnum_chars = sum(c.isalnum() for c in content)
+                if alnum_chars < 20:
+                    logger.warning(
+                        f"[XMLCWE] Descartado CWE-{cwe_id} por contenido insuficiente "
+                        f"(alnum_chars={alnum_chars}): '{content[:80]}'"
+                    )
+                    skipped += 1
+                    continue
+
+                doc = Document(
+                    id=f"cwe-{cwe_id}",
+                    content=content,
+                    meta={
+                        "source_type": "cwe_weakness",
+                        "source": f"CWE-{cwe_id}",
+                        "cwe_id": int(cwe_id) if cwe_id.isdigit() else cwe_id,
+                        "name": name or "Sin nombre",
+                        "source_file": str(file_path),
+                    }
+                )
+                documents.append(doc)
+
+        logger.info(
+            f"[XMLCWE] {len(documents)} documentos CWE generados, "
+            f"{skipped} descartados por datos insuficientes."
+        )
+        return {"documents": documents}
+
+    @staticmethod
+    def _extract_text(elem) -> str:
+        """
+        Extrae todo el texto de un elemento XML, incluyendo el de sub-tags anidados
+        (ej. <xhtml:p>, <xhtml:div> dentro de <Description>). A diferencia de
+        elem.text (que solo trae el texto directo del nodo), esto recorre todo
+        el árbol y concatena cada fragmento de texto encontrado.
+        """
+        if elem is None:
+            return ""
+        parts = [t.strip() for t in elem.itertext() if t and t.strip()]
+        return " ".join(parts)
+
+
+# --- NVD CVE (JSON) → Document ---------------------------------------------
+# Portado de src/ingestion/index_nvd.py (rama ciber-fetching-turco): SOLO la
+# lógica de conversión. El embedding/escritura a pgvector lo hace el pipeline.
+CWE_RE = re.compile(r"^CWE-\d+$")
+
+
+def _english_description(cve: dict) -> str:
+    """Descripción en inglés (lo único que se embebe). Fallback: la primera que haya."""
+    descriptions = cve.get("descriptions", [])
+    for d in descriptions:
+        if d.get("lang") == "en":
+            return d.get("value", "")
+    return descriptions[0].get("value", "") if descriptions else ""
+
+
+def _cvss(metrics: dict) -> dict:
+    """Extrae score/vector/severity. Prioriza v3.1 > v3.0 para 'v3', guarda v2 aparte.
+
+    Cada métrica en el JSON de NVD es una LISTA; tomamos el primer elemento
+    (habitualmente el 'Primary' de nvd@nist.gov).
+    """
+    out = {
+        "cvss_v3_score": None, "cvss_v3_vector": None,
+        "cvss_v2_score": None, "cvss_v2_vector": None,
+        "severity": None,
+    }
+    for key in ("cvssMetricV31", "cvssMetricV30"):
+        entries = metrics.get(key)
+        if entries:
+            data = entries[0].get("cvssData", {})
+            out["cvss_v3_score"] = data.get("baseScore")
+            out["cvss_v3_vector"] = data.get("vectorString")
+            out["severity"] = data.get("baseSeverity") or entries[0].get("baseSeverity")
+            break
+    entries_v2 = metrics.get("cvssMetricV2")
+    if entries_v2:
+        data = entries_v2[0].get("cvssData", {})
+        out["cvss_v2_score"] = data.get("baseScore")
+        out["cvss_v2_vector"] = data.get("vectorString")
+        if out["severity"] is None:
+            out["severity"] = entries_v2[0].get("baseSeverity")
+    return out
+
+
+def _vendors_products(cve: dict) -> tuple[list[str], list[str]]:
+    """Vendors y productos únicos, parseados de los CPE de configurations.
+
+    CPE 2.3 = cpe:2.3:<part>:<vendor>:<product>:<version>:...  (índices 3 y 4).
+    """
+    vendors, products = set(), set()
+    for config in cve.get("configurations", []):
+        for node in config.get("nodes", []):
+            for match in node.get("cpeMatch", []):
+                parts = match.get("criteria", "").split(":")
+                if len(parts) > 4:
+                    vendor, product = parts[3], parts[4]
+                    if vendor and vendor != "*":
+                        vendors.add(vendor)
+                    if product and product != "*":
+                        products.add(product)
+    return sorted(vendors), sorted(products)
+
+
+def _cwe_ids(cve: dict) -> list[str]:
+    ids = set()
+    for weakness in cve.get("weaknesses", []):
+        for desc in weakness.get("description", []):
+            value = desc.get("value", "")
+            if CWE_RE.match(value):
+                ids.add(value)
+    return sorted(ids)
+
+
+def cve_to_document(cve: dict):
+    """Convierte un objeto 'cve' crudo de NVD en un Document de Haystack.
+
+    Devuelve None si el CVE no tiene descripción utilizable (nada que embeber).
+    """
+    from haystack import Document
+
+    cve_id = cve.get("id")
+    description = _english_description(cve)
+    if not cve_id or not description.strip():
+        return None
+
+    vendors, products = _vendors_products(cve)
+    meta = {
+        "source_type": "nvd_cve",
+        "source": cve_id,
+        "cve_id": cve_id,
+        "published_date": cve.get("published"),
+        "last_modified": cve.get("lastModified"),
+        "vendors": vendors,
+        "products": products,
+        "cwe_ids": _cwe_ids(cve),
+        "references": [r.get("url") for r in cve.get("references", []) if r.get("url")],
+        **_cvss(cve.get("metrics", {})),
+    }
+    # id determinístico: reindexar el mismo CVE actualiza la fila, no la duplica.
+    doc_id = hashlib.sha256(cve_id.encode()).hexdigest()
+    return Document(id=doc_id, content=description, meta=meta)
+
+
+class NVDJsonConverter:
+    """Páginas JSON crudas de la NVD (cves_page_*.json de fetch_nvd.py) → un
+    Document atómico por CVE. Ante un CVE repetido entre páginas, gana el de
+    lastModified más reciente."""
+
+    def run(self, sources: list[Path]):
+        by_id: dict[str, dict] = {}
+        for path in sources:
+            try:
+                data = json.loads(Path(path).read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError) as e:
+                logger.error(f"[NVD] No se pudo leer {Path(path).name}: {e}")
+                continue
+            for entry in data.get("vulnerabilities", []):
+                cve = entry.get("cve", {})
+                cve_id = cve.get("id")
+                if not cve_id:
+                    continue
+                prev = by_id.get(cve_id)
+                if prev is None or cve.get("lastModified", "") >= prev.get("lastModified", ""):
+                    by_id[cve_id] = cve
+
+        documents = []
+        skipped = 0
+        for cve in by_id.values():
+            doc = cve_to_document(cve)
+            if doc is None:
+                skipped += 1
+                continue
+            documents.append(doc)
+
+        logger.info(
+            f"[NVD] {len(documents)} documentos CVE generados, "
+            f"{skipped} descartados por falta de descripción."
+        )
+        return {"documents": documents}
 
 
 class Pipeline:
@@ -240,8 +478,16 @@ class Pipeline:
     # Carga de documentos locales
     # ------------------------------------------------------------------
 
-    def _load_local_documents(self) -> list[Document]:
-        docs: list[Document] = []
+    def _load_local_documents(self) -> tuple[list[Document], list[Document]]:
+        """Devuelve (splittables, atomicos).
+
+        - splittables: PDF/DOCX/MD/TXT → se chunkean con DocumentSplitter y se
+          deduplican por (file_path, _split_id).
+        - atomicos:    CWE (XML) y CVE (JSON) → id determinístico, NO se chunkean
+          y se deduplican por id. Ver docs/indexing_design_capa1.md.
+        """
+        splittable: list[Document] = []
+        atomic: list[Document] = []
 
         # --- PDFs: convertir primero a .md con marker-pdf ---
         pdf_files = list(INPUT_DIR.glob("*.pdf"))
@@ -263,7 +509,7 @@ class Pipeline:
                     # funcione igual que antes (basada en el archivo fuente real)
                     doc.meta["file_path"] = str(original_pdf)
                     doc.meta["source"]    = original_pdf.name
-                docs.extend(result["documents"])
+                splittable.extend(result["documents"])
 
         # --- DOCX, MD nativo y TXT: misma lógica que antes ---
         other_converters = [
@@ -277,9 +523,20 @@ class Pipeline:
             if not files:
                 continue
             result = converter.run(sources=files)
-            docs.extend(result["documents"])
+            splittable.extend(result["documents"])
 
-        return docs
+        # --- XML de CWE → Documents atómicos (esquema MITRE cwe-7) ---
+        xml_files = [f for f in INPUT_DIR.glob("*.xml") if f.parent == INPUT_DIR]
+        if xml_files:
+            atomic.extend(XMLCWEConverter().run(sources=xml_files)["documents"])
+
+        # --- JSON de CVE (NVD) → Documents atómicos ---
+        # fetch_nvd.py deja las páginas en rawdata/nvd/<corrida>/cves_page_*.json
+        cve_files = sorted(INPUT_DIR.rglob("cves_page_*.json"))
+        if cve_files:
+            atomic.extend(NVDJsonConverter().run(sources=cve_files)["documents"])
+
+        return splittable, atomic
 
     # ------------------------------------------------------------------
     # Indexación incremental
@@ -290,36 +547,56 @@ class Pipeline:
             logger.error(f"Directorio de entrada no encontrado: {INPUT_DIR}")
             return
 
-        docs = self._load_local_documents()
-        if not docs:
+        splittable_docs, atomic_docs = self._load_local_documents()
+        if not splittable_docs and not atomic_docs:
             logger.warning("No se encontraron documentos en rawdata/")
             return
 
-        splitter = DocumentSplitter(
-            split_by="word",
-            split_length=self.valves.split_length,
-            split_overlap=self.valves.split_overlap,
-        )
-        docs = splitter.run(documents=docs)["documents"]
+        # Solo los splittables (PDF/DOCX/MD/TXT) se chunkean. Los atómicos
+        # (CWE/CVE) ya vienen dimensionados y con id determinístico.
+        if splittable_docs:
+            splitter = DocumentSplitter(
+                split_by="word",
+                split_length=self.valves.split_length,
+                split_overlap=self.valves.split_overlap,
+            )
+            splittable_docs = splitter.run(documents=splittable_docs)["documents"]
 
+        stored = self.store.filter_documents()
+
+        # Dedup de splittables: por (file_path, _split_id), como antes.
         existing_keys = {
             (doc.meta.get("file_path"), doc.meta.get("_split_id"))
-            for doc in self.store.filter_documents()
+            for doc in stored
             if doc.meta.get("file_path") is not None
         }
-
-        new_docs = [
-            doc for doc in docs
+        new_splittable = [
+            doc for doc in splittable_docs
             if (doc.meta.get("file_path"), doc.meta.get("_split_id")) not in existing_keys
         ]
 
+        # Dedup de atómicos: por id determinístico. Evita re-embeber en cada
+        # arranque (contra el store) Y colapsa el mismo CWE repetido entre varios
+        # catálogos XML dentro del mismo batch (gana la primera aparición).
+        seen_ids = {doc.id for doc in stored}
+        new_atomic = []
+        for doc in atomic_docs:
+            if doc.id in seen_ids:
+                continue
+            seen_ids.add(doc.id)
+            new_atomic.append(doc)
+
+        new_docs = new_splittable + new_atomic
         if not new_docs:
             logger.info("Sin documentos nuevos para indexar.")
-            total = len(self.store.filter_documents())
+            total = len(stored)
             logger.info(f"Total de documentos en el store: {total}")
             return
 
-        logger.info(f"Embedding de {len(new_docs)} documentos nuevos...")
+        logger.info(
+            f"Embedding de {len(new_docs)} documentos nuevos "
+            f"({len(new_splittable)} chunks + {len(new_atomic)} atómicos)..."
+        )
         doc_embedder = OllamaDocumentEmbedder(
             model=self.valves.embedding_model,
             url=OLLAMA_URL,
@@ -331,7 +608,7 @@ class Pipeline:
             policy=DuplicatePolicy.OVERWRITE,
         )
         total = len(self.store.filter_documents())
-        logger.info(f"Indexación completa: {len(new_docs)} chunks agregados.")
+        logger.info(f"Indexación completa: {len(new_docs)} documentos agregados.")
         logger.info(f"Total de documentos en el store: {total}")
 
     # ------------------------------------------------------------------
