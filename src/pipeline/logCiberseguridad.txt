@@ -1145,3 +1145,10 @@ Al implementar estas medidas, se puede reducir significativamente el riesgo de v
 2026-07-08 00:23:43,791 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
 2026-07-08 00:23:44,061 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
 2026-07-08 00:23:44,061 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-09 13:53:43,528 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-09 13:54:29,997 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-09 13:54:30,321 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-09 13:54:30,323 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-09 13:54:30,323 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-09 13:54:30,323 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-09 13:54:34,445 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.

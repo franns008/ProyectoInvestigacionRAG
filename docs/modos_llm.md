@@ -23,9 +23,9 @@ Dos ejes **ortogonales** e independientes:
 No hay Makefile ni scripts: el modo se elige con una variable en `.env`, así funciona
 igual en **Windows y Linux** (`docker compose` es idéntico en ambos).
 
-## Cómo cambiar de modo
+## Configuración del modo (variables)
 
-Se controla con dos variables en `infrastructure/.env` (plantilla en
+El modo se controla con dos variables en `infrastructure/.env` (plantilla en
 `infrastructure/.env.example`):
 
 ```dotenv
@@ -39,38 +39,98 @@ LLM_MODEL=               # vacío = default por proveedor
   - groq → el del pipeline (`meta-llama/llama-4-scout-17b-16e-instruct`).
   - ollama → `qwen2.5:3b-instruct` (~2 GB VRAM, bilingüe ES/EN).
 
-## Levantar la infra
+## Levantar la infra — paso a paso
 
-Desde `infrastructure/`. Copiar primero la plantilla: `cp .env.example .env` y editar.
-
-### Modo API Key (Groq) — cualquier máquina, CPU
+Todos los comandos se corren **parados en `infrastructure/`**:
 
 ```bash
-# .env:  LLM_PROVIDER=groq   +   GROQ_API_KEY=<tu key de Groq>
-docker compose up -d --build
-docker compose exec ollama ollama pull bge-m3     # embeddings (una vez)
+cd infrastructure
 ```
 
-### Modo Ollama local — GPU Nvidia
+Elegí UNO de los dos modos.
 
-```bash
-# .env:  LLM_PROVIDER=ollama   +   LLM_MODEL=qwen2.5:3b-instruct   (GROQ_API_KEY vacío)
-docker compose -f docker-compose.yml -f docker-compose.nvidia.yml up -d --build
+---
 
-# Modelos en Ollama (una vez):
-docker compose exec ollama ollama pull bge-m3               # embeddings
-docker compose exec ollama ollama pull qwen2.5:3b-instruct  # LLM de generación
-```
+### 🅰️ Modo API Key (Groq) — cualquier máquina, CPU
+
+Para quienes no corren modelos locales. La generación va a Groq; sólo los embeddings
+corren local (CPU alcanza).
+
+1. **Crear el `.env`** (si no existe):
+   ```bash
+   cp .env.example .env
+   ```
+2. **Editar `.env`** y dejar:
+   ```dotenv
+   LLM_PROVIDER=groq
+   GROQ_API_KEY=<tu key de https://console.groq.com/keys>
+   ```
+   (El resto de credenciales usan defaults del compose — no hace falta tocarlas.)
+3. **Levantar el stack** (la primera vez buildea la imagen, tarda):
+   ```bash
+   docker compose up -d --build
+   ```
+4. **Descargar el modelo de embeddings** en Ollama (una sola vez):
+   ```bash
+   docker compose exec ollama ollama pull bge-m3
+   ```
+5. **Usar el RAG**: abrí OpenWebUI en `http://localhost:8180` y elegí el modelo
+   *"RAG ciberseguridad"* en el selector.
+
+---
+
+### 🅱️ Modo Ollama local (Nvidia) — GPU
+
+Para quienes tienen GPU Nvidia. La generación **y** los embeddings corren locales;
+no se usa Groq. Requiere `nvidia-container-toolkit` instalado en el host.
+
+1. **Crear el `.env`** (si no existe):
+   ```bash
+   cp .env.example .env
+   ```
+2. **Editar `.env`** y dejar:
+   ```dotenv
+   LLM_PROVIDER=ollama
+   LLM_MODEL=qwen2.5:3b-instruct
+   # GROQ_API_KEY podés dejarla vacía o sin poner
+   ```
+3. **Levantar el stack con el overlay de GPU** (primera vez buildea con CUDA, tarda):
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.nvidia.yml up -d --build
+   ```
+4. **Descargar los modelos** en Ollama (una sola vez): embeddings **y** el LLM:
+   ```bash
+   docker compose exec ollama ollama pull bge-m3
+   docker compose exec ollama ollama pull qwen2.5:3b-instruct
+   ```
+   > Si en el paso 2 pusiste otro `LLM_MODEL`, descargá **ese** en vez de
+   > `qwen2.5:3b-instruct`.
+5. **Usar el RAG**: abrí OpenWebUI en `http://localhost:8180` y elegí el modelo
+   *"RAG ciberseguridad"* en el selector.
 
 > El overlay `docker-compose.nvidia.yml` reserva la GPU para `ollama` y `pipelines`
-> y buildea torch con CUDA. Requiere `nvidia-container-toolkit` en el host. Detalles
-> en [`docs/arquitectura_groq.md`](arquitectura_groq.md) §7.1.
+> y buildea torch con CUDA. Detalles en [`docs/arquitectura_groq.md`](arquitectura_groq.md) §7.1.
 
-Luego se usa el RAG desde OpenWebUI en `http://localhost:${OWEBUI_PORT:-8180}` en
-ambos modos, igual que siempre.
+---
 
-> **Nota:** `ollama` sin GPU funciona pero es lento; el modo local está pensado para
-> Nvidia. Si no tenés GPU, usá el modo API Key.
+### Cambiar de modo o parar
+
+- **Cambiar de modo** (ej. de groq a ollama): editá `LLM_PROVIDER` en `.env` y
+  **recreá** el stack con el `up` del modo destino (las env vars se leen al arrancar):
+  ```bash
+  docker compose up -d           # (o con el overlay -f nvidia según el modo)
+  ```
+- **Ver logs de la generación**: `docker compose logs -f pipelines` o el archivo
+  `src/pipeline/logCiberseguridad.txt`.
+- **Parar** todo sin borrar datos: `docker compose down`.
+- **Reset total** (borra la base y hay que reindexar): `docker compose down -v`.
+
+> **Notas**
+> - "Una sola vez" = el `ollama pull` persiste en el volumen `ollama_data`; no hay
+>   que repetirlo salvo que borres el volumen.
+> - `ollama` sin GPU funciona pero es lento; el modo local está pensado para Nvidia.
+>   Si no tenés GPU, usá el modo API Key.
+> - Si `8180` está ocupado, cambiá `OWEBUI_PORT` en `.env` (ver puertos opcionales).
 
 ## Cómo funciona por dentro
 
