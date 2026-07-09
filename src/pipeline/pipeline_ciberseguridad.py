@@ -30,6 +30,7 @@ from pydantic import BaseModel
 import hashlib
 import json
 import logging
+import os
 import re
 
 # Configurar el logger específico para nuestra app
@@ -59,6 +60,7 @@ from haystack.components.converters import (
 )
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder, OllamaDocumentEmbedder
 from haystack.components.generators.openai import OpenAIGenerator
+from haystack_integrations.components.generators.ollama import OllamaGenerator
 from haystack.document_stores.types import DuplicatePolicy
 
 # --- Configuración fija de infraestructura ---
@@ -69,6 +71,15 @@ DB_TABLE            = "ciberseguridad_docs"
 EMBEDDING_DIMENSION = 1024
 INPUT_DIR           = Path("/app/pipelines/rawdata")
 CONVERTED_DIR       = INPUT_DIR / "_converted_md"   # caché de PDFs ya convertidos
+
+# --- Proveedor del LLM de generación (ver docs/modos_llm.md) ---
+# El repo soporta dos modos de generación, elegidos con la env var LLM_PROVIDER:
+#   - "groq"   (default): generación por API (Groq, endpoint OpenAI-compatible).
+#                         Corre en cualquier máquina (CPU); requiere GROQ_API_KEY.
+#   - "ollama"          : generación local en Ollama (orientado a GPU Nvidia).
+#                         No requiere GROQ_API_KEY. El modelo se elige con LLM_MODEL.
+# Los EMBEDDINGS siempre son locales en Ollama (bge-m3) en ambos modos.
+DEFAULT_OLLAMA_LLM  = "qwen2.5:3b-instruct"   # ~2 GB VRAM; override con LLM_MODEL
 
 PROMPT_TEMPLATE = """
 You are a cybersecurity assistant. Answer strictly from the provided context.
@@ -464,11 +475,55 @@ def get_document_store() -> PgvectorDocumentStore:
     )
 
 
+def _llm_provider() -> str:
+    """Proveedor de generación activo: 'groq' (default) u 'ollama'. Ver docs/modos_llm.md."""
+    return os.getenv("LLM_PROVIDER", "groq").strip().lower()
+
+
+def build_generator(valves):
+    """Devuelve el generador del LLM según LLM_PROVIDER (leído en tiempo de build, para
+    que on_valves_updated y el eval headless respeten el modo activo).
+
+    - groq   (default): OpenAIGenerator contra el endpoint OpenAI-compatible de Groq.
+                        Sólo aquí se lee GROQ_API_KEY (Secret) → el modo ollama no la exige.
+    - ollama          : OllamaGenerator local. Modelo = LLM_MODEL o DEFAULT_OLLAMA_LLM.
+    """
+    v = valves
+    provider = _llm_provider()
+
+    if provider == "ollama":
+        model = os.getenv("LLM_MODEL") or DEFAULT_OLLAMA_LLM
+        return OllamaGenerator(
+            model=model,
+            url=OLLAMA_URL,
+            timeout=120,   # generación local puede tardar más que la API
+            generation_kwargs={
+                "num_predict": v.max_tokens,   # Ollama usa num_predict, no max_tokens
+                "temperature": v.temperature,
+            },
+        )
+
+    # Default: Groq (API Key). LLM_MODEL puede overridear el valve si se quiere.
+    model = os.getenv("LLM_MODEL") or v.llm_model
+    return OpenAIGenerator(
+        api_key=Secret.from_env_var("GROQ_API_KEY"),
+        api_base_url=GROQ_BASE_URL,
+        model=model,
+        max_retries=5,      # default 2 — el cliente respeta el retry-after de Groq ante 429
+        timeout=60.0,
+        generation_kwargs={
+            "max_tokens":  v.max_tokens,
+            "temperature": v.temperature,
+        },
+    )
+
+
 def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline:
     """Arma el pipeline de query: retrievers híbridos + joiner (RRF) + prompt + LLM.
 
     `valves` es cualquier objeto con los atributos de Pipeline.Valves que usa el
     pipeline: embedding_model, retriever_top_k, llm_model, max_tokens, temperature.
+    El generador (Groq o Ollama local) lo elige build_generator según LLM_PROVIDER.
     """
     v = valves
     pipeline = HaystackPipeline()
@@ -480,17 +535,7 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline
         join_mode="reciprocal_rank_fusion",
     ))
     pipeline.add_component("prompt_builder",      PromptBuilder(template=PROMPT_TEMPLATE))
-    pipeline.add_component("llm", OpenAIGenerator(
-        api_key=Secret.from_env_var("GROQ_API_KEY"),
-        api_base_url=GROQ_BASE_URL,
-        model=v.llm_model,
-        max_retries=5,      # default 2 — el cliente respeta el retry-after de Groq ante 429
-        timeout=60.0,
-        generation_kwargs={
-            "max_tokens":  v.max_tokens,
-            "temperature": v.temperature,
-        },
-    ))
+    pipeline.add_component("llm", build_generator(v))
 
     pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
     pipeline.connect("embedding_retriever",     "document_joiner")

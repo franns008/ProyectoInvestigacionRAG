@@ -1129,3 +1129,19 @@ Al implementar estas medidas, se puede reducir significativamente el riesgo de v
 2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -   [4] fuente=CWE-1067
 2026-07-03 20:14:42,655 - INFO - [HaystackRAG] -         contenido: Vulnerabilidad CWE-1067: Excessive Execution of Sequential Searches of Data Resource Descripción: The product contains a data query against an SQL table or view 					that is configured in a way that does not utilize an index and may cause 					sequential searches to be performed....
 2026-07-03 20:14:42,655 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-08 00:23:14,938 - INFO - [HaystackRAG] - Cargando modelos de marker-pdf...
+2026-07-08 00:23:40,386 - INFO - [HaystackRAG] - marker-pdf cargado correctamente.
+2026-07-08 00:23:40,502 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-08 00:23:40,503 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-08 00:23:40,503 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-08 00:23:40,503 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-08 00:23:42,168 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-08 00:23:42,688 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-08 00:23:42,688 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-08 00:23:42,703 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-08 00:23:42,703 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-08 00:23:42,704 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-08 00:23:42,704 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-08 00:23:43,791 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-08 00:23:44,061 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-08 00:23:44,061 - INFO - [HaystackRAG] - Total de documentos en el store: 965

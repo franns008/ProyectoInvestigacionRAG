@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -31,6 +32,7 @@ sys.path.insert(0, str(EVAL_DIR.parent))
 import pipeline_ciberseguridad as rag  # noqa: E402
 
 from haystack.components.generators.chat import OpenAIChatGenerator  # noqa: E402
+from haystack_integrations.components.generators.ollama import OllamaChatGenerator  # noqa: E402
 from haystack.components.evaluators import (  # noqa: E402
     FaithfulnessEvaluator,
     ContextRelevanceEvaluator,
@@ -44,8 +46,18 @@ def load_dataset(path: Path) -> list[dict]:
     return data
 
 
-def make_judge(model: str) -> OpenAIChatGenerator:
-    """Juez LLM = Groq vía endpoint OpenAI-compatible, en modo JSON y determinístico."""
+def make_judge(model: str):
+    """Juez LLM determinístico y en modo JSON. Sigue LLM_PROVIDER (ver docs/modos_llm.md):
+    - ollama : OllamaChatGenerator local → Tier-3 corre sin key de Groq (modo GPU).
+    - groq   : OpenAIChatGenerator contra el endpoint OpenAI-compatible de Groq.
+    """
+    if rag._llm_provider() == "ollama":
+        return OllamaChatGenerator(
+            model=model,
+            url=rag.OLLAMA_URL,
+            timeout=120,
+            generation_kwargs={"format": "json", "temperature": 0},
+        )
     return OpenAIChatGenerator(
         api_key=rag.Secret.from_env_var("GROQ_API_KEY"),
         api_base_url=rag.GROQ_BASE_URL,
@@ -84,7 +96,16 @@ def main() -> None:
     store  = rag.get_document_store()
     valves = rag.Pipeline.Valves(temperature=0.0)
     pipeline = rag.build_rag_pipeline(store, valves)
-    judge_model = args.judge_model or valves.llm_model
+
+    # Modelo del juez: --judge-model gana; si no, el mismo que usa el generador activo.
+    # En modo ollama, valves.llm_model es un nombre de modelo Groq (no existe en Ollama),
+    # así que se resuelve con LLM_MODEL / DEFAULT_OLLAMA_LLM igual que build_generator.
+    if args.judge_model:
+        judge_model = args.judge_model
+    elif rag._llm_provider() == "ollama":
+        judge_model = os.getenv("LLM_MODEL") or rag.DEFAULT_OLLAMA_LLM
+    else:
+        judge_model = os.getenv("LLM_MODEL") or valves.llm_model
 
     print(f"Tier 3 — juez={judge_model}  |  {len(dataset)} preguntas\n")
 
