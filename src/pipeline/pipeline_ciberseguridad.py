@@ -2,7 +2,7 @@
 title: Rag de Ciberseguridad
 author: Valentino, Miguel y Luca
 version: 1.4
-requirements: haystack-ai, pgvector-haystack, ollama-haystack, pypdf, python-docx, markdown-it-py, mdit-plain
+requirements: haystack-ai, pgvector-haystack, ollama-haystack, sentence-transformers, pypdf, python-docx, markdown-it-py, mdit-plain
 """
 
 import torch as _torch
@@ -54,6 +54,7 @@ from haystack_integrations.components.retrievers.pgvector import (
 )
 from haystack.components.builders import PromptBuilder
 from haystack.components.joiners import DocumentJoiner
+from haystack.components.rankers import SentenceTransformersSimilarityRanker
 from haystack.components.preprocessors import DocumentSplitter
 from haystack.components.converters import (
     DOCXToDocument, MarkdownToDocument, TextFileToDocument
@@ -519,11 +520,15 @@ def build_generator(valves):
 
 
 def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline:
-    """Arma el pipeline de query: retrievers híbridos + joiner (RRF) + prompt + LLM.
+    """Arma el pipeline de query: retrievers híbridos + joiner (RRF) + reranker + prompt + LLM.
 
-    `valves` es cualquier objeto con los atributos de Pipeline.Valves que usa el
-    pipeline: embedding_model, retriever_top_k, llm_model, max_tokens, temperature.
-    El generador (Groq o Ollama local) lo elige build_generator según LLM_PROVIDER.
+    Los retrievers recuperan ancho (retriever_top_k), el joiner fusiona por RRF y el
+    cross-encoder reranker (SentenceTransformersSimilarityRanker) re-puntúa y deja los
+    ranker_top_k mejores docs en el prompt.
+
+    `valves` es cualquier objeto con los atributos de Pipeline.Valves que usa el pipeline:
+    embedding_model, retriever_top_k, ranker_model, ranker_top_k, llm_model, max_tokens,
+    temperature. El generador (Groq o Ollama local) lo elige build_generator según LLM_PROVIDER.
     """
     v = valves
     pipeline = HaystackPipeline()
@@ -533,6 +538,11 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline
     pipeline.add_component("keyword_retriever",   PgvectorKeywordRetriever(document_store=store, top_k=v.retriever_top_k))
     pipeline.add_component("document_joiner",     DocumentJoiner(
         join_mode="reciprocal_rank_fusion",
+        top_k=v.retriever_top_k * 2,   # cap de candidatos que entran al reranker
+    ))
+    pipeline.add_component("ranker",              SentenceTransformersSimilarityRanker(
+        model=v.ranker_model,
+        top_k=v.ranker_top_k,          # techo duro de docs que llegan al prompt
     ))
     pipeline.add_component("prompt_builder",      PromptBuilder(template=PROMPT_TEMPLATE))
     pipeline.add_component("llm", build_generator(v))
@@ -540,7 +550,8 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline
     pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
     pipeline.connect("embedding_retriever",     "document_joiner")
     pipeline.connect("keyword_retriever",       "document_joiner")
-    pipeline.connect("document_joiner",         "prompt_builder.documents")
+    pipeline.connect("document_joiner",         "ranker.documents")
+    pipeline.connect("ranker",                  "prompt_builder.documents")
     pipeline.connect("prompt_builder",          "llm")
 
     return pipeline
@@ -553,7 +564,10 @@ class Pipeline:
         llm_model:       str   = "meta-llama/llama-4-scout-17b-16e-instruct"
         # Embeddings locales en Ollama (bge-m3 = 1024 dims, coincide con EMBEDDING_DIMENSION)
         embedding_model: str   = "bge-m3"
-        retriever_top_k: int   = 3
+        retriever_top_k: int   = 15    # recuperamos ancho; el reranker filtra
+        # Cross-encoder reranker (compañero local de bge-m3, corre en CPU)
+        ranker_model:    str   = "BAAI/bge-reranker-v2-m3"
+        ranker_top_k:    int   = 4     # docs que realmente llegan al prompt (techo duro)
         max_tokens:      int   = 512
         temperature:     float = 0.5
         split_length:    int   = 200
@@ -563,18 +577,13 @@ class Pipeline:
         self.name   = "RAG ciberseguridad"
         self.valves = self.Valves()
         self.store  = self._get_document_store()
-        
-        logger.info("Cargando modelos de marker-pdf...")
-        try:
-            from marker.converters.pdf import PdfConverter
-            from marker.models import create_model_dict
-            self._marker_converter = PdfConverter(artifact_dict=create_model_dict())
-            logger.info("marker-pdf cargado correctamente.")
-        except Exception as e:
-            import traceback
-            logger.error(f"No se pudo cargar marker-pdf: {e}")
-            logger.error(f"Traceback completo:\n{traceback.format_exc()}")
-            self._marker_converter = None
+
+        # marker-pdf carga modelos pesados (~3 GB residentes) y SOLO se usa para
+        # convertir PDFs sin cachear. No se carga acá: se hace lazy en la primera
+        # conversión real (ver _get_marker_converter) y se libera tras indexar. En
+        # estado estable (PDFs ya convertidos en _converted_md) nunca se carga.
+        self._marker_converter = None
+        self._marker_load_failed = False
 
         self.rag_pipeline = self._build_rag_pipeline()
         logger.info("Indexando documentos en __init__...")
@@ -608,19 +617,73 @@ class Pipeline:
             {
                 "text_embedder":     {"text": user_message},
                 "keyword_retriever": {"query": keyword_query},
+                "ranker":            {"query": user_message},
                 "prompt_builder":    {"question": user_message},
             },
             include_outputs_from={
                 "embedding_retriever",
                 "keyword_retriever",
                 "document_joiner",
+                "ranker",
+                "prompt_builder",
             },
         )
 
         # --- Debug: documentos recuperados por cada retriever ---
         self._log_retrieved_docs(result)
 
+        # --- Medición de tokens (relevancia del reranker: menos docs → menos tokens) ---
+        self._log_token_usage(result)
+
         return result["llm"]["replies"][0]
+
+    def _log_token_usage(self, result: dict) -> None:
+        """Loguea el uso de tokens de la generación al txt.
+
+        Groq (OpenAIGenerator) y Ollama (OllamaGenerator) reportan el uso con claves
+        distintas en el meta del reply; normalizamos ambos a prompt/completion/total.
+        También logueamos el tamaño del prompt (chars/palabras) y cuántos docs entraron,
+        para poder medir el efecto del reranker en los tokens enviados al LLM.
+        """
+        sep = "-" * 60
+
+        # Tamaño del prompt efectivo (lo que se le manda al LLM) y nº de docs al prompt.
+        prompt = result.get("prompt_builder", {}).get("prompt") or ""
+        n_docs = len(result.get("ranker", {}).get("documents", []))
+
+        # Uso de tokens: el meta es una lista (un dict por reply); tomamos el primero.
+        meta_list = result.get("llm", {}).get("meta") or []
+        meta = meta_list[0] if meta_list else {}
+
+        prompt_tokens = completion_tokens = total_tokens = None
+        usage = meta.get("usage")
+        if isinstance(usage, dict):
+            # Groq / OpenAI-compatible
+            prompt_tokens     = usage.get("prompt_tokens")
+            completion_tokens = usage.get("completion_tokens")
+            total_tokens      = usage.get("total_tokens")
+        else:
+            # Ollama: prompt_eval_count (entrada) / eval_count (salida)
+            prompt_tokens     = meta.get("prompt_eval_count")
+            completion_tokens = meta.get("eval_count")
+
+        if total_tokens is None and (prompt_tokens is not None or completion_tokens is not None):
+            total_tokens = (prompt_tokens or 0) + (completion_tokens or 0)
+
+        logger.info(f"{sep}")
+        logger.info(
+            f"[TOKENS] docs_al_prompt={n_docs} | prompt_chars={len(prompt)} | "
+            f"prompt_words={len(prompt.split())}"
+        )
+        if prompt_tokens is None and completion_tokens is None:
+            model = meta.get("model", "desconocido")
+            logger.info(f"[TOKENS] uso no reportado por el generador (model={model}).")
+        else:
+            logger.info(
+                f"[TOKENS] prompt={prompt_tokens} | completion={completion_tokens} | "
+                f"total={total_tokens} | model={meta.get('model', 'desconocido')}"
+            )
+        logger.info(f"{sep}")
 
     def _log_retrieved_docs(self, result: dict) -> None:
         """Loguea en detalle los documentos que cada retriever pasó al joiner."""
@@ -649,14 +712,25 @@ class Pipeline:
             logger.info(f"  [{i+1}] score={score} | fuente={source}")
             logger.info(f"        snippet: {snippet}...")
 
-        # Joiner (lo que realmente llega al prompt)
+        # Joiner (candidatos fusionados que entran al reranker)
         joined_docs = result.get("document_joiner", {}).get("documents", [])
         logger.info(f"{sep}")
-        logger.info(f"[DOCUMENT JOINER] {len(joined_docs)} documentos enviados al prompt:")
+        logger.info(f"[DOCUMENT JOINER] {len(joined_docs)} candidatos fusionados (RRF) al reranker:")
         for i, doc in enumerate(joined_docs):
             source  = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
             snippet = (doc.content or "")[:300].replace("\n", " ")
             logger.info(f"  [{i+1}] fuente={source}")
+            logger.info(f"        contenido: {snippet}...")
+
+        # Reranker (lo que realmente llega al prompt)
+        ranked_docs = result.get("ranker", {}).get("documents", [])
+        logger.info(f"{sep}")
+        logger.info(f"[RANKER] {len(ranked_docs)} documentos re-rankeados enviados al prompt:")
+        for i, doc in enumerate(ranked_docs):
+            score   = f"{doc.score:.4f}" if doc.score is not None else "N/A"
+            source  = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
+            snippet = (doc.content or "")[:300].replace("\n", " ")
+            logger.info(f"  [{i+1}] score={score} | fuente={source}")
             logger.info(f"        contenido: {snippet}...")
         logger.info(f"{sep}")
 
@@ -671,27 +745,61 @@ class Pipeline:
     # Conversión de PDFs con marker-pdf
     # ------------------------------------------------------------------
 
+    def _get_marker_converter(self):
+        """Carga marker-pdf on-demand y cachea la instancia. Devuelve el converter o
+        None si falla (una sola vez; no reintenta en cada PDF). Cargar estos modelos
+        cuesta ~3 GB de RAM, así que solo se hace cuando hay que convertir de verdad."""
+        if self._marker_converter is not None:
+            return self._marker_converter
+        if self._marker_load_failed:
+            return None
+        logger.info("Cargando modelos de marker-pdf (lazy)...")
+        try:
+            from marker.converters.pdf import PdfConverter
+            from marker.models import create_model_dict
+            self._marker_converter = PdfConverter(artifact_dict=create_model_dict())
+            logger.info("marker-pdf cargado correctamente.")
+        except Exception as e:
+            import traceback
+            logger.error(f"No se pudo cargar marker-pdf: {e}")
+            logger.error(f"Traceback completo:\n{traceback.format_exc()}")
+            self._marker_load_failed = True
+            self._marker_converter = None
+        return self._marker_converter
+
+    def _release_marker_converter(self) -> None:
+        """Libera los modelos de marker-pdf de memoria tras indexar (recupera ~3 GB)."""
+        if self._marker_converter is None:
+            return
+        logger.info("Liberando modelos de marker-pdf de memoria.")
+        self._marker_converter = None
+        import gc
+        gc.collect()
+
     def _convert_pdf_with_marker(self, pdf_path: Path) -> Path | None:
         """
         Convierte un PDF a Markdown usando marker-pdf y lo guarda en CONVERTED_DIR.
-        Si el .md ya existe (caché), lo reutiliza sin reconvertir.
+        Si el .md ya existe (caché), lo reutiliza SIN cargar marker en memoria.
         Retorna el path del .md, o None si falla.
         """
-        if self._marker_converter is None:
-            logger.warning(f"marker-pdf no disponible, salteando: {pdf_path.name}")
-            return None
-
         CONVERTED_DIR.mkdir(parents=True, exist_ok=True)
         md_path = CONVERTED_DIR / (pdf_path.stem + ".md")
 
+        # Cache hit: NO cargamos marker (el gran ahorro de RAM en estado estable).
         if md_path.exists():
             logger.info(f"Reutilizando conversión cacheada: {md_path.name}")
             return md_path
 
+        # Cache miss: recién acá cargamos marker (lazy).
+        converter = self._get_marker_converter()
+        if converter is None:
+            logger.warning(f"marker-pdf no disponible, salteando: {pdf_path.name}")
+            return None
+
         logger.info(f"Convirtiendo con marker-pdf: {pdf_path.name}")
         try:
             from marker.output import text_from_rendered
-            rendered    = self._marker_converter(str(pdf_path))
+            rendered    = converter(str(pdf_path))
             markdown_text, _, _ = text_from_rendered(rendered)
             md_path.write_text(markdown_text, encoding="utf-8")
             logger.info(f"Conversión exitosa → {md_path.name}")
@@ -774,6 +882,11 @@ class Pipeline:
             return
 
         splittable_docs, atomic_docs = self._load_local_documents()
+
+        # La conversión de PDFs ya terminó: si marker se cargó, lo liberamos antes
+        # del embedding (paso también intensivo en memoria) para no acumular ~3 GB.
+        self._release_marker_converter()
+
         if not splittable_docs and not atomic_docs:
             logger.warning("No se encontraron documentos en rawdata/")
             return

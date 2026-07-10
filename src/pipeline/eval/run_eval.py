@@ -82,20 +82,25 @@ def append_history(out_dir: Path, snapshot: dict) -> Path:
 
 
 def run_question(pipeline, question: str):
-    """Una corrida del pipeline; devuelve (emb_ids, kw_ids, joined_ids, answer)."""
+    """Una corrida del pipeline; devuelve (emb_ids, kw_ids, ranked_ids, answer).
+
+    `ranked_ids` son los docs que el reranker deja al prompt (lo que ve el LLM), no
+    los candidatos fusionados del joiner. Las métricas Tier 1 se calculan sobre esto.
+    """
     result = pipeline.run(
         {
             "text_embedder":     {"text": question},
             "keyword_retriever": {"query": rag.build_keyword_query(question)},
+            "ranker":            {"query": question},
             "prompt_builder":    {"question": question},
         },
-        include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner"},
+        include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner", "ranker"},
     )
     emb_ids    = [d.id for d in result["embedding_retriever"]["documents"]]
     kw_ids     = [d.id for d in result["keyword_retriever"]["documents"]]
-    joined_ids = [d.id for d in result["document_joiner"]["documents"]]
+    ranked_ids = [d.id for d in result["ranker"]["documents"]]
     answer     = result.get("llm", {}).get("replies", [None])[0]
-    return emb_ids, kw_ids, joined_ids, answer
+    return emb_ids, kw_ids, ranked_ids, answer
 
 
 def compute_sas(embedder, answer: str | None, reference: str | None) -> float | None:

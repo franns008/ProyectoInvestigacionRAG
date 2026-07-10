@@ -35,4 +35,4 @@ infrastructure/.env
 src/pipeline/eval/results/
 
 # NVD
-data/raw/nvd
+data/raw/nvdsrc/pipeline/logCiberseguridad.txt

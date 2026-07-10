@@ -12,6 +12,9 @@ en Ollama); generación intercambiable (Groq API o Ollama local).
 - [`docs/arquitectura_groq.md`](docs/arquitectura_groq.md) — arquitectura general y
   ejecución (CPU por defecto / GPU Nvidia opcional).
 - [`docs/eval_harness.md`](docs/eval_harness.md) — harness de evaluación (Tiers 1-3).
+- [`docs/reranker_cross_encoder.md`](docs/reranker_cross_encoder.md) — reranker cross-encoder
+  (`bge-reranker-v2-m3`) tras el retrieval híbrido: retrieve-and-rerank, implicancias (modelo
+  local en CPU, latencia) y cambios en pipeline/Dockerfile/eval.
 
 ## Mapa rápido
 

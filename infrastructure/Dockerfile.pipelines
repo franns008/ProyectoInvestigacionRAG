@@ -17,7 +17,14 @@ RUN pip install --no-cache-dir --force-reinstall \
     torchvision==0.22.0 \
     --index-url ${TORCH_INDEX_URL}
 
+# Cross-encoder reranker (bge-reranker-v2-m3): corre en CPU con el torch ya fijado.
+# Pre-descargamos el modelo al buildear para que el primer arranque no espere la
+# descarga de HuggingFace y el container funcione offline.
+RUN pip install --no-cache-dir sentence-transformers
+RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-v2-m3')"
+
 # Verificaciones
 RUN python -c "import torch, torchvision; print('torch:', torch.__version__, '| torchvision:', torchvision.__version__)"
 RUN python -c "from transformers import PreTrainedModel; print('transformers OK')"
 RUN python -c "from marker.converters.pdf import PdfConverter; print('marker-pdf OK')"
+RUN python -c "from haystack.components.rankers import SentenceTransformersSimilarityRanker; print('ranker OK')"
