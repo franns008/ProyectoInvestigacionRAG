@@ -1,14 +1,14 @@
 # Plan de diseño: harness de evaluación del RAG
 
 > **Estado (2026-07-03): IMPLEMENTADO y verificado.** El harness vive en
-> [../src/pipeline/eval/](../src/pipeline/eval/) y corre dentro del container `pipelines`.
+> [../src/pipeline/eval/](../../src/pipeline/eval/) y corre dentro del container `pipelines`.
 > Las tres fases (0–3) están operativas. Baseline inicial (27 preguntas, `top_k=3`, `temp=0`):
 > **recall@k=0.841, hit_rate=0.864, MRR=0.693** (Tier 1, n=22 con ground truth) y
 > **SAS=0.755** (Tier 2, n=14). Tier 3 (juez Groq) probado sobre subsets.
 >
 > **Hallazgos del baseline:** las categorías débiles son `concepto_es` (recall 0.333) y
 > `multi_doc` (0.250) — la brecha es→en descrita en
-> [optimizacion_keyword_retrieval.md](optimizacion_keyword_retrieval.md). Subir `top_k` a 8 **no**
+> [optimizacion_keyword_retrieval.md](../optimizacion_keyword_retrieval.md). Subir `top_k` a 8 **no**
 > las mejora → el cuello de botella es el preprocesado de la query, no `k`.
 >
 > **Corpus actual:** 710 CWE, **0 CVE** (la ingesta NVD aún no se corrió). Por eso las preguntas
@@ -19,7 +19,7 @@
 
 Hoy, cuando se cambia una pieza del pipeline (retriever, chunking, modelo de embeddings,
 prompt, LLM, valves), la única forma de saber si mejoró o empeoró es leer a ojo los logs de
-[pipeline_ciberseguridad.py](../src/pipeline/pipeline_ciberseguridad.py) y "sentir" las
+[pipeline_ciberseguridad.py](../../src/pipeline/pipeline_ciberseguridad.py) y "sentir" las
 respuestas. Eso no escala ni es reproducible.
 
 El objetivo de este plan es definir un **eval harness**: un dataset de preguntas con ground
@@ -49,14 +49,14 @@ tocaste, mirás la fila relevante y las demás como control de "no rompí nada".
 ## Arquitectura de ejecución: dentro del container `pipelines`
 
 El pipeline hardcodea hostnames de la red interna de Docker —
-`vdb:5432` y `ollama:11434` ([pipeline_ciberseguridad.py](../src/pipeline/pipeline_ciberseguridad.py#L65-L66))—
+`vdb:5432` y `ollama:11434` ([pipeline_ciberseguridad.py](../../src/pipeline/pipeline_ciberseguridad.py#L65-L66))—
 y `GROQ_API_KEY` se inyecta desde `env/pipelines.env`. Desde el host esos nombres no resuelven
 y el secreto no está a mano.
 
 Decisión: **el harness se ejecuta con `docker compose exec pipelines …`**, donde `vdb`,
 `ollama` y `GROQ_API_KEY` ya resuelven. Como el compose monta `../src/pipeline/ →
 /app/pipelines`
-([docker-compose.yml](../infrastructure/docker-compose.yml#L103-L108)), si el harness vive en
+([docker-compose.yml](../../infrastructure/docker-compose.yml#L103-L108)), si el harness vive en
 `src/pipeline/eval/` aparece en `/app/pipelines/eval/` **sin rebuild ni copy**.
 
 > **A verificar (Fase 0):** que el server de Open WebUI Pipelines no intente auto-cargar los
@@ -71,7 +71,7 @@ El harness usa el store **ya poblado** por la operación normal — **no re-inde
 
 Hoy no se puede instanciar el pipeline sin arrastrar todo el runtime: `__init__` carga
 marker-pdf e indexa documentos
-([pipeline_ciberseguridad.py](../src/pipeline/pipeline_ciberseguridad.py#L449-L468)). Para el
+([pipeline_ciberseguridad.py](../../src/pipeline/pipeline_ciberseguridad.py#L449-L468)). Para el
 eval no queremos nada de eso.
 
 Refactor propuesto (sin cambiar comportamiento de runtime): extraer a **funciones
@@ -94,9 +94,9 @@ La clave para poder correrlo seguido sin morir en el rate limit de Groq es escal
 
 Aprovecha que los documentos atómicos tienen **id determinístico**: CWE →
 `cwe-89`
-([pipeline_ciberseguridad.py](../src/pipeline/pipeline_ciberseguridad.py#L150)), CVE →
+([pipeline_ciberseguridad.py](../../src/pipeline/pipeline_ciberseguridad.py#L150)), CVE →
 `sha256(cve_id)`
-([pipeline_ciberseguridad.py](../src/pipeline/pipeline_ciberseguridad.py#L281)). El ground
+([pipeline_ciberseguridad.py](../../src/pipeline/pipeline_ciberseguridad.py#L281)). El ground
 truth de una pregunta es, literalmente, una **lista de ids esperados**. No hace falta fuzzy
 match ni juez.
 
@@ -105,7 +105,7 @@ Métricas sobre los documentos que el `DocumentJoiner` pasó al prompt:
 - **MRR:** ¿qué tan arriba aparecieron?
 - **Contribución por retriever:** embedding vs keyword (ya se expone en el output del pipeline
   vía `include_outputs_from`, igual que en
-  [`_log_retrieved_docs`](../src/pipeline/pipeline_ciberseguridad.py#L512)).
+  [`_log_retrieved_docs`](../../src/pipeline/pipeline_ciberseguridad.py#L512)).
 
 ### Tier 2 — Similitud de respuesta (SAS, local, gratis, rápido)
 
@@ -122,7 +122,7 @@ Este es el **gate diario** para cambios de generación.
 
 Faithfulness (¿la respuesta está fundada en los chunks recuperados?), answer relevancy y
 context relevance, usando **Groq como juez** reusando el `OpenAIGenerator` ya cableado
-([pipeline_ciberseguridad.py](../src/pipeline/pipeline_ciberseguridad.py#L747-L757)).
+([pipeline_ciberseguridad.py](../../src/pipeline/pipeline_ciberseguridad.py#L747-L757)).
 
 > **Recomendación:** usar los evaluators nativos de Haystack (`FaithfulnessEvaluator`,
 > `ContextRelevanceEvaluator`) en vez de agregar Ragas como dependencia — reusan el wiring de
@@ -138,7 +138,7 @@ pregunta). Tier 3 puntual.
 ## Determinismo: forzar `temperature = 0` en eval
 
 El pipeline usa `temperature = 0.5`
-([pipeline_ciberseguridad.py](../src/pipeline/pipeline_ciberseguridad.py#L446)). Con eso la
+([pipeline_ciberseguridad.py](../../src/pipeline/pipeline_ciberseguridad.py#L446)). Con eso la
 misma pregunta da respuestas distintas en cada corrida, y el delta de SAS/faithfulness sería
 **ruido, no señal del cambio**. El harness debe construir las `Valves` con `temperature = 0`.
 Si se quisiera medir con la temperatura real de producción, habría que correr N veces y
@@ -258,7 +258,7 @@ src/pipeline/eval/
   report.py               # tabla + delta vs baseline + desglose por pregunta/categoría
   baseline.json           # snapshot de referencia (versionado)
   results/                # corridas timestamped (gitignored)
-docs/eval_harness.md      # este documento
+docs/eval/eval_harness.md # este documento
 ```
 
 ## Comandos (target final)
@@ -330,10 +330,12 @@ que ese umbral puede necesitar subirse si genera falsos positivos.
 
 ## Relacionado
 
-- [optimizacion_keyword_retrieval.md](optimizacion_keyword_retrieval.md) — el banco de queries de
+- [mejoras_harness.md](mejoras_harness.md) — plan priorizado de mejoras sobre este harness
+  (dual-`k`, abstención, nDCG/tokens, recalibrar SAS, baseline de Tier 3). **Propuesto.**
+- [optimizacion_keyword_retrieval.md](../optimizacion_keyword_retrieval.md) — el banco de queries de
   su sección "Verificación" es la semilla natural de las categorías `id_*` y `concepto_es`.
-- [analisis_keyword_retriever.md](analisis_keyword_retriever.md) — evidencia de logs que motiva
+- [analisis_keyword_retriever.md](../analisis_keyword_retriever.md) — evidencia de logs que motiva
   medir la contribución por retriever (Tier 1).
-- [data_splitting.md](data_splitting.md) / [enriquecimiento_de_chunks.md](enriquecimiento_de_chunks.md)
+- [data_splitting.md](../data_splitting.md) / [enriquecimiento_de_chunks.md](../enriquecimiento_de_chunks.md)
   — cambios de chunking que este harness permitiría evaluar objetivamente.
 ```

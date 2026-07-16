@@ -4,7 +4,7 @@ Compara un snapshot de resultados (el de la corrida actual) contra baseline.json
 y muestra: delta de métricas globales, delta por categoría y la lista de preguntas
 que regresaron. Lo usa run_eval.py al final de cada corrida.
 
-Ver docs/eval_harness.md.
+Ver docs/eval/eval_harness.md.
 """
 from __future__ import annotations
 

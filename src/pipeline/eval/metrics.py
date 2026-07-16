@@ -3,7 +3,7 @@
 Tier 1 (retrieval): determinístico, sin LLM. El ground truth es una lista de doc
 ids esperados (ids determinísticos del store: cwe-<n>, sha256(cve_id)).
 
-Ver docs/eval_harness.md.
+Ver docs/eval/eval_harness.md.
 """
 from __future__ import annotations
 

@@ -13,7 +13,7 @@ Multiplica llamadas a Groq (varias por pregunta) → correr a mano y sobre subse
 
     docker compose exec pipelines python /app/pipelines/eval/run_eval_llm.py --limit 8
 
-Ver docs/eval_harness.md.
+Ver docs/eval/eval_harness.md.
 """
 from __future__ import annotations
 

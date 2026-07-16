@@ -167,11 +167,11 @@ Pendiente a evaluar: subir `ranker_top_k` a 5 o agregar `score_threshold` para r
    El bloque `[RANKER]` debe mostrar ~4 docs finales con su score; el `[DOCUMENT JOINER]`,
    más candidatos.
 3. **Eval:** `docker compose exec pipelines python /app/pipelines/eval/run_eval.py`
-   (ver [eval_harness.md](eval_harness.md)). Comparar contra el baseline; si mejora,
+   (ver [eval_harness.md](eval/eval_harness.md)). Comparar contra el baseline; si mejora,
    re-correr con `--set-baseline`.
 
 ## Relacionado
 
 - [optimizacion_keyword_retrieval.md](optimizacion_keyword_retrieval.md) — preprocesado
   de la query para el keyword retriever (aguas arriba del reranker).
-- [eval_harness.md](eval_harness.md) — cómo se miden recall/hit/mrr/sas.
+- [eval_harness.md](eval/eval_harness.md) — cómo se miden recall/hit/mrr/sas.

@@ -156,7 +156,7 @@ no se usa Groq. Requiere `nvidia-container-toolkit` instalado en el host.
   docker compose exec pipelines python /app/pipelines/eval/run_eval_llm.py --limit 8
   ```
 
-Ver [`docs/eval_harness.md`](eval_harness.md) para el detalle del harness.
+Ver [`docs/eval/eval_harness.md`](eval/eval_harness.md) para el detalle del harness.
 
 ## Checklist de troubleshooting
 

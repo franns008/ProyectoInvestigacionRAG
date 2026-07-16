@@ -11,7 +11,9 @@ en Ollama); generación intercambiable (Groq API o Ollama local).
   `LLM_PROVIDER`. Leer antes de tocar la generación, el arranque de la infra o el eval.
 - [`docs/arquitectura_groq.md`](docs/arquitectura_groq.md) — arquitectura general y
   ejecución (CPU por defecto / GPU Nvidia opcional).
-- [`docs/eval_harness.md`](docs/eval_harness.md) — harness de evaluación (Tiers 1-3).
+- [`docs/eval/`](docs/eval/) — todo sobre el harness de evaluación:
+  [`eval_harness.md`](docs/eval/eval_harness.md) (diseño vigente, Tiers 1-3) y
+  [`mejoras_harness.md`](docs/eval/mejoras_harness.md) (plan de mejoras priorizado, propuesto).
 - [`docs/reranker_cross_encoder.md`](docs/reranker_cross_encoder.md) — reranker cross-encoder
   (`bge-reranker-v2-m3`) tras el retrieval híbrido: retrieve-and-rerank, implicancias (modelo
   local en CPU, latencia) y cambios en pipeline/Dockerfile/eval.

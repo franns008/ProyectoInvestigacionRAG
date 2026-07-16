@@ -4,7 +4,7 @@ Mide el impacto de cualquier cambio en el pipeline (retriever, chunking, embeddi
 prompt, LLM, valves) corriendo un dataset de preguntas con ground truth y comparando
 las métricas contra un **baseline**.
 
-Diseño completo y racional: [../../../docs/eval_harness.md](../../../docs/eval_harness.md).
+Diseño completo y racional: [../../../docs/eval/eval_harness.md](../../../docs/eval/eval_harness.md).
 
 ## Requisitos
 

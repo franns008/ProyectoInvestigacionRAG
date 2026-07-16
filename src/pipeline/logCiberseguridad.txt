@@ -3035,3 +3035,59 @@ ASSISTANT: Según CWE-80, "Improper Neutralization of Script-Related HTML Tags i
 2026-07-10 21:58:15,759 - INFO - [HaystackRAG] - [TOKENS] docs_al_prompt=4 | prompt_chars=8529 | prompt_words=1151
 2026-07-10 21:58:15,759 - INFO - [HaystackRAG] - [TOKENS] prompt=1970 | completion=18 | total=1988 | model=meta-llama/llama-4-scout-17b-16e-instruct
 2026-07-10 21:58:15,759 - INFO - [HaystackRAG] - ------------------------------------------------------------
+2026-07-12 15:05:24,478 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-12 15:05:24,479 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-12 15:05:24,479 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-12 15:05:24,479 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-12 15:05:25,580 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-12 15:05:25,878 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-12 15:05:25,878 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-12 15:05:25,890 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-12 15:05:25,890 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-12 15:05:25,890 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-12 15:05:25,890 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-12 15:05:26,958 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-12 15:05:27,205 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-12 15:05:27,205 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-15 16:41:02,014 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-15 16:41:02,015 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-15 16:41:02,015 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-15 16:41:02,015 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-15 16:41:03,093 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-15 16:41:03,395 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-15 16:41:03,395 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-15 16:41:03,406 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-15 16:41:03,406 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-15 16:41:03,407 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-15 16:41:03,407 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-15 16:41:04,445 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-15 16:41:04,872 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-15 16:41:04,872 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-15 17:01:49,800 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-15 17:01:49,801 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-15 17:01:49,802 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-15 17:01:49,802 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-15 17:01:50,949 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-15 17:01:51,272 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-15 17:01:51,272 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-15 17:01:51,285 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-15 17:01:51,285 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-15 17:01:51,285 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-15 17:01:51,285 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-15 17:01:52,348 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-15 17:01:52,599 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-15 17:01:52,599 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-16 20:12:31,839 - INFO - [HaystackRAG] - Indexando documentos en __init__...
+2026-07-16 20:12:31,840 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-16 20:12:31,840 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-16 20:12:31,840 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-16 20:12:32,965 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-16 20:12:33,280 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-16 20:12:33,281 - INFO - [HaystackRAG] - Total de documentos en el store: 965
+2026-07-16 20:12:33,292 - INFO - [HaystackRAG] - Indexando documentos nuevos si los hay...
+2026-07-16 20:12:33,292 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: Estudio_InfraestructurasCloud_SCI_V1_INCIBE.md
+2026-07-16 20:12:33,292 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.md
+2026-07-16 20:12:33,292 - INFO - [HaystackRAG] - Reutilizando conversión cacheada: INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.md
+2026-07-16 20:12:34,333 - INFO - [HaystackRAG] - [XMLCWE] 1035 documentos CWE generados, 0 descartados por datos insuficientes.
+2026-07-16 20:12:34,576 - INFO - [HaystackRAG] - Sin documentos nuevos para indexar.
+2026-07-16 20:12:34,577 - INFO - [HaystackRAG] - Total de documentos en el store: 965

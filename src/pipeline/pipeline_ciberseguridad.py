@@ -464,7 +464,7 @@ def build_keyword_query(user_message: str) -> str:
 # pipeline de query SIN arrastrar el runtime de Open WebUI (Valves, carga de
 # marker-pdf, indexación). Las usa el harness de evaluación (eval/) para correr
 # headless. La clase Pipeline delega en ellas → el runtime no cambia.
-# Ver docs/eval_harness.md.
+# Ver docs/eval/eval_harness.md.
 # ======================================================================
 
 def get_document_store() -> PgvectorDocumentStore:

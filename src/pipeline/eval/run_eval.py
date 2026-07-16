@@ -9,7 +9,7 @@ Ejecutar DENTRO del container `pipelines` (donde resuelven vdb/ollama/GROQ_API_K
 
     docker compose exec pipelines python /app/pipelines/eval/run_eval.py
 
-Ver docs/eval_harness.md.
+Ver docs/eval/eval_harness.md.
 """
 from __future__ import annotations
 
