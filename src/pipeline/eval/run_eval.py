@@ -97,10 +97,11 @@ def run_question(pipeline, question: str):
         include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner", "ranker"},
     )
     emb_ids    = [d.id for d in result["embedding_retriever"]["documents"]]
+    document_ids = [d.id for d in result["document_joiner"]["documents"]]
     kw_ids     = [d.id for d in result["keyword_retriever"]["documents"]]
     ranked_ids = [d.id for d in result["ranker"]["documents"]]
     answer     = result.get("llm", {}).get("replies", [None])[0]
-    return emb_ids, kw_ids, ranked_ids, answer
+    return emb_ids, kw_ids, ranked_ids, answer,document_ids
 
 
 def compute_sas(embedder, answer: str | None, reference: str | None) -> float | None:
@@ -113,7 +114,7 @@ def compute_sas(embedder, answer: str | None, reference: str | None) -> float | 
     return round(m.cosine_similarity(a, r), 4)
 
 
-def evaluate(item: dict, emb_ids, kw_ids, joined_ids, answer) -> dict:
+def evaluate(item: dict, emb_ids, kw_ids, joined_ids, answer,document_ids) -> dict:
     expected = item.get("expected_doc_ids") or []
     rec = {
         "id":               item["id"],
@@ -121,6 +122,7 @@ def evaluate(item: dict, emb_ids, kw_ids, joined_ids, answer) -> dict:
         "question":         item["question"],
         "expected_doc_ids": expected,
         "retrieved_ids":    joined_ids,
+        "document_ids":     document_ids,
         "answer":           answer,
         "reference_answer": item.get("reference_answer"),
         "status":           "ok",
@@ -217,8 +219,8 @@ def main() -> None:
     per_question: list[dict] = []
     for i, item in enumerate(dataset, 1):
         try:
-            emb, kw, joined, answer = run_question(pipeline, item["question"])
-            rec = evaluate(item, emb, kw, joined, answer)
+            emb, kw, joined, answer, document_ids = run_question(pipeline, item["question"])
+            rec = evaluate(item, emb, kw, joined, answer,document_ids)
         except Exception as e:  # noqa: BLE001 — queremos seguir con el resto
             rec = {
                 "id": item["id"], "category": item.get("category", "?"),
