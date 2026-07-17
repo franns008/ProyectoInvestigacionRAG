@@ -168,6 +168,12 @@ Campos:
 - `expected_doc_ids` — ground truth de retrieval. Debe **curarse contra el corpus realmente
   indexado**: correr la pregunta una vez, inspeccionar el store / los logs y fijar los ids
   correctos a mano. Para preguntas puramente conceptuales puede quedar vacío.
+- `expected_sources` — ground truth a nivel de **fuente** (nombre del archivo original,
+  `meta.source`). Habilita **Tier 1b — `source_recall@k`**: a diferencia de un chunk-id (hash
+  del contenido, cambia con cada estrategia de chunking), el nombre de archivo es estable, así
+  que es el ground truth correcto para preguntas cuyo contenido vive en el corpus splittable
+  (guías INCIBE) y para **comparar estrategias de chunking**. Ver
+  [../data_splitting.md](../data_splitting.md). Vacío/ausente = no aplica.
 - `reference_answer` — respuesta modelo escrita a mano. Alimenta SAS y el juez. Puede omitirse
   en preguntas solo-retrieval.
 - `eval_focus` — permite reportar por foco: un cambio de retriever se juzga por las de

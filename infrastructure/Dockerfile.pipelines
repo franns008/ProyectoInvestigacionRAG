@@ -1,30 +1,67 @@
 FROM ghcr.io/open-webui/pipelines:main
 
-# Instalar marker-pdf (instala surya-ocr que requiere torch>=2.7)
-RUN pip install --no-cache-dir marker-pdf
-
-# Forzar torch+torchvision compatibles DESPUÉS de marker
-# torch 2.7.0 es lo que surya-ocr requiere explícitamente.
+# ── torch (CPU por defecto; CUDA vía build-arg del overlay nvidia) ───────────────
+# Antes lo arrastraba marker-pdf como dependencia; ahora se instala explícito para que
+# la imagen SLIM (sin marker) también tenga torch fijado. torch 2.7.0 es lo que pedía
+# surya-ocr (dep de marker) y sigue sirviendo para el reranker.
 #
-# Por defecto se instala la build de CPU (corre en cualquier máquina; la
-# generación va por Groq y embeddings/marker-pdf en CPU son suficientes).
-# Para NVIDIA, buildear con:
+# Por defecto se instala la build de CPU (corre en cualquier máquina; la generación va
+# por Groq/Ollama y el reranker en CPU alcanza). Para NVIDIA, buildear con:
 #   --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cu126
 # (lo hace automáticamente docker-compose.nvidia.yml)
 ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu
-RUN pip install --no-cache-dir --force-reinstall \
+RUN pip install --no-cache-dir \
     torch==2.7.0 \
     torchvision==0.22.0 \
     --index-url ${TORCH_INDEX_URL}
 
-# Cross-encoder reranker (bge-reranker-v2-m3): corre en CPU con el torch ya fijado.
-# Pre-descargamos el modelo al buildear para que el primer arranque no espere la
-# descarga de HuggingFace y el container funcione offline.
+# ── Cross-encoder reranker (bge-reranker-v2-m3): corre en CPU con el torch ya fijado ─
+# Pre-descargamos el modelo al buildear (~4.3 GB) para que el primer arranque no espere
+# la descarga de HuggingFace y el container funcione offline.
 RUN pip install --no-cache-dir sentence-transformers
 RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-v2-m3')"
 
-# Verificaciones
+# ── Stack Haystack + integraciones ───────────────────────────────────────────────
+# La imagen base (ghcr.io/open-webui/pipelines:main, tag móvil) dejó de traer haystack,
+# que antes se instalaba en runtime desde el header `requirements:` del pipeline. Fijarlo
+# en build-time hace el build reproducible y que `docker compose exec/run pipelines python
+# ...` (harness/experimentos) tenga haystack sin depender del pip de arranque del server.
+RUN pip install --no-cache-dir \
+    haystack-ai pgvector-haystack ollama-haystack \
+    pypdf python-docx markdown-it-py mdit-plain
+
+# ── nltk + datos punkt_tab: SOLO los usa el experimento de chunking ──────────────
+# (estrategias sentence_es y recursive_500, que tokenizan oraciones). La producción
+# (DocumentSplitter word/200/20) no lo necesita. Ver docs/data_splitting.md.
+RUN pip install --no-cache-dir nltk
+RUN python -c "import nltk; nltk.download('punkt_tab')"
+
+# ── marker-pdf: OPCIONAL vía build-arg. Default OFF → imagen ~3 GB más liviana ────
+# marker-pdf arrastra ~3 GB de modelos OCR (surya). En el pipeline SOLO se usa para
+# convertir PDFs NUEVOS a Markdown en runtime (_get_marker_converter, carga lazy y
+# guardada con try/except). Con los PDFs ya convertidos y cacheados en
+# rawdata/_converted_md, marker NUNCA se carga, así que por defecto NO se instala.
+# El pipeline degrada con gracia si marker no está: loguea un warning y saltea el PDF
+# sin caer. Ver docs/imagen_pipelines.md.
+#
+# Para una imagen capaz de convertir PDFs nuevos (imagen "full"):
+#   docker compose build --build-arg INSTALL_MARKER=true pipelines
+# El force-reinstall de torch tras marker garantiza el torch CPU/CUDA elegido (marker
+# puede tironear otra build de torch al resolver surya-ocr).
+ARG INSTALL_MARKER=false
+RUN if [ "$INSTALL_MARKER" = "true" ]; then \
+        echo "INSTALL_MARKER=true → instalando marker-pdf (imagen full)" && \
+        pip install --no-cache-dir marker-pdf && \
+        pip install --no-cache-dir --force-reinstall \
+            torch==2.7.0 torchvision==0.22.0 --index-url ${TORCH_INDEX_URL} && \
+        python -c "from marker.converters.pdf import PdfConverter; print('marker-pdf OK')" ; \
+    else \
+        echo "INSTALL_MARKER=false → imagen SLIM sin marker-pdf. Los PDFs deben venir ya" \
+             "convertidos en rawdata/_converted_md. Rebuild con --build-arg INSTALL_MARKER=true" \
+             "para habilitar la conversión de PDFs nuevos en runtime." ; \
+    fi
+
+# ── Verificaciones (independientes de marker) ────────────────────────────────────
 RUN python -c "import torch, torchvision; print('torch:', torch.__version__, '| torchvision:', torchvision.__version__)"
 RUN python -c "from transformers import PreTrainedModel; print('transformers OK')"
-RUN python -c "from marker.converters.pdf import PdfConverter; print('marker-pdf OK')"
 RUN python -c "from haystack.components.rankers import SentenceTransformersSimilarityRanker; print('ranker OK')"

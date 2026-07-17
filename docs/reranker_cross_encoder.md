@@ -76,8 +76,13 @@ primer `run`). Los embeddings (`bge-m3` en Ollama) **no cambian**.
 ### Imagen del container — [Dockerfile.pipelines](../infrastructure/Dockerfile.pipelines)
 
 Se instala `sentence-transformers` y se **pre-descarga** `bge-reranker-v2-m3` al buildear
-(≈2.3 GB), para que el primer arranque no espere la descarga y el container funcione
-offline. Usa el mismo torch CPU ya fijado; corre en CPU sin cambios extra.
+(≈4.3 GB en disco), para que el primer arranque no espere la descarga y el container
+funcione offline. Usa el mismo torch CPU ya fijado; corre en CPU sin cambios extra.
+
+> **Nota (imagen slim):** estos ~4.3 GB del reranker **no** son opcionales (se usan en
+> cada query), pero el resto de la imagen sí se adelgazó: marker-pdf pasó a ser opcional
+> (build-arg `INSTALL_MARKER`, default off) y el volumen `marker_cache` que duplicaba el
+> modelo del reranker en disco se desmontó. Ver [imagen_pipelines.md](imagen_pipelines.md).
 
 ### Eval harness — [run_eval.py](../src/pipeline/eval/run_eval.py)
 

@@ -17,6 +17,12 @@ en Ollama); generación intercambiable (Groq API o Ollama local).
 - [`docs/reranker_cross_encoder.md`](docs/reranker_cross_encoder.md) — reranker cross-encoder
   (`bge-reranker-v2-m3`) tras el retrieval híbrido: retrieve-and-rerank, implicancias (modelo
   local en CPU, latencia) y cambios en pipeline/Dockerfile/eval.
+- [`docs/data_splitting.md`](docs/data_splitting.md) — chunking del corpus splittable:
+  análisis, estrategias candidatas (`src/pipeline/chunking_strategies.py`) y el harness para
+  compararlas en tablas pgvector separadas (`src/pipeline/eval/run_chunking_experiment.py`).
+- [`docs/imagen_pipelines.md`](docs/imagen_pipelines.md) — imagen del container `pipelines`:
+  marker-pdf opcional (build-arg `INSTALL_MARKER`, default off → imagen slim ~3 GB menos) y el
+  volumen `marker_cache` desactivado. Cómo volver a la imagen full para convertir PDFs nuevos.
 
 ## Mapa rápido
 

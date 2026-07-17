@@ -467,12 +467,21 @@ def build_keyword_query(user_message: str) -> str:
 # Ver docs/eval/eval_harness.md.
 # ======================================================================
 
-def get_document_store() -> PgvectorDocumentStore:
+def get_document_store(
+    table_name: str = DB_TABLE,
+    keyword_index_name: str = "ciberseguridad_keyword_index",
+) -> PgvectorDocumentStore:
+    """`table_name`/`keyword_index_name` son overrideables para instanciar stores
+    paralelos (p. ej. un experimento de chunking en una tabla
+    `ciberseguridad_docs_chunk_<estrategia>`) sin tocar la tabla de producción.
+    Los defaults reproducen exactamente el store de producción. Ver
+    docs/data_splitting.md y src/pipeline/eval/run_chunking_experiment.py.
+    """
     return PgvectorDocumentStore(
         connection_string=Secret.from_token(DB_CONNECTION),
         embedding_dimension=EMBEDDING_DIMENSION,
-        table_name=DB_TABLE,
-        keyword_index_name="ciberseguridad_keyword_index",
+        table_name=table_name,
+        keyword_index_name=keyword_index_name,
     )
 
 
@@ -519,7 +528,7 @@ def build_generator(valves):
     )
 
 
-def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline:
+def build_rag_pipeline(store: PgvectorDocumentStore, valves, include_llm: bool = True) -> HaystackPipeline:
     """Arma el pipeline de query: retrievers híbridos + joiner (RRF) + reranker + prompt + LLM.
 
     Los retrievers recuperan ancho (retriever_top_k), el joiner fusiona por RRF y el
@@ -529,6 +538,11 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline
     `valves` es cualquier objeto con los atributos de Pipeline.Valves que usa el pipeline:
     embedding_model, retriever_top_k, ranker_model, ranker_top_k, llm_model, max_tokens,
     temperature. El generador (Groq o Ollama local) lo elige build_generator según LLM_PROVIDER.
+
+    `include_llm=False` arma el pipeline SOLO hasta el reranker (sin prompt_builder ni
+    LLM): útil para medir retrieval puro (recall@k / source_recall del experimento de
+    chunking) sin exigir GROQ_API_KEY ni pagar la latencia de generación. El runtime de
+    producción usa el default (True). Ver src/pipeline/eval/run_chunking_experiment.py.
     """
     v = valves
     pipeline = HaystackPipeline()
@@ -544,15 +558,17 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline
         model=v.ranker_model,
         top_k=v.ranker_top_k,          # techo duro de docs que llegan al prompt
     ))
-    pipeline.add_component("prompt_builder",      PromptBuilder(template=PROMPT_TEMPLATE))
-    pipeline.add_component("llm", build_generator(v))
 
     pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
     pipeline.connect("embedding_retriever",     "document_joiner")
     pipeline.connect("keyword_retriever",       "document_joiner")
     pipeline.connect("document_joiner",         "ranker.documents")
-    pipeline.connect("ranker",                  "prompt_builder.documents")
-    pipeline.connect("prompt_builder",          "llm")
+
+    if include_llm:
+        pipeline.add_component("prompt_builder", PromptBuilder(template=PROMPT_TEMPLATE))
+        pipeline.add_component("llm", build_generator(v))
+        pipeline.connect("ranker",          "prompt_builder.documents")
+        pipeline.connect("prompt_builder",  "llm")
 
     return pipeline
 
