@@ -1,5 +1,9 @@
 FROM ghcr.io/open-webui/pipelines:main
 
+# Instalar dependencias del proyecto, incluyendo Haystack y los conectores del RAG.
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
 # Instalar marker-pdf (instala surya-ocr que requiere torch>=2.7)
 RUN pip install --no-cache-dir marker-pdf
 

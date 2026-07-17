@@ -53,8 +53,8 @@ services:
 
     pipelines:
         build:
-            context: .
-            dockerfile: Dockerfile.pipelines
+            context: ..
+            dockerfile: infrastructure/Dockerfile.pipelines
         restart: unless-stopped
         env_file:
             - env/pipelines.env
