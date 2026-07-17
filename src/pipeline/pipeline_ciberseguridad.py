@@ -936,18 +936,43 @@ class Pipeline:
             f"Embedding de {len(new_docs)} documentos nuevos "
             f"({len(new_splittable)} chunks + {len(new_atomic)} atómicos)..."
         )
+        embed_batch_size = 32
         doc_embedder = OllamaDocumentEmbedder(
             model=self.valves.embedding_model,
             url=OLLAMA_URL,
-            batch_size=32,
+            batch_size=embed_batch_size,
         )
-        docs_with_embeddings = doc_embedder.run(new_docs)
-        self.store.write_documents(
-            docs_with_embeddings["documents"],
-            policy=DuplicatePolicy.OVERWRITE,
-        )
+
+        # Se embebe en los mismos lotes que usa el embedder internamente: si un
+        # lote falla (p.ej. un chunk demasiado largo para Ollama), se descarta
+        # ese lote entero y se sigue con el resto en vez de abortar todo el
+        # embedding. No se reintenta doc por doc.
+        embedded_docs = []
+        failed_count = 0
+        for i in range(0, len(new_docs), embed_batch_size):
+            batch = new_docs[i : i + embed_batch_size]
+            try:
+                embedded_docs.extend(doc_embedder.run(batch)["documents"])
+            except Exception as e:
+                failed_count += len(batch)
+                logger.error(
+                    f"Fallo el embedding del lote {i // embed_batch_size} "
+                    f"({len(batch)} docs, ids={[d.id for d in batch]}, "
+                    f"file_paths={[d.meta.get('file_path') for d in batch]}): {e}. "
+                    "Quedan sin indexar."
+                )
+
+        if embedded_docs:
+            self.store.write_documents(
+                embedded_docs,
+                policy=DuplicatePolicy.OVERWRITE,
+            )
         total = len(self.store.filter_documents())
-        logger.info(f"Indexación completa: {len(new_docs)} documentos agregados.")
+        logger.info(
+            f"Indexación completa: {len(embedded_docs)} documentos agregados"
+            + (f", {failed_count} fallaron y quedaron sin indexar" if failed_count else "")
+            + "."
+        )
         logger.info(f"Total de documentos en el store: {total}")
 
     # ------------------------------------------------------------------
