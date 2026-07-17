@@ -343,5 +343,9 @@ que ese umbral puede necesitar subirse si genera falsos positivos.
 - [analisis_keyword_retriever.md](../analisis_keyword_retriever.md) — evidencia de logs que motiva
   medir la contribución por retriever (Tier 1).
 - [data_splitting.md](../data_splitting.md) / [enriquecimiento_de_chunks.md](../enriquecimiento_de_chunks.md)
-  — cambios de chunking que este harness permitiría evaluar objetivamente.
+  — cambios de chunking que este harness permitiría evaluar objetivamente. `data_splitting.md`
+  **extiende** este harness con **Tier 1b `source_recall@k`** (ground truth a nivel de archivo,
+  estable entre estrategias de chunking) y la categoría de dataset `guia_incibe`, más un
+  orquestador propio ([run_chunking_experiment.py](../../src/pipeline/eval/run_chunking_experiment.py))
+  que compara estrategias en tablas pgvector separadas.
 ```

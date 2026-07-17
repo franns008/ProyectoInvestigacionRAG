@@ -4,19 +4,29 @@ tabla pgvector SEPARADA y corre el eval contra cada una, para comparar estrategi
 de forma controlada sin tocar la tabla de producción (`ciberseguridad_docs`).
 
 Cada estrategia se materializa en `ciberseguridad_docs_chunk_<estrategia>`. Los
-documentos atómicos (CWE/CVE) NO cambian entre estrategias — se embeben una sola
-vez y se reutilizan en cada tabla; solo se re-chunkea el corpus splittable
-(guías INCIBE). Ver docs/data_splitting.md.
+documentos atómicos (CWE, y opcionalmente CVE) NO cambian entre estrategias — se
+embeben una sola vez y se reutilizan en cada tabla; solo se re-chunkea el corpus
+splittable (guías INCIBE). Ver docs/data_splitting.md.
 
-Ejecutar DENTRO del container `pipelines`:
+Retrieval puro: arma el pipeline SIN LLM (build_rag_pipeline(include_llm=False)), así
+NO exige GROQ_API_KEY ni paga la latencia de generación. El chunking se juzga por
+retrieval, que es lo que mueve; la generación (SAS) se evalúa aparte con run_eval.py.
 
-    docker compose exec pipelines python /app/pipelines/eval/run_chunking_experiment.py
-    docker compose exec pipelines python /app/pipelines/eval/run_chunking_experiment.py --strategies current_word200 recursive_500
+Ejecutar como container EFÍMERO que saltea el server de Open WebUI (para NO disparar la
+auto-indexación de producción, que embebería los ~76k CVE de NVD). En Fedora/SELinux los
+bind-mounts necesitan `:z`. NO se monta el volumen marker_cache (el reranker ya está en
+la imagen). Desde infrastructure/:
 
-Métricas por estrategia:
-  · Tier 1  (recall@k por doc-id)     — solo válido para preguntas CWE (id estable).
-  · Tier 1b (source_recall@k)         — el eje que mide el chunking del corpus splittable.
-  · Tier 2  (SAS)                     — calidad de respuesta generada.
+    docker run --rm --network infrastructure_default -e TORCH_DEVICE=cpu \
+      -v "$(cd .. && pwd)/src/pipeline":/app/pipelines:z \
+      -v "$(cd .. && pwd)/data/raw":/app/pipelines/rawdata:z \
+      --entrypoint python infrastructure-pipelines:latest \
+      /app/pipelines/eval/run_chunking_experiment.py
+      # opcional: --strategies current_word200 recursive_500   |   --include-cve
+
+Métricas por estrategia (retrieval puro, sin LLM):
+  · Tier 1  (recall@k por doc-id)  — solo válido para preguntas CWE (id estable).
+  · Tier 1b (source_recall@k)      — el eje que mide el chunking del corpus splittable.
 """
 from __future__ import annotations
 

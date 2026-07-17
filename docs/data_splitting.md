@@ -6,11 +6,12 @@ estrategias candidatas (con **mediciones reales sobre el corpus**) y define el
 **harness para compararlas objetivamente** en performance de recuperación y calidad de
 respuesta.
 
-> **Estado (2026-07-17):** análisis + andamiaje de experimentación **implementados**;
-> el barrido comparativo sobre el stack levantado queda para correr (necesita el
-> container `pipelines` arriba). El runtime de producción **no cambió**: el pipeline
-> sigue usando `DocumentSplitter(word/200/20)`. Todo lo nuevo vive aparte y en tablas
-> pgvector separadas.
+> **Estado (2026-07-17):** análisis + andamiaje de experimentación **implementados** y el
+> experimento **corre end-to-end** (modo retrieval puro). El barrido completo de las 4
+> estrategias quedó **a medio correr por RAM** (el proceso se mató embebiendo la 2ª
+> estrategia con el stack + otros procesos activos, ver §7.3); se retoma **una estrategia
+> a la vez**. El runtime de producción **no cambió**: el pipeline sigue usando
+> `DocumentSplitter(word/200/20)`. Todo lo nuevo vive aparte y en tablas pgvector separadas.
 
 > **Recordatorio de arquitectura:** los **embeddings** se calculan **local** en Ollama
 > (`bge-m3`, 1024 dims) y sólo la **generación** va a **Groq**. El chunking **no consume
@@ -132,12 +133,15 @@ Registradas en
 [`src/pipeline/chunking_strategies.py`](../src/pipeline/chunking_strategies.py). Números
 **medidos** sobre los 3 PDFs INCIBE (34.130 palabras en total):
 
+Números **medidos en la corrida real** (A, B) y en validación local sobre el mismo corpus
+(C, D):
+
 | Estrategia | Componente Haystack | n_chunks | avg_words | Notas |
 |---|---|---|---|---|
-| **A. `current_word200`** (baseline) | `DocumentSplitter(word/200/20)` | 255 | 148 | La de producción. Sin `language`, corta a mitad de oración. |
-| **B. `sentence_es`** | `DocumentSplitter(word/220/30, respect_sentence_boundary, language=es)` | ~250 | ~254 | No corta oraciones; tokenizador ES. Cambio mínimo, mismo componente. |
-| **C. `recursive_500`** | `RecursiveDocumentSplitter(500/75, sep=[¶,\n,sentence, ])` | 82 | 489 | Respeta jerarquía párrafo→línea→oración. Chunks grandes, autocontenidos. |
-| **D. `markdown_header`** | `MarkdownHeaderSplitter(h1-3) + secondary word/400/40` + breadcrumb | ~150 | ~250 | **Requiere markdown crudo** (§3.8). Preserva `header`/`parent_headers` en meta y los antepone al contenido. |
+| **A. `current_word200`** (baseline) | `DocumentSplitter(word/200/20)` | 255 | 148.1 | La de producción. Sin `language`, corta a mitad de oración. |
+| **B. `sentence_es`** | `DocumentSplitter(word/220/30, respect_sentence_boundary, language=es)` | 148 | 278.1 | No corta oraciones; tokenizador ES. Cambio mínimo, mismo componente. |
+| **C. `recursive_500`** | `RecursiveDocumentSplitter(500/75, sep=[¶,\n,sentence, ])` | 82 | 489.4 | Respeta jerarquía párrafo→línea→oración. Chunks grandes, autocontenidos. |
+| **D. `markdown_header`** | `MarkdownHeaderSplitter(h1-3) + secondary word/400/40` + breadcrumb | 151 | 264.9 | **Requiere markdown crudo** (§3.8). Preserva `header`/`parent_headers` en meta y los antepone al contenido. |
 
 Notas de implementación:
 
@@ -154,8 +158,10 @@ Notas de implementación:
   Mejora 4 del análisis previo) usando `dataclasses.replace` (Document es inmutable).
 
 > **Dependencias:** `nltk` (para B y C) y `markdown-it-py`/`mdit-plain` (para el
-> converter) deben estar en la imagen del container `pipelines`. Ya están en
-> `requirements.txt` salvo `nltk`, que hay que agregar antes de correr el experimento.
+> converter) están **horneadas en la imagen** del container `pipelines`
+> ([Dockerfile.pipelines](../infrastructure/Dockerfile.pipelines)): `nltk` + los datos
+> `punkt_tab` se instalan en el build, y el stack Haystack incluye el converter de
+> markdown. No hay que instalar nada aparte para correr el experimento.
 
 ---
 
@@ -194,7 +200,14 @@ de control de "no rompí el retrieval de lo atómico".
 
 - **Tier 1 `recall@k`** (doc-id): control sobre las preguntas CWE.
 - **Tier 1b `source_recall@k`** (fuente): **el eje** que mide el chunking del splittable.
-- **Tier 2 `SAS`**: calidad de la respuesta generada (coseno contra `reference_answer`).
+
+> **Retrieval puro (sin LLM).** El experimento arma el pipeline con
+> `build_rag_pipeline(include_llm=False)` — retrievers + joiner + reranker, sin
+> `prompt_builder` ni generador. Así **no exige `GROQ_API_KEY` ni paga la latencia de
+> generación**, y el chunking se juzga por lo que realmente mueve: el retrieval. La
+> **Tier 2 `SAS`** (calidad de respuesta generada) se mide aparte con
+> [run_eval.py](../src/pipeline/eval/run_eval.py) una vez elegida la estrategia, no en
+> este barrido.
 
 ---
 
@@ -218,28 +231,55 @@ Habilitado por `get_document_store(table_name=..., keyword_index_name=...)`
 ([pipeline_ciberseguridad.py](../src/pipeline/pipeline_ciberseguridad.py)), ahora
 parametrizable (defaults = store de producción, runtime sin cambios).
 
-### Comandos
+### 7.1 El flag de estrategia
+
+El tipo de chunking se elige **al lanzar**, con `--strategies` (uno o varios nombres, que
+son las claves de `STRATEGIES` en `chunking_strategies.py`). No es dinámico en caliente:
+cada corrida indexa y evalúa las estrategias pedidas. Para **sumar** un tipo nuevo, se
+agrega una entrada al diccionario `STRATEGIES` y queda disponible en el flag sin tocar el
+orquestador.
+
+### 7.2 Cómo correrlo (container efímero, sin auto-indexar producción)
+
+No se usa `docker compose exec pipelines`, porque eso levanta el **server de Open WebUI**,
+que en su arranque auto-indexa el corpus de producción — incluidos los **~76k CVE de NVD**
+(horas de embeddings). En su lugar, un container **efímero** que saltea el server y corre
+Python directo. En **Fedora/SELinux** los bind-mounts requieren `:z`; **no** se monta el
+volumen `marker_cache` (el reranker ya vive en la imagen). Desde `infrastructure/`:
 
 ```bash
-# Todas las estrategias:
-docker compose exec pipelines python /app/pipelines/eval/run_chunking_experiment.py
-
-# Un subconjunto:
-docker compose exec pipelines python /app/pipelines/eval/run_chunking_experiment.py \
-    --strategies current_word200 recursive_500 markdown_header
+docker run --rm --network infrastructure_default -e TORCH_DEVICE=cpu \
+  -v "$(cd .. && pwd)/src/pipeline":/app/pipelines:z \
+  -v "$(cd .. && pwd)/data/raw":/app/pipelines/rawdata:z \
+  --entrypoint python infrastructure-pipelines:latest \
+  /app/pipelines/eval/run_chunking_experiment.py
 ```
 
-Salida (ejemplo de formato):
+- `--strategies A B …` — subconjunto de estrategias (default: todas).
+- `--include-cve` — indexar también los ~76k CVE (lento; **off** por defecto, ver paso 2
+  del flujo: son atómicos y no aportan a comparar chunking).
+
+Salida (formato real, retrieval puro):
 
 ```
-estrategia          chunks   avg_w  recall@k  src_recall     sas
-current_word200        255   148.1     0.841       0.667   0.755
-sentence_es            250   253.6     0.841       1.000   0.770
-recursive_500           82   489.4     0.841       1.000   0.780
-markdown_header        150   248.6     0.841       1.000   0.795
+estrategia          chunks   avg_w  recall@k  src_recall
+current_word200        255   148.1       ...         ...
+sentence_es            148   278.1       ...         ...
+recursive_500           82   489.4       ...         ...
+markdown_header        151   264.9       ...         ...
 ```
 
-(Números ilustrativos — pendiente la corrida real sobre el stack levantado.)
+Los `n_chunks`/`avg_w` son reales; las columnas `recall@k`/`src_recall` quedan pendientes
+del barrido completo (§7.3). El JSON por corrida se persiste en
+`src/pipeline/eval/results/chunking_experiment_<timestamp>.json` (gitignored).
+
+### 7.3 Nota operativa: RAM
+
+El experimento carga el reranker (~2 GB residentes) + embeddings + pgvector. En una máquina
+con ~15 GB de RAM y otros procesos activos (navegador, otro stack Docker), la primera
+corrida completa se **quedó sin memoria** (OOM, exit 137) embebiendo la 2ª estrategia. Para
+que entre, correr **una estrategia por vez** (`--strategies recursive_500`, luego otra) y/o
+liberar RAM (cerrar apps, `docker stop` de otros proyectos). No es un problema de disco.
 
 ---
 
@@ -247,16 +287,17 @@ markdown_header        150   248.6     0.841       1.000   0.795
 
 | Prioridad | Acción | Beneficio | Riesgo/costo |
 |-----------|--------|-----------|--------------|
-| 1 | Correr `run_chunking_experiment.py` y leer `source_recall`/`sas` | Decisión basada en datos, no en teoría | Requiere stack arriba; ~min de indexación local |
+| 1 | Correr `run_chunking_experiment.py` (una estrategia por vez) y leer `source_recall` | Decisión basada en datos, no en teoría | Requiere la imagen buildeada + vdb/ollama arriba; RAM (§7.3) |
 | 2 | Adoptar la ganadora (probable **C** o **D**) como splitter de producción | Mejor contexto por chunk | Reindexar la tabla de producción |
 | 3 | Si gana **D**: cambiar el pipeline para pasar **markdown crudo** al splitter markdown-aware (evitar `MarkdownToDocument` para PDFs) | Aprovecha la estructura de sección | Toca `_load_local_documents` |
 | 4 | Re-indexar al cambiar los valves de chunking | Config utilizable de verdad | Cambio en `on_valves_updated` |
 | 5 | Alinear parámetros código ↔ runtime | Consistencia | — |
 
 **Hipótesis a validar con el experimento:** las estrategias que respetan estructura (C
-recursivo y D markdown-aware) deberían **subir `source_recall` y `SAS`** en las preguntas
+recursivo y D markdown-aware) deberían **subir `source_recall`** en las preguntas
 `guia_incibe` sin degradar el `recall@k` de CWE (que no se chunkean). El breadcrumb de la
-D es el candidato de mayor impacto para preguntas conceptuales sobre las guías.
+D es el candidato de mayor impacto para preguntas conceptuales sobre las guías. La calidad
+de respuesta (SAS) de la ganadora se confirma después con `run_eval.py` (§6.3).
 
 ---
 
