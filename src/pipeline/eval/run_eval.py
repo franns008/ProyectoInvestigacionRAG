@@ -113,24 +113,48 @@ def compute_sas(embedder, answer: str | None, reference: str | None) -> float | 
     r = embedder.run(text=reference)["embedding"]
     return round(m.cosine_similarity(a, r), 4)
 
+def check_correct_rejection(answer:str ) -> bool:
+    """
+        Verifica si el LLM se abstuvo correctamente de responder una pregunta
+        para la cual no tenía contexto.
+    """
+    if not answer:
+        return False
+    # Convert the answer to lowercase for case-insensitive comparison
+    answer_lower = answer.lower()
+    # Check for common phrases indicating a correct rejection
+    rejection_phrases = [
+        "no puedo responder",
+        "no tengo suficiente información",
+        "no es posible responder",
+        "no puedo proporcionar una respuesta",
+        "no hay información suficiente",
+        "no puedo determinar la respuesta",
+        "no puedo dar una respuesta precisa",
+        "no puedo contestar",
+        "no puedo ayudar con eso",
+        "no tengo datos suficientes"
+    ]
+    return any(phrase in answer_lower for phrase in rejection_phrases)
 
-def evaluate(item: dict, emb_ids, kw_ids, joined_ids, answer,document_ids) -> dict:
+
+def evaluate(item: dict, emb_ids, kw_ids, ranked_ids, answer, document_ids) -> dict:
     expected = item.get("expected_doc_ids") or []
     rec = {
         "id":               item["id"],
         "category":         item.get("category", "?"),
         "question":         item["question"],
         "expected_doc_ids": expected,
-        "retrieved_ids":    joined_ids,
+        "ranked_ids":       ranked_ids,  # Renombrado de retrieved_ids/joined_ids
         "document_ids":     document_ids,
         "answer":           answer,
         "reference_answer": item.get("reference_answer"),
         "status":           "ok",
     }
     if expected:
-        rec["recall"] = m.recall_at_k(joined_ids, expected)
-        rec["hit"]    = m.hit_at_k(joined_ids, expected)
-        rec["rr"]     = m.reciprocal_rank(joined_ids, expected)
+        rec["recall"] = m.recall_at_k(ranked_ids, expected)
+        rec["hit"]    = m.hit_at_k(ranked_ids, expected)
+        rec["rr"]     = m.reciprocal_rank(ranked_ids, expected)
         exp = set(expected)
         rec["hit_source"] = {          # qué retriever aportó algún esperado
             "embedding": bool(exp & set(emb_ids)),
@@ -139,6 +163,8 @@ def evaluate(item: dict, emb_ids, kw_ids, joined_ids, answer,document_ids) -> di
     else:
         rec["recall"] = rec["hit"] = rec["rr"] = None
         rec["hit_source"] = None
+        rec["correct_rejection"] = check_correct_rejection(answer)  # Verifica si el LLM se abstuvo correctamente
+        #FUncion a mejorar, debería ser más robusta y considerar más casos de abstención correcta.
     return rec
 
 
@@ -219,8 +245,10 @@ def main() -> None:
     per_question: list[dict] = []
     for i, item in enumerate(dataset, 1):
         try:
-            emb, kw, joined, answer, document_ids = run_question(pipeline, item["question"])
-            rec = evaluate(item, emb, kw, joined, answer,document_ids)
+            
+            emb_ids, kw_ids, ranked_ids, answer, document_ids = run_question(pipeline, item["question"])
+
+            rec = evaluate(item, emb_ids, kw_ids, ranked_ids, answer, document_ids)
         except Exception as e:  # noqa: BLE001 — queremos seguir con el resto
             rec = {
                 "id": item["id"], "category": item.get("category", "?"),

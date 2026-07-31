@@ -36,6 +36,14 @@ def _arrow(delta: float) -> str:
 
 
 def _fmt(cur: float | None, base: float | None) -> str:
+    """
+    Recibe por parámetro un valor actual y un valor base, y devuelve una cadena de texto formateada.
+    Formatea un valor actual y un valor base en una cadena de texto.
+    - Si ambos son None, devuelve "n/a".
+    - Si el valor base es None, devuelve el valor actual seguido de "(nuevo)".
+    - Si el valor actual es None, devuelve "n/a" seguido del valor base.
+    """
+
     if cur is None and base is None:
         return "   n/a"
     if base is None:
@@ -81,6 +89,12 @@ def print_delta(current: dict, baseline: dict | None) -> None:
 
 
 def _print_regressions(current: dict, baseline: dict) -> None:
+    """
+    Hace un diff por pregunta entre el snapshot actual y el baseline, y muestra las preguntas que
+    tuvieron regresión de recall o de SAS. Se considera regresión de SAS si bajó más que SAS_REGRESSION_THRESHOLD.
+    """
+
+
     cur_by_id = {q["id"]: q for q in current["per_question"]}
     base_by_id = {q["id"]: q for q in baseline["per_question"]}
 

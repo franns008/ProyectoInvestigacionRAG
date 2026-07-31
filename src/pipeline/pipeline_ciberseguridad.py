@@ -95,7 +95,7 @@ Rules:
 - Do NOT confuse a CWE (category) with a CVE (concrete instance).
 - Cite the exact identifier (CWE-x / CVE-x) whenever a statement comes from such an entry.
 - NEVER invent CVE/CWE identifiers, CVSS scores or severities. Use only values present in the context.
-- If the context does not contain the answer, say you don't know. Do not make one up.
+- If the context does not contain the answer, say explicitly that you don't know.
 - Answer in the language of the question, NOT the language of the documents.
 
 Context:
