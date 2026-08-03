@@ -95,22 +95,23 @@ def _print_regressions(current: dict, baseline: dict) -> None:
     """
 
 
-    cur_by_id = {q["id"]: q for q in current["per_question"]}
-    base_by_id = {q["id"]: q for q in baseline["per_question"]}
+
+    current_by_id = {question["id"]: question for question in current["per_question"]}
+    baseline_by_id = {question["id"]: question for question in baseline["per_question"]}
 
     retr_reg, sas_reg = [], []
-    for qid, cq in cur_by_id.items():
-        bq = base_by_id.get(qid)
-        if bq is None:
+    for question_id, current_question in current_by_id.items():
+        baseline_question = baseline_by_id.get(question_id)
+        if baseline_question is None:
             continue
         # Retrieval: recall bajó
-        if cq.get("recall") is not None and bq.get("recall") is not None:
-            if cq["recall"] < bq["recall"]:
-                retr_reg.append((qid, bq["recall"], cq["recall"]))
+        if current_question.get("recall") is not None and baseline_question.get("recall") is not None:
+            if current_question["recall"] < baseline_question["recall"]:
+                retr_reg.append((question_id, baseline_question["recall"], current_question["recall"]))
         # Generación: SAS bajó más que el umbral
-        if cq.get("sas") is not None and bq.get("sas") is not None:
-            if bq["sas"] - cq["sas"] > SAS_REGRESSION_THRESHOLD:
-                sas_reg.append((qid, bq["sas"], cq["sas"]))
+        if current_question.get("sas") is not None and baseline_question.get("sas") is not None:
+            if baseline_question["sas"] - current_question["sas"] > SAS_REGRESSION_THRESHOLD:
+                sas_reg.append((question_id, baseline_question["sas"], current_question["sas"]))
 
     if not retr_reg and not sas_reg:
         print("\n  Sin regresiones por pregunta. 🎉")
