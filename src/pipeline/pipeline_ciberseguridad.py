@@ -249,6 +249,9 @@ def _cvss(metrics: dict) -> dict:
 
 def _vendors_products(cve: dict) -> tuple[list[str], list[str]]:
     """Vendors y productos únicos, parseados de los CPE de configurations.
+    Vendors: Ej. "microsoft", "adobe", "apache".
+    Products: Ej. "windows_10", "acrobat_reader", "http_server".
+    Los CPE son strings con formato estandarizado: cpe:2.3:<part>:<vendor>:<product>:<version>:...
 
     CPE 2.3 = cpe:2.3:<part>:<vendor>:<product>:<version>:...  (índices 3 y 4).
     """
