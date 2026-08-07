@@ -175,11 +175,11 @@ class Indexer:
         # Deduplicación contra la BD
         stored = self.store.filter_documents()
         existing_keys = {
-            (d.meta.get("file_path"), d.meta.get("_split_id")) 
+            (d.meta.get("file_path"), d.meta.get("split_id")) 
             for d in stored if d.meta.get("file_path")
         }
         
-        new_splittable = [d for d in splittable_docs if (d.meta.get("file_path"), d.meta.get("_split_id")) not in existing_keys]
+        new_splittable = [d for d in splittable_docs if (d.meta.get("file_path"), d.meta.get("split_id")) not in existing_keys]
         
         seen_ids = {d.id for d in stored}
         new_atomic = []

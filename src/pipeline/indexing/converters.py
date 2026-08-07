@@ -1,11 +1,32 @@
+"""
+Conversores de fuentes estructuradas para la indexación:
+- XMLCWEConverter: XML de MITRE (CWE) → un Document atómico por Weakness.
+- NVDJsonConverter: páginas JSON de la NVD (CVE) → un Document atómico por CVE.
+
+Ambos producen documentos *atómicos*: no pasan por el DocumentSplitter.
+"""
+
+import hashlib
+import json
+import logging
+import re
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+from haystack import Document
+
+# Comparte el logger configurado en run_indexing.py (mismo objeto singleton).
+logger = logging.getLogger("IndexingRAG")
+
+# Los <Description> de weakness en NVD traen valores tipo "CWE-79" o "NVD-CWE-noinfo";
+# solo nos quedamos con los IDs de CWE reales.
+CWE_RE = re.compile(r"^CWE-\d+$")
+
 
 class XMLCWEConverter:
     """XML de MITRE (esquema CWE, namespace cwe-7) → un Document por Weakness."""
 
     def run(self, sources: list[Path]):
-        import xml.etree.ElementTree as ET
-        from haystack import Document
-
         documents = []
         skipped = 0
         ns = {'cwe': 'http://cwe.mitre.org/cwe-7'}
@@ -159,8 +180,6 @@ def cve_to_document(cve: dict):
 
     Devuelve None si el CVE no tiene descripción utilizable (nada que embeber).
     """
-    from haystack import Document
-
     cve_id = cve.get("id")
     description = _english_description(cve)
     if not cve_id or not description.strip():
