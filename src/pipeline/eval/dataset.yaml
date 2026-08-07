@@ -1,0 +1,268 @@
+# Dataset de evaluación del RAG de ciberseguridad.
+# Ver docs/eval_harness.md para el diseño completo.
+#
+# Campos por pregunta:
+#   id                : slug estable (se usa en el reporte por-pregunta)
+#   category          : categoría de la taxonomía (docs/eval_harness.md)
+#   question          : la pregunta tal cual la haría un usuario
+#   expected_doc_ids  : ground truth de retrieval (ids determinísticos del store:
+#                       cwe-<n>, sha256(cve_id)). Vacío [] = pregunta sin doc
+#                       esperado (negativas / fuera de dominio / no indexado aún).
+#   reference_answer  : respuesta modelo (Tier 2 SAS y Tier 3 juez). Opcional.
+#   eval_focus        : [retrieval] / [generation] / [retrieval, generation]
+#   tags              : libres, para filtrar
+#
+# NOTA sobre CVEs: hoy el store tiene 710 CWE y 0 CVE (la ingesta NVD todavía no
+# se corrió). Por eso las preguntas de CVE tienen expected_doc_ids: [] y hoy son
+# tests de robustez (el RAG debe decir que no lo encuentra, no alucinar). Cuando
+# se indexen CVEs, cambiar su expected_doc_ids al sha256(cve_id) real y su
+# category a id_cve / nombre_cve.
+
+# ── id_cwe: CWE por número exacto ───────────────────────────────────────────
+- id: cwe89-por-numero
+  category: id_cwe
+  question: "Explicame la vulnerabilidad CWE-89 y cómo prevenirla."
+  expected_doc_ids: ["cwe-89"]
+  reference_answer: |
+    CWE-89 es SQL Injection: ocurre cuando entrada no sanitizada se interpola en
+    una consulta SQL y altera su lógica, permitiendo leer o modificar datos no
+    autorizados. Se previene con consultas parametrizadas / prepared statements,
+    ORMs seguros, validación de entrada y el principio de menor privilegio en la BD.
+  eval_focus: [retrieval, generation]
+  tags: [injection, es]
+
+- id: cwe79-por-numero
+  category: id_cwe
+  question: "¿Qué describe la CWE-79?"
+  expected_doc_ids: ["cwe-79"]
+  reference_answer: |
+    CWE-79 es Cross-Site Scripting (XSS): neutralización incorrecta de la entrada
+    al generar una página web, lo que permite inyectar scripts que se ejecutan en
+    el navegador de otros usuarios.
+  eval_focus: [retrieval, generation]
+  tags: [xss, es]
+
+- id: cwe798-por-numero
+  category: id_cwe
+  question: "¿Qué riesgo de seguridad describe CWE-798?"
+  expected_doc_ids: ["cwe-798"]
+  reference_answer: |
+    CWE-798 es el uso de credenciales embebidas (hard-coded) en el código o la
+    configuración: contraseñas, claves o tokens fijos que un atacante puede
+    descubrir y reutilizar. Se mitiga externalizando secretos a un gestor de
+    secretos o variables de entorno y rotándolos.
+  eval_focus: [retrieval, generation]
+  tags: [credenciales, es]
+
+# ── id_variantes: mismo ID en formato no canónico ───────────────────────────
+- id: cwe89-variante-espacio
+  category: id_variantes
+  question: "que es cwe 89"
+  expected_doc_ids: ["cwe-89"]
+  eval_focus: [retrieval]
+  tags: [injection, normalizacion]
+
+- id: cwe79-variante-junto
+  category: id_variantes
+  question: "explicame cwe79"
+  expected_doc_ids: ["cwe-79"]
+  eval_focus: [retrieval]
+  tags: [xss, normalizacion]
+
+# ── nombre_cwe: por nombre/concepto (incluye EN) ────────────────────────────
+- id: sqli-en
+  category: nombre_cwe
+  question: "What is SQL injection and how do I prevent it?"
+  expected_doc_ids: ["cwe-89"]
+  reference_answer: |
+    SQL injection (CWE-89) happens when unsanitized input is concatenated into a
+    SQL query, letting an attacker change its logic. Prevent it with parameterized
+    queries / prepared statements, input validation and least-privilege DB accounts.
+  eval_focus: [retrieval, generation]
+  tags: [injection, en]
+
+- id: buffer-overflow-nombre
+  category: nombre_cwe
+  question: "¿Qué es un buffer overflow?"
+  expected_doc_ids: ["cwe-120"]
+  reference_answer: |
+    Un buffer overflow (CWE-120) ocurre al copiar datos a un búfer sin verificar
+    su tamaño, sobrescribiendo memoria adyacente. Puede corromper datos, provocar
+    caídas o ejecución de código.
+  eval_focus: [retrieval, generation]
+  tags: [memory, es]
+
+- id: ssrf-nombre
+  category: nombre_cwe
+  question: "¿Qué es un ataque SSRF?"
+  expected_doc_ids: ["cwe-918"]
+  eval_focus: [retrieval, generation]
+  tags: [ssrf, es]
+
+# ── concepto_es: concepto en español → doc CWE en inglés (brecha es→en) ──────
+- id: inyeccion-sql-es
+  category: concepto_es
+  question: "¿Cómo funciona una inyección SQL?"
+  expected_doc_ids: ["cwe-89"]
+  eval_focus: [retrieval]
+  tags: [injection, es]
+
+- id: credenciales-en-codigo
+  category: concepto_es
+  question: "¿Qué problema hay en dejar credenciales escritas en el código fuente?"
+  expected_doc_ids: ["cwe-798"]
+  eval_focus: [retrieval]
+  tags: [credenciales, es]
+
+- id: desbordamiento-bufer-es
+  category: concepto_es
+  question: "¿Qué es un desbordamiento de búfer?"
+  expected_doc_ids: ["cwe-120"]
+  eval_focus: [retrieval]
+  tags: [memory, es]
+
+# ── desarrollar: respuesta larga/explicativa (foco en generación) ───────────
+- id: xss-explicar-prevenir
+  category: desarrollar
+  question: "¿Qué es el Cross-Site Scripting y cómo se previene?"
+  expected_doc_ids: ["cwe-79"]
+  reference_answer: |
+    El Cross-Site Scripting (XSS, CWE-79) permite inyectar scripts maliciosos en
+    páginas que otros usuarios visitan, porque la entrada no se neutraliza al
+    generar el HTML. Los tipos habituales son reflejado, almacenado y basado en
+    DOM. Se previene escapando/encodeando la salida según el contexto, validando
+    la entrada, usando Content-Security-Policy y frameworks que escapan por defecto.
+  eval_focus: [generation, retrieval]
+  tags: [xss, es]
+
+- id: path-traversal-detalle
+  category: desarrollar
+  question: "Explicá en detalle cómo funciona un ataque de path traversal y sus mitigaciones."
+  expected_doc_ids: ["cwe-22"]
+  reference_answer: |
+    El path traversal (CWE-22) abusa de una limitación insuficiente de rutas para
+    acceder a archivos fuera del directorio previsto usando secuencias como ../.
+    Se mitiga canonicalizando y validando rutas contra una allowlist, evitando
+    pasar entrada del usuario directo al filesystem y aplicando permisos mínimos.
+  eval_focus: [generation, retrieval]
+  tags: [path-traversal, es]
+
+# ── comparativa: contraste multi-concepto (multi-doc) ───────────────────────
+- id: comparar-oob-read-write
+  category: comparativa
+  question: "¿En qué se diferencian una lectura fuera de límites y una escritura fuera de límites?"
+  expected_doc_ids: ["cwe-125", "cwe-787"]
+  reference_answer: |
+    La lectura fuera de límites (CWE-125) accede a memoria fuera del búfer y suele
+    filtrar información; la escritura fuera de límites (CWE-787) escribe fuera del
+    búfer y puede corromper memoria o permitir ejecución de código. Ambas nacen de
+    no validar índices o tamaños.
+  eval_focus: [retrieval, generation]
+  tags: [memory, es, multidoc]
+
+# ── multi_doc: requiere varios documentos ───────────────────────────────────
+- id: tipos-inyeccion-comandos
+  category: multi_doc
+  question: "¿Qué tipos de inyección de comandos existen?"
+  expected_doc_ids: ["cwe-77", "cwe-78"]
+  eval_focus: [retrieval]
+  tags: [injection, multidoc]
+
+- id: control-acceso-varios
+  category: multi_doc
+  question: "Nombrá vulnerabilidades relacionadas con fallas de control de acceso."
+  expected_doc_ids: ["cwe-306", "cwe-862", "cwe-269"]
+  eval_focus: [retrieval]
+  tags: [access-control, multidoc]
+
+# ── procedimental: pasos de mitigación ──────────────────────────────────────
+- id: mitigar-csrf
+  category: procedimental
+  question: "¿Cómo mitigar un CSRF paso a paso?"
+  expected_doc_ids: ["cwe-352"]
+  reference_answer: |
+    Para mitigar CSRF (CWE-352): usar tokens anti-CSRF por sesión/solicitud,
+    validar el token en cada acción que cambie estado, usar cookies SameSite,
+    verificar cabeceras Origin/Referer y requerir reautenticación en acciones
+    sensibles.
+  eval_focus: [generation, retrieval]
+  tags: [csrf, es]
+
+- id: prevenir-deserializacion
+  category: procedimental
+  question: "¿Cómo prevenir la deserialización insegura de datos?"
+  expected_doc_ids: ["cwe-502"]
+  eval_focus: [generation, retrieval]
+  tags: [deserialization, es]
+
+# ── bilingue: misma pregunta en ES y EN → mismo doc ─────────────────────────
+- id: open-redirect-es
+  category: bilingue
+  question: "¿Qué es una vulnerabilidad de open redirect?"
+  expected_doc_ids: ["cwe-601"]
+  eval_focus: [retrieval]
+  tags: [open-redirect, es]
+
+- id: open-redirect-en
+  category: bilingue
+  question: "what is an open redirect vulnerability"
+  expected_doc_ids: ["cwe-601"]
+  eval_focus: [retrieval]
+  tags: [open-redirect, en]
+
+# ── regresion: conceptuales puras sin ID (no deben degradarse) ──────────────
+- id: xxe-conceptual
+  category: regresion
+  question: "¿Qué es un ataque XML External Entity (XXE)?"
+  expected_doc_ids: ["cwe-611"]
+  eval_focus: [retrieval, generation]
+  tags: [xxe, es]
+
+- id: privilegios-conceptual
+  category: regresion
+  question: "¿Qué es la gestión incorrecta de privilegios?"
+  expected_doc_ids: ["cwe-269"]
+  eval_focus: [retrieval]
+  tags: [privilegios, es]
+
+# ── fuera_dominio: negativas, el RAG debe decir que no sabe (anti-alucinación)
+- id: capital-francia
+  category: fuera_dominio
+  question: "¿Cuál es la capital de Francia?"
+  expected_doc_ids: []
+  reference_answer: "No lo sé: esa pregunta está fuera del alcance de la base de ciberseguridad."
+  eval_focus: [generation]
+  tags: [negativa]
+
+- id: receta-tarta
+  category: fuera_dominio
+  question: "Dame una receta de tarta de manzana."
+  expected_doc_ids: []
+  reference_answer: "No lo sé: la base solo contiene información de ciberseguridad."
+  eval_focus: [generation]
+  tags: [negativa]
+
+# ── CVE: hoy no indexados → tests de robustez (ver NOTA del encabezado) ──────
+- id: cve-log4shell-numero
+  category: id_inexistente
+  question: "¿Qué es la vulnerabilidad CVE-2021-44228?"
+  expected_doc_ids: []
+  reference_answer: "No dispongo de información sobre ese CVE en la base."
+  eval_focus: [generation]
+  tags: [cve, robustez, pendiente-ingesta]
+
+- id: cve-log4j-nombre
+  category: id_inexistente
+  question: "Contame sobre las vulnerabilidades de Log4Shell en Log4j."
+  expected_doc_ids: []
+  reference_answer: "No dispongo de información específica sobre Log4Shell en la base."
+  eval_focus: [generation]
+  tags: [cve, robustez, pendiente-ingesta]
+
+- id: cve-inexistente
+  category: id_inexistente
+  question: "¿Qué es CVE-9999-99999?"
+  expected_doc_ids: []
+  reference_answer: "No existe / no dispongo de información sobre ese identificador."
+  eval_focus: [generation]
+  tags: [cve, robustez]

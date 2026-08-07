@@ -1,15 +1,34 @@
 FROM ghcr.io/open-webui/pipelines:main
 
+# Instalar dependencias del proyecto, incluyendo Haystack y los conectores del RAG.
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
 # Instalar marker-pdf (instala surya-ocr que requiere torch>=2.7)
 RUN pip install --no-cache-dir marker-pdf
 
 # Forzar torch+torchvision compatibles DESPUÉS de marker
-# torch 2.7.0 es lo que surya-ocr requiere explícitamente
+# torch 2.7.0 es lo que surya-ocr requiere explícitamente.
+#
+# Por defecto se instala la build de CPU (corre en cualquier máquina; la
+# generación va por Groq y embeddings/marker-pdf en CPU son suficientes).
+# Para NVIDIA, buildear con:
+#   --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cu126
+# (lo hace automáticamente docker-compose.nvidia.yml)
+ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu
 RUN pip install --no-cache-dir --force-reinstall \
-    torch torchvision \
-    --index-url https://download.pytorch.org/whl/cu121
+    torch==2.7.0 \
+    torchvision==0.22.0 \
+    --index-url ${TORCH_INDEX_URL}
+
+# Cross-encoder reranker (bge-reranker-v2-m3): corre en CPU con el torch ya fijado.
+# Pre-descargamos el modelo al buildear para que el primer arranque no espere la
+# descarga de HuggingFace y el container funcione offline.
+RUN pip install --no-cache-dir sentence-transformers
+RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-v2-m3')"
 
 # Verificaciones
 RUN python -c "import torch, torchvision; print('torch:', torch.__version__, '| torchvision:', torchvision.__version__)"
 RUN python -c "from transformers import PreTrainedModel; print('transformers OK')"
 RUN python -c "from marker.converters.pdf import PdfConverter; print('marker-pdf OK')"
+RUN python -c "from haystack.components.rankers import SentenceTransformersSimilarityRanker; print('ranker OK')"

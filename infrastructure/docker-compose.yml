@@ -8,14 +8,6 @@ services:
            - "${OLLAMA_PORT:-11434}:11434"
         volumes:
             - ollama_data:/root/.ollama
-        deploy:
-            resources:
-               reservations:
-                    devices:
-                      - driver: nvidia
-                        count: 1
-                        #device_ids: ["1"]
-                        capabilities: [gpu]
 
     db:
         image: postgres:15-alpine
@@ -23,8 +15,8 @@ services:
         env_file:
             - env/db.env
         environment:
-            POSTGRES_USER: ${DATABASE_USER}
-            POSTGRES_PASSWORD: ${DATABASE_PASS}
+            POSTGRES_USER: ${DATABASE_USER:-owui}
+            POSTGRES_PASSWORD: ${DATABASE_PASS:-owui}
         ports:
             - "${DB_PORT:-5432}:5432"
         volumes:
@@ -36,8 +28,8 @@ services:
         env_file:
             - env/vdb.env
         environment:
-            POSTGRES_USER: ${PGVECTOR_USR}
-            POSTGRES_PASSWORD: ${PGVECTOR_PASS}
+            POSTGRES_USER: ${PGVECTOR_USR:-avdbuser}
+            POSTGRES_PASSWORD: ${PGVECTOR_PASS:-avdbpass}
         ports:
             - "${VDB_PORT:-5433}:5432"
         volumes:
@@ -49,9 +41,10 @@ services:
         env_file:
             - env/openwebui.env
         environment:
-            DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASS}@db/owebuidb?sslmode=disable
-            PGVECTOR_DB_URL: postgresql://${PGVECTOR_USR}:${PGVECTOR_PASS}@vdb/pgvdb?sslmode=disable
-            OPENAI_API_KEY: ${PIPESERVER_KEY}
+            DATABASE_URL: postgresql://${DATABASE_USER:-owui}:${DATABASE_PASS:-owui}@db/owebuidb?sslmode=disable
+            PGVECTOR_DB_URL: postgresql://${PGVECTOR_USR:-avdbuser}:${PGVECTOR_PASS:-avdbpass}@vdb/pgvdb?sslmode=disable
+            OPENAI_API_BASE_URL: http://pipelines:9099
+            OPENAI_API_KEY: ${PIPESERVER_KEY:-0p3n-w3bui}
         depends_on:
             - db
             - vdb
@@ -60,14 +53,20 @@ services:
 
     pipelines:
         build:
-            context: .
-            dockerfile: Dockerfile.pipelines
+            context: ..
+            dockerfile: infrastructure/Dockerfile.pipelines
         restart: unless-stopped
         env_file:
             - env/pipelines.env
         environment:
-            PG_CONN_STR: postgresql://${PGVECTOR_USR}:${PGVECTOR_PASS}@vdb/pgvdb?sslmode=disable
-            TORCH_DEVICE: cuda  
+            PG_CONN_STR: postgresql://${PGVECTOR_USR:-avdbuser}:${PGVECTOR_PASS:-avdbpass}@vdb/pgvdb?sslmode=disable
+            TORCH_DEVICE: cpu
+            # Proveedor del LLM de generación: groq (API Key, default) u ollama (local, GPU).
+            # Ver docs/modos_llm.md. GROQ_API_KEY puede ir vacío cuando LLM_PROVIDER=ollama.
+            LLM_PROVIDER: ${LLM_PROVIDER:-groq}
+            LLM_MODEL: ${LLM_MODEL:-}
+            GROQ_API_KEY: ${GROQ_API_KEY:-}
+            PIPELINES_API_KEY: ${PIPESERVER_KEY:-0p3n-w3bui}
         ports:
             - "${PIPELINES_PORT:-9099}:9099"
         extra_hosts:
@@ -75,16 +74,10 @@ services:
         volumes:
             - pipelines:/app/pipelines
             - rawdata:/app/pipelines/rawdata
+            - marker_cache:/root/.cache
         depends_on:
             - vdb
             - ollama
-        deploy:                         
-            resources:
-                reservations:
-                    devices:
-                      - driver: nvidia
-                        count: 1
-                        capabilities: [gpu]
 
 volumes:
     ollama_data:
@@ -123,3 +116,6 @@ volumes:
             type: 'none'
             o: 'bind'
             device: ../data/raw/
+    # Caché de modelos de marker-pdf / huggingface (evita re-descargar en cada recreate)
+    marker_cache:
+        driver: local

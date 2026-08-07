@@ -27,6 +27,9 @@ MAX_DATE_RANGE_DAYS = 120    # restricción de la API para lastMod*Date
 MAX_RETRIES = 3
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+# Escribe dentro de data/raw/, que el docker-compose bind-montea como el volumen
+# `rawdata` → /app/pipelines/rawdata (INPUT_DIR del pipeline), para que el
+# NVDJsonConverter levante estas páginas en el próximo arranque.
 RAW_DIR = REPO_ROOT / "data" / "raw" / "nvd"
 CHECKPOINT_PATH = RAW_DIR / "_checkpoint.json"
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.000Z"

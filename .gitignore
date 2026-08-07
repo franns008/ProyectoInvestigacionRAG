@@ -33,3 +33,9 @@ infrastructure/.env
 
 # Logs
 *.log
+
+# Resultados de eval (corridas timestamped; el baseline sí se versiona)
+src/pipeline/eval/results/
+
+# NVD
+data/raw/nvdsrc/pipeline/logCiberseguridad.txt

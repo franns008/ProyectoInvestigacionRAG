@@ -15,5 +15,17 @@ docker compose run
 ```
 And a bit of luck.
 
+## Dos modos de generación (API Key ↔ Ollama local) — CRUCIAL
+
+La generación del RAG se puede levantar de dos maneras según tu hardware, eligiendo
+con la variable `LLM_PROVIDER` en `infrastructure/.env`:
+
+- **`groq`** (default): generación por **API Key** (Groq). Corre en cualquier máquina (CPU).
+- **`ollama`**: generación **local** en Ollama, orientada a **GPU Nvidia**. Sin API Key.
+
+Los embeddings (`bge-m3`) son siempre locales y no cambian entre modos.
+
+👉 **Guía completa e instrucciones de uso: [`docs/modos_llm.md`](docs/modos_llm.md)** (doc crucial).
+
 ## Creando tu propio RAG
 El código de tu RAG puede vivir en cualquier carpeta fuera de infrastructure e incluso fuera del repositorio. La carpeta `seven_wonders` tiene un ejemplo de RAG sencillo usando HayStack pero pueden crearse RAGs usando cualquier otra librería como LlamaIndex o LangChain. Sigue por el camino de tu arcoiris 🌈.
