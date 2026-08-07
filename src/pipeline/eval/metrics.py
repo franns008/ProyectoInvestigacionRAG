@@ -79,14 +79,32 @@ def source_recall_at_k(retrieved_sources: Sequence[str], expected_sources: Itera
     return len(exp & set(retrieved_sources)) / len(exp)
 
 
+def source_reciprocal_rank(retrieved_sources: Sequence[str], expected_sources: Iterable[str]) -> float:
+    """1/posición (1-indexada) de la primera fuente esperada; 0 si ninguna aparece.
+
+    Complementa a source_recall_at_k, que con 1 fuente esperada por pregunta sólo puede
+    valer 0 ó 1 y empata estrategias que recuperan la guía correcta en distinta posición.
+    Con ranker_top_k=4, llegar 1º o 4º al prompt no es lo mismo: el orden es justamente
+    lo que el reranker decide y lo que cambia el contexto que ve el LLM.
+    """
+    exp = set(expected_sources)
+    for i, source in enumerate(retrieved_sources, start=1):
+        if source in exp:
+            return 1.0 / i
+    return 0.0
+
+
 def aggregate_source_retrieval(per_question: list[dict]) -> dict:
-    """Promedia (macro) recall/hit de fuente sobre las preguntas con expected_sources."""
+    """Promedia (macro) recall/hit/mrr de fuente sobre las preguntas con expected_sources."""
     scored = [q for q in per_question if q.get("source_recall") is not None]
     if not scored:
-        return {"source_recall_at_k": None, "source_hit_rate": None, "n": 0}
+        return {"source_recall_at_k": None, "source_hit_rate": None,
+                "source_mrr": None, "n": 0}
+    con_rr = [q for q in scored if q.get("source_rr") is not None]
     return {
         "source_recall_at_k": round(mean(q["source_recall"] for q in scored), 4),
         "source_hit_rate":    round(mean(q["source_hit"] for q in scored), 4),
+        "source_mrr":         round(mean(q["source_rr"] for q in con_rr), 4) if con_rr else None,
         "n":                  len(scored),
     }
 

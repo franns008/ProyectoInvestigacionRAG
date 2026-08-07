@@ -56,7 +56,11 @@ if not logger.handlers:
     logger.addHandler(ch)
 
 class Indexer:
-    def __init__(self):
+    def __init__(self, include_cve: bool = False):
+        # include_cve=False por defecto: los ~8k CVE de NVD son atómicos y su embedding
+        # local en CPU domina el tiempo de indexación (~20 min) sin aportar a las
+        # preguntas de CWE/guías. Activar con --include-cve cuando se los quiera indexar.
+        self.include_cve = include_cve
         self.store = PgvectorDocumentStore(
             connection_string=Secret.from_token(DB_CONNECTION),
             embedding_dimension=EMBEDDING_DIMENSION,
@@ -153,9 +157,12 @@ class Indexer:
         if xml_files:
             atomic.extend(XMLCWEConverter().run(sources=xml_files)["documents"])
 
-        cve_files = sorted(INPUT_DIR.rglob("cves_page_*.json"))
-        if cve_files:
-            atomic.extend(NVDJsonConverter().run(sources=cve_files)["documents"])
+        if self.include_cve:
+            cve_files = sorted(INPUT_DIR.rglob("cves_page_*.json"))
+            if cve_files:
+                atomic.extend(NVDJsonConverter().run(sources=cve_files)["documents"])
+        else:
+            logger.info("CVE (NVD) OMITIDOS — usar --include-cve para indexarlos.")
 
         return splittable, atomic
 
@@ -228,5 +235,13 @@ class Indexer:
 
 
 if __name__ == "__main__":
-    indexer = Indexer()
-    indexer.run()
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Indexación del RAG de ciberseguridad.")
+    ap.add_argument("--include-cve", action="store_true",
+                    help="Indexar también los CVE de NVD (cves_page_*.json). Off por "
+                         "defecto: son ~8k documentos atómicos y su embedding en CPU "
+                         "domina el tiempo de corrida.")
+    args = ap.parse_args()
+
+    Indexer(include_cve=args.include_cve).run()

@@ -1,6 +1,12 @@
 """Registro de estrategias de chunking candidatas para el corpus splittable
 (PDF/DOCX/MD/TXT). Los documentos atómicos (CWE, CVE) nunca pasan por acá.
 
+IMPORTANTE — por qué este módulo vive en eval/ y NO en la raíz de src/pipeline/:
+el server de OpenWebUI Pipelines escanea su directorio raíz y trata CADA .py como
+un pipeline. Un módulo que no define una clase `Pipeline` es movido a `failed/` al
+arrancar el server (y se le crea un directorio `<nombre>/valves.json`), rompiendo el
+import. En eval/ el server no lo toca. No mover este archivo a la raíz.
+
 Contexto y resultados empíricos: docs/data_splitting.md. Lo usa
 src/pipeline/eval/run_chunking_experiment.py para indexar y comparar cada
 estrategia en una tabla pgvector separada, sin tocar la tabla de producción.

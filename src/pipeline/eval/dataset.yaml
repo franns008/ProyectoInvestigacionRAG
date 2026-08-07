@@ -318,3 +318,142 @@
   reference_answer: "No existe / no dispongo de información sobre ese identificador."
   eval_focus: [generation]
   tags: [cve, robustez]
+
+# ── guia_incibe: ampliación del conjunto (3 → 12 preguntas, 4 por guía) ─────────
+# Con 3 preguntas el source_recall sólo podía valer 0, 0.33, 0.67 ó 1, y empataba
+# estrategias distintas. Se reparten 4 por documento para que el promedio macro no
+# quede sesgado hacia una guía. Todas están ancladas a secciones concretas cuyo
+# contenido vive SÓLO en las guías (no en el catálogo CWE), que es lo que hace que
+# midan el chunking del corpus splittable. Ver docs/data_splitting.md §6.2.
+
+- id: xss-sop-cors-csp
+  category: guia_incibe
+  question: "¿Qué son SOP, CORS y CSP y qué papel cumplen para prevenir XSS?"
+  expected_doc_ids: []
+  expected_sources: ["INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf"]
+  reference_answer: |
+    La política de mismo origen (SOP) es una medida del navegador que restringe la
+    interacción entre documentos o scripts de orígenes distintos. CORS relaja esa
+    política de forma controlada mediante cabeceras HTTP, permitiendo accesos
+    cruzados específicos. La política de seguridad de contenido (CSP) es una capa
+    adicional que deja al desarrollador declarar qué recursos pueden cargarse,
+    evitando la ejecución de scripts maliciosos al especificar fuentes de confianza.
+  eval_focus: [retrieval, generation]
+  tags: [xss, guia, chunking]
+
+- id: xss-herramientas-sast-dast
+  category: guia_incibe
+  question: "¿Qué herramientas de análisis estático y dinámico menciona INCIBE para detectar XSS?"
+  expected_doc_ids: []
+  expected_sources: ["INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf"]
+  reference_answer: |
+    Para análisis estático (SAST) menciona SonarQube y Brakeman (este último para
+    Ruby on Rails). Para análisis dinámico (DAST) menciona OWASP ZAP y Burp Suite
+    Community Edition, que actúan como proxies intermediarios para interceptar y
+    manipular el tráfico entre navegador y servidor.
+  eval_focus: [retrieval, generation]
+  tags: [xss, guia, chunking]
+
+- id: xss-csp-report-only
+  category: guia_incibe
+  question: "¿Cómo recomienda la guía desplegar una política CSP sin romper el funcionamiento de la web?"
+  expected_doc_ids: []
+  expected_sources: ["INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf"]
+  reference_answer: |
+    Recomienda implementarla primero en modo "report-only", mediante la cabecera
+    Content-Security-Policy-Report-Only, que permite recolectar informes de
+    violaciones sin afectar la operatividad. Tras analizar esos informes y ajustar
+    la política (incorporando hashes o nonces para scripts y estilos inline), se
+    aplica de forma definitiva con la cabecera Content-Security-Policy.
+  eval_focus: [retrieval, generation]
+  tags: [xss, guia, chunking]
+
+- id: cloud-modelos-servicio
+  category: guia_incibe
+  question: "¿Qué diferencia hay entre los modelos de servicio SaaS, PaaS e IaaS?"
+  expected_doc_ids: []
+  expected_sources: ["Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf"]
+  reference_answer: |
+    SaaS entrega al usuario final una aplicación en la nube junto con toda su
+    infraestructura y plataforma subyacentes, accesible por navegador. PaaS provee
+    una plataforma de software para que los desarrolladores creen, ejecuten y
+    administren sus aplicaciones sin mantener la infraestructura asociada. IaaS
+    proporciona recursos informáticos virtualizados (almacenamiento, redes y
+    máquinas virtuales) bajo demanda, pagando sólo por lo utilizado.
+  eval_focus: [retrieval, generation]
+  tags: [cloud, guia, chunking]
+
+- id: cloud-buenas-practicas
+  category: guia_incibe
+  question: "¿Qué buenas prácticas recomienda INCIBE para proteger una infraestructura cloud?"
+  expected_doc_ids: []
+  expected_sources: ["Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf"]
+  reference_answer: |
+    Gestión de accesos con autenticación y autorización robustas; cifrado de los
+    datos almacenados y en tránsito (por ejemplo HTTPS en lugar de HTTP);
+    monitorización en tiempo real de la actividad; gestión de vulnerabilidades
+    aplicando parches o contramedidas; realización y prueba periódica de backups; y
+    concienciación del personal, dado que el fallo humano es una de las principales
+    vías de entrada de los atacantes.
+  eval_focus: [retrieval, generation]
+  tags: [cloud, guia, chunking]
+
+- id: cloud-componentes-infraestructura
+  category: guia_incibe
+  question: "¿Qué componentes forman una infraestructura cloud según el estudio de INCIBE?"
+  expected_doc_ids: []
+  expected_sources: ["Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf"]
+  reference_answer: |
+    El hardware (conmutadores, enrutadores, firewalls, balanceadores de carga y
+    matrices o dispositivos de almacenamiento), la virtualización —que separa las
+    funciones y servicios de TI del hardware—, la gestión del almacenamiento, que
+    permite agregar o eliminar unidades de forma flexible, y la conexión por red,
+    que en el entorno cloud se resuelve mediante VLAN en lugar de cables y
+    conmutadores físicos.
+  eval_focus: [retrieval, generation]
+  tags: [cloud, guia, chunking]
+
+- id: 5g-snpn-vs-pni-npn
+  category: guia_incibe
+  question: "¿Qué diferencia hay entre una red privada 5G SNPN y una PNI-NPN?"
+  expected_doc_ids: []
+  expected_sources: ["INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf"]
+  reference_answer: |
+    Son los dos tipos de red privada 5G que define el 3GPP. La SNPN (stand-alone
+    non-public network) es una red privada independiente, que no depende de las
+    funciones de red de la red pública terrestre móvil (PLMN). La PNI-NPN (public
+    network integrated non-public network) comparte parte de la infraestructura de
+    red pública; la 5G-ACIA describe tres escenarios típicos, uno de ellos con la
+    red de acceso radioeléctrico (RAN) compartida entre la empresa y el operador.
+  eval_focus: [retrieval, generation]
+  tags: [5g, guia, chunking]
+
+- id: 5g-linea-base-referencias
+  category: guia_incibe
+  question: "¿En qué estándares apoyarse para definir la línea base de configuración de seguridad de una red 5G privada?"
+  expected_doc_ids: []
+  expected_sources: ["INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf"]
+  reference_answer: |
+    La guía recomienda verificar primero si existen estándares de facto reconocidos
+    en la industria, citando los CIS Benchmarks y el OWASP Top Ten para sistemas
+    operativos, bases de datos y componentes web. Para los sistemas 5G, donde no hay
+    líneas base maduras, propone construirla en tres partes: identificar los
+    elementos configurables, establecer el conjunto completo de líneas base y
+    definir líneas base jerarquizadas según distintos niveles de requisitos.
+  eval_focus: [retrieval, generation]
+  tags: [5g, guia, chunking]
+
+- id: 5g-ens-configuracion
+  category: guia_incibe
+  question: "¿Qué exige el Esquema Nacional de Seguridad español sobre la configuración de seguridad?"
+  expected_doc_ids: []
+  expected_sources: ["INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf"]
+  reference_answer: |
+    El ENS (Real Decreto 311/2022), en su medida de configuración de seguridad
+    [op.exp.2], exige que los ordenadores se configuren antes de entrar en
+    funcionamiento de forma que se retiren las cuentas y contraseñas estándar
+    [op.exp.2.1], se aplique la regla de mínima funcionalidad [op.exp.2.2], se
+    aplique la regla de seguridad por defecto [op.exp.2.3] y las máquinas virtuales
+    se configuren y gestionen de forma segura [op.exp.2.4].
+  eval_focus: [retrieval, generation]
+  tags: [5g, guia, chunking]

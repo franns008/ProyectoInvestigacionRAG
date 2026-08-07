@@ -133,7 +133,7 @@ al prompt.
 ## 5. Estrategias candidatas (con medición real)
 
 Registradas en
-[`src/pipeline/chunking_strategies.py`](../src/pipeline/chunking_strategies.py). Números
+[`src/pipeline/eval/chunking_strategies.py`](../src/pipeline/eval/chunking_strategies.py). Números
 **medidos** sobre los 3 PDFs INCIBE (34.130 palabras en total):
 
 Números **medidos en la corrida real** (A, B) y en validación local sobre el mismo corpus

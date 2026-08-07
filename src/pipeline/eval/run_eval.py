@@ -184,8 +184,9 @@ def evaluate(item: dict, emb_ids, kw_ids, ranked_ids, ranked_sources, answer, do
     if expected_sources:
         rec["source_recall"] = m.source_recall_at_k(ranked_sources, expected_sources)
         rec["source_hit"]    = m.source_hit_at_k(ranked_sources, expected_sources)
+        rec["source_rr"]     = m.source_reciprocal_rank(ranked_sources, expected_sources)
     else:
-        rec["source_recall"] = rec["source_hit"] = None
+        rec["source_recall"] = rec["source_hit"] = rec["source_rr"] = None
     return rec
 
 
