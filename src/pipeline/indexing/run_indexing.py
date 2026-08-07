@@ -22,8 +22,15 @@ from haystack_integrations.document_stores.pgvector import PgvectorDocumentStore
 from haystack_integrations.components.embedders.ollama import OllamaDocumentEmbedder
 from haystack.document_stores.types import DuplicatePolicy
 
-# Importamos los conversores que separamos en el otro archivo
-from converters import XMLCWEConverter, NVDJsonConverter
+# Importamos los conversores que separamos en el otro archivo.
+# Import robusto: funciona ejecutado como script (`python indexing/run_indexing.py`,
+# donde sys.path incluye indexing/ y no hay paquete padre) y también importado como
+# módulo (`from indexing.run_indexing import INPUT_DIR`), que es lo que hace
+# src/pipeline/eval/run_chunking_experiment.py para reusar rutas y conversores.
+try:
+    from .converters import XMLCWEConverter, NVDJsonConverter
+except ImportError:  # ejecutado como script: no hay paquete padre
+    from converters import XMLCWEConverter, NVDJsonConverter
 
 # --- Configuración ---
 DB_CONNECTION       = "postgresql://avdbuser:avdbpass@vdb:5432/pgvdb"

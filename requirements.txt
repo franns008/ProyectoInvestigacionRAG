@@ -6,6 +6,10 @@ pypdf
 python-docx
 markdown-it-py
 mdit-plain
-marker-pdf
+nltk
 requests
 python-dotenv
+
+# marker-pdf NO va acá: lo instala condicionalmente Dockerfile.pipelines según el
+# build-arg INSTALL_MARKER (default false → imagen slim, ~3 GB menos). Sólo hace falta
+# para convertir PDFs nuevos a Markdown. Ver docs/imagen_pipelines.md.

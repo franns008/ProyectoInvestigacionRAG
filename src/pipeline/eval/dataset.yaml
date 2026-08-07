@@ -8,6 +8,13 @@
 #   expected_doc_ids  : ground truth de retrieval (ids determinísticos del store:
 #                       cwe-<n>, sha256(cve_id)). Vacío [] = pregunta sin doc
 #                       esperado (negativas / fuera de dominio / no indexado aún).
+#   expected_sources  : ground truth de retrieval a nivel de FUENTE (nombre del
+#                       archivo original, meta.source), para preguntas cuyo
+#                       contenido solo vive en el corpus splittable (guías INCIBE
+#                       en PDF/MD/DOCX/TXT). A diferencia de expected_doc_ids, el
+#                       id de un chunk cambia con la estrategia de chunking (es un
+#                       hash del contenido); el nombre de archivo no. Ver
+#                       docs/data_splitting.md. Vacío/ausente = no aplica.
 #   reference_answer  : respuesta modelo (Tier 2 SAS y Tier 3 juez). Opcional.
 #   eval_focus        : [retrieval] / [generation] / [retrieval, generation]
 #   tags              : libres, para filtrar
@@ -224,6 +231,51 @@
   expected_doc_ids: ["cwe-269"]
   eval_focus: [retrieval]
   tags: [privilegios, es]
+
+# ── guia_incibe: contenido que SOLO vive en las guías INCIBE (no en el catálogo
+# CWE) — es la única categoría que estresa el chunking del corpus splittable.
+# expected_sources ancla contra el nombre del PDF original, no contra un chunk id
+# (que cambia con la estrategia de chunking). Ver docs/data_splitting.md.
+- id: xss-programacion-segura
+  category: guia_incibe
+  question: "¿Qué recomendaciones de programación segura da INCIBE para evitar XSS al manipular el DOM?"
+  expected_doc_ids: []
+  expected_sources: ["INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf"]
+  reference_answer: |
+    La guía recomienda validar y sanear toda entrada de usuario (p. ej. con
+    htmlspecialchars antes de volcarla al HTML), evitar asignar entrada no
+    confiable a innerHTML y usar textContent o DOMPurify en su lugar, validar las
+    URLs antes de asignarlas a window.location, evitar document.write con entrada
+    no controlada, configurar cookies con los atributos Secure y HttpOnly, y
+    apoyarse en frameworks (React, Vue, Angular) que escapan por defecto.
+  eval_focus: [retrieval, generation]
+  tags: [xss, guia, chunking]
+
+- id: cloud-honeypots-industriales
+  category: guia_incibe
+  question: "¿Qué honeypots industriales menciona la guía de INCIBE sobre infraestructuras cloud en SCI?"
+  expected_doc_ids: []
+  expected_sources: ["Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf"]
+  reference_answer: |
+    La guía menciona Conpot, Gridpot y SCADA-honeynet como honeypots industriales
+    ya existentes, y también la opción de crear máquinas virtuales propias que
+    simulen dispositivos industriales (PLC, HMI, RTU) interconectados mediante
+    VLANs en infraestructura cloud.
+  eval_focus: [retrieval, generation]
+  tags: [cloud, sci, guia, chunking]
+
+- id: 5g-riesgo-mitm
+  category: guia_incibe
+  question: "¿Por qué las redes privadas 5G aumentan el riesgo de ataques man-in-the-middle?"
+  expected_doc_ids: []
+  expected_sources: ["INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf"]
+  reference_answer: |
+    Porque una red privada 5G introduce múltiples enlaces distintos —las interfaces
+    radio, la red de transmisión y los canales de operación y mantenimiento
+    (O&M)— y cada enlace adicional amplía la superficie de exposición a
+    interceptaciones y manipulaciones no autorizadas de los datos.
+  eval_focus: [retrieval, generation]
+  tags: [5g, guia, chunking]
 
 # ── fuera_dominio: negativas, el RAG debe decir que no sabe (anti-alucinación)
 - id: capital-francia

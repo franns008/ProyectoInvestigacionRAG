@@ -74,7 +74,13 @@ services:
         volumes:
             - pipelines:/app/pipelines
             - rawdata:/app/pipelines/rawdata
-            - marker_cache:/root/.cache
+            # marker_cache DESACTIVADO: el modelo del reranker (bge-reranker-v2-m3, ~4.3 GB)
+            # ya está horneado en la imagen (ver Dockerfile.pipelines), así que montar un
+            # volumen sobre /root/.cache sólo DUPLICABA esos 4.3 GB en disco al crear el
+            # container. Sin el volumen, el runtime lee el modelo directo de la imagen.
+            # Nota: si aparece un PDF nuevo, marker-pdf re-descarga sus modelos OCR en el
+            # container (se pierden al recrear); con PDFs ya cacheados en _converted_md no corre.
+            # - marker_cache:/root/.cache
         depends_on:
             - vdb
             - ollama
@@ -116,6 +122,8 @@ volumes:
             type: 'none'
             o: 'bind'
             device: ../data/raw/
-    # Caché de modelos de marker-pdf / huggingface (evita re-descargar en cada recreate)
-    marker_cache:
-        driver: local
+    # Caché de modelos de marker-pdf / huggingface. DESACTIVADO (ver el comentario en el
+    # mount de 'pipelines'): el modelo del reranker ya viene en la imagen y el volumen sólo
+    # duplicaba ~4.3 GB en disco. Para reactivarlo, descomentar acá y el mount de arriba.
+    # marker_cache:
+    #     driver: local

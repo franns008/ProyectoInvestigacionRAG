@@ -168,12 +168,21 @@ def build_keyword_query(user_message: str) -> str:
 # ======================================================================
 # Motor RAG
 # ======================================================================
-def get_document_store() -> PgvectorDocumentStore:
+def get_document_store(
+    table_name: str = DB_TABLE,
+    keyword_index_name: str = "ciberseguridad_keyword_index",
+) -> PgvectorDocumentStore:
+    """`table_name`/`keyword_index_name` son overrideables para instanciar stores
+    paralelos (p. ej. un experimento de chunking en una tabla
+    `ciberseguridad_docs_chunk_<estrategia>`) sin tocar la tabla de producción.
+    Los defaults reproducen exactamente el store de producción. Ver
+    docs/data_splitting.md y src/pipeline/eval/run_chunking_experiment.py.
+    """
     return PgvectorDocumentStore(
         connection_string=Secret.from_token(DB_CONNECTION),
         embedding_dimension=EMBEDDING_DIMENSION,
-        table_name=DB_TABLE,
-        keyword_index_name="ciberseguridad_keyword_index",
+        table_name=table_name,
+        keyword_index_name=keyword_index_name,
     )
 
 def _llm_provider() -> str:
@@ -206,7 +215,14 @@ def build_generator(valves):
         },
     )
 
-def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline:
+def build_rag_pipeline(store: PgvectorDocumentStore, valves, include_llm: bool = True) -> HaystackPipeline:
+    """Arma el grafo de query (retrievers híbridos + RRF + reranker + generación).
+
+    `include_llm=False` arma el pipeline SOLO hasta el reranker (sin prompt_builder ni
+    LLM): útil para medir retrieval puro (recall@k / source_recall del experimento de
+    chunking) sin exigir GROQ_API_KEY ni pagar la latencia de generación. El runtime de
+    producción usa el default (True). Ver src/pipeline/eval/run_chunking_experiment.py.
+    """
     v = valves
     pipeline = HaystackPipeline()
     pipeline.add_component("text_embedder",       OllamaTextEmbedder(model=v.embedding_model, url=OLLAMA_URL))
@@ -214,15 +230,17 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves) -> HaystackPipeline
     pipeline.add_component("keyword_retriever",   PgvectorKeywordRetriever(document_store=store, top_k=v.retriever_top_k))
     pipeline.add_component("document_joiner",     DocumentJoiner(join_mode="reciprocal_rank_fusion", top_k=v.retriever_top_k * 2))
     pipeline.add_component("ranker",              SentenceTransformersSimilarityRanker(model=v.ranker_model, top_k=v.ranker_top_k))
-    pipeline.add_component("prompt_builder",      PromptBuilder(template=PROMPT_TEMPLATE))
-    pipeline.add_component("llm",                 build_generator(v))
 
     pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
     pipeline.connect("embedding_retriever",     "document_joiner")
     pipeline.connect("keyword_retriever",       "document_joiner")
     pipeline.connect("document_joiner",         "ranker.documents")
-    pipeline.connect("ranker",                  "prompt_builder.documents")
-    pipeline.connect("prompt_builder",          "llm")
+
+    if include_llm:
+        pipeline.add_component("prompt_builder", PromptBuilder(template=PROMPT_TEMPLATE))
+        pipeline.add_component("llm",            build_generator(v))
+        pipeline.connect("ranker",          "prompt_builder.documents")
+        pipeline.connect("prompt_builder",  "llm")
 
     return pipeline
 
