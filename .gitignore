@@ -5,6 +5,9 @@ infrastructure/appdata/postgress_vector/
 infrastructure/appdata/owui/
 infrastructure/appdata/pipelines/
 
+# Dumps crudos de fuentes estructuradas (grandes, se regeneran con los scripts de ingestion)
+data/raw/nvd/
+
 # Python
 __pycache__/
 *.pyc

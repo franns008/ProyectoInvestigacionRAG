@@ -58,9 +58,11 @@ def append_history(out_dir: Path, snapshot: dict) -> Path:
     hist = out_dir / "history.csv"
     o = snapshot["overall"]
     s = snapshot.get("sas", {}) or {}
+    src = snapshot.get("source_overall", {}) or {}
     c = snapshot["config"]
     row = {
         "timestamp":       snapshot["timestamp"],
+        "chunking":        c.get("chunking", ""),
         "top_k":           c["top_k"],
         "temperature":     c["temperature"],
         "llm_model":       c["llm_model"],
@@ -71,6 +73,8 @@ def append_history(out_dir: Path, snapshot: dict) -> Path:
         "mrr":             o["mrr"],
         "n_sas":           s.get("n"),
         "sas":             s.get("sas"),
+        "n_source":        src.get("n"),
+        "source_recall":   src.get("source_recall_at_k"),
     }
     write_header = not hist.exists()
     with hist.open("a", newline="", encoding="utf-8") as f:
@@ -82,10 +86,13 @@ def append_history(out_dir: Path, snapshot: dict) -> Path:
 
 
 def run_question(pipeline, question: str):
-    """Una corrida del pipeline; devuelve (emb_ids, kw_ids, ranked_ids, answer).
+    """Una corrida del pipeline; devuelve
+    (emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids).
 
-    `ranked_ids` son los docs que el reranker deja al prompt (lo que ve el LLM), no
-    los candidatos fusionados del joiner. Las métricas Tier 1 se calculan sobre esto.
+    `ranked_ids`/`ranked_sources` son los docs que el reranker deja al prompt (lo que
+    ve el LLM), no los candidatos fusionados del joiner. Las métricas Tier 1 se
+    calculan sobre esto. `ranked_sources` es meta.source de esos mismos docs — ground
+    truth agnóstico a la estrategia de chunking (ver metrics.source_recall_at_k).
     """
     result = pipeline.run(
         {
@@ -96,11 +103,14 @@ def run_question(pipeline, question: str):
         },
         include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner", "ranker"},
     )
-    emb_ids    = [d.id for d in result["embedding_retriever"]["documents"]]
-    kw_ids     = [d.id for d in result["keyword_retriever"]["documents"]]
-    ranked_ids = [d.id for d in result["ranker"]["documents"]]
-    answer     = result.get("llm", {}).get("replies", [None])[0]
-    return emb_ids, kw_ids, ranked_ids, answer
+    ranked_docs    = result["ranker"]["documents"]
+    emb_ids        = [d.id for d in result["embedding_retriever"]["documents"]]
+    document_ids   = [d.id for d in result["document_joiner"]["documents"]]
+    kw_ids         = [d.id for d in result["keyword_retriever"]["documents"]]
+    ranked_ids     = [d.id for d in ranked_docs]
+    ranked_sources = [d.meta.get("source") for d in ranked_docs]
+    answer         = result.get("llm", {}).get("replies", [None])[0]
+    return emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids
 
 
 def compute_sas(embedder, answer: str | None, reference: str | None) -> float | None:
@@ -112,23 +122,53 @@ def compute_sas(embedder, answer: str | None, reference: str | None) -> float | 
     r = embedder.run(text=reference)["embedding"]
     return round(m.cosine_similarity(a, r), 4)
 
+def check_correct_rejection(answer:str ) -> bool:
+    """
+        Verifica si el LLM se abstuvo correctamente de responder una pregunta
+        para la cual no tenía contexto.
+    """
+    if not answer:
+        return False
+    # Convert the answer to lowercase for case-insensitive comparison
+    answer_lower = answer.lower()
+    # Check for common phrases indicating a correct rejection
+    rejection_phrases = [
+        "no puedo responder",
+        "no tengo suficiente información",
+        "no es posible responder",
+        "no puedo proporcionar una respuesta",
+        "no hay información suficiente",
+        "no puedo determinar la respuesta",
+        "no puedo dar una respuesta precisa",
+        "no puedo contestar",
+        "no puedo ayudar con eso",
+        "no tengo datos suficientes"
+    ]
+    return any(phrase in answer_lower for phrase in rejection_phrases)
 
-def evaluate(item: dict, emb_ids, kw_ids, joined_ids, answer) -> dict:
+
+def evaluate(item: dict, emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids=None) -> dict:
+    """`document_ids` (candidatos del joiner) es opcional: el experimento de chunking
+    corre en retrieval puro y sólo necesita ranked_ids/ranked_sources."""
     expected = item.get("expected_doc_ids") or []
+    expected_sources = item.get("expected_sources") or []
     rec = {
         "id":               item["id"],
         "category":         item.get("category", "?"),
         "question":         item["question"],
         "expected_doc_ids": expected,
-        "retrieved_ids":    joined_ids,
+        "expected_sources": expected_sources,
+        "ranked_ids":       ranked_ids,  # Renombrado de retrieved_ids/joined_ids
+        "ranked_sources":   ranked_sources,
+        "document_ids":     document_ids,
         "answer":           answer,
         "reference_answer": item.get("reference_answer"),
         "status":           "ok",
     }
     if expected:
-        rec["recall"] = m.recall_at_k(joined_ids, expected)
-        rec["hit"]    = m.hit_at_k(joined_ids, expected)
-        rec["rr"]     = m.reciprocal_rank(joined_ids, expected)
+        rec["recall"] = m.recall_at_k(ranked_ids, expected)
+        rec["hit"]    = m.hit_at_k(ranked_ids, expected)
+        rec["rr"]     = m.reciprocal_rank(ranked_ids, expected)
         exp = set(expected)
         rec["hit_source"] = {          # qué retriever aportó algún esperado
             "embedding": bool(exp & set(emb_ids)),
@@ -137,6 +177,16 @@ def evaluate(item: dict, emb_ids, kw_ids, joined_ids, answer) -> dict:
     else:
         rec["recall"] = rec["hit"] = rec["rr"] = None
         rec["hit_source"] = None
+        rec["correct_rejection"] = check_correct_rejection(answer)  # Verifica si el LLM se abstuvo correctamente
+        #FUncion a mejorar, debería ser más robusta y considerar más casos de abstención correcta.
+
+    # Tier 1b: ground truth a nivel de fuente (agnóstico a la estrategia de chunking).
+    if expected_sources:
+        rec["source_recall"] = m.source_recall_at_k(ranked_sources, expected_sources)
+        rec["source_hit"]    = m.source_hit_at_k(ranked_sources, expected_sources)
+        rec["source_rr"]     = m.source_reciprocal_rank(ranked_sources, expected_sources)
+    else:
+        rec["source_recall"] = rec["source_hit"] = rec["source_rr"] = None
     return rec
 
 
@@ -159,7 +209,7 @@ def _print_row(i: int, rec: dict) -> None:
           f"recall={rec['recall']:.2f} rr={rec['rr']:.2f} via={src}{_sas_str(rec)}")
 
 
-def _print_summary(overall: dict, by_cat: dict, sas_overall: dict) -> None:
+def _print_summary(overall: dict, by_cat: dict, sas_overall: dict, src_overall: dict | None = None) -> None:
     print("\n" + "=" * 64)
     print("RESUMEN")
     print("=" * 64)
@@ -168,17 +218,23 @@ def _print_summary(overall: dict, by_cat: dict, sas_overall: dict) -> None:
     print("\n  Tier 1 RETRIEVAL — solo preguntas con ground truth:")
     if overall["n"] == 0:
         print("    Sin preguntas con ground truth.")
-        return
-    print(f"    overall (n={overall['n']}):  "
-          f"recall@k={overall['recall_at_k']:.3f}  "
-          f"hit_rate={overall['hit_rate']:.3f}  "
-          f"mrr={overall['mrr']:.3f}")
-    print("\n    Por categoría:")
-    for cat, agg in by_cat.items():
-        if agg["n"] == 0:
-            continue
-        print(f"      {cat:<16} n={agg['n']:<2}  recall={agg['recall_at_k']:.3f}  "
-              f"hit={agg['hit_rate']:.3f}  mrr={agg['mrr']:.3f}")
+    else:
+        print(f"    overall (n={overall['n']}):  "
+              f"recall@k={overall['recall_at_k']:.3f}  "
+              f"hit_rate={overall['hit_rate']:.3f}  "
+              f"mrr={overall['mrr']:.3f}")
+        print("\n    Por categoría:")
+        for cat, agg in by_cat.items():
+            if agg["n"] == 0:
+                continue
+            print(f"      {cat:<16} n={agg['n']:<2}  recall={agg['recall_at_k']:.3f}  "
+                  f"hit={agg['hit_rate']:.3f}  mrr={agg['mrr']:.3f}")
+
+    # Tier 1b: recall a nivel de fuente — el eje que mide el chunking del splittable.
+    if src_overall and src_overall.get("source_recall_at_k") is not None:
+        print(f"\n  Tier 1b FUENTE (n={src_overall['n']}):  "
+              f"source_recall@k={src_overall['source_recall_at_k']:.3f}  "
+              f"source_hit={src_overall['source_hit_rate']:.3f}")
 
 
 def main() -> None:
@@ -217,8 +273,10 @@ def main() -> None:
     per_question: list[dict] = []
     for i, item in enumerate(dataset, 1):
         try:
-            emb, kw, joined, answer = run_question(pipeline, item["question"])
-            rec = evaluate(item, emb, kw, joined, answer)
+            
+            emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids = run_question(pipeline, item["question"])
+
+            rec = evaluate(item, emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids)
         except Exception as e:  # noqa: BLE001 — queremos seguir con el resto
             rec = {
                 "id": item["id"], "category": item.get("category", "?"),
@@ -226,16 +284,18 @@ def main() -> None:
                 "expected_doc_ids": item.get("expected_doc_ids") or [],
                 "answer": None, "reference_answer": item.get("reference_answer"),
                 "recall": None, "hit": None, "rr": None,
+                "source_recall": None, "source_hit": None,
                 "status": "error", "error": repr(e),
             }
         rec["sas"] = compute_sas(embedder, rec.get("answer"), rec.get("reference_answer"))
         per_question.append(rec)
         _print_row(i, rec)
 
-    overall = m.aggregate_retrieval(per_question)
-    by_cat  = m.aggregate_by_category(per_question)
-    sas     = m.aggregate_sas(per_question)
-    _print_summary(overall, by_cat, sas)
+    overall     = m.aggregate_retrieval(per_question)
+    by_cat      = m.aggregate_by_category(per_question)
+    sas         = m.aggregate_sas(per_question)
+    src_overall = m.aggregate_source_retrieval(per_question)
+    _print_summary(overall, by_cat, sas, src_overall)
 
     snapshot = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -244,8 +304,10 @@ def main() -> None:
             "temperature": valves.temperature,
             "llm_model": valves.llm_model,
             "embedding_model": valves.embedding_model,
+            "chunking": "production",   # run_chunking_experiment lo sobreescribe por estrategia
         },
         "overall": overall,
+        "source_overall": src_overall,
         "sas": sas,
         "by_category": by_cat,
         "per_question": per_question,

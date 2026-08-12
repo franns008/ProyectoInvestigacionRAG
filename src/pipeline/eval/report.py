@@ -36,6 +36,14 @@ def _arrow(delta: float) -> str:
 
 
 def _fmt(cur: float | None, base: float | None) -> str:
+    """
+    Recibe por parámetro un valor actual y un valor base, y devuelve una cadena de texto formateada.
+    Formatea un valor actual y un valor base en una cadena de texto.
+    - Si ambos son None, devuelve "n/a".
+    - Si el valor base es None, devuelve el valor actual seguido de "(nuevo)".
+    - Si el valor actual es None, devuelve "n/a" seguido del valor base.
+    """
+
     if cur is None and base is None:
         return "   n/a"
     if base is None:
@@ -81,22 +89,29 @@ def print_delta(current: dict, baseline: dict | None) -> None:
 
 
 def _print_regressions(current: dict, baseline: dict) -> None:
-    cur_by_id = {q["id"]: q for q in current["per_question"]}
-    base_by_id = {q["id"]: q for q in baseline["per_question"]}
+    """
+    Hace un diff por pregunta entre el snapshot actual y el baseline, y muestra las preguntas que
+    tuvieron regresión de recall o de SAS. Se considera regresión de SAS si bajó más que SAS_REGRESSION_THRESHOLD.
+    """
+
+
+
+    current_by_id = {question["id"]: question for question in current["per_question"]}
+    baseline_by_id = {question["id"]: question for question in baseline["per_question"]}
 
     retr_reg, sas_reg = [], []
-    for qid, cq in cur_by_id.items():
-        bq = base_by_id.get(qid)
-        if bq is None:
+    for question_id, current_question in current_by_id.items():
+        baseline_question = baseline_by_id.get(question_id)
+        if baseline_question is None:
             continue
         # Retrieval: recall bajó
-        if cq.get("recall") is not None and bq.get("recall") is not None:
-            if cq["recall"] < bq["recall"]:
-                retr_reg.append((qid, bq["recall"], cq["recall"]))
+        if current_question.get("recall") is not None and baseline_question.get("recall") is not None:
+            if current_question["recall"] < baseline_question["recall"]:
+                retr_reg.append((question_id, baseline_question["recall"], current_question["recall"]))
         # Generación: SAS bajó más que el umbral
-        if cq.get("sas") is not None and bq.get("sas") is not None:
-            if bq["sas"] - cq["sas"] > SAS_REGRESSION_THRESHOLD:
-                sas_reg.append((qid, bq["sas"], cq["sas"]))
+        if current_question.get("sas") is not None and baseline_question.get("sas") is not None:
+            if baseline_question["sas"] - current_question["sas"] > SAS_REGRESSION_THRESHOLD:
+                sas_reg.append((question_id, baseline_question["sas"], current_question["sas"]))
 
     if not retr_reg and not sas_reg:
         print("\n  Sin regresiones por pregunta. 🎉")

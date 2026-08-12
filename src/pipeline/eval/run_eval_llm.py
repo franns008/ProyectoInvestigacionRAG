@@ -126,9 +126,9 @@ def main() -> None:
     fres = faith.run(questions=questions, contexts=contexts, predicted_answers=answers)
 
     print("  Juzgando context relevance...")
-    ctxrel = ContextRelevanceEvaluator(chat_generator=make_judge(judge_model),
-                                       raise_on_failure=False, progress_bar=False)
-    cres = ctxrel.run(questions=questions, contexts=contexts)
+    ctxrel = ContextRelevanceEvaluator(chat_generator=make_judge(judge_model), 
+                                       raise_on_failure=False, progress_bar=False) # Indica qué tan relevantes son los contextos para cada pregunta.
+    cres = ctxrel.run(questions=questions, contexts=contexts) # cres es un dict con 'score' y 'individual_scores' para cada pregunta.
 
     f_ind = fres.get("individual_scores", [])
     c_ind = cres.get("individual_scores", [])
