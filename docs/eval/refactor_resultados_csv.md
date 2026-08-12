@@ -84,9 +84,12 @@ RUNS_COLUMNS = [
     # config
     "llm_provider", "llm_model", "judge_model", "temperature",
     "embedding_model", "ranker_model", "retriever_top_k", "ranker_top_k",
+    "chunking",                       # estrategia de chunking (hoy "production")
     "n_docs_store", "dataset_n", "n_errors", "duration_s",
     # Tier 1 (calculadas sobre la salida del ranker → sufijo _eff, "efectivo")
     "n_gt", "recall_eff", "hit_eff", "mrr_eff",
+    # Tier 1b — retrieval a nivel de FUENTE (agnóstico al chunking; ver metrics.py)
+    "n_source", "source_recall", "source_hit", "source_mrr",
     # Tier 2
     "n_sas", "sas_mean", "sas_std",
     # Tier 3 (suite=judge)
@@ -97,8 +100,13 @@ QUESTIONS_COLUMNS = [
     # claves
     "run_id", "question_id", "category", "status", "error",
     # Tier 1
-    "n_expected", "expected_ids", "retrieved_ids", "rank_first_hit",
+    "n_expected", "expected_ids", "retrieved_ids", "joined_ids", "rank_first_hit",
     "recall_eff", "hit_eff", "rr_eff", "via_embedding", "via_keyword",
+    # Tier 1b (fuente)
+    "expected_sources", "retrieved_sources",
+    "source_recall", "source_hit", "source_rr",
+    # abstención (negativas; ver check_correct_rejection en run_eval.py)
+    "correct_rejection",
     # Tier 2 / Tier 3
     "sas", "faithfulness", "context_relevance",
     # texto (siempre al final)
@@ -227,9 +235,16 @@ Principio: **escribe crudo, no compara**. Cambios sobre el archivo actual:
    (si la corrida muere en la pregunta 20, las 19 anteriores quedan persistidas).
    Mapeo desde el `rec` actual de `evaluate()`:
    - `question_id` ← `rec["id"]`; `expected_ids` ← `rec["expected_doc_ids"]`;
-     `retrieved_ids` ← `rec["retrieved_ids"]` (los del ranker, como hoy).
+     `retrieved_ids` ← `rec["ranked_ids"]` (la salida del ranker, lo que ve el LLM);
+     `joined_ids` ← `rec["document_ids"]` (candidatos del joiner — techo del
+     retriever; habilita el recall_ret de H1 sin migración futura).
    - `recall_eff`/`hit_eff`/`rr_eff` ← `recall`/`hit`/`rr` (renombre honesto: se calculan
      sobre la salida del reranker; ver H1 en mejoras_harness).
+   - Tier 1b: `expected_sources`, `retrieved_sources` ← `rec["ranked_sources"]`, y
+     `source_recall`/`source_hit`/`source_rr` directo del `rec` (vacíos si la pregunta
+     no tiene `expected_sources`).
+   - `correct_rejection` ← `rec["correct_rejection"]` (solo existe en negativas;
+     vacío en el resto).
    - `rank_first_hit` ← posición 1-indexada del primer esperado en `retrieved_ids`
      (vacío si no hubo hit o no hay ground truth). Equivale a `round(1/rr)` pero
      calcularlo directo, no dividir.
@@ -237,8 +252,12 @@ Principio: **escribe crudo, no compara**. Cambios sobre el archivo actual:
      (vacías si `hit_source is None`).
    - `faithfulness`/`context_relevance` ← vacías (las llena Tier 3).
    - `status`/`error` como hoy (`ok`/`error`).
-6. **Al final**: agregados con `metrics.aggregate_retrieval` y `aggregate_sas` (sin
-   cambios) → una fila a `runs.csv` con `suite="retrieval"`. Campos:
+6. **Al final**: agregados con `metrics.aggregate_retrieval`, `aggregate_sas` y
+   `aggregate_source_retrieval` (sin cambios) → una fila a `runs.csv` con
+   `suite="retrieval"`. Los agregados Tier 1b mapean:
+   `n_source` ← `n`, `source_recall` ← `source_recall_at_k`, `source_hit` ←
+   `source_hit_rate`, `source_mrr` ← `source_mrr`. `chunking` ← `"production"`
+   (el valor que hoy pone el snapshot en `config.chunking`). Campos:
    - `duration_s`: `time.perf_counter()` alrededor del loop completo, redondeado a 1
      decimal. `sas_std`: `statistics.stdev` de los SAS individuales si `n_sas >= 2`,
      si no vacío. `n_errors`: cantidad de `status == "error"`.
@@ -266,15 +285,23 @@ Principio: **escribe crudo, no compara**. Cambios sobre el archivo actual:
 
 No es código del repo: son acciones que el implementador ejecuta una vez.
 
-1. Para cada una de las 3 filas de `results/history.csv`, appendear (con
-   `csv_store.append_row`, p. ej. desde un script descartable en el scratchpad o un
-   heredoc de python) una fila a `runs.csv` con este mapeo:
-   `timestamp→timestamp_utc` (y derivar `run_id` reformateando:
+1. **Verificar primero la integridad del archivo**: el código actual (post-merge
+   `ciber-fetching`) escribe filas de 14 columnas (`chunking`, `n_source`,
+   `source_recall` nuevas) pero el header del archivo es el viejo de 11 — si alguien
+   corrió el eval después del merge hay filas desalineadas. Chequear con
+   `awk -F',' '{print NR": "NF}' history.csv`: al momento de escribir este plan hay
+   3 filas de datos, todas de 11 columnas, consistentes con el header. Si aparecieran
+   filas de 14, mapear sus 3 columnas extra por posición (`chunking` va segunda;
+   `n_source`/`source_recall` al final).
+2. Para cada fila de datos, appendear (con `csv_store.append_row`, desde un script
+   descartable en el scratchpad o un heredoc de python) una fila a `runs.csv` con este
+   mapeo: `timestamp→timestamp_utc` (y derivar `run_id` reformateando:
    `2026-07-03T21:27:11.078335+00:00` → `20260703T212711Z`), `top_k→retriever_top_k`,
    `n_retrieval→n_gt`, `recall_at_k→recall_eff`, `hit_rate→hit_eff`, `mrr→mrr_eff`,
    `sas→sas_mean`, `n_sas→n_sas`, `llm_model`/`temperature`/`embedding_model` directo,
+   (`chunking`/`n_source`/`source_recall` directo si la fila los tuviera),
    `suite=retrieval`, `label=migrada-de-history`, resto vacío.
-2. `epoch` de cada fila migrada: la de 2026-07-03 es `pre-reranker`. Para las dos de
+3. `epoch` de cada fila migrada: la de 2026-07-03 es `pre-reranker`. Para las dos de
    2026-07-10: `grep -l ranker results/20260710T*.log` — si el log menciona la etapa
    `ranker`, son `reranker-v1` (y además fijar `ranker_top_k=4`); si no, `pre-reranker`.
    Si el grep no es concluyente, poner `epoch=legacy` y seguir (son 3 filas; no hacer
@@ -285,10 +312,11 @@ No es código del repo: son acciones que el implementador ejecuta una vez.
    en la evolución, pero `question <qid>` simplemente no listará esos run_ids y
    compararlas con `compare` degrada a delta global (§5.2.9) — comportamiento
    esperado, no bug.
-3. Borrar `history.csv`. Mover los `*.log` sueltos a `results/logs/`. Borrar los
+4. Borrar `history.csv`. Mover los `*.log` sueltos a `results/logs/`. Borrar los
    `<stamp>.json` sueltos (su detalle por pregunta se pierde; aceptado — el resumen ya
-   está migrado).
-4. `git rm src/pipeline/eval/baseline.json`.
+   está migrado). Los `chunking_experiment_*.json` que pudiera haber en `results/` NO
+   se tocan (régimen aparte, ver "Fuera de alcance").
+5. `git rm src/pipeline/eval/baseline.json`.
 
 ## Paso 5 — `report.py` (reescritura completa)
 
@@ -384,7 +412,8 @@ Reglas de formato:
    - `n_errors > 0` en cualquiera de las dos → mencionarlo.
 3. **Config diff**: columnas del grupo config de `runs.csv` con valores distintos,
    formato `retriever_top_k: 15 → 8`; si no hay: `config idéntica`.
-4. **Global**: `recall_eff`, `hit_eff`, `mrr_eff`, `sas_mean` con delta pintado.
+4. **Global**: `recall_eff`, `hit_eff`, `mrr_eff`, `source_recall`, `sas_mean` con
+   delta pintado (`source_recall` con `–` si ninguna de las dos corridas lo tiene).
 5. **Por categoría**: DF `category, n, recall_base, recall_cur, Δrecall, sas_base,
    sas_cur, Δsas`, ordenado por `Δrecall` ascendente (lo peor arriba). Fuente:
    `questions.csv` filtrado a ambos run_ids + `groupby("category")`.
@@ -573,16 +602,21 @@ loops); `via` con `np.select` sobre `via_embedding`/`via_keyword` → `emb`/`kw`
 
 ### 5.6 Dependencia nueva: matplotlib
 
-En `infrastructure/Dockerfile.pipelines`, antes del bloque "Verificaciones":
+En `infrastructure/Dockerfile.pipelines`, como `RUN` propio **al final** (antes del
+bloque de verificaciones), **no** en `requirements.txt`: el `COPY requirements.txt`
+está al principio de la imagen y editarlo invalidaría las capas pesadas que vienen
+después (torch + la descarga de ~4.3 GB del reranker). Una layer apendeada al final
+rebuildea sola.
 
 ```dockerfile
 # Gráficos del reporte de evaluación (report.py html). Sin backend GUI (Agg).
+# Deliberadamente NO está en requirements.txt: editar ese archivo invalida las
+# capas de torch/reranker; esta layer al final rebuildea sola.
 RUN pip install --no-cache-dir matplotlib
 ```
 
 y una verificación más: `RUN python -c "import matplotlib; print('matplotlib OK')"`.
-Requiere `docker compose build pipelines` (layer apendeada; no invalida las capas
-pesadas de torch/marker). En `report.py` el import vive dentro de `fig_*`/`cmd_html`;
+Requiere `docker compose build pipelines`. En `report.py` el import vive dentro de `fig_*`/`cmd_html`;
 si falla: `el modo html requiere matplotlib en la imagen — rebuildeá con docker compose
 build pipelines` y exit 2. Los demás modos no lo tocan.
 
@@ -700,7 +734,8 @@ Requiere el stack levantado (`cd infrastructure && docker compose up -d`) y el s
 poblado.
 
 1. `scripts/eval.sh --label "primera corrida CSV"` → verificar: fila nueva en `runs.csv`,
-   27 filas nuevas en `questions.csv`, log en `results/logs/`, y que
+   una fila nueva en `questions.csv` por pregunta del dataset (hoy 39), log en
+   `results/logs/`, y que
    `csv_store.load_runs()/load_questions()` cargan sin warnings de dtype.
 2. Segunda corrida idéntica → `report.py --run <run2> --baseline <run1>` debe dar deltas
    ≈ 0 (retrieval exactamente 0; SAS puede moverse ~±0.01 — anotar el valor observado,
@@ -730,7 +765,18 @@ poblado.
 
 ## Fuera de alcance (queda en mejoras_harness.md)
 
-Dual-k (`recall_ret` post-joiner), nDCG, abstención determinística, tokens/latencia por
-pregunta, `pipeline_signature`, recalibración de SAS, baseline/answer-relevancy de Tier 3
-(H7). El esquema mínimo + la migración automática de `csv_store.py` están pensados para
-absorber esas columnas cuando lleguen.
+- Métricas dual-k: el cálculo de `recall_ret` sobre `joined_ids` (la columna ya se
+  persiste; la métrica llega con H1), nDCG, tokens/latencia por pregunta,
+  `pipeline_signature`, recalibración de SAS, baseline/answer-relevancy de Tier 3 (H7).
+- **Abstención**: `check_correct_rejection` ya existe en `run_eval.py` y su resultado
+  se persiste (`correct_rejection`); el agregado global, la detección de ids inventados
+  y el endurecimiento de la heurística siguen siendo H6.
+- **Experimento de chunking** (`run_chunking_experiment.py` / `report_chunking.py` /
+  `chunking_experiment_*.json`): régimen de resultados aparte con su propio ciclo de
+  vida (corridas efímeras multi-tabla, se comparan entre sí y se descartan). **No se
+  migra a las tablas CSV** en este refactor; sus JSON quedan gitignoreados por
+  `results/*` igual que hoy. Si a futuro se quisiera trackear su historia, entraría
+  como `suite=chunking` sin cambiar el esquema.
+
+El esquema mínimo + la migración automática de `csv_store.py` están pensados para
+absorber las columnas nuevas cuando lleguen.
