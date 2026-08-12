@@ -60,7 +60,7 @@ DB_CONNECTION       = "postgresql://avdbuser:avdbpass@vdb:5432/pgvdb"
 OLLAMA_URL          = "http://ollama:11434"
 GROQ_BASE_URL       = "https://api.groq.com/openai/v1"
 DB_TABLE            = "ciberseguridad_docs"
-EMBEDDING_DIMENSION = 1024
+EMBEDDING_DIMENSION = 2560  # nativa de qwen3-embedding:4b (sin truncar vía MRL)
 DEFAULT_OLLAMA_LLM  = "qwen2.5:3b-instruct"
 
 PROMPT_TEMPLATE = """
@@ -151,6 +151,14 @@ def _find_security_terms(text_low: str) -> list[str]:
             found.append(term)
     return found
 
+_EMBED_TASK_INSTRUCTION = "Given a question, retrieve passages that answer the question"
+
+def build_embedding_query(user_message: str) -> str:
+    """qwen3-embedding es instruction-tuned: prefijar la query (no los documentos)
+    con la tarea de retrieval mejora el recall ~1-5% frente a no usarlo."""
+    return f"Instruct: {_EMBED_TASK_INSTRUCTION}\nQuery: {user_message.strip()}"
+
+
 def build_keyword_query(user_message: str) -> str:
     text = user_message.strip()
     ids = _extract_vuln_ids(text)
@@ -231,7 +239,7 @@ class Pipeline:
 
     class Valves(BaseModel):
         llm_model:       str   = "meta-llama/llama-4-scout-17b-16e-instruct"
-        embedding_model: str   = "bge-m3"
+        embedding_model: str   = "qwen3-embedding:4b"
         retriever_top_k: int   = 15
         ranker_model:    str   = "BAAI/bge-reranker-v2-m3"
         ranker_top_k:    int   = 4
@@ -276,7 +284,7 @@ class Pipeline:
 
         result = self.rag_pipeline.run(
             {
-                "text_embedder":     {"text": user_message},
+                "text_embedder":     {"text": build_embedding_query(user_message)},
                 "keyword_retriever": {"query": keyword_query},
                 "ranker":            {"query": user_message},
                 "prompt_builder":    {"question": user_message},

@@ -10,6 +10,7 @@ Se encarga de:
 
 import logging
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from haystack import Document
@@ -29,15 +30,18 @@ from converters import XMLCWEConverter, NVDJsonConverter
 DB_CONNECTION       = "postgresql://avdbuser:avdbpass@vdb:5432/pgvdb"
 OLLAMA_URL          = "http://ollama:11434"
 DB_TABLE            = "ciberseguridad_docs"
-EMBEDDING_DIMENSION = 1024
+EMBEDDING_DIMENSION = 2560  # nativa de qwen3-embedding:4b (sin truncar vía MRL)
 INPUT_DIR           = Path("/app/pipelines/rawdata")
 CONVERTED_DIR       = INPUT_DIR / "_converted_md"
 
 # Variables de chunking y embedding (antes vivían en los Valves del pipeline)
 SPLIT_LENGTH        = 200
 SPLIT_OVERLAP       = 20
-EMBEDDING_MODEL     = "bge-m3"
-EMBED_BATCH_SIZE    = 32
+EMBEDDING_MODEL     = "qwen3-embedding:4b"
+EMBED_BATCH_SIZE    = 64
+# Requests concurrentes a Ollama. Debe ser <= OLLAMA_NUM_PARALLEL (infrastructure/env/ollama.env)
+# para que efectivamente se procesen en paralelo y no se encolen del lado del servidor.
+EMBED_CONCURRENCY   = 2
 
 # --- Logger ---
 logger = logging.getLogger("IndexingRAG")
@@ -203,15 +207,26 @@ class Indexer:
 
         embedded_docs = []
         failed_count = 0
-        
-        # Embebemos en lotes
-        for i in range(0, len(new_docs), EMBED_BATCH_SIZE):
-            batch = new_docs[i : i + EMBED_BATCH_SIZE]
-            try:
-                embedded_docs.extend(doc_embedder.run(batch)["documents"])
-            except Exception as e:
-                failed_count += len(batch)
-                logger.error(f"Fallo en lote {i // EMBED_BATCH_SIZE}: {e}")
+
+        batches = [new_docs[i:i + EMBED_BATCH_SIZE] for i in range(0, len(new_docs), EMBED_BATCH_SIZE)]
+        logger.info(
+            f"Embebiendo {len(batches)} lotes de hasta {EMBED_BATCH_SIZE} docs "
+            f"({EMBED_CONCURRENCY} en paralelo)..."
+        )
+
+        # Requests concurrentes a Ollama en vez de una a la vez: con GPU hay
+        # margen para tener varios lotes en vuelo simultáneamente.
+        with ThreadPoolExecutor(max_workers=EMBED_CONCURRENCY) as executor:
+            future_to_batch = {executor.submit(doc_embedder.run, batch): batch for batch in batches}
+            for n, future in enumerate(as_completed(future_to_batch), start=1):
+                batch = future_to_batch[future]
+                try:
+                    embedded_docs.extend(future.result()["documents"])
+                except Exception as e:
+                    failed_count += len(batch)
+                    logger.error(f"Fallo en lote: {e}")
+                if n % 10 == 0 or n == len(batches):
+                    logger.info(f"Progreso embedding: {n}/{len(batches)} lotes procesados")
 
         if embedded_docs:
             self.store.write_documents(embedded_docs, policy=DuplicatePolicy.OVERWRITE)
