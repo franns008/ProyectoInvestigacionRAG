@@ -56,9 +56,8 @@ EMBEDDING_DIMENSION = 1024
 CWE_RE = re.compile(r"^CWE-\d+$")
 
 
-# ---------------------------------------------------------------------------
 # Parsing de un CVE crudo -> dict normalizado
-# ---------------------------------------------------------------------------
+
 
 def _english_description(cve: dict) -> str:
     """Descripción en inglés (lo único que se embebe). Fallback: la primera que haya."""
@@ -154,9 +153,7 @@ def cve_to_document(cve: dict) -> Document | None:
     return Document(id=doc_id, content=description, meta=meta)
 
 
-# ---------------------------------------------------------------------------
 # Lectura de los JSON crudos
-# ---------------------------------------------------------------------------
 
 def load_cves_from_raw(limit: int | None = None) -> list[dict]:
     """Junta todos los objetos 'cve' de todos los cves_page_*.json bajo data/raw/nvd/.
@@ -183,9 +180,8 @@ def load_cves_from_raw(limit: int | None = None) -> list[dict]:
     return cves[:limit] if limit else cves
 
 
-# ---------------------------------------------------------------------------
+
 # Store / conexión
-# ---------------------------------------------------------------------------
 
 def _connection_string() -> str:
     host = os.environ.get("PGVECTOR_HOST", "localhost")
@@ -214,9 +210,7 @@ def _existing_last_modified(store: PgvectorDocumentStore) -> dict[str, str]:
     return existing
 
 
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Indexa CVEs de data/raw/nvd/ en pgvector")
