@@ -1,7 +1,8 @@
 # Bitácora de implementación: refactor de resultados a CSV
 
-> **Estado (2026-08-14): EN CURSO.** Pasos 0–3 terminados y verificados.
-> Pasos 4–10 pendientes. `run_eval.py` ya escribe `runs.csv` + `questions.csv`.
+> **Estado (2026-08-14): EN CURSO.** Pasos 0–4 y 8 terminados y verificados.
+> Pendientes: 5 (reescritura de `report.py`, el grande), 6, 7, 9 y 10.
+> `run_eval.py` ya escribe `runs.csv` + `questions.csv`, y el histórico está migrado.
 > Rama: `eval-csv-turco` (sacada de `eval-luca` @ `d7c0418`). Implementa: Valentino.
 >
 > Este documento **no reemplaza al plan**: la especificación sigue siendo
@@ -27,11 +28,11 @@ sólo había deducido leyendo el código. Eso merece quedar escrito.
 | 1 | `csv_store.py` | ✅ hecho y testeado |
 | 2 | `eval_meta.yaml` | ✅ hecho y testeado |
 | 3 | `run_eval.py` escribe crudo | ✅ hecho y testeado |
-| 4 | Migrar `history.csv` y limpiar `results/` | ⬜ pendiente |
+| 4 | Migrar `history.csv` y limpiar `results/` | ✅ hecho (con desvío, ver abajo) |
 | 5 | `report.py` (reescritura completa) | ⬜ pendiente |
 | 6 | `run_eval_llm.py` (Tier 3, mínimo) | ⬜ pendiente |
 | 7 | Wrappers `scripts/eval.sh` | ⬜ pendiente |
-| 8 | Git: `.gitignore` + `.gitattributes` | ⬜ pendiente |
+| 8 | Git: `.gitignore` + `.gitattributes` | ✅ hecho (adelantado al Paso 4) |
 | 9 | Documentación | ⬜ pendiente |
 | 10 | Validación y baseline inicial | ⬜ pendiente |
 
@@ -264,6 +265,61 @@ cambia con el proveedor. **Toda corrida local quedó registrada como si fuera Gr
 
 Por eso se adelantó `effective_llm_model(valves)` (§Paso 3.6) antes que el resto del
 Paso 3: no es una prolijidad, es un dato corrupto que ya está entrando al histórico.
+
+### Paso 4 — migración y limpieza ✅ (con desvío)
+
+**El plan no aplicaba como estaba escrito.** Asume 3 corridas históricas en
+`history.csv` (una del 2026-07-03 y dos del 2026-07-10). En esta máquina no existen:
+`results/` está gitignoreado y **nunca se commiteó nada de esa carpeta**, así que
+esas corridas viven sólo en la máquina de quien las corrió. Son irrecuperables desde
+acá.
+
+Lo que sí había en `history.csv` eran **2 filas nuestras** del 2026-08-14 (la prueba
+de 3 preguntas y la corrida completa). El chequeo de integridad de §4.1 dio limpio:
+las 3 líneas con 14 columnas, consistentes con el header — el archivo lo generó el
+código actual desde cero, así que la desalineación que advertía el plan no ocurrió.
+
+**Desvío: se migró `baseline.json` en vez de descartarlo.** El plan dice
+`git rm src/pipeline/eval/baseline.json` a secas (§4.5). Pero ese archivo **sí** está
+versionado y contiene la corrida del equipo del 2026-07-03 completa (config, recall
+0.8409, hit 0.8636, mrr 0.6932, SAS 0.7549 — exactamente una fila de `runs.csv`).
+Descartarlo habría perdido el único punto de comparación histórico que sobrevive en
+el repo. Se migró como fila con `epoch: pre-reranker` (top_k=3 y sin etapa `ranker` en
+su config) y recién después se borró.
+
+**Desvío: se corrigió el `llm_model` de las 2 filas migradas.** El plan mapea columnas
+tal cual. Acá se registró `llm_provider=ollama` / `llm_model=llama3.1` en vez del
+`meta-llama/llama-4-scout` que decía el archivo, porque es un valor **conocido como
+falso** (hallazgo 8) y se verificó contra el `.env` y los logs de Ollama. Migrar el
+dato mentiroso habría metido dos filas incomparables en la tabla nueva. Por el mismo
+criterio se completaron `ranker_top_k=4` y `n_docs_store=965`, que constan en la
+cabecera de los logs de esas corridas.
+
+La fila de `baseline.json` **no** lleva esa corrección: esa corrida sí fue por Groq.
+
+**Desvío de orden: el Paso 8 se adelantó.** Se aplicaron el `.gitignore` y el
+`.gitattributes` de §Paso 8 **antes** de borrar `baseline.json`. Con `results/`
+enteramente ignorado, borrarlo primero habría dejado una ventana con cero datos
+históricos versionados. Verificado: `runs.csv` es versionable y `questions.csv` +
+`logs/` siguen ignorados.
+
+`results/` quedó como pide el criterio de terminado: sólo `runs.csv`,
+`questions.csv` y `logs/`.
+
+**`runs.csv` resultante (4 filas):**
+
+```
+run_id            epoch         provider  modelo      top_k  rank_k  docs  n_gt  recall_eff
+20260703T210122Z  pre-reranker  groq      llama-4-...     3       –     –    22      0.8409
+20260814T030325Z  reranker-v1   ollama    llama3.1       15       4   965     3      1.0
+20260814T032439Z  reranker-v1   ollama    llama3.1       15       4   965    22      0.8409
+20260814T035911Z  reranker-v1   ollama    llama3.1       15       4   965     3      1.0
+```
+
+Con la tabla armada, **H1 se ve de un vistazo**: la primera y la tercera fila tienen
+el mismo `recall_eff` (0.8409) sobre el mismo `n_gt` (22), con topologías y `top_k`
+distintos. Es el mismo hallazgo 6, pero ahora legible sin abrir un solo archivo — que
+es exactamente lo que el refactor buscaba.
 
 ---
 
