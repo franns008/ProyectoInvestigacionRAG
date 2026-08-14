@@ -1,7 +1,7 @@
 # Bitácora de implementación: refactor de resultados a CSV
 
-> **Estado (2026-08-14): EN CURSO.** Pasos 0, 1 y 2 terminados y verificados;
-> Paso 3 arrancado (sólo el helper compartido). Pasos 4–10 pendientes.
+> **Estado (2026-08-14): EN CURSO.** Pasos 0–3 terminados y verificados.
+> Pasos 4–10 pendientes. `run_eval.py` ya escribe `runs.csv` + `questions.csv`.
 > Rama: `eval-csv-turco` (sacada de `eval-luca` @ `d7c0418`). Implementa: Valentino.
 >
 > Este documento **no reemplaza al plan**: la especificación sigue siendo
@@ -26,7 +26,7 @@ sólo había deducido leyendo el código. Eso merece quedar escrito.
 | 0 | Verificación previa (pandas, permisos) | ✅ hecho |
 | 1 | `csv_store.py` | ✅ hecho y testeado |
 | 2 | `eval_meta.yaml` | ✅ hecho y testeado |
-| 3 | `run_eval.py` escribe crudo | 🟡 arrancado (sólo `effective_llm_model`) |
+| 3 | `run_eval.py` escribe crudo | ✅ hecho y testeado |
 | 4 | Migrar `history.csv` y limpiar `results/` | ⬜ pendiente |
 | 5 | `report.py` (reescritura completa) | ⬜ pendiente |
 | 6 | `run_eval_llm.py` (Tier 3, mínimo) | ⬜ pendiente |
@@ -77,15 +77,48 @@ Copiado literal del plan (§Paso 2), comentarios incluidos. `baseline_run_id: nu
 Verificado: `load_meta()` lo lee bien, y falla con mensaje claro si falta el archivo
 o una clave obligatoria.
 
-### Paso 3 — `run_eval.py` 🟡
+### Paso 3 — `run_eval.py` ✅
 
-Hecho hasta ahora: **sólo** `effective_llm_model(valves)` en `csv_store.py` (el
-helper compartido que pide §Paso 3.6). `run_eval.py` **todavía no fue modificado**:
-sigue escribiendo `<stamp>.json` + `<stamp>.log` + `history.csv`.
+Implementado según §Paso 3, puntos 1–9. El script pasó a **escribir crudo, no
+comparar**: ya no emite `<stamp>.json`, `history.csv` ni lee `baseline.json`.
 
-Se adelantó ese helper porque la primera corrida demostró que el bug que previene
-es real y ya está corrompiendo datos — ver
-[Hallazgo 3](#3-el-snapshot-registra-el-llm-equivocado-confirma-el-helper-del-paso-36).
+- `make_run_id()` — timestamp UTC, con sufijo `-2`/`-3` si colisiona dentro del
+  mismo segundo (consulta la columna `run_id` de `runs.csv`).
+- Log movido a `results/logs/<run_id>.log`; el `_Tee` se mantiene igual.
+- `git_metadata()` — lee `GIT_COMMIT`/`GIT_BRANCH`/`GIT_DIRTY` del entorno. **Nunca**
+  corre `git` adentro del container (no hay `.git` montado); si faltan, quedan vacías.
+- Flags: `--label` nuevo, `--baseline` eliminado, `--set-baseline` con la semántica
+  nueva (reescribe una línea de `eval_meta.yaml`).
+- `set_baseline()` — reemplazo por regex sobre el texto crudo, no `yaml.safe_dump`.
+- `question_row()` / `run_row()` — el mapeo de §3.5 y §3.6, con `rank_first_hit`
+  calculado directo (no `round(1/rr)`) y `effective_llm_model()` para el modelo.
+- `by_category` **deja de persistirse** (report.py lo recalcula con groupby).
+- Cortesía final: `report.compare(...)` en `try/except` — los datos se escriben
+  **antes** de cualquier análisis.
+
+**Verificado con una corrida real** (`--limit 3 --label "..."`):
+
+| Qué | Resultado |
+|---|---|
+| `runs.csv` (1 fila × 35 columnas) y `questions.csv` (3 × 27) creados | ✔ |
+| Log en `results/logs/<run_id>.log` | ✔ |
+| `--set-baseline` reescribe la línea **conservando los 13 comentarios** y el historial de `epochs` | ✔ |
+| Si no encuentra la línea → error claro y archivo **intacto** | ✔ |
+| Migración de esquema sobre el `questions.csv` real: columna nueva → filas viejas intactas; al revertir, aviso de descarte | ✔ |
+| `report.compare` no existe todavía → warning y los datos igual persistidos | ✔ (esperado hasta el Paso 5) |
+
+**Lo que la fila nueva registra y antes era invisible:**
+
+```
+llm_provider: ollama     llm_model: llama3.1      ← hallazgo 8, arreglado
+ranker_top_k: 4                                   ← habilita H1
+n_docs_store: 965                                 ← habría detectado el hallazgo 7
+sas_std: 0.0698                                   ← insumo directo para H5
+```
+
+Y en `questions.csv`, `joined_ids` guardó **16 candidatos** del joiner contra los 4
+de `retrieved_ids`: el dato que H1 necesita para medir el techo del retriever, que
+hasta ahora se descartaba en cada corrida.
 
 ---
 
