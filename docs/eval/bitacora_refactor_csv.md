@@ -1,7 +1,7 @@
 # Bitácora de implementación: refactor de resultados a CSV
 
-> **Estado (2026-08-14): EN CURSO.** Pasos 0–4 y 8 terminados y verificados.
-> Pendientes: 5 (reescritura de `report.py`, el grande), 6, 7, 9 y 10.
+> **Estado (2026-08-14): EN CURSO.** Pasos 0–4, 7 y 8 terminados y verificados.
+> Pendientes: 5 (reescritura de `report.py`, el grande), 6, 9 y 10.
 > `run_eval.py` ya escribe `runs.csv` + `questions.csv`, y el histórico está migrado.
 > Rama: `eval-csv-turco` (sacada de `eval-luca` @ `d7c0418`). Implementa: Valentino.
 >
@@ -31,7 +31,7 @@ sólo había deducido leyendo el código. Eso merece quedar escrito.
 | 4 | Migrar `history.csv` y limpiar `results/` | ✅ hecho (con desvío, ver abajo) |
 | 5 | `report.py` (reescritura completa) | ⬜ pendiente |
 | 6 | `run_eval_llm.py` (Tier 3, mínimo) | ⬜ pendiente |
-| 7 | Wrappers `scripts/eval.sh` | ⬜ pendiente |
+| 7 | Wrappers `scripts/eval.sh` | ✅ hecho (con fix para Windows) |
 | 8 | Git: `.gitignore` + `.gitattributes` | ✅ hecho (adelantado al Paso 4) |
 | 9 | Documentación | ⬜ pendiente |
 | 10 | Validación y baseline inicial | ⬜ pendiente |
@@ -320,6 +320,30 @@ Con la tabla armada, **H1 se ve de un vistazo**: la primera y la tercera fila ti
 el mismo `recall_eff` (0.8409) sobre el mismo `n_gt` (22), con topologías y `top_k`
 distintos. Es el mismo hallazgo 6, pero ahora legible sin abrir un solo archivo — que
 es exactamente lo que el refactor buscaba.
+
+### Paso 7 — wrappers ✅ (con fix para Windows)
+
+`scripts/eval.sh` y `scripts/eval_llm.sh` según §Paso 7, con una línea agregada.
+
+**Hallazgo 9 — el wrapper del plan no corre en Windows.** Tal cual está escrito falla:
+
+```
+python: can't open file '/app/C:/Program Files/Git/app/pipelines/eval/run_eval.py'
+```
+
+Git Bash (MSYS) reescribe los argumentos que parecen rutas POSIX, así que
+`/app/pipelines/eval/run_eval.py` llega al container como una ruta de Windows. Se
+resuelve con `export MSYS_NO_PATHCONV=1` al principio del script; **no tiene efecto en
+Linux/macOS**, así que la solución sirve para todo el equipo sin bifurcar el script.
+
+Se adelantó este paso (antes que el 5) porque hasta ahora **todas** las corridas
+quedaron con `git_commit`/`git_branch` vacíos: ese dato lo inyecta el wrapper y no
+existía. Verificado tras el fix:
+
+```
+run_id            label            git_commit  git_branch      git_dirty
+20260814T162753Z  prueba wrapper   217f7ce     eval-csv-turco  1
+```
 
 ---
 
