@@ -1,13 +1,15 @@
 # Bitácora de implementación: refactor de resultados a CSV
 
-> **Estado (2026-08-18): EN CURSO.** Pasos 0–4, 7 y 8 terminados y verificados.
-> Del Paso 5 está hecha y validada **toda la capa de terminal** (§5.1–5.2:
-> `compare`, `runs` y `question`), que es el gate obligatorio del plan; falta el
-> modo `html` (§5.3–5.6). El **Paso 6 está hecho y validado**. Hay un **baseline
-> provisorio** fijado (`20260818T202351Z`, dataset completo de 39, Groq
-> `openai/gpt-oss-120b`): válido tal cual para retrieval, provisorio en `sas_mean`
-> hasta que el equipo defina el modelo (hallazgo 14).
-> Pendientes: el `html` del Paso 5, y los Pasos 9 y 10.
+> **Estado (2026-08-18): CASI TERMINADO.** Todos los pasos hechos y verificados
+> **salvo el modo `html` de `report.py`** (§5.3–5.6), que es lo único que falta.
+> La capa de terminal del Paso 5 (`compare`, `runs`, `question`) —el gate obligatorio
+> del plan— está completa, igual que los Pasos 6, 9 y 10.
+>
+> Hay un **baseline provisorio** fijado (`20260818T202351Z`, dataset completo de 39,
+> Groq `openai/gpt-oss-120b`): válido tal cual como referencia de **retrieval**
+> (verificado: el LLM no afecta esas métricas), provisorio en `sas_mean` hasta que el
+> equipo defina el modelo (hallazgo 14).
+>
 > `run_eval.py` ya escribe `runs.csv` + `questions.csv`, y el histórico está migrado.
 > Rama: `eval-csv-turco` (sacada de `eval-luca` @ `d7c0418`). Implementa: Valentino.
 >
@@ -39,8 +41,8 @@ sólo había deducido leyendo el código. Eso merece quedar escrito.
 | 6 | `run_eval_llm.py` (Tier 3, mínimo) | ✅ hecho y validado (con 3 hallazgos) |
 | 7 | Wrappers `scripts/eval.sh` | ✅ hecho (con fix para Windows) |
 | 8 | Git: `.gitignore` + `.gitattributes` | ✅ hecho (adelantado al Paso 4) |
-| 9 | Documentación | ⬜ pendiente |
-| 10 | Validación y baseline inicial | ⬜ pendiente |
+| 9 | Documentación | ✅ hecho |
+| 10 | Validación y baseline inicial | ✅ hecho (baseline provisorio) |
 
 ### Paso 0 — verificación previa ✅
 
@@ -564,6 +566,88 @@ desde `failed/`** → `docker compose restart` (que sí conserva los parches). E
 es el que faltaba documentar. El arreglo durable sigue siendo rebuildear la imagen
 (hallazgo 1): `requirements.txt` ya declara `haystack-ai>=2.30,<3`, así que un rebuild
 deja esto resuelto para siempre.
+
+---
+
+### Paso 10 — validación ✅ (los 7 puntos)
+
+Punto 1 ✅ (corrida completa `20260818T202351Z`: 39 filas en `questions.csv`, log, y
+`load_runs`/`load_questions` cargan sin warnings de dtype). Punto 4 ✅. Punto 6 ✅.
+Punto 7 ✅ (baseline provisorio, ver hallazgo 14).
+
+**Punto 3 ✅ — `--top-k 5`.** Config diff y deltas reales, como pedía el plan:
+
+```
+retriever_top_k : 15 → 5
+
+recall_eff  0.795  ▼0.045      mrr_eff  0.731  ▲0.023
+```
+
+Vale la pena mirarlo: **el recall baja y el MRR sube**. Con menos candidatos el reranker
+tiene menos ruido que ordenar, así que prioriza mejor lo que encuentra — pero se pierde
+más cosas. Regresión concreta: `credenciales-en-codigo` 1.00 → 0.00, y `concepto_es`
+(ya la categoría más débil) cae de 0.667 a 0.333.
+
+**Punto 5 ✅ — migración de esquema.** Con `questions.csv` respaldado antes (está
+gitignoreado: si se rompe no se recupera de git). Ida: se agregó `dummy_migracion` a
+`QUESTIONS_COLUMNS` y se corrió con `--limit 1` → el archivo se reescribió con la
+columna nueva, **138 → 139 filas sin perder ninguna**, y las 139 con la dummy vacía.
+Vuelta: se sacó la columna del esquema y se volvió a correr →
+
+```
+⚠ csv_store: columna 'dummy_migracion' eliminada del esquema; datos descartados en …/questions.csv
+```
+
+Header de vuelta a la normalidad, 140 filas, `csv_store.py` idéntico al de git.
+
+**Punto 2 ✅ — corrida idéntica.** `20260818T212046Z` contra el baseline, misma config:
+
+```
+recall_eff     0.841  =0.000       ← las cuatro de retrieval, exactamente 0
+hit_eff        0.864  =0.000
+mrr_eff        0.708  =0.000
+source_recall  1.000  =0.000
+sas_mean       0.785  ▼0.010       ← el valor a anotar para H5
+```
+
+El plan pedía anotar el movimiento de SAS entre corridas idénticas: **−0.010 global**.
+Pero el número global esconde lo importante, que es el hallazgo de abajo.
+
+**Hallazgo 18 — `temperature=0` no da determinismo, y el SAS castiga la brevedad.**
+En esa corrida idéntica una pregunta se movió **0.34**:
+
+| corrida | respuesta a `cve-log4j-nombre` | sas |
+|---|---|---|
+| baseline | "No dispongo de información sobre vulnerabilidades específicas de Log4Shell en Log4j en el contexto proporcionado." | 0.843 |
+| idéntica | "No sé." | 0.499 |
+
+Tres cosas de una:
+
+1. **El retrieval fue idéntico** (delta 0.000, mismos documentos), así que la variación
+   es puramente del LLM. `temperature=0` **no** garantiza determinismo en Groq.
+2. **Las dos respuestas son correctas.** Es una pregunta negativa (`id_inexistente`, sin
+   ground truth): el RAG tenía que abstenerse y se abstuvo las dos veces. El SAS le puso
+   0.34 de diferencia a dos comportamientos igual de correctos, sólo porque uno es más
+   corto. **El SAS no sirve para preguntas de abstención.**
+3. **Por lo tanto `SAS_REGRESSION_THRESHOLD = 0.05` genera falsos positivos.** Esta
+   "regresión de generación" es ruido. Insumo directo para H5: o se sube el umbral, o
+   —mejor— se excluyen las negativas del chequeo de regresión de SAS.
+
+**Hallazgo 19 — `correct_rejection` no detecta las abstenciones reales.** Buscando el
+dato del hallazgo 18 apareció que **las dos** abstenciones correctas de arriba están
+guardadas con `correct_rejection=0`:
+
+```
+20260818T202351Z  correct_rejection=0.0   "No dispongo de información sobre…"
+20260818T212046Z  correct_rejection=0.0   "No sé."
+```
+
+`check_correct_rejection()` compara contra una lista de frases fijas ("no puedo
+responder", "no tengo suficiente información") y ninguna de las dos redacciones que el
+modelo usó está en la lista. O sea que hoy la métrica de abstención devuelve 0 **incluso
+cuando el RAG se abstiene perfectamente**: no está midiendo lo que dice medir. Es el H6
+de [mejoras_harness.md](mejoras_harness.md), ahora con evidencia en vez de sospecha.
+Queda fuera del alcance de este refactor, pero **el número no hay que creerlo**.
 
 ---
 

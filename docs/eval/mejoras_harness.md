@@ -26,6 +26,35 @@ así que el eval no puede reusarla y tendría que duplicarla para H9.
 
 ## H1 + H2 — Registrar los dos `k` + regenerar baseline
 
+> **Parcialmente resuelto por el refactor a CSV (2026-08-18).** Ver
+> [refactor_resultados_csv.md](refactor_resultados_csv.md) y
+> [bitacora_refactor_csv.md](bitacora_refactor_csv.md).
+>
+> **Ya está hecho:**
+> - **Punto 3** — `runs.csv` registra `retriever_top_k` y `ranker_top_k` en columnas
+>   separadas, y las métricas efectivas llevan el sufijo `_eff` para que el nombre no
+>   engañe (`recall_eff` = sobre la salida del reranker).
+> - **Punto 6** — `history.csv` ya no existe; lo reemplaza `runs.csv`, y el problema del
+>   `DictWriter` desaparece: `csv_store.append_row` **migra el esquema solo** y reescribe
+>   el archivo con un rename atómico cuando cambian las columnas. Las 3 corridas
+>   históricas se migraron sin perder datos.
+> - **Puntos 7 y 9** — la promoción de baseline y la norma de re-basear están resueltas:
+>   el baseline es un `run_id` en `eval_meta.yaml`, y ese archivo declara además la
+>   **`epoch`** (el período de topología). `report.py` avisa solo cuando comparás
+>   corridas de epochs distintas, que es la guarda del punto 8 pero por nombre declarado
+>   en vez de por hash.
+>
+> **Sigue pendiente:** los **puntos 1, 2, 4 y 5** — las métricas dual-k. Hoy se guarda
+> `joined_ids` en `questions.csv` (o sea, el dato **crudo** para calcular el techo del
+> retriever ya está persistido), pero **nadie calcula ni agrega** `recall_retriever` /
+> `hit_retriever`, así que el gap "cuánto recall cuesta el reranker" sigue invisible.
+> La buena noticia: al estar `joined_ids` guardado, ese gap se puede calcular
+> retroactivamente sobre las corridas ya hechas, sin re-correr nada.
+>
+> **Nota sobre el diagnóstico original:** el recall clavado en 0.8409 se confirmó una
+> tercera vez el 2026-08-18, ahora con Groq `gpt-oss-120b` sobre las 39 preguntas. Tres
+> topologías y tres proveedores distintos, el mismo número.
+
 **Problema:** las métricas Tier 1 se calculan sobre la salida del **reranker**
 (`ranker_top_k=4`, [run_eval.py:101](../../src/pipeline/eval/run_eval.py#L101)), pero el
 snapshot guarda `top_k = retriever_top_k = 15`
@@ -65,6 +94,52 @@ orden. Con esto, **todos los deltas actuales engañan**.
 ---
 
 ## H6 — Métrica determinística de abstención
+
+> **Confirmado empíricamente (2026-08-18).** No es una sospecha: hoy la métrica devuelve
+> `0` **incluso cuando el RAG se abstiene perfectamente**. Dos corridas de
+> `cve-log4j-nombre`, las dos con abstención correcta, las dos guardadas con
+> `correct_rejection=0`:
+>
+> | respuesta del RAG | `correct_rejection` |
+> |---|---|
+> | "No dispongo de información sobre vulnerabilidades específicas de Log4Shell en Log4j en el contexto proporcionado." | 0 |
+> | "No sé." | 0 |
+>
+> `check_correct_rejection()` compara contra una lista de frases fijas ("no puedo
+> responder", "no tengo suficiente información") y ninguna de las dos redacciones está
+> en la lista. **El número que hay hoy en `questions.csv` no significa nada.** Detalle en
+> [bitacora_refactor_csv.md](bitacora_refactor_csv.md), hallazgo 19.
+>
+> ### Decisión de alcance (Valentino, 2026-08-18)
+>
+> **Para las preguntas negativas se evalúan dos cosas y nada más: que se haya abstenido,
+> y que no haya inventado datos.** El SAS **sale** de esas preguntas.
+>
+> El motivo, con evidencia: el SAS compara la respuesta contra **una** `reference_answer`
+> elegida arbitrariamente, y para una negativa hay infinitas respuestas correctas y muy
+> distintas entre sí. Medido: "No sé." sacó 0.499 y "No dispongo de información sobre
+> Log4Shell…" sacó 0.843 — **las dos correctas**, 0.34 de diferencia, y la ganadora ganó
+> sólo por parecerse en las palabras a la referencia (hallazgo 18). El SAS ahí no mide
+> si acertó, mide si se expresó parecido al ejemplo.
+>
+> Las dos métricas que reemplazan al SAS son **binarias**, así que no dependen de la
+> redacción — que es exactamente por lo que funcionan donde el SAS falla. Coincide con
+> el paso a paso de abajo: `correct = refused and not fabricated`.
+>
+> **Estado medido hoy** (corrida `20260818T202351Z`, 39 preguntas, Groq
+> `openai/gpt-oss-120b`), útil como punto de partida:
+>
+> - **17 preguntas negativas, 0 con ids inventados** (`fabricated = ids_respuesta −
+>   ids_pregunta` sobre `rag._extract_vuln_ids`). Es una mejora respecto de lo que
+>   registra el punto 3 de abajo, donde `cve-log4j-nombre` soltaba "CWE-779, CWE-464,
+>   CWE-244". Ese caso hoy sale limpio.
+> - O sea que `fabricated` ya se puede calcular y hoy daría 0/17. La mitad que falta de
+>   verdad es `refused`.
+>
+> **Límite conocido:** el chequeo de ids detecta invención de **identificadores**, que es
+> la forma más verificable de alucinar en este dominio, pero no atrapa afirmaciones
+> inventadas en prosa sin ids. Para eso está `faithfulness` (Tier 3). Son dos capas
+> complementarias, no una.
 
 **Problema:** las negativas (`fuera_dominio`, `id_inexistente`) no tienen `expected_doc_ids`,
 así que Tier 1 las saltea, su SAS es ruido y faithfulness solo corre manual (Tier 3). No hay
@@ -142,6 +217,29 @@ harness no los persiste. Se está optimizando a ciegas el eje costo/eficiencia.
 ---
 
 ## H5 + H7 — SAS confiable + Tier 3 con baseline y answer relevancy
+
+> **Datos medidos (2026-08-18)** para calibrar el umbral, que hoy es
+> `SAS_REGRESSION_THRESHOLD = 0.05` en `report.py`. Dos corridas **idénticas** sobre las
+> 39 preguntas (misma config, mismo modelo, `temperature=0`, retrieval con delta
+> exactamente 0.000):
+>
+> - **Ruido global de SAS: −0.010.** Chico, como esperaba el plan.
+> - **Ruido máximo por pregunta: −0.344** (`cve-log4j-nombre`, 0.843 → 0.499). Enorme.
+>
+> Dos conclusiones que cambian el diseño de H5:
+>
+> 1. **`temperature=0` no da determinismo.** La variación es 100% del LLM (Groq), porque
+>    el retrieval fue idéntico. Cualquier umbral tiene que absorber eso.
+> 2. **El caso peor son las negativas, y por una razón estructural:** las dos respuestas
+>    de esa pregunta eran abstenciones **correctas** ("No dispongo de información…" vs
+>    "No sé."), y el SAS les puso 0.34 de diferencia por la longitud. Medir con similitud
+>    semántica contra una `reference_answer` no tiene sentido cuando la respuesta correcta
+>    es "no sé": hay infinitas formas igual de válidas y muy distintas entre sí.
+>
+> **Recomendación concreta:** antes de tocar el umbral, **excluir las preguntas negativas
+> del chequeo de regresión de SAS** y dejarlas a cargo de H6. Subir el umbral hasta
+> tapar 0.34 lo volvería inútil para las preguntas normales. Detalle en
+> [bitacora_refactor_csv.md](bitacora_refactor_csv.md), hallazgo 18.
 
 **Problema:** el gate de generación es débil por dos lados. **SAS** (Tier 2) es ruidoso — dos
 corridas de config idéntica dieron 0.7722 vs 0.7654, y el umbral de regresión es 0.05
