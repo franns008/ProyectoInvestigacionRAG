@@ -54,6 +54,8 @@ RUNS_COLUMNS = [
     "n_gt", "recall_eff", "hit_eff", "mrr_eff",
     # Tier 1b — retrieval a nivel de FUENTE (agnóstico al chunking; ver metrics.py)
     "n_source", "source_recall", "source_hit", "source_mrr",
+    # Abstención (sólo sobre las preguntas con `expect_refusal`)
+    "n_abstention", "abstention_rate",
     # Tier 2
     "n_sas", "sas_mean", "sas_std",
     # Tier 3 (suite=judge)
@@ -69,8 +71,8 @@ QUESTIONS_COLUMNS = [
     # Tier 1b (fuente)
     "expected_sources", "retrieved_sources",
     "source_recall", "source_hit", "source_rr",
-    # abstención (negativas; ver check_correct_rejection en run_eval.py)
-    "correct_rejection",
+    # abstención (negativas con `expect_refusal` en el dataset; H6)
+    "expect_refusal", "refused", "fabricated_ids", "correct_rejection",
     # Tier 2 / Tier 3
     "sas", "faithfulness", "context_relevance",
     # texto (siempre al final)
@@ -217,7 +219,7 @@ _RUNS_STR = {
 _QUESTIONS_STR = {
     "run_id", "question_id", "category", "status", "error",
     "expected_ids", "retrieved_ids", "joined_ids",
-    "expected_sources", "retrieved_sources",
+    "expected_sources", "retrieved_sources", "fabricated_ids",
     "question", "answer", "reference_answer",
 }
 

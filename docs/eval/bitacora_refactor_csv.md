@@ -718,6 +718,100 @@ Queda fuera del alcance de este refactor, pero **el número no hay que creerlo**
 
 ---
 
+### H6 — abstención medida de verdad (fuera del refactor, 2026-08-18)
+
+Implementado después de cerrar el refactor, a pedido de Valentino. El planteo suyo
+—"en las negativas, verificar sólo que conteste que no sabe y que no invente datos"—
+coincide con H6 de [mejoras_harness.md](mejoras_harness.md), y bajarlo a código
+destapó tres cosas que el plan de H6 no podía anticipar.
+
+**Hallazgo 22 — inferir "debe abstenerse" de `expected_doc_ids == []` es un desastre.**
+H6 (punto 6) propone ese default. Con el dataset real:
+
+| categoría | sin ground truth | ¿debe abstenerse? |
+|---|---|---|
+| `guia_incibe` | 12 | **NO** — tienen `reference_answer` con contenido de los PDFs |
+| `fuera_dominio` | 2 | sí |
+| `id_inexistente` | 3 | sí |
+
+Las 12 de INCIBE no tienen ids porque nadie se los asignó a esos chunks, no porque
+no haya respuesta. Con el default de H6 habrían quedado marcadas como **12
+abstenciones falladas** estando perfectas. Se resolvió con un campo explícito
+`expect_refusal: true` en el dataset, sobre las 5 que lo son de verdad.
+
+**Corrección de alcance sobre el hallazgo 18.** Se había concluido "sacar las
+negativas del chequeo de SAS". Con esto a la vista, la exclusión correcta es mucho
+más chica: **sólo las 5 con `expect_refusal`**. De las 7 regresiones de SAS de la
+corrida `20260818T212732Z`, 6 eran de `guia_incibe` — mediciones legítimas contra
+respuestas de referencia reales. La ruidosa era una sola.
+
+**Hallazgo 23 — los guiones tipográficos hacían invisible la detección de ids.**
+`rag._extract_vuln_ids` sólo entiende el guión ASCII, y `gpt-oss` escribe
+`CVE‑2021‑44228` con U+2011:
+
+```
+'CVE-2021-44228 ni CWE-89'   → ['CWE-89', 'CVE-2021-44228']
+'CVE‑2021‑44228 ni CWE‑89'   → []          ← mismo texto, guión U+2011
+```
+
+O sea que un id inventado con guión "bonito" no se detectaba. La primera medición
+de esta sesión ("17 negativas, 0 ids inventados") estaba hecha sin normalizar y por
+lo tanto **no era confiable**. Rehecha con `normalizar_guiones()`: aparece un caso
+que estaba oculto (`xss-sop-cors-csp` menciona `CWE‑79`), aunque es de `guia_incibe`
+y ahí citar un CWE es legítimo. Para las 5 de abstención sigue dando 0.
+
+**Hallazgo 24 — el RAG se abstiene en preguntas que SÍ debe contestar, y era
+invisible.** Al validar `is_refusal` contra las 39 respuestas reales apareció un
+"falso positivo" que no lo era:
+
+```
+prevenir-deserializacion
+  recall = 1.0   rank = 1     ← el retriever puso cwe-502 PRIMERO
+  respuesta: "No sé."
+  sas = nan                   ← no tiene reference_answer
+```
+
+Las tres corridas iguales. **Tier 1 lo da por perfecto y Tier 2 no lo mide**: el
+fallo es 100% de generación y no había ninguna métrica que lo viera. Por eso
+`refused` se calcula ahora en **las 39** preguntas, no sólo en las trampa:
+abstenerse tiene dos lecturas opuestas según la pregunta, y las dos importan. Una
+pregunta normal que pasa de contestar a negarse cuenta como regresión.
+
+Con la métrica andando aparecieron **dos**, no una:
+
+```
+⚠ ABSTENCIONES INDEBIDAS (2): se negó a responder preguntas que NO son trampa
+  ✗ tipos-inyeccion-comandos     recall=0.50
+  ✗ prevenir-deserializacion     recall=1.00
+```
+
+`tipos-inyeccion-comandos` es la que en el heatmap del reporte HTML aparecía
+clavada en 0.50 en las tres corridas: el retriever le trae la mitad de lo que
+debería y el LLM, con eso, prefiere no contestar. Son dos fallos distintos —uno de
+retrieval y otro de generación— que hasta ahora se veían como un solo número
+mediocre.
+
+**Qué quedó implementado**
+
+- `metrics.py`: `normalizar_guiones`, `is_refusal` (marcadores sacados de las
+  respuestas **reales** del baseline, no inventados), `fabricated_ids`
+  (`respuesta − pregunta`, para no penalizar que repita el CVE del enunciado) y
+  `aggregate_abstention`.
+- `dataset.yaml`: `expect_refusal: true` en las 5.
+- Esquema: `expect_refusal`, `refused`, `fabricated_ids` en `questions.csv`;
+  `n_abstention`, `abstention_rate` en `runs.csv`.
+- `run_eval.py`: se eliminó `check_correct_rejection` (la función del hallazgo 19,
+  cuya lista de frases no matcheaba **ninguna** abstención real). El veredicto es
+  ahora `correct = refused and not fabricated`.
+- `report.py`: las de `expect_refusal` salen del chequeo de SAS, y hay dos tipos de
+  regresión nuevos —dejar de abstenerse bien, y empezar a abstenerse mal—.
+
+**Validación de `is_refusal` sobre las 39 respuestas reales:** 5/5 abstenciones
+detectadas, 0 falsos negativos, y el único "falso positivo" resultó ser el hallazgo
+24 (una abstención real, en una pregunta que no debía abstenerse).
+
+---
+
 ## Desvíos respecto del plan
 
 Ninguno funcional hasta ahora. El único punto de implementación libre:

@@ -127,3 +127,102 @@ def aggregate_sas(per_question: list[dict]) -> dict:
     if not scored:
         return {"sas": None, "n": 0}
     return {"sas": round(mean(q["sas"] for q in scored), 4), "n": len(scored)}
+
+
+# ── Abstención en preguntas negativas (H6 de docs/eval/mejoras_harness.md) ───
+#
+# Una pregunta con `expect_refusal: true` en el dataset es una trampa: el RAG NO
+# tiene ese dato y lo correcto es que lo diga. Medirla con SAS no sirve —hay
+# infinitas formas válidas de decir "no sé" y la `reference_answer` es sólo una,
+# así que el SAS premia la que se parezca a esa redacción (hallazgo 18)—. El
+# veredicto correcto es binario y tiene dos partes:
+#
+#     correct = se abstuvo  AND  no inventó identificadores
+#
+# Las dos son independientes: un modelo puede decir "no tengo información" y en
+# la misma respuesta soltar tres CWE inventados.
+
+# Guiones tipográficos → ASCII. Los LLM escriben `CVE‑2021‑44228` con U+2011 y el
+# regex de ids del pipeline sólo entiende `-`: sin esto, un id inventado con
+# guión "bonito" es invisible. Verificado (2026-08-18): `_extract_vuln_ids`
+# devuelve `[]` sobre un texto con U+2011, y las respuestas de gpt-oss los usan.
+_GUIONES = dict.fromkeys(map(ord, "\u2010\u2011\u2012\u2013\u2014\u2212"), "-")
+
+
+def normalizar_guiones(texto: str) -> str:
+    """Unifica los guiones a ASCII. Aplicar SIEMPRE antes de extraer ids."""
+    return (texto or "").translate(_GUIONES)
+
+
+# Marcadores de abstención sacados de las RESPUESTAS REALES del baseline
+# (corrida 20260818T202351Z), no inventados de memoria — que es justo el error
+# de la versión anterior: su lista no matcheaba ninguna de las abstenciones que
+# el modelo produce de verdad, así que la métrica daba 0 siempre (hallazgo 19).
+#
+# `"no sé"` va CON tilde a propósito: sin ella matchearía el "no se" reflexivo
+# ("no se recomienda", "no se debe") que aparece en respuestas normales.
+REFUSAL_MARKERS = (
+    "no lo sé",
+    "no sé",
+    "no dispongo de información",
+    "no dispongo de datos",
+    "no tengo información",
+    "no tengo datos",
+    "no hay información",
+    "no se encuentra en el contexto",
+    "no está en el contexto",
+    "fuera del alcance",
+    "no puedo responder",
+    "no tengo suficiente información",
+    "no es posible responder",
+    "no puedo proporcionar una respuesta",
+    "no hay información suficiente",
+    "no puedo determinar",
+    "no puedo contestar",
+)
+
+
+def is_refusal(answer: str) -> bool:
+    """¿La respuesta es una abstención?
+
+    Detección por marcadores, no por juez: tiene que ser determinística y gratis
+    para poder correr en cada eval. La contra conocida es que una abstención
+    redactada de una forma nueva no se detecta — si aparece, se agrega el
+    marcador acá, tomándolo de la respuesta real.
+    """
+    if not answer:
+        return False
+    low = normalizar_guiones(str(answer)).lower()
+    return any(marker in low for marker in REFUSAL_MARKERS)
+
+
+def fabricated_ids(answer_ids: Iterable[str], question_ids: Iterable[str]) -> list[str]:
+    """Ids que aparecen en la respuesta y NO venían en la pregunta.
+
+    Restar los de la pregunta es lo que evita el falso positivo obvio: si te
+    preguntan por CVE-2021-44228, repetirlo en la respuesta no es inventar nada.
+
+    Recibe listas de ids ya extraídas (`rag._extract_vuln_ids` sobre el texto
+    normalizado) en vez de los textos: así `metrics.py` no depende del pipeline.
+    """
+    de_la_pregunta = set(question_ids)
+    vistos, out = set(), []
+    for i in answer_ids:
+        if i not in de_la_pregunta and i not in vistos:
+            vistos.add(i)
+            out.append(i)
+    return out
+
+
+def aggregate_abstention(per_question: list[dict]) -> dict:
+    """Tasa de abstención correcta sobre las preguntas con `expect_refusal`.
+
+    Devuelve `{"n": 0, "rate": None}` si el dataset no tiene ninguna: sin
+    preguntas trampa no hay nada que promediar, y un 0.0 se leería como "falla
+    siempre" en vez de "no se midió".
+    """
+    negativas = [q for q in per_question if q.get("expect_refusal")]
+    if not negativas:
+        return {"n": 0, "rate": None}
+    ok = sum(1 for q in negativas if q.get("correct_rejection"))
+    return {"n": len(negativas), "rate": ok / len(negativas)}

@@ -58,7 +58,8 @@ CONFIG_COLUMNS = [
 
 # Métricas globales del bloque GLOBAL, en orden de lectura. `source_recall` puede
 # no existir en corridas viejas: se muestra `–` y no rompe.
-GLOBAL_METRICS = ["recall_eff", "hit_eff", "mrr_eff", "source_recall", "sas_mean"]
+GLOBAL_METRICS = ["recall_eff", "hit_eff", "mrr_eff", "source_recall", "sas_mean",
+                  "abstention_rate"]
 
 ANCHO = 64
 
@@ -303,25 +304,53 @@ def _paired(q: "pd.DataFrame", metric: str, run_base: str, run_cur: str) -> "pd.
     return d
 
 
+def sin_abstenciones(q: "pd.DataFrame") -> "pd.DataFrame":
+    """Saca las preguntas con `expect_refusal`. Se usa para el chequeo de SAS.
+
+    El SAS compara contra **una** `reference_answer`, y para una pregunta trampa
+    hay infinitas respuestas correctas y muy distintas entre sí: "No sé." sacó
+    0.499 y "No dispongo de información…" 0.843, las dos correctas (hallazgo 18).
+    Dejarlas adentro llena el reporte de regresiones que son ruido. A esas
+    preguntas las evalúa `correct_rejection`, que es binario y no depende de la
+    redacción.
+    """
+    if "expect_refusal" not in q.columns:
+        return q
+    return q[q["expect_refusal"] != 1.0]
+
+
 def regressions(q: "pd.DataFrame", run_base: str, run_cur: str) -> dict[str, "pd.DataFrame"]:
-    """{'retrieval': df, 'sas': df} con las preguntas que empeoraron.
+    """{'retrieval': df, 'sas': df, 'abstencion': df} con lo que empeoró.
 
     Retrieval: cualquier caída de `recall_eff` (perder una pregunta es grave, no
     hay umbral). Generación: caída de SAS mayor al umbral, porque el SAS tiene
-    ruido propio entre corridas.
+    ruido propio entre corridas. Abstención: pasar de abstenerse bien a mal, que
+    no tiene umbral porque es binario.
     """
     ret = _paired(q, "recall_eff", run_base, run_cur)
-    sas = _paired(q, "sas", run_base, run_cur)
+    sas = _paired(sin_abstenciones(q), "sas", run_base, run_cur)
+    if "expect_refusal" in q.columns:
+        trampa = q[q["expect_refusal"] == 1.0]
+        normales = q[q["expect_refusal"] != 1.0]
+    else:
+        trampa = normales = q.iloc[0:0]
+    abst = _paired(trampa, "correct_rejection", run_base, run_cur)
+    # `refused` sube de 0 a 1 en una pregunta normal = empezó a negarse a
+    # contestar algo que antes contestaba. Es una regresión de generación que
+    # ninguna otra métrica ve: el recall puede seguir en 1.0.
+    indeb = _paired(normales, "refused", run_base, run_cur)
     return {
         "retrieval": ret[ret["delta"] < 0].sort_values("delta"),
         "sas": sas[sas["delta"] < -SAS_REGRESSION_THRESHOLD].sort_values("delta"),
+        "abstencion": abst[abst["delta"] < 0].sort_values("delta"),
+        "indebida": indeb[indeb["delta"] > 0].sort_values("delta", ascending=False),
     }
 
 
 def improvements(q: "pd.DataFrame", run_base: str, run_cur: str) -> dict[str, "pd.DataFrame"]:
     """Simétrico de `regressions`: las subas también validan un cambio."""
     ret = _paired(q, "recall_eff", run_base, run_cur)
-    sas = _paired(q, "sas", run_base, run_cur)
+    sas = _paired(sin_abstenciones(q), "sas", run_base, run_cur)
     return {
         "retrieval": ret[ret["delta"] > 0].sort_values("delta", ascending=False),
         "sas": sas[sas["delta"] > SAS_REGRESSION_THRESHOLD].sort_values("delta", ascending=False),
@@ -356,7 +385,7 @@ def _print_resumen_solo(row: "pd.Series") -> None:
     """Sin baseline no hay delta: se muestran las métricas de la corrida a secas."""
     print("\n  Global:")
     for m in GLOBAL_METRICS:
-        print(f"    {m:<14} {num(row.get(m))}")
+        print(f"    {m:<16} {num(row.get(m))}")
 
 
 def _print_advertencias(row_base: "pd.Series", row_cur: "pd.Series") -> None:
@@ -397,7 +426,7 @@ def _print_config_diff(row_base: "pd.Series", row_cur: "pd.Series") -> None:
 def _print_global(row_base: "pd.Series", row_cur: "pd.Series") -> None:
     print("\n" + _hdr("GLOBAL"))
     for m in GLOBAL_METRICS:
-        print(f"  {m:<14} {fmt_delta(row_cur.get(m), row_base.get(m))}")
+        print(f"  {m:<16} {fmt_delta(row_cur.get(m), row_base.get(m))}")
 
 
 def _print_categorias(q: "pd.DataFrame", base_id: str, cur_id: str) -> None:
@@ -464,7 +493,8 @@ def compare(run_id: str | None = None, baseline_run_id: str | None = None,
 
     regs = regressions(q, base_id, cur_id)
     mejoras = improvements(q, base_id, cur_id)
-    n_reg = len(regs["retrieval"]) + len(regs["sas"])
+    n_reg = (len(regs["retrieval"]) + len(regs["sas"])
+             + len(regs["abstencion"]) + len(regs["indebida"]))
 
     print("\n" + _hdr("POR PREGUNTA"))
     if n_reg == 0:
@@ -478,6 +508,15 @@ def compare(run_id: str | None = None, baseline_run_id: str | None = None,
                 regs["sas"],
                 f"⚠ Regresiones de GENERACIÓN (SAS bajó > {SAS_REGRESSION_THRESHOLD}):",
                 "bad", decimales=3)
+        if not regs["abstencion"].empty:
+            _print_lista_preguntas(
+                regs["abstencion"],
+                "⚠ Regresiones de ABSTENCIÓN (dejó de abstenerse bien):", "bad")
+        if not regs["indebida"].empty:
+            _print_lista_preguntas(
+                regs["indebida"],
+                "⚠ ABSTENCIONES INDEBIDAS nuevas (se negó a contestar algo que sí debía):",
+                "bad")
 
     if not mejoras["retrieval"].empty or not mejoras["sas"].empty:
         total = len(mejoras["retrieval"]) + len(mejoras["sas"])

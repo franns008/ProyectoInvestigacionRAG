@@ -282,6 +282,7 @@
   category: fuera_dominio
   question: "¿Cuál es la capital de Francia?"
   expected_doc_ids: []
+  expect_refusal: true    # el RAG DEBE abstenerse; ver H6 de mejoras_harness.md
   reference_answer: "No lo sé: esa pregunta está fuera del alcance de la base de ciberseguridad."
   eval_focus: [generation]
   tags: [negativa]
@@ -290,6 +291,7 @@
   category: fuera_dominio
   question: "Dame una receta de tarta de manzana."
   expected_doc_ids: []
+  expect_refusal: true    # el RAG DEBE abstenerse; ver H6 de mejoras_harness.md
   reference_answer: "No lo sé: la base solo contiene información de ciberseguridad."
   eval_focus: [generation]
   tags: [negativa]
@@ -299,6 +301,7 @@
   category: id_inexistente
   question: "¿Qué es la vulnerabilidad CVE-2021-44228?"
   expected_doc_ids: []
+  expect_refusal: true    # el RAG DEBE abstenerse; ver H6 de mejoras_harness.md
   reference_answer: "No dispongo de información sobre ese CVE en la base."
   eval_focus: [generation]
   tags: [cve, robustez, pendiente-ingesta]
@@ -307,6 +310,7 @@
   category: id_inexistente
   question: "Contame sobre las vulnerabilidades de Log4Shell en Log4j."
   expected_doc_ids: []
+  expect_refusal: true    # el RAG DEBE abstenerse; ver H6 de mejoras_harness.md
   reference_answer: "No dispongo de información específica sobre Log4Shell en la base."
   eval_focus: [generation]
   tags: [cve, robustez, pendiente-ingesta]
@@ -315,6 +319,7 @@
   category: id_inexistente
   question: "¿Qué es CVE-9999-99999?"
   expected_doc_ids: []
+  expect_refusal: true    # el RAG DEBE abstenerse; ver H6 de mejoras_harness.md
   reference_answer: "No existe / no dispongo de información sobre ese identificador."
   eval_focus: [generation]
   tags: [cve, robustez]

@@ -95,6 +95,36 @@ orden. Con esto, **todos los deltas actuales engañan**.
 
 ## H6 — Métrica determinística de abstención
 
+> ## ✅ IMPLEMENTADO (2026-08-18)
+>
+> Los puntos 1–5 están hechos, y el punto 6 (`expect_refusal`) resultó **no ser
+> opcional**: es la pieza que hace que la métrica no mienta. Ver
+> [bitacora_refactor_csv.md](bitacora_refactor_csv.md), hallazgos 22–24.
+>
+> **El default que proponía el punto 6 estaba mal.** "Inferir de `expected_doc_ids`
+> vacío" habría marcado como abstenciones falladas a las **12 preguntas de
+> `guia_incibe`**, que no tienen ground truth de retrieval pero sí `reference_answer`
+> real y deben responderse. Las preguntas trampa son **5**, no 17, y ahora llevan
+> `expect_refusal: true` explícito en el dataset.
+>
+> **Dos cosas que aparecieron al implementarlo:**
+>
+> 1. **Los guiones tipográficos rompían la detección de ids inventados.**
+>    `_extract_vuln_ids` sólo entiende `-` ASCII y el modelo escribe `CVE‑2021‑44228`
+>    con U+2011 → devolvía `[]`. Se normaliza con `metrics.normalizar_guiones()`
+>    **antes** de extraer. Cualquier código nuevo que extraiga ids tiene que hacer lo
+>    mismo.
+> 2. **`is_refusal` sirve en las dos direcciones.** En una pregunta normal, negarse a
+>    contestar es un fallo de generación que **ninguna métrica veía**: el caso real es
+>    `prevenir-deserializacion`, con `recall=1.0` y `rank=1` (el retriever puso
+>    `cwe-502` primero) y respuesta `"No sé."`. Tier 1 lo daba por perfecto y Tier 2
+>    era NaN. Por eso `refused` se calcula en las 39 preguntas y una abstención
+>    indebida nueva cuenta como regresión.
+>
+> Lo que **sigue pendiente** es la calibración de H5 que depende de esto: ahora que
+> las trampa salieron del chequeo de SAS, se puede revisar
+> `SAS_REGRESSION_THRESHOLD` con datos limpios.
+
 > **Confirmado empíricamente (2026-08-18).** No es una sospecha: hoy la métrica devuelve
 > `0` **incluso cuando el RAG se abstiene perfectamente**. Dos corridas de
 > `cve-log4j-nombre`, las dos con abstención correcta, las dos guardadas con

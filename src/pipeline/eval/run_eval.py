@@ -170,31 +170,6 @@ def compute_sas(embedder, answer: str | None, reference: str | None) -> float | 
     r = embedder.run(text=reference)["embedding"]
     return round(m.cosine_similarity(a, r), 4)
 
-def check_correct_rejection(answer:str ) -> bool:
-    """
-        Verifica si el LLM se abstuvo correctamente de responder una pregunta
-        para la cual no tenía contexto.
-    """
-    if not answer:
-        return False
-    # Convert the answer to lowercase for case-insensitive comparison
-    answer_lower = answer.lower()
-    # Check for common phrases indicating a correct rejection
-    rejection_phrases = [
-        "no puedo responder",
-        "no tengo suficiente información",
-        "no es posible responder",
-        "no puedo proporcionar una respuesta",
-        "no hay información suficiente",
-        "no puedo determinar la respuesta",
-        "no puedo dar una respuesta precisa",
-        "no puedo contestar",
-        "no puedo ayudar con eso",
-        "no tengo datos suficientes"
-    ]
-    return any(phrase in answer_lower for phrase in rejection_phrases)
-
-
 def evaluate(item: dict, emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids=None) -> dict:
     """`document_ids` (candidatos del joiner) es opcional: el experimento de chunking
     corre en retrieval puro y sólo necesita ranked_ids/ranked_sources."""
@@ -225,8 +200,30 @@ def evaluate(item: dict, emb_ids, kw_ids, ranked_ids, ranked_sources, answer, do
     else:
         rec["recall"] = rec["hit"] = rec["rr"] = None
         rec["hit_source"] = None
-        rec["correct_rejection"] = check_correct_rejection(answer)  # Verifica si el LLM se abstuvo correctamente
-        #FUncion a mejorar, debería ser más robusta y considerar más casos de abstención correcta.
+
+    # Abstención (H6). Sólo sobre las preguntas marcadas `expect_refusal` en el
+    # dataset. **No** se infiere de `expected_doc_ids == []`: las 12 preguntas de
+    # `guia_incibe` no tienen ground truth de retrieval y sin embargo SÍ deben
+    # responderse — inferirlo las marcaría a todas como abstenciones falladas.
+    rec["expect_refusal"] = bool(item.get("expect_refusal"))
+    # `refused` se calcula SIEMPRE, no sólo en las trampa. Abstenerse tiene dos
+    # lecturas opuestas según la pregunta, y las dos importan:
+    #   · con expect_refusal → abstenerse es lo correcto.
+    #   · sin expect_refusal → abstenerse es un FALLO DE GENERACIÓN que hoy no
+    #     detecta nada. Caso real: `prevenir-deserializacion` tiene recall 1.0 y
+    #     rank 1 (el retriever puso cwe-502 primero) y el LLM contestó "No sé.".
+    #     Tier 1 lo da por perfecto y Tier 2 es NaN: era invisible.
+    rec["refused"] = m.is_refusal(answer)
+    if rec["expect_refusal"]:
+        # Guiones a ASCII antes de extraer: el modelo escribe `CVE‑2021‑44228`
+        # con U+2011 y el regex de ids sólo entiende `-`.
+        ids_resp = rag._extract_vuln_ids(m.normalizar_guiones(answer or ""))
+        ids_preg = rag._extract_vuln_ids(m.normalizar_guiones(item.get("question", "")))
+        fabricados = m.fabricated_ids(ids_resp, ids_preg)
+        rec["fabricated_ids"] = fabricados
+        rec["correct_rejection"] = rec["refused"] and not fabricados
+    else:
+        rec["fabricated_ids"] = rec["correct_rejection"] = None
 
     # Tier 1b: ground truth a nivel de fuente (agnóstico a la estrategia de chunking).
     if expected_sources:
@@ -257,7 +254,8 @@ def _print_row(i: int, rec: dict) -> None:
           f"recall={rec['recall']:.2f} rr={rec['rr']:.2f} via={src}{_sas_str(rec)}")
 
 
-def _print_summary(overall: dict, by_cat: dict, sas_overall: dict, src_overall: dict | None = None) -> None:
+def _print_summary(overall: dict, by_cat: dict, sas_overall: dict, src_overall: dict | None = None,
+                   abst: dict | None = None, per_question: list[dict] | None = None) -> None:
     print("\n" + "=" * 64)
     print("RESUMEN")
     print("=" * 64)
@@ -283,6 +281,31 @@ def _print_summary(overall: dict, by_cat: dict, sas_overall: dict, src_overall: 
         print(f"\n  Tier 1b FUENTE (n={src_overall['n']}):  "
               f"source_recall@k={src_overall['source_recall_at_k']:.3f}  "
               f"source_hit={src_overall['source_hit_rate']:.3f}")
+
+    # Abstención: sólo las preguntas trampa (`expect_refusal` en el dataset). Se
+    # listan las que fallaron, porque "4 de 5" sin decir cuál no sirve para nada.
+    if abst and abst.get("rate") is not None:
+        print()
+        print(f"  ABSTENCIÓN (n={abst['n']} con expect_refusal):  "
+              f"correctas={abst['rate']:.3f}")
+        for q in (per_question or []):
+            if q.get("expect_refusal") and not q.get("correct_rejection"):
+                motivo = ("no se abstuvo" if not q.get("refused")
+                          else f"inventó {', '.join(q.get('fabricated_ids') or [])}")
+                print(f"    ✗ {q['id']:<28} {motivo}")
+
+    # Abstenciones INDEBIDAS: se negó a contestar algo que NO es trampa. Ninguna
+    # otra métrica lo ve — el recall puede estar en 1.000 y el SAS en NaN.
+    indebidas = [q for q in (per_question or [])
+                 if q.get("refused") and not q.get("expect_refusal")]
+    if indebidas:
+        print()
+        print(f"  ⚠ ABSTENCIONES INDEBIDAS ({len(indebidas)}): se negó a responder "
+              f"preguntas que NO son trampa")
+        for q in indebidas:
+            r = q.get("recall")
+            print(f"    ✗ {q['id']:<28} "
+                  + ("sin ground truth" if r is None else f"recall={r:.2f}"))
 
 
 # ── armado de filas para las tablas CSV ─────────────────────────────────────
@@ -320,6 +343,9 @@ def question_row(run_id: str, rec: dict) -> dict:
         "source_recall":     rec.get("source_recall"),
         "source_hit":        rec.get("source_hit"),
         "source_rr":         rec.get("source_rr"),
+        "expect_refusal":    rec.get("expect_refusal"),
+        "refused":           rec.get("refused"),
+        "fabricated_ids":    rec.get("fabricated_ids"),
         "correct_rejection": rec.get("correct_rejection"),
         "sas":               rec.get("sas"),
         "faithfulness":      None,   # las llena Tier 3 (run_eval_llm.py)
@@ -331,7 +357,7 @@ def question_row(run_id: str, rec: dict) -> dict:
 
 
 def run_row(run_id: str, valves, meta: dict, per_question: list[dict],
-            overall: dict, src_overall: dict, sas: dict,
+            overall: dict, src_overall: dict, sas: dict, abst: dict,
             n_docs_store: int, dataset_n: int, duration_s: float,
             label: str) -> dict:
     """La fila resumen de `runs.csv` (una por corrida)."""
@@ -365,6 +391,8 @@ def run_row(run_id: str, valves, meta: dict, per_question: list[dict],
         "source_recall":   src_overall.get("source_recall_at_k"),
         "source_hit":      src_overall.get("source_hit_rate"),
         "source_mrr":      src_overall.get("source_mrr"),
+        "n_abstention":    abst.get("n"),
+        "abstention_rate": abst.get("rate"),
         "n_sas":           sas.get("n"),
         "sas_mean":        sas.get("sas"),
         "sas_std":         statistics.stdev(sas_values) if len(sas_values) >= 2 else None,
@@ -446,13 +474,14 @@ def main() -> None:
     by_cat      = m.aggregate_by_category(per_question)   # sólo para imprimir; no se persiste
     sas         = m.aggregate_sas(per_question)
     src_overall = m.aggregate_source_retrieval(per_question)
-    _print_summary(overall, by_cat, sas, src_overall)
+    abst = m.aggregate_abstention(per_question)
+    _print_summary(overall, by_cat, sas, src_overall, abst, per_question)
 
     # `by_category` deja de persistirse: report.py lo recalcula con un groupby sobre
     # questions.csv, así no hay dos fuentes de verdad para el mismo número.
     csv_store.append_row(
         runs_csv,
-        run_row(run_id, valves, meta, per_question, overall, src_overall, sas,
+        run_row(run_id, valves, meta, per_question, overall, src_overall, sas, abst,
                 n_docs_store, len(dataset), duration_s, args.label),
         csv_store.RUNS_COLUMNS,
     )
