@@ -1,7 +1,9 @@
 # Bitácora de implementación: refactor de resultados a CSV
 
-> **Estado (2026-08-14): EN CURSO.** Pasos 0–4, 7 y 8 terminados y verificados.
-> Pendientes: 5 (reescritura de `report.py`, el grande), 6, 9 y 10.
+> **Estado (2026-08-18): EN CURSO.** Pasos 0–4, 7 y 8 terminados y verificados.
+> Del Paso 5 está hecha y validada **toda la capa de terminal** (§5.1–5.2:
+> `compare`, `runs` y `question`), que es el gate obligatorio del plan. Falta el
+> modo `html` (§5.3–5.6). Pendientes: resto del 5, 6, 9 y 10.
 > `run_eval.py` ya escribe `runs.csv` + `questions.csv`, y el histórico está migrado.
 > Rama: `eval-csv-turco` (sacada de `eval-luca` @ `d7c0418`). Implementa: Valentino.
 >
@@ -29,7 +31,7 @@ sólo había deducido leyendo el código. Eso merece quedar escrito.
 | 2 | `eval_meta.yaml` | ✅ hecho y testeado |
 | 3 | `run_eval.py` escribe crudo | ✅ hecho y testeado |
 | 4 | Migrar `history.csv` y limpiar `results/` | ✅ hecho (con desvío, ver abajo) |
-| 5 | `report.py` (reescritura completa) | ⬜ pendiente |
+| 5 | `report.py` (reescritura completa) | 🟨 parcial: capa de terminal hecha; falta `html` |
 | 6 | `run_eval_llm.py` (Tier 3, mínimo) | ⬜ pendiente |
 | 7 | Wrappers `scripts/eval.sh` | ✅ hecho (con fix para Windows) |
 | 8 | Git: `.gitignore` + `.gitattributes` | ✅ hecho (adelantado al Paso 4) |
@@ -347,6 +349,116 @@ run_id            label            git_commit  git_branch      git_dirty
 
 ---
 
+### Paso 5 — `report.py` 🟨 (capa de terminal hecha; `html` pendiente)
+
+Se respetó el **orden interno obligatorio** del plan: primero la capa de terminal, que
+es el gate diario y no depende de matplotlib. Dentro de esa capa se hizo primero
+`compare` solo, porque es el modo que llama `run_eval.py` y el que hacía falta para
+que desapareciera el `⚠ reporte falló` que arrastraban todas las corridas desde el
+Paso 3.
+
+El módulo viejo se reescribió entero: no queda nada que lea JSON (`load_snapshot`,
+`promote` y `print_delta` sobre dicts ya no existen). Lo único que sobrevive es la
+**semántica** de `_arrow`/`_fmt`, como pedía §5.2, ahora en `fmt_delta`.
+
+Estructura según §5.5: `load_context` / `resolve_pair` para datos, un bloque de
+funciones de análisis puras (`config_diff`, `category_table`, `question_pivot`,
+`regressions`, `improvements`, `question_membership`) que devuelven DataFrames sin
+imprimir nada, y encima la capa de presentación. Esa separación es la que va a
+permitir que el modo `html` reuse los mismos números sin recalcularlos.
+
+**Validación hecha** (adelanta parte del §5.7, con dos corridas reales nuevas —
+`20260818T135812Z` y `20260818T140451Z` — más un `results/` sintético para los casos
+que los datos reales no producen):
+
+| Caso | Resultado |
+|---|---|
+| corrida vs baseline, todo normal | ✅ exit 0 |
+| epochs distintas (`pre-reranker` vs `reranker-v1`) | ✅ aviso de topología + config diff de 7 columnas |
+| baseline sin filas en `questions.csv` | ✅ degrada a delta global con aviso, exit 0 |
+| `dataset_n` distinto (3 vs 2) | ✅ aviso + nota de pregunta ausente |
+| `baseline_run_id: null` | ✅ resumen solo, exit 0 |
+| `results/` vacío | ✅ mensaje accionable, exit 2 |
+| `run_id` inexistente | ✅ lista las últimas 5, exit 2 |
+| regresiones de retrieval y de SAS + mejoras + pregunta nueva | ✅ las 3 listas, exit 1 con `--strict` |
+| SAS que baja **menos** que el umbral | ✅ correctamente NO marcado como regresión |
+| output con pipe | ✅ cero códigos ANSI |
+
+Después se completaron los otros dos modos de terminal, con lo que la capa que el
+plan marca como **gate obligatorio** (§5.1–5.2) queda cerrada:
+
+- **`runs`** — historial (últimas 15 con `suite=retrieval`, `--all` suma las judge),
+  baseline marcado con `*` pegado al `run_id` para que no se pierda de vista cuando
+  la tabla es ancha, y sparklines de `recall_eff`, `mrr_eff` y `sas_mean`.
+  La escala de la sparkline es **fija 0–1 y no min-max relativo**, como pide el plan:
+  con min-max, una métrica que se movió de 0.80 a 0.82 se vería igual de dramática
+  que una que fue de 0.10 a 0.95, y las series no se podrían comparar entre sí.
+- **`question <qid>`** — ficha (categoría, `expected_ids`, pregunta des-escapada con
+  `csv_store.unescape_text`), tabla cronológica con `via` (emb / kw / emb+kw / -)
+  resuelto con `np.select` sobre los flags leídos como float, y la respuesta de la
+  última corrida más la del baseline **sólo si difieren** (repetir el mismo texto dos
+  veces empuja lo importante fuera de la pantalla). Con un id que no existe, sugiere
+  con `difflib.get_close_matches` y sale con exit 2 — verificado: `cwe89-por-numer`
+  sugiere `cwe89-por-numero, cwe79-por-numero, cwe798-por-numero`.
+
+Validación de estos dos modos: tabla y sparklines sin excepciones sobre los datos
+reales y sobre el sintético; `*` del baseline correcto; `runs` sobre un `results/`
+vacío avisa y sale con 0; sparkline con faltantes (`·`) y con valores fuera de 0–1
+(clampeados) probados aparte.
+
+**Hallazgo 10 — `--top-k 1` no fuerza una regresión.** El §5.7.3 propone correr con
+`--top-k 1` para provocar una regresión garantizada y así probar `--strict`. No
+funciona: las preguntas `cwe*-por-numero` se recuperan por keyword y mantienen
+`recall=1.0` aun con `top_k=1`. La corrida `20260818T140451Z` lo confirma. Para
+validar ese camino hubo que armar un `results/` sintético. **Conviene corregir el
+§5.7.3 del plan**, o el Paso 10 va a "validar" `--strict` contra un caso que nunca
+dispara.
+
+**Hallazgo 11 — `argparse.set_defaults()` muta los actions compartidos por `parents=`.**
+Un flag global escrito **antes** del subcomando (`report.py --results X compare`) se
+perdía y el reporte leía el `results/` de siempre. La causa no es el bug clásico de
+argparse: `set_defaults()` escribe `action.default` sobre los objetos action, y
+`parents=` los **comparte por referencia** entre el parser principal y el subparser.
+El `default=SUPPRESS` que justamente evita el problema quedaba pisado. Se resolvió
+usando `set_defaults` sólo para `cmd` y resolviendo los defaults reales después de
+parsear (helper `_opt`). Verificado en las tres posiciones posibles del flag.
+
+**Hallazgo 13 — definir "corrida completa" por la MODA deja afuera las corridas que
+importan.** §5.4 (gráfico 1) define las corridas completas como las que tienen
+`dataset_n == moda`. Al implementar la evolución del modo `runs`, el estado real de
+la epoch vigente era:
+
+```
+dataset_n = 3   → 5 corridas   (pruebas con --limit de este mismo día)
+dataset_n = 39  → 1 corrida    (la única sobre el dataset entero)
+dataset_n = 2   → 1 corrida
+```
+
+La moda es **3**, así que la tendencia mostraba la evolución del smoke test y
+excluía la única corrida real. Y el problema se agrava solo: cuanto más se usa
+`--limit` para probar, más se afianza la moda equivocada. Es un caso donde el plan
+razonó sobre un `results/` maduro y la realidad es un `results/` de desarrollo.
+
+Decidido con Valentino (2026-08-18): **"completa" = `dataset_n` máximo de la epoch**.
+Se queda dentro de los CSV (no mira `dataset.yaml`, respetando el principio de que
+`report.py` sólo lee `runs.csv` / `questions.csv` / `eval_meta.yaml`) y es un cambio
+de una línea. Contra conocida y aceptada: si algún día se achica el dataset a
+propósito, el máximo apunta al tamaño viejo hasta re-basear — pero achicar el
+dataset es deliberado y raro, y correr con `--limit` es diario. **Conviene llevarle
+esto a Luca para que lo baje al plan.**
+
+Efecto inmediato: con el criterio nuevo hay 1 sola corrida completa, así que la
+evolución no se dibuja. §5.4 pide omitirla con menos de 2, pero omitirla en
+silencio se lee como "no pasó nada", así que se agregó el aviso `aún no hay
+historia suficiente…` diciendo cuál es el criterio.
+
+**Hallazgo 12 — los faltantes llegan de tres formas.** Según el dtype de la columna,
+un valor vacío es `None`, `float('nan')` o el `pd.NA` de las columnas string. El
+tercero se imprimía literal como `<NA>` en el diff de config. Se normalizan los tres
+en `_celda`, en un solo lugar.
+
+---
+
 ## Desvíos respecto del plan
 
 Ninguno funcional hasta ahora. El único punto de implementación libre:
@@ -356,6 +468,33 @@ Ninguno funcional hasta ahora. El único punto de implementación libre:
   "dicts de dtype explícitos definidos en este módulo" y eso se cumple (siguen siendo
   dicts del módulo); derivarlos evita que se desincronicen del esquema al agregar una
   columna.
+
+Del Paso 5 (todos chicos, ninguno cambia el comportamiento especificado):
+
+- **El diff de config no cubre todo el grupo "config" de `runs.csv`.** §5.2.3 dice
+  "columnas del grupo config". `CONFIG_COLUMNS` deja afuera tres: `dataset_n` y
+  `n_errors` porque ya se avisan en el bloque de advertencias (mostrarlos dos veces
+  resta atención al aviso, que es lo importante), y `duration_s` porque es un
+  resultado, no una decisión: aparecería en el diff de **todas** las corridas y lo
+  volvería ruido.
+- **La columna `n` de la tabla por categoría es la de la corrida actual**, no el
+  máximo de los dos lados. Con el máximo, comparando una corrida de 2 preguntas
+  contra un baseline de 3 la tabla decía `n=3` al lado de un promedio calculado
+  sobre 2. La categoría que sólo existe en el baseline cae de vuelta a su `n`.
+- **`--run` y `--baseline` también cuelgan del parser principal.** §5.1 los muestra
+  sólo bajo `compare`, pero la misma sección dice "sin subcomando ⇒ `compare` con
+  defaults": si `report.py` sin más es un compare, `report.py --run X` tiene que
+  andar. Escribir `compare` sigue siendo válido.
+- **"Corrida completa" = `dataset_n` máximo de la epoch, no la moda** (§5.4). Es el
+  único desvío del Paso 5 que cambia comportamiento especificado; está decidido con
+  Valentino y explicado en el hallazgo 13. **Falta bajárselo a Luca.**
+- **La evolución omitida avisa.** §5.4 dice omitir el gráfico con menos de 2 corridas
+  completas; se agregó además la nota `aún no hay historia suficiente…` porque un
+  bloque que desaparece sin decir nada se lee como "no pasó nada".
+- **`runs` muestra `mrr_eff` además de `recall_eff` y `sas_mean`.** El ejemplo de
+  §5.2 dibuja dos sparklines; se agregó la tercera porque `mrr` es la métrica que
+  distingue "encontró el documento" de "lo puso primero", que es justamente lo que
+  el reranker vino a mejorar — sin ella no se ve si el reranker está haciendo algo.
 
 Si algún desvío real aparece más adelante, se registra acá **antes** de codearlo.
 
