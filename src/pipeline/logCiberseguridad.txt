@@ -3184,3 +3184,5 @@ ASSISTANT: Según CWE-80, "Improper Neutralization of Script-Related HTML Tags i
 2026-08-18 13:28:39,391 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
 2026-08-18 20:09:43,323 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
 2026-08-18 20:09:43,787 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
+2026-08-18 22:45:13,334 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-18 22:45:13,509 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
