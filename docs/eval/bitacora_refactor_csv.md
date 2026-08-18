@@ -2,8 +2,12 @@
 
 > **Estado (2026-08-18): EN CURSO.** Pasos 0–4, 7 y 8 terminados y verificados.
 > Del Paso 5 está hecha y validada **toda la capa de terminal** (§5.1–5.2:
-> `compare`, `runs` y `question`), que es el gate obligatorio del plan. Falta el
-> modo `html` (§5.3–5.6). Pendientes: resto del 5, 6, 9 y 10.
+> `compare`, `runs` y `question`), que es el gate obligatorio del plan; falta el
+> modo `html` (§5.3–5.6). El **Paso 6 está hecho y validado**. Hay un **baseline
+> provisorio** fijado (`20260818T202351Z`, dataset completo de 39, Groq
+> `openai/gpt-oss-120b`): válido tal cual para retrieval, provisorio en `sas_mean`
+> hasta que el equipo defina el modelo (hallazgo 14).
+> Pendientes: el `html` del Paso 5, y los Pasos 9 y 10.
 > `run_eval.py` ya escribe `runs.csv` + `questions.csv`, y el histórico está migrado.
 > Rama: `eval-csv-turco` (sacada de `eval-luca` @ `d7c0418`). Implementa: Valentino.
 >
@@ -32,7 +36,7 @@ sólo había deducido leyendo el código. Eso merece quedar escrito.
 | 3 | `run_eval.py` escribe crudo | ✅ hecho y testeado |
 | 4 | Migrar `history.csv` y limpiar `results/` | ✅ hecho (con desvío, ver abajo) |
 | 5 | `report.py` (reescritura completa) | 🟨 parcial: capa de terminal hecha; falta `html` |
-| 6 | `run_eval_llm.py` (Tier 3, mínimo) | ⬜ pendiente |
+| 6 | `run_eval_llm.py` (Tier 3, mínimo) | ✅ hecho y validado (con 3 hallazgos) |
 | 7 | Wrappers `scripts/eval.sh` | ✅ hecho (con fix para Windows) |
 | 8 | Git: `.gitignore` + `.gitattributes` | ✅ hecho (adelantado al Paso 4) |
 | 9 | Documentación | ⬜ pendiente |
@@ -459,6 +463,110 @@ en `_celda`, en un solo lugar.
 
 ---
 
+### Paso 6 — `run_eval_llm.py` ✅ (con 3 hallazgos)
+
+Migrado según §Paso 6: `run_id`, log en `results/logs/`, `--label`, metadata de git y
+epoch, una fila por pregunta en `questions.csv` (con `category`, que antes se perdía)
+y una fila `suite="judge"` en `runs.csv`. Se eliminó la escritura de
+`tier3_<stamp>.json`. Las columnas de Tier 1 y 2 quedan vacías en las filas judge.
+
+Validado con `--limit 3` sobre Groq (`openai/gpt-oss-120b`):
+
+```
+run_id            suite  judge_model          n_judge  faithfulness  context_relevance
+20260818T205726Z  judge  openai/gpt-oss-120b        3        0.8222                1.0
+```
+
+Verificado además que `report.py runs` **excluye** las filas judge por default y sólo
+las muestra con `--all`, como pide §Paso 6.5.
+
+**Hallazgo 14 — el modelo de Groq del repo ya no existe.** `pipeline_ciberseguridad.py`
+tiene hardcodeado `meta-llama/llama-4-scout-17b-16e-instruct` como default de los
+valves. Con una API key nueva de Groq eso devuelve **404 `model_not_found`**. No es
+sólo ese modelo: la key expone **13 modelos y ninguno es de Llama** (verificado con el
+SDK oficial; `llama-3.1-8b-instant` y `llama-3.3-70b-versatile` también dan 404).
+
+De los 13, sólo dos sirven para el eval: `openai/gpt-oss-120b` y `openai/gpt-oss-20b`.
+Los demás quedan afuera por razones concretas: `qwen/qwen3.6-27b` escupe su `<think>`
+dentro de la respuesta; `groq/compound*` son agénticos con búsqueda web propia (podrían
+contestar sin usar los documentos recuperados → invalida el eval); `whisper-*` son
+speech-to-text; `canopylabs/orpheus-*` son text-to-speech; `llama-prompt-guard-2-*`
+son clasificadores con 512 tokens de contexto; `allam-2-7b` está orientado al árabe y
+tiene 4k de contexto (justo para un prompt con 4 documentos adentro).
+
+Dos consecuencias: **(1)** hoy el repo no arranca con Groq para nadie con key nueva, y
+está escrito en 4 lugares (`pipeline_ciberseguridad.py`, `.env.example`,
+`docs/modos_llm.md`, `docs/arquitectura_groq.md`); **(2)** el baseline histórico del
+2026-07-03 se corrió con scout y **ya no se puede reproducir**. Pendiente de definir
+con el equipo qué modelo se adopta.
+
+**Hallazgo 15 — el Tier 3 estaba roto desde que entró el reranker, y nadie lo vio.**
+`run_eval_llm.py` armaba la llamada al pipeline sin pasarle nada al `ranker`, así que
+tiraba `ValueError: Missing mandatory input 'query' for component 'ranker'` **antes de
+la primera pregunta**. El script no se tocó cuando se agregó el cross-encoder. Nadie lo
+notó porque para correrlo hace falta una key de Groq que en esta máquina no había.
+
+Y arreglar el crash destapó un problema mayor: el contexto que se le pasaba al juez
+salía del `document_joiner` (15 documentos), pero el cableado real es
+`ranker → prompt_builder → llm`, o sea que **el LLM ve 4**. Juzgar contra los 15 rompe
+las dos métricas en direcciones opuestas: `faithfulness` se vuelve indulgente (una
+afirmación inventada puede quedar "respaldada" por un documento que el LLM nunca leyó,
+justo lo contrario de lo que la métrica anti-alucinación tiene que detectar) y
+`context_relevance` se diluye (promedia 11 documentos que no se usaron). Decidido con
+Valentino: se juzga contra la salida del `ranker`. **Desvío del plan**, que dice
+`document_joiner` — pero el plan se escribió antes del reranker.
+
+**Hallazgo 16 — el juez `gpt-oss` concatena los scores en vez de listarlos.** Con el
+crash arreglado, los números salían absurdos:
+
+```
+cwe89-por-numero   faithfulness=1111000.00
+GLOBAL:            faithfulness=370407.0        ← la métrica va de 0 a 1
+```
+
+Causa: ante N afirmaciones el modelo devuelve **un solo número con los dígitos
+pegados** en vez de un score por afirmación:
+
+```json
+{"statements": ["CWE-89 es inyección SQL.", "Se previene con consultas parametrizadas."],
+ "statement_scores": [10]}          ← dos afirmaciones, un score: es "1" y "0" pegados
+```
+
+Pasa con `gpt-oss-120b` **y** con `gpt-oss-20b`: es la familia, no el tamaño. El modo
+`response_format: json_object` no impone la forma del array.
+
+La solución es structured output (`json_schema`) declarando el esquema de salida de
+cada evaluador (`.outputs`: `statements` + `statement_scores` para Faithfulness,
+`relevant_statements` para ContextRelevance). Con un detalle que costó encontrar:
+**el tipo tiene que ser `boolean`, no `integer` con `enum: [0,1]`**. Con el enum el
+modelo genera `10` igual, Groq lo valida contra el esquema, falla y devuelve **400**;
+con booleanos genera `[true, false]` correctamente y Haystack los promedia igual
+(`True == 1`). Resultado tras el arreglo: `faithfulness` 0.80 / 1.00 / 0.67 → 0.822.
+
+**Nota:** el modo `ollama` de `make_judge` sigue con `format: json` a secas y **no está
+validado** contra este problema. Si alguien corre el Tier 3 en local, que mire los
+números antes de creerles.
+
+**Hallazgo 17 — cambiar `.env` deja el pipeline roto en cadena.** Las variables
+(`LLM_PROVIDER`, `LLM_MODEL`, `GROQ_API_KEY`) llegan al container por el bloque
+`environment:` del compose, que se resuelve **al crear** el container. Editar `.env` no
+alcanza: hay que recrearlo. Y ahí arranca la cadena:
+
+1. El container recreado vuelve a la imagen, que trae **haystack 3.0.0**.
+2. OpenWebUI intenta cargar el pipeline, falla por esa versión, y **mueve el `.py` a
+   `/app/pipelines/failed/`**.
+3. Reaplicar los parches con pip **no alcanza**: el archivo ya no está donde va. Y el
+   síntoma es un `AttributeError` engañoso, porque sin el `.py` el nombre resuelve al
+   directorio `pipeline_ciberseguridad/` como namespace package.
+
+El procedimiento completo, entonces: recrear → reaplicar pip → **devolver el `.py`
+desde `failed/`** → `docker compose restart` (que sí conserva los parches). El paso 3
+es el que faltaba documentar. El arreglo durable sigue siendo rebuildear la imagen
+(hallazgo 1): `requirements.txt` ya declara `haystack-ai>=2.30,<3`, así que un rebuild
+deja esto resuelto para siempre.
+
+---
+
 ## Desvíos respecto del plan
 
 Ninguno funcional hasta ahora. El único punto de implementación libre:
@@ -491,6 +599,13 @@ Del Paso 5 (todos chicos, ninguno cambia el comportamiento especificado):
 - **La evolución omitida avisa.** §5.4 dice omitir el gráfico con menos de 2 corridas
   completas; se agregó además la nota `aún no hay historia suficiente…` porque un
   bloque que desaparece sin decir nada se lee como "no pasó nada".
+- **El Tier 3 juzga contra la salida del `ranker`, no del `document_joiner`** (§Paso
+  6.2). Justificado en el hallazgo 15: el plan se escribió antes del cross-encoder y
+  hoy el LLM ve 4 documentos, no 15. **Falta bajárselo a Luca.**
+- **`make_judge` recibe el esquema de salida del evaluador.** El plan no lo contempla
+  porque el problema sólo aparece con los modelos disponibles hoy (hallazgo 16). Sin
+  esto, el Tier 3 devuelve números sin sentido en vez de fallar, que es el peor modo
+  de fallar posible.
 - **`runs` muestra `mrr_eff` además de `recall_eff` y `sas_mean`.** El ejemplo de
   §5.2 dibuja dos sparklines; se agregó la tercera porque `mrr` es la métrica que
   distingue "encontró el documento" de "lo puso primero", que es justamente lo que

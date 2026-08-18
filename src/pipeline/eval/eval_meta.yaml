@@ -4,7 +4,12 @@ schema_version: 1
 
 # Baseline = run_id de una fila de results/runs.csv. Para re-basear, editar esta línea
 # (o correr scripts/eval.sh --set-baseline) y commitear.
-baseline_run_id: null   # se fija en el Paso 10 con la corrida de validación
+# PROVISORIO (2026-08-18): dataset completo (39), epoch reranker-v1, Groq
+# openai/gpt-oss-120b. Válido tal cual como referencia de RETRIEVAL: recall/hit/mrr
+# no dependen del LLM (verificado: delta 0.000 exacto contra la corrida equivalente
+# en Ollama). Sólo `sas_mean` queda atado al modelo, que el equipo todavía no definió
+# porque meta-llama/llama-4-scout ya no existe en Groq. Al definirlo → re-basear.
+baseline_run_id: 20260818T202351Z
 
 # Epoch vigente: nombre del período de topología actual. Se estampa en cada corrida.
 # ¿Cambiaste la topología del pipeline (reranker, chunking, modelo de embeddings,
