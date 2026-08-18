@@ -1,9 +1,9 @@
 # Bitácora de implementación: refactor de resultados a CSV
 
-> **Estado (2026-08-18): CASI TERMINADO.** Todos los pasos hechos y verificados
-> **salvo el modo `html` de `report.py`** (§5.3–5.6), que es lo único que falta.
-> La capa de terminal del Paso 5 (`compare`, `runs`, `question`) —el gate obligatorio
-> del plan— está completa, igual que los Pasos 6, 9 y 10.
+> **Estado (2026-08-18): TERMINADO.** Los 11 pasos hechos y verificados, y los tres
+> criterios de terminado del plan pasan. `report.py` tiene los cuatro modos
+> (`compare`, `runs`, `question`, `html`), y la imagen se rebuildeó, así que la
+> deriva de dependencias que arrastraba el entorno quedó resuelta de raíz.
 >
 > Hay un **baseline provisorio** fijado (`20260818T202351Z`, dataset completo de 39,
 > Groq `openai/gpt-oss-120b`): válido tal cual como referencia de **retrieval**
@@ -37,7 +37,7 @@ sólo había deducido leyendo el código. Eso merece quedar escrito.
 | 2 | `eval_meta.yaml` | ✅ hecho y testeado |
 | 3 | `run_eval.py` escribe crudo | ✅ hecho y testeado |
 | 4 | Migrar `history.csv` y limpiar `results/` | ✅ hecho (con desvío, ver abajo) |
-| 5 | `report.py` (reescritura completa) | 🟨 parcial: capa de terminal hecha; falta `html` |
+| 5 | `report.py` (reescritura completa) | ✅ hecho y validado (terminal + html) |
 | 6 | `run_eval_llm.py` (Tier 3, mínimo) | ✅ hecho y validado (con 3 hallazgos) |
 | 7 | Wrappers `scripts/eval.sh` | ✅ hecho (con fix para Windows) |
 | 8 | Git: `.gitignore` + `.gitattributes` | ✅ hecho (adelantado al Paso 4) |
@@ -568,6 +568,73 @@ es el que faltaba documentar. El arreglo durable sigue siendo rebuildear la imag
 deja esto resuelto para siempre.
 
 ---
+
+### Paso 5 (cont.) — modo `html` ✅
+
+Documento autocontenido, un solo archivo: **0 referencias externas, 0 `<script>`,
+3 SVG embebidos inline, 123 KB** (el límite del §5.7.5 es 1 MB). Modo claro único
+con fondos explícitos, como pide §5.3.
+
+**Paletas validadas por script, no a ojo.** La categórica
+(`#2a78d6,#eb6834,#1baf7a,#eda100`) sobre superficie `#fcfcfb`: **ALL CHECKS PASS**,
+con el WARN de contraste que ya anticipaba el plan (`#1baf7a` 2.74:1, `#eda100`
+2.11:1). Ese WARN **obliga** las dos mitigaciones que están implementadas: label
+directo al final de cada línea *además* de la leyenda, y la tabla de datos al lado
+de cada gráfico. La rampa secuencial del heatmap se valida distinto (monotonía de
+luminosidad): L de 0.905 → 0.338 con pasos parejos de ~0.14. ✔
+
+**Hallazgo 20 — el validador de color no ve el layout, y el layout tenía 4 bugs.**
+El §5.7.5 pide "abrir el archivo y mirarlo", y tiene toda la razón: la paleta pasó
+todos los checks y aun así el primer render salió con cuatro problemas que sólo se
+ven con el ojo.
+
+1. **El dumbbell estaba al revés.** §5.4 pide "lo peor arriba" y `multi_doc` (0.25)
+   quedaba abajo de todo: matplotlib pone el índice 0 abajo, así que ordenar
+   ascendente no alcanza — hace falta `invert_yaxis()`.
+2. **La leyenda del dumbbell chocaba** con los puntos de las categorías en 1.00,
+   que ocupan justo la esquina donde caía. Se movió arriba y fuera de los ejes.
+3. **Baseline y actual superpuestos eran indistinguibles.** Cuando una categoría no
+   se movió, los dos puntos caen exactamente encima y no se sabe si el baseline
+   está tapado o no existe. Se resolvió con el anillo de 2px del color de la
+   superficie que pide el método.
+4. **Los nombres de categoría del heatmap se dibujaban encima de los question_id.**
+   El offset estaba en coordenadas de datos y los ids son largos y de ancho
+   variable. Se pasó a offset en **puntos** desde el eje, dimensionado por el id
+   más largo.
+
+**Desvío: los labels de categoría del heatmap van horizontales, no rotados 90°**
+(§5.4 dice rotados). Al arreglar el punto 4 apareció que rotados se pisaban *entre
+sí*: rotar asume categorías con muchas filas, y acá tienen 1–3 — un nombre vertical
+de 11 caracteres no entra en una banda de 2 filas. Horizontal ocupa ~10px de alto,
+entra hasta en una banda de una fila, y a la izquierda sobra lugar.
+
+**Import lazy verificado:** `import report` y `report.compare()` **no** cargan
+matplotlib (`'matplotlib' in sys.modules` → `False` en los dos casos). Los modos de
+terminal siguen andando en una imagen sin matplotlib, como exige el plan.
+
+**Paso 5.6 — la dependencia nueva.** `RUN pip install --no-cache-dir matplotlib`
+apendeado al final de `Dockerfile.pipelines`, más su verificación. Va al final y
+**no** a `requirements.txt` porque ese archivo se copia al principio de la imagen:
+tocarlo invalidaría las capas de torch y la descarga de ~4.3 GB del reranker.
+
+### Hallazgo 21 — el rebuild arregló la deriva de la imagen para siempre
+
+El Paso 5.6 obligaba a rebuildear, así que se aprovechó para hacer el arreglo
+durable que estaba pendiente desde el hallazgo 1:
+`docker compose build --build-arg INSTALL_MARKER=true pipelines`.
+
+Verificado **después de recrear el container y sin reaplicar nada a mano**:
+
+```
+haystack   : 2.31.0     ← antes volvía a 3.0.0 y rompía el pipeline
+matplotlib : 3.10.5
+mdit-plain, python-docx, datasets: presentes
+failed/    : (vacío)    ← el pipeline ya no se cae al arrancar
+```
+
+Se terminó el parcheo manual. La cadena del hallazgo 17 (recrear → pipeline a
+`failed/` → `AttributeError` engañoso) **ya no se dispara**, porque su causa raíz
+era la imagen vieja. Cualquiera del equipo que rebuildee queda igual.
 
 ### Paso 10 — validación ✅ (los 7 puntos)
 
