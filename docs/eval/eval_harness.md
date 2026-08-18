@@ -306,6 +306,10 @@ scripts/eval_llm.sh --limit 8
 # Mirar resultados ya guardados (no corre el eval)
 docker compose exec pipelines python /app/pipelines/eval/report.py runs
 docker compose exec pipelines python /app/pipelines/eval/report.py question <question_id>
+
+# Reporte HTML con gráficos: documento autocontenido, se abre con doble clic.
+# Queda en src/pipeline/eval/results/report/ (gitignored, regenerable).
+docker compose exec pipelines python /app/pipelines/eval/report.py html
 ```
 
 Loop de trabajo: cambio algo (retriever, chunking, prompt, LLM, valves) → `run_eval` → leo el
@@ -326,6 +330,23 @@ Descartado por ahora (se puede reconsiderar más adelante):
   frágil si el stack no está levantado. Quedaría como opcional no bloqueante para Tier 1+2.
 - **CI en cada PR:** levantar y **poblar** pgvector + Ollama en el runner es pesado, y Groq en
   CI arriesga 429. Fuera de alcance por ahora; si algún día entra, solo Tier 1+2, nunca el juez.
+
+> **Actualización (2026-08-18): ya existe la pieza que faltaba para automatizarlo.**
+> `report.py --strict` devuelve **exit 1 si hubo regresiones** y 0 si no (sin el flag
+> siempre devuelve 0: informa, no bloquea). Eso es exactamente lo que un hook o un job
+> de CI necesitan para decidir si frenan.
+>
+> Las razones para no automatizarlo **siguen en pie** (hace falta el stack levantado y
+> poblado), así que la decisión no cambia: sigue siendo **manual, antes de mergear**. Lo
+> que cambió es que el día que se quiera automatizar, no hay que escribir nada nuevo —
+> alcanza con encadenar `scripts/eval.sh && report.py --strict`.
+>
+> Una advertencia antes de cablearlo a algo bloqueante: hoy `--strict` **da falsos
+> positivos** en las preguntas negativas. Dos corridas idénticas produjeron una
+> "regresión" de SAS de −0.344 en `cve-log4j-nombre` que era puro ruido (las dos
+> respuestas eran abstenciones correctas). Ver H5 y H6 de
+> [mejoras_harness.md](mejoras_harness.md): hasta que eso se resuelva, un gate
+> automático frenaría merges buenos.
 
 **Orden crítico si el cambio implica reindexar** (chunking, converters, modelo de embeddings):
 primero **reindexar el store**, después correr el eval. Si no, se estaría midiendo el retriever

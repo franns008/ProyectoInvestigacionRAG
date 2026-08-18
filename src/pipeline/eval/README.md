@@ -49,6 +49,47 @@ docker compose exec pipelines python /app/pipelines/eval/report.py runs --all   
 docker compose exec pipelines python /app/pipelines/eval/report.py question cwe89-por-numero
 ```
 
+### El reporte HTML
+
+Los modos de arriba son el gate diario y alcanzan para el 90% de los casos. El HTML
+es para **mirar con calma o compartir**: los mismos números más tres gráficos
+(evolución, categorías baseline→actual, y una matriz pregunta × corrida).
+
+```bash
+# la última corrida contra el baseline
+docker compose exec pipelines python /app/pipelines/eval/report.py html
+
+# una corrida puntual, o un par cualquiera
+docker compose exec pipelines python /app/pipelines/eval/report.py html --run <run_id>
+docker compose exec pipelines python /app/pipelines/eval/report.py html --run A --baseline B
+
+# a un path elegido por vos
+docker compose exec pipelines python /app/pipelines/eval/report.py html -o /app/pipelines/eval/results/mi_reporte.html
+```
+
+El archivo queda en:
+
+```
+src/pipeline/eval/results/report/report_<run>_vs_<baseline>.html
+```
+
+**Se abre con doble clic, y ya.** Es un documento autocontenido: un solo archivo,
+sin dependencias, sin JavaScript y sin ninguna request externa (los gráficos van
+como SVG embebidos). Pesa ~120 KB, así que se puede mandar por mail o Discord y se
+ve igual en cualquier máquina, incluso sin internet.
+
+`results/report/` está gitignoreado junto con el resto de `results/` — el HTML es un
+artefacto regenerable, no algo para versionar. Si querés compartirlo, mandá el
+archivo.
+
+**Requiere matplotlib en la imagen.** Los modos de terminal no lo tocan (el import es
+lazy), así que si falta, sólo falla el `html` y con un mensaje que dice qué hacer:
+
+```
+el modo html requiere matplotlib en la imagen — rebuildeá con
+docker compose build --build-arg INSTALL_MARKER=true pipelines
+```
+
 ## Flujo de trabajo
 
 1. **Una vez:** corré `scripts/eval.sh --set-baseline` para fijar la referencia.
@@ -270,6 +311,7 @@ cuando la salida no es una terminal, así que el log queda limpio.
 | `run_eval.py` | runner Tier 1 + 2 |
 | `run_eval_llm.py` | runner Tier 3 (juez LLM), manual |
 | `metrics.py` | recall@k, hit@k, MRR, coseno/SAS |
-| `report.py` | análisis: `compare`, `runs`, `question` (y `html`, en curso) |
+| `report.py` | análisis: `compare`, `runs`, `question`, `html` |
 | `results/runs.csv` | historial de corridas (versionado) |
 | `results/questions.csv` + `logs/` | detalle por pregunta y logs (gitignored) |
+| `results/report/` | reportes HTML generados (gitignored, regenerables) |
