@@ -3176,3 +3176,53 @@ ASSISTANT: Según CWE-80, "Improper Neutralization of Script-Related HTML Tags i
 2026-08-07 16:50:57,256 - INFO - [HaystackRAG_Query] - [TOKENS] docs_al_prompt=4 | prompt_chars=6671 | prompt_words=955
 2026-08-07 16:50:57,256 - INFO - [HaystackRAG_Query] - [TOKENS] prompt=1656 | completion=256 | total=1912 | model=qwen2.5:3b-instruct
 2026-08-07 16:50:57,256 - INFO - [HaystackRAG_Query] - ------------------------------------------------------------
+2026-08-09 15:14:05,080 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-09 15:14:05,445 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-10 12:49:31,341 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-10 12:49:31,612 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-10 17:54:55,090 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-10 17:54:55,390 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-11 15:38:14,984 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-11 15:38:15,395 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-12 13:24:14,778 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-12 13:24:15,057 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-12 16:41:04,764 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-12 16:41:05,035 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-12 16:52:21,408 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-12 16:52:21,689 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-13 18:02:06,628 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-13 18:02:06,908 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-14 12:27:57,364 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-14 12:27:57,654 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-14 15:06:25,597 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-14 15:06:25,876 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-17 14:21:56,714 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-17 14:21:56,992 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-17 19:06:24,725 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-17 19:06:25,019 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-18 13:06:22,658 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-18 13:06:22,953 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-18 17:34:43,799 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-18 17:34:44,175 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-18 17:36:35,916 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-18 17:36:37,641 - ERROR - [HaystackRAG_Query] - Error conectando a la BD en el arranque: Failed to connect to PostgreSQL database.  Ensure the connection string follows the PostgreSQL connection specification: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING.
+2026-08-18 17:52:10,539 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-18 17:52:10,822 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-19 12:58:33,350 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-19 12:58:33,665 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-20 13:20:22,734 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-20 13:20:23,018 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-20 19:25:05,635 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-20 19:25:06,025 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-21 12:37:20,247 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-21 12:37:20,549 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-21 15:08:29,562 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-21 15:08:29,870 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-23 21:21:27,645 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-23 21:21:27,932 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-24 12:37:46,287 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-24 12:37:46,580 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-25 12:16:41,886 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-25 12:16:42,175 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
+2026-08-26 14:02:42,086 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-26 14:02:42,379 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 1465
