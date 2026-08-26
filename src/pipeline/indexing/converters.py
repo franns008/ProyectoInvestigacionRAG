@@ -23,6 +23,8 @@ logger = logging.getLogger("IndexingRAG")
 CWE_RE = re.compile(r"^CWE-\d+$")
 
 
+logger = logging.getLogger("IndexingRAG")  
+CWE_RE = re.compile(r"^CWE-\d+$") 
 class XMLCWEConverter:
     """XML de MITRE (esquema CWE, namespace cwe-7) → un Document por Weakness."""
 
