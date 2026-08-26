@@ -1,0 +1,2 @@
+# runs.csv es append-only: dos branches que agregan filas mergean por unión.
+src/pipeline/eval/results/runs.csv merge=union

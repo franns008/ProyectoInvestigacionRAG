@@ -57,7 +57,17 @@ RUN if [ "$INSTALL_MARKER" = "true" ]; then \
              "para habilitar la conversión de PDFs nuevos." ; \
     fi
 
+# ── Gráficos del reporte de evaluación (report.py html) ─────────────────────────
+# Sin backend GUI: report.py fuerza el backend "Agg" antes de importarlo.
+#
+# Deliberadamente NO está en requirements.txt: ese archivo se copia al principio de
+# la imagen, así que tocarlo invalida las capas pesadas que vienen después (torch y
+# la descarga de ~4.3 GB del reranker). Apendeada acá al final, esta layer rebuildea
+# sola. Ver docs/eval/refactor_resultados_csv.md §5.6.
+RUN pip install --no-cache-dir matplotlib
+
 # ── Verificaciones (independientes de marker) ────────────────────────────────────
 RUN python -c "import torch, torchvision; print('torch:', torch.__version__, '| torchvision:', torchvision.__version__)"
+RUN python -c "import matplotlib; matplotlib.use('Agg'); print('matplotlib OK:', matplotlib.__version__)"
 RUN python -c "from transformers import PreTrainedModel; print('transformers OK')"
 RUN python -c "from haystack.components.rankers import SentenceTransformersSimilarityRanker; print('ranker OK')"

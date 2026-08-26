@@ -1,5 +1,14 @@
 # Plan de diseño: harness de evaluación del RAG
 
+> ⚠️ **La persistencia de resultados cambió (2026-08-18).** Este documento sigue siendo
+> el diseño vigente del harness (tiers, dataset, taxonomía, criterios), pero los
+> resultados ya **no** se guardan como un JSON por corrida más `baseline.json`: viven en
+> dos tablas CSV acumulativas (`results/runs.csv` y `results/questions.csv`) y el
+> baseline es un `run_id` declarado en `eval_meta.yaml`. Racional y plan del cambio:
+> [refactor_resultados_csv.md](refactor_resultados_csv.md). Bitácora de implementación
+> y hallazgos: [bitacora_refactor_csv.md](bitacora_refactor_csv.md). Las secciones
+> "Baseline y delta", "Estructura de archivos" y "Comandos" ya están actualizadas.
+
 > **Estado (2026-07-03): IMPLEMENTADO y verificado.** El harness vive en
 > [../src/pipeline/eval/](../../src/pipeline/eval/) y corre dentro del container `pipelines`.
 > Las tres fases (0–3) están operativas. Baseline inicial (27 preguntas, `top_k=3`, `temp=0`):
@@ -242,36 +251,65 @@ mano antes de un merge grande.
 
 ### Baseline y delta
 
-- `run_eval.py` compara siempre contra `baseline.json` y reporta ± por métrica y por categoría.
-- `run_eval.py --set-baseline` promueve la última corrida a `baseline.json`.
-- `dataset.yaml` y `baseline.json` **se commitean** (referencia compartida por el equipo);
-  `results/` va al `.gitignore`.
+> **Actualizado (2026-08-18):** `baseline.json` ya no existe. El baseline es ahora el
+> `run_id` de una fila de `results/runs.csv`, declarado en `eval_meta.yaml`.
 
-## Estructura de archivos propuesta
+- El baseline se declara en `eval_meta.yaml` (`baseline_run_id`), que **se versiona**:
+  es la referencia compartida por el equipo, no la de tu máquina.
+- `scripts/eval.sh --set-baseline` apunta esa línea a la corrida recién hecha.
+- `report.py` compara la última corrida contra esa, y reporta ± por métrica, por
+  categoría y **por pregunta**.
+- `eval_meta.yaml` declara además la **`epoch`** vigente: el nombre del período de
+  topología actual. Comparar corridas de epochs distintas produce deltas que no
+  significan nada, así que `report.py` avisa cuando pasa.
+
+### Estructura de archivos
+
+> **Actualizado (2026-08-18):** la persistencia migró de "un JSON por corrida" a **dos
+> tablas CSV acumulativas**. El racional completo está en
+> [refactor_resultados_csv.md](refactor_resultados_csv.md); el diccionario de columnas,
+> en [el README del harness](../../src/pipeline/eval/README.md).
 
 ```
 src/pipeline/eval/
   dataset.yaml            # preguntas + ground truth (versionado)
+  eval_meta.yaml          # baseline_run_id + epoch vigente (versionado)
+  csv_store.py            # único lugar que lee/escribe las tablas
   run_eval.py             # Tier 1 (retrieval) + Tier 2 (SAS) — gate diario
-  run_eval_llm.py         # Tier 3 (juez LLM con Groq) — manual
+  run_eval_llm.py         # Tier 3 (juez LLM) — manual
   metrics.py              # recall@k, hit@k, mrr, coseno/SAS
-  report.py               # tabla + delta vs baseline + desglose por pregunta/categoría
-  baseline.json           # snapshot de referencia (versionado)
-  results/                # corridas timestamped (gitignored)
+  report.py               # compare / runs / question (y html)
+  results/
+    runs.csv              # 1 fila por corrida (VERSIONADO)
+    questions.csv         # 1 fila por corrida × pregunta (gitignored)
+    logs/<run_id>.log     # volcado de consola (gitignored)
+scripts/eval.sh           # wrapper: inyecta commit, rama y estado de git
+scripts/eval_llm.sh       # ídem para Tier 3
 docs/eval/eval_harness.md # este documento
 ```
 
-## Comandos (target final)
+## Comandos
+
+Usar siempre los wrappers: son los que inyectan el commit y la rama en cada fila de
+`runs.csv`. Corriendo `docker compose exec` a mano, esa metadata queda vacía.
 
 ```bash
 # Gate diario (retrieval + SAS): correr tras cualquier cambio
-docker compose exec pipelines python /app/pipelines/eval/run_eval.py
+scripts/eval.sh
 
 # Promover la corrida actual a baseline
-docker compose exec pipelines python /app/pipelines/eval/run_eval.py --set-baseline
+scripts/eval.sh --set-baseline
 
 # Capa profunda (juez LLM): manual, antes de un merge grande
-docker compose exec pipelines python /app/pipelines/eval/run_eval_llm.py
+scripts/eval_llm.sh --limit 8
+
+# Mirar resultados ya guardados (no corre el eval)
+docker compose exec pipelines python /app/pipelines/eval/report.py runs
+docker compose exec pipelines python /app/pipelines/eval/report.py question <question_id>
+
+# Reporte HTML con gráficos: documento autocontenido, se abre con doble clic.
+# Queda en src/pipeline/eval/results/report/ (gitignored, regenerable).
+docker compose exec pipelines python /app/pipelines/eval/report.py html
 ```
 
 Loop de trabajo: cambio algo (retriever, chunking, prompt, LLM, valves) → `run_eval` → leo el
@@ -292,6 +330,23 @@ Descartado por ahora (se puede reconsiderar más adelante):
   frágil si el stack no está levantado. Quedaría como opcional no bloqueante para Tier 1+2.
 - **CI en cada PR:** levantar y **poblar** pgvector + Ollama en el runner es pesado, y Groq en
   CI arriesga 429. Fuera de alcance por ahora; si algún día entra, solo Tier 1+2, nunca el juez.
+
+> **Actualización (2026-08-18): ya existe la pieza que faltaba para automatizarlo.**
+> `report.py --strict` devuelve **exit 1 si hubo regresiones** y 0 si no (sin el flag
+> siempre devuelve 0: informa, no bloquea). Eso es exactamente lo que un hook o un job
+> de CI necesitan para decidir si frenan.
+>
+> Las razones para no automatizarlo **siguen en pie** (hace falta el stack levantado y
+> poblado), así que la decisión no cambia: sigue siendo **manual, antes de mergear**. Lo
+> que cambió es que el día que se quiera automatizar, no hay que escribir nada nuevo —
+> alcanza con encadenar `scripts/eval.sh && report.py --strict`.
+>
+> Una advertencia antes de cablearlo a algo bloqueante: hoy `--strict` **da falsos
+> positivos** en las preguntas negativas. Dos corridas idénticas produjeron una
+> "regresión" de SAS de −0.344 en `cve-log4j-nombre` que era puro ruido (las dos
+> respuestas eran abstenciones correctas). Ver H5 y H6 de
+> [mejoras_harness.md](mejoras_harness.md): hasta que eso se resuelva, un gate
+> automático frenaría merges buenos.
 
 **Orden crítico si el cambio implica reindexar** (chunking, converters, modelo de embeddings):
 primero **reindexar el store**, después correr el eval. Si no, se estaría midiendo el retriever

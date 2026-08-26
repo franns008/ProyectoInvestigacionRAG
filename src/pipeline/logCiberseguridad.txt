@@ -5831,3 +5831,13 @@ Una analogía podría ser un hotel que solo usa números de habitación de 3 dí
 
 Explain
 2026-08-12 22:07:21,316 - INFO - [HaystackRAG_Query] - [KEYWORD QUERY] -> 'analogía podría hotel solo usa números habitación dígitos 999 habitaciones huées tendrán problemas encontrar alojamiento número habitación mayor 999 manera similar longitud insuficiente ids sesión hacer sea fácilmente predicable vulnerable ataques'
+2026-08-14 14:28:14,778 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-14 14:28:15,660 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
+2026-08-18 13:25:46,252 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-18 13:25:46,689 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
+2026-08-18 13:28:38,804 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-18 13:28:39,391 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
+2026-08-18 20:09:43,323 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-18 20:09:43,787 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
+2026-08-18 22:45:13,334 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-08-18 22:45:13,509 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
