@@ -31,6 +31,11 @@ infrastructure/.env
 # IDE
 .idea/
 .vscode/
+
+# Extensión de VSCode: dependencias y build
+extension/node_modules/
+extension/out/
+extension/*.vsix
 *.swp
 *.swo
 

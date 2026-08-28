@@ -1,0 +1,94 @@
+{
+  "name": "cibersec-deps",
+  "displayName": "Escaneo de dependencias",
+  "description": "Detecta dependencias vulnerables en requirements.txt y las prioriza por explotabilidad real.",
+  "version": "0.1.0",
+  "publisher": "idi-rag",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": ["Linters"],
+  "main": "./out/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "El escaneo ejecuta un intérprete de Python configurado por el usuario."
+    }
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "cibersec.scanRequirements",
+        "title": "Escanear dependencias vulnerables",
+        "category": "Ciberseguridad"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "cibersec.scanRequirements",
+          "when": "resourceFilename =~ /requirements.*\\.txt$/",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "cibersec.scanRequirements",
+          "when": "resourceFilename =~ /requirements.*\\.txt$/",
+          "group": "7_modification"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Escaneo de dependencias",
+      "properties": {
+        "cibersec.provider": {
+          "type": "string",
+          "enum": ["local", "rag"],
+          "default": "local",
+          "enumDescriptions": [
+            "Corre el escáner determinístico local (sin LLM, sin stack).",
+            "Consulta el pipeline RAG, que agrega la explicación en lenguaje natural."
+          ],
+          "markdownDescription": "De dónde salen los hallazgos. `local` no necesita infraestructura; `rag` requiere el servidor de Pipelines levantado."
+        },
+        "cibersec.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "description": "Intérprete con el que se corre el escáner local. Ruta absoluta o comando en el PATH."
+        },
+        "cibersec.scannerRoot": {
+          "type": "string",
+          "default": "src/pipeline",
+          "description": "Directorio desde el que se importa el módulo `deps`, relativo a la raíz del workspace."
+        },
+        "cibersec.dataDir": {
+          "type": "string",
+          "default": "data/raw",
+          "description": "Directorio con los dumps de OSV, EPSS y CISA KEV, relativo a la raíz del workspace."
+        },
+        "cibersec.ragUrl": {
+          "type": "string",
+          "default": "http://localhost:9099",
+          "description": "Servidor de Pipelines (API compatible con OpenAI). Sólo se usa con el proveedor `rag`."
+        },
+        "cibersec.ragModel": {
+          "type": "string",
+          "default": "pipeline_dependencias",
+          "description": "Pipeline que resuelve el escaneo. Sólo se usa con el proveedor `rag`."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.6.0"
+  }
+}
