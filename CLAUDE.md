@@ -17,7 +17,10 @@ en Ollama); generación intercambiable (Groq API o Ollama local).
 - [`docs/escaneo_dependencias_setup.md`](docs/escaneo_dependencias_setup.md) — **puesta en
   marcha** del escaneo de `requirements.txt` y su extensión de VSCode en una máquina nueva.
   No necesita el stack: ni Docker, ni pgvector, ni LLM. El diseño está en
-  [`escaneo_dependencias.md`](docs/escaneo_dependencias.md).
+  [`escaneo_dependencias.md`](docs/escaneo_dependencias.md) y el guion de la demo en
+  [`escaneo_dependencias_demo.md`](docs/escaneo_dependencias_demo.md).
+  **El escaneo vive en la rama `feature/requirements`, no en `main`.** Un clon nuevo cae
+  en `main`, que todavía no lo tiene: hay que hacer `git checkout feature/requirements`.
 - [`docs/reranker_cross_encoder.md`](docs/reranker_cross_encoder.md) — reranker cross-encoder
   (`bge-reranker-v2-m3`) tras el retrieval híbrido: retrieve-and-rerank, implicancias (modelo
   local en CPU, latencia) y cambios en pipeline/Dockerfile/eval.

@@ -470,6 +470,8 @@ en **20 ms**. Todo determinístico, sin LLM ni embeddings.
 
 - [escaneo_dependencias_setup.md](escaneo_dependencias_setup.md) — **cómo hacerlo andar**
   en una máquina nueva. Este documento es el porqué; ése es el cómo.
+- [escaneo_dependencias_demo.md](escaneo_dependencias_demo.md) — guion de la demo: qué
+  mostrar, en qué orden, y las preguntas previsibles con su respuesta.
 
 - [Arquitectura_RAG_Ciberseguridad.md](Arquitectura_RAG_Ciberseguridad.md) — el desacople
   indexación/inferencia que este plan respeta.

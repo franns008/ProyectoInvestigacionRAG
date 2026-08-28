@@ -2,7 +2,8 @@
 
 Cómo dejar funcionando en una máquina nueva el escaneo de `requirements.txt` y su
 extensión de VSCode. Para **por qué** está diseñado así, ver
-[`escaneo_dependencias.md`](escaneo_dependencias.md).
+[`escaneo_dependencias.md`](escaneo_dependencias.md); para **qué mostrar** en la
+presentación, [`escaneo_dependencias_demo.md`](escaneo_dependencias_demo.md).
 
 > **Nada de esto necesita el stack.** Ni Docker, ni pgvector, ni Ollama, ni GPU, ni una
 > API key. El escaneo es determinístico: lógica pura sobre tres archivos descargados.

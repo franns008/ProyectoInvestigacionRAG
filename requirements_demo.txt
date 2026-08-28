@@ -1,3 +1,14 @@
-pyyaml==5.3.1
-jinja2==2.10
-urllib3==1.25.8
+# Manifiesto de ejemplo para la demo del escaneo de dependencias.
+#
+# Son librerías muy usadas, fijadas en versiones de 2018-2019. No es un caso armado:
+# cualquier proyecto que no haya actualizado en unos años se ve así.
+#
+# El escáner solo lee líneas con pin exacto (==). Ver docs/escaneo_dependencias_setup.md.
+#
+#   PYTHONPATH=src/pipeline .venv/bin/python -m deps.cli requirements_demo.txt --data data/raw
+
+Django==2.2.0
+Pillow==5.2.0
+requests==2.19.1
+urllib3==1.24.1
+cryptography==2.3
