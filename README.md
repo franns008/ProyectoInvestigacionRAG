@@ -27,5 +27,23 @@ Los embeddings (`bge-m3`) son siempre locales y no cambian entre modos.
 
 👉 **Guía completa e instrucciones de uso: [`docs/modos_llm.md`](docs/modos_llm.md)** (doc crucial).
 
+## Escaneo de dependencias vulnerables
+
+Además del chat, el repo trae una herramienta que lee un `requirements.txt` y devuelve
+sus dependencias vulnerables **priorizadas por explotabilidad real** (CISA KEV → EPSS →
+CVSS), con una extensión de VSCode que la muestra.
+
+**No necesita el stack**: ni Docker, ni pgvector, ni Ollama, ni API Key. Es lógica
+determinística sobre tres archivos descargados, y corre en ~1 segundo.
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install packaging pytest
+./scripts/fetch_deps_data.sh
+.venv/bin/python -m pytest
+```
+
+👉 **Puesta en marcha completa: [`docs/escaneo_dependencias_setup.md`](docs/escaneo_dependencias_setup.md)**
+· diseño y justificación: [`docs/escaneo_dependencias.md`](docs/escaneo_dependencias.md).
+
 ## Creando tu propio RAG
 El código de tu RAG puede vivir en cualquier carpeta fuera de infrastructure e incluso fuera del repositorio. La carpeta `seven_wonders` tiene un ejemplo de RAG sencillo usando HayStack pero pueden crearse RAGs usando cualquier otra librería como LlamaIndex o LangChain. Sigue por el camino de tu arcoiris 🌈.

@@ -468,6 +468,9 @@ en **20 ms**. Todo determinístico, sin LLM ni embeddings.
 
 ## Relacionado
 
+- [escaneo_dependencias_setup.md](escaneo_dependencias_setup.md) — **cómo hacerlo andar**
+  en una máquina nueva. Este documento es el porqué; ése es el cómo.
+
 - [Arquitectura_RAG_Ciberseguridad.md](Arquitectura_RAG_Ciberseguridad.md) — el desacople
   indexación/inferencia que este plan respeta.
 - [plan_de_trabajo.md](plan_de_trabajo.md) — "Mejora 3" (EPSS + KEV) y el desafío multi-hop

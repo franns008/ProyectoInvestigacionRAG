@@ -14,6 +14,10 @@ en Ollama); generación intercambiable (Groq API o Ollama local).
 - [`docs/eval/`](docs/eval/) — todo sobre el harness de evaluación:
   [`eval_harness.md`](docs/eval/eval_harness.md) (diseño vigente, Tiers 1-3) y
   [`mejoras_harness.md`](docs/eval/mejoras_harness.md) (plan de mejoras priorizado, propuesto).
+- [`docs/escaneo_dependencias_setup.md`](docs/escaneo_dependencias_setup.md) — **puesta en
+  marcha** del escaneo de `requirements.txt` y su extensión de VSCode en una máquina nueva.
+  No necesita el stack: ni Docker, ni pgvector, ni LLM. El diseño está en
+  [`escaneo_dependencias.md`](docs/escaneo_dependencias.md).
 - [`docs/reranker_cross_encoder.md`](docs/reranker_cross_encoder.md) — reranker cross-encoder
   (`bge-reranker-v2-m3`) tras el retrieval híbrido: retrieve-and-rerank, implicancias (modelo
   local en CPU, latencia) y cambios en pipeline/Dockerfile/eval.
@@ -23,6 +27,10 @@ en Ollama); generación intercambiable (Groq API o Ollama local).
 - `src/pipeline/pipeline_ciberseguridad.py` — el RAG (pipeline OpenWebUI). La
   generación la arma `build_generator(valves)` según `LLM_PROVIDER`.
 - `src/pipeline/eval/` — harness de evaluación (corre dentro del container `pipelines`).
+- `src/pipeline/deps/` — escaneo de dependencias (resolver + priorización + CLI). Lógica
+  pura: no importa Haystack ni toca la base. Se testea con `pytest` sin levantar nada.
+- `extension/` — extensión de VSCode que muestra el escaneo. Cliente del `deps.cli` hoy,
+  del pipeline RAG cuando exista (`src/scan/types.ts` es el contrato compartido).
 - `infrastructure/` — stack Docker Compose. `docker-compose.yml` (base, CPU) +
   `docker-compose.nvidia.yml` (overlay GPU). Config en `.env` (plantilla `.env.example`).
 
