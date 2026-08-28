@@ -106,8 +106,47 @@ El embudo lo resuelve código determinístico (joins por identificador de CVE). 
 lo que un ranking no puede: **explicar**. Por qué esta primero, qué clase de debilidad es,
 qué implica, qué hacer — con cada afirmación citada.
 
-Sin RAG hay una tabla ordenada. Sin priorización, el RAG escribe 152 párrafos que nadie
-lee. Se necesitan mutuamente, y ese es un argumento de diseño defendible.
+Sin RAG hay una tabla ordenada —que es lo que `pip-audit` ya da gratis—. Sin priorización,
+el RAG escribe 152 párrafos que nadie lee. Se necesitan mutuamente, y ese es un argumento
+de diseño defendible.
+
+Dos precisiones sobre el alcance, para no prometer de más:
+
+- **Se explican los primeros hallazgos, no los 152.** Explicarlos todos destruiría el
+  sentido de haber priorizado.
+- **Buena parte de la cadena es determinística, no retrieval.** El CWE se trae por clave
+  exacta (ver [El camino de inferencia](#el-camino-de-inferencia)); lo genuinamente
+  semántico es la prosa de INCIBE. Es la decisión correcta, pero conviene tenerla clara
+  antes de que alguien pregunte "¿y dónde está el RAG acá?".
+
+#### El punto débil, y cómo se responde
+
+**Un LLM sin RAG también sabe qué es un *out-of-bounds write*.** Los CWE tienen décadas y
+están en los datos de entrenamiento de cualquier modelo — es exactamente el motivo por el
+que este trabajo eligió las CVE y no los CWE como argumento de knowledge-cutoff (ver
+[Por qué dependencias y no código fuente](#por-qué-dependencias-y-no-código-fuente)).
+
+O sea: si la explicación termina siendo *"CWE-787 es una escritura fuera de límites, de
+las categorías más peligrosas"*, eso lo escribe un modelo pelado y el RAG queda como
+adorno. La explicación tiene que apoyarse en lo que el modelo **no** puede saber ni
+demostrar:
+
+| Aporte | Por qué el modelo solo no llega |
+|---|---|
+| **La cita verificable** | "Puede permitir ejecución de código" respaldado por un documento que se abre y se lee ≠ la misma frase generada de memoria. Es la diferencia entre afirmar y demostrar. |
+| **Las mitigaciones del catálogo** | Medido sobre el corpus ya indexado: la entrada de CWE-787 tiene **27.876 caracteres**, de los cuales 4.811 son `Potential_Mitigations` y 462 `Common_Consequences`. Son contramedidas específicas de MITRE, no consejos genéricos. |
+| **El detalle del advisory** | Que el fallo esté en `libwebp` **embebida dentro de** Pillow es post-cutoff y sale del advisory, no del modelo. |
+| **La cadena multi-hop** | `requirements → advisory → CVE → CWE → corpus`. Ningún chunk plano la contiene, y es el problema de investigación que declara el [plan de trabajo](plan_de_trabajo.md). |
+
+Formulado para una defensa:
+
+> El ranking dice qué arreglar primero. Lo que no puede es decir **por qué**, y sobre todo
+> no puede **probarlo**. Cada afirmación de esta explicación está citada contra el catálogo
+> de MITRE o contra el advisory de origen, y se puede abrir y verificar. Un modelo sin esto
+> devuelve la misma prosa sin nada detrás.
+
+Ahí el RAG no es una capa decorativa sobre una tabla: es lo que convierte un dato en una
+recomendación auditable.
 
 ### La cadena multi-hop
 
@@ -208,6 +247,8 @@ trabajo usa para describir el proyecto.
 | *"¿No alcanza con darle búsqueda web al modelo?"* | Corpus auditable y acotado a fuentes autoritativas, todo local por confidencialidad, cita verificable en cada afirmación. |
 | *"¿Y si le pregunto algo que no sabe?"* | Está diseñado para abstenerse. Anunciarlo **antes** convierte ese caso en confirmación, no en falla. Está medido: columna `correct_rejection` del eval. |
 | *"¿Esto no lo hace ya Dependabot?"* | Dependabot lista. Esto prioriza por explotabilidad real y explica con fuentes citadas. Ver [limitaciones](#limitaciones-honestas). |
+| *"El embudo es determinístico. ¿Para qué el RAG?"* | El ranking dice qué arreglar primero; no dice por qué ni lo puede probar. Ver [El punto débil, y cómo se responde](#el-punto-débil-y-cómo-se-responde). |
+| *"Un modelo ya sabe qué es un buffer overflow"* | Cierto, y por eso la explicación no se apoya ahí: se apoya en la cita verificable, en las mitigaciones del catálogo y en el detalle post-cutoff del advisory. Mismo enlace. |
 
 ## Arquitectura (sin cambios)
 

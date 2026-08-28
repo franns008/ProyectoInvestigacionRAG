@@ -114,6 +114,8 @@ Si hay tiempo, o si preguntan por qué no analizan código fuente:
 |---|---|
 | *"¿Esto no lo hace Dependabot?"* | Dependabot lista. Esto prioriza por explotabilidad real y va a explicar con fuentes citadas. Y corre local, sin mandar el manifiesto a un tercero. |
 | *"¿No alcanza con darle búsqueda web al modelo?"* | Corpus auditable y acotado a fuentes autoritativas, todo local por confidencialidad, y una cita verificable en cada afirmación. |
+| *"Si el embudo es determinístico, ¿para qué el RAG?"* | El ranking dice qué arreglar primero; no dice por qué ni lo puede probar. Sin priorización el RAG escribiría 128 párrafos que nadie lee; sin RAG queda una tabla ordenada, que es lo que `pip-audit` ya da. Se necesitan mutuamente. |
+| *"Un modelo ya sabe qué es un buffer overflow"* | Cierto — los CWE tienen décadas y están en el entrenamiento. Por eso la explicación no se apoya ahí, sino en la **cita verificable**, en las mitigaciones concretas del catálogo de MITRE y en el detalle del advisory (que el fallo esté en `libwebp` embebida en Pillow es post-cutoff). Detalle en [escaneo_dependencias.md](escaneo_dependencias.md#el-punto-débil-y-cómo-se-responde). |
 | *"¿Y si le preguntan algo que no sabe?"* | Está diseñado para abstenerse, y está medido (columna `correct_rejection` del eval). Conviene **anunciarlo antes** de que pase: así ese caso confirma el diseño en vez de parecer una falla. |
 | *"¿Por qué no analizan el código fuente?"* | Ver el punto 7. |
 | *"¿Cubre otros lenguajes?"* | OSV cubre npm, Go, crates.io y más. El alcance de esta etapa es Python; extenderlo es cambiar el ecosistema del lookup. |
