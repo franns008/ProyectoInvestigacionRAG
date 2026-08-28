@@ -7,19 +7,31 @@ Ver [`docs/escaneo_dependencias.md`](../docs/escaneo_dependencias.md) para el di
 
 ## Probarla
 
+Una sola vez, para instalar las dependencias:
+
 ```bash
 cd extension
 npm install
-npm run compile
 ```
 
-Después, en VSCode: abrir la carpeta `extension/` y presionar **F5**. Se abre una
-ventana nueva (Extension Development Host); ahí hay que abrir **la raíz de este repo**
-como workspace, abrir un `requirements.txt` y usar el botón *Escanear dependencias
-vulnerables* de la barra del editor (o clic derecho sobre el archivo en el explorador).
+Después, cada vez que la quieras correr:
 
-Requisitos previos: los dumps de OSV, EPSS y CISA KEV en `data/raw/` y un intérprete de
-Python con `packaging` instalado.
+1. Abrí **la carpeta `extension/`** en VSCode (`File > Open Folder…`, y elegí
+   `extension`, no la raíz del repo). Es importante: F5 usa el `launch.json` que está
+   adentro de esa carpeta.
+2. Apretá **F5**. Compila sola y abre una **segunda ventana** de VSCode
+   (Extension Development Host) con la raíz del repo ya abierta.
+3. En esa ventana nueva, abrí un `requirements.txt` con dependencias fijadas con `==`.
+4. Apretá el botón **Escanear dependencias vulnerables** arriba a la derecha de la barra
+   del editor, o clic derecho sobre el archivo en el explorador.
+
+El panel con los resultados se abre al costado.
+
+> La ventana original queda como consola de depuración: los `console.log` y los errores
+> de la extensión aparecen ahí, no en la ventana de prueba.
+
+Requisitos previos: los dumps de OSV, EPSS y CISA KEV en `data/raw/`. El intérprete lo
+detecta solo si hay un `.venv` en la raíz del repo.
 
 ## Ajustes
 

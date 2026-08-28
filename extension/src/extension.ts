@@ -7,6 +7,7 @@
  * Fase 3, ahí se devuelve un RagProvider y no cambia nada más.
  */
 
+import * as fs from "node:fs";
 import * as path from "node:path";
 import * as vscode from "vscode";
 import { ResultsPanel } from "./panel";
@@ -78,10 +79,30 @@ function buildProvider(workspaceRoot: string): ScanProvider {
   }
 
   return new LocalScannerProvider({
-    pythonPath: config.get<string>("pythonPath", "python3"),
+    pythonPath: pythonFor(workspaceRoot, config.get<string>("pythonPath", "")),
     scannerRoot: resolve(workspaceRoot, config.get<string>("scannerRoot", "src/pipeline")),
     dataDir: resolve(workspaceRoot, config.get<string>("dataDir", "data/raw")),
   });
+}
+
+/**
+ * Intérprete a usar: el configurado, o el `.venv` del workspace si existe.
+ *
+ * El escáner necesita `packaging`, que rara vez está en el Python del sistema. Detectar
+ * el entorno del proyecto evita que la extensión falle en el primer intento por un
+ * ajuste que el usuario todavía no sabe que tiene que tocar.
+ */
+function pythonFor(workspaceRoot: string, configured: string): string {
+  if (configured.trim()) {
+    return resolve(workspaceRoot, configured.trim());
+  }
+  const candidates = [
+    path.join(workspaceRoot, ".venv", "bin", "python"),
+    path.join(workspaceRoot, ".venv", "Scripts", "python.exe"),
+    path.join(workspaceRoot, "venv", "bin", "python"),
+    path.join(workspaceRoot, "venv", "Scripts", "python.exe"),
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) ?? "python3";
 }
 
 /** Los ajustes de rutas se interpretan relativos al workspace, salvo que sean absolutos. */

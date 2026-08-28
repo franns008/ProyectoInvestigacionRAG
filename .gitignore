@@ -36,6 +36,10 @@ infrastructure/.env
 extension/node_modules/
 extension/out/
 extension/*.vsix
+# ...pero su launch.json SÍ se versiona: es lo que hace que F5 funcione sin
+# configurar nada. Git exige desexcluir el directorio antes que los archivos.
+!extension/.vscode/
+!extension/.vscode/*.json
 *.swp
 *.swo
 
