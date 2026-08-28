@@ -59,4 +59,4 @@ done
 
 echo
 echo "Listo. Los datos están en ${DATA_DIR}."
-echo "Probalo:  cd src/pipeline && python -m deps.cli <requirements.txt> --data ../../data/raw"
+echo "Probalo:  PYTHONPATH=src/pipeline .venv/bin/python -m deps.cli <requirements.txt> --data data/raw"

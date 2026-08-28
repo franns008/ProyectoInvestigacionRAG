@@ -67,10 +67,17 @@ lugar de medirse estadísticamente.
 
 ### 4. Escanear desde la terminal
 
+Desde la raíz del repo:
+
 ```bash
-cd src/pipeline
-../../.venv/bin/python -m deps.cli ../../requirements_demo.txt --data ../../data/raw
+PYTHONPATH=src/pipeline .venv/bin/python -m deps.cli requirements_demo.txt --data data/raw
 ```
+
+`PYTHONPATH` hace falta porque el módulo se llama `deps` y vive en `src/pipeline`, que es
+el directorio que el container monta como `/app/pipelines`. (Se puede en cambio hacer
+`cd src/pipeline` y usar rutas relativas, pero invocar el intérprete del venv por una
+ruta con `..` hace que Python imprima un `RuntimeWarning` sobre `sys.prefix` que no
+significa nada y solo ensucia la salida.)
 
 Agregá `--json` para la salida que consume la extensión, o `--top N` para acortar.
 
@@ -194,9 +201,8 @@ implementado"— recibe un cuerpo que hace un POST al `9099`.
 **`ModuleNotFoundError: No module named 'packaging'`** — falta el paso 1, o la extensión
 está usando otro intérprete: revisá `cibersec.pythonPath`.
 
-**`ModuleNotFoundError: No module named 'deps'`** — la CLI se corre desde `src/pipeline`,
-que es el directorio que el container monta como `/app/pipelines`. Desde otro lado, hay
-que exportar `PYTHONPATH=<repo>/src/pipeline`.
+**`ModuleNotFoundError: No module named 'deps'`** — falta el `PYTHONPATH=src/pipeline`
+del paso 4. El módulo se llama `deps` y vive ahí.
 
 **F5 abre una ventana que parece normal** — es la correcta. Abrí un `requirements.txt` y
 mirá abajo a la derecha. Si el comando tampoco aparece en la paleta, el error está en la

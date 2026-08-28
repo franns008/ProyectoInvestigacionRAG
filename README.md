@@ -40,6 +40,7 @@ determinística sobre tres archivos descargados, y corre en ~1 segundo.
 python3 -m venv .venv && .venv/bin/pip install packaging pytest
 ./scripts/fetch_deps_data.sh
 .venv/bin/python -m pytest
+PYTHONPATH=src/pipeline .venv/bin/python -m deps.cli <tu-requirements.txt> --data data/raw
 ```
 
 👉 **Puesta en marcha completa: [`docs/escaneo_dependencias_setup.md`](docs/escaneo_dependencias_setup.md)**
