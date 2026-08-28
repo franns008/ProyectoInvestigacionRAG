@@ -7,6 +7,9 @@ infrastructure/appdata/pipelines/
 
 # Dumps crudos de fuentes estructuradas (grandes, se regeneran con los scripts de ingestion)
 data/raw/nvd/
+data/raw/osv/
+data/raw/epss/
+data/raw/kev/
 
 # Python
 __pycache__/
