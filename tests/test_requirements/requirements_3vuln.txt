@@ -1,0 +1,6 @@
+# Las tres dependencias vulnerables. django aporta DOS CVE distintas, así que el
+# total de hallazgos (4) no coincide con el de paquetes (3): son cosas distintas
+# y el escaneo tiene que distinguirlas.
+django==2.2.0
+mezzanine==6.0.0
+pillow==5.2.0

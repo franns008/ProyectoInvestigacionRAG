@@ -1,8 +1,13 @@
 # Escaneo de dependencias: `requirements.txt` → vulnerabilidades priorizadas
 
-> **Estado (2026-08-26): PROPUESTO.** Plan de implementación. Las piezas de lógica pura
-> (resolver de versiones y priorización) están **prototipadas y verificadas** con datos
-> reales; el resto está por construir.
+> **Estado (2026-08-28): FASE 2 IMPLEMENTADA.** La lógica pura está en el repo
+> (`src/pipeline/deps/`), con 54 tests que corren en 0,06 s sin stack, sin GPU y sin LLM.
+> Las Fases 1, 3 y 4 siguen **propuestas**.
+>
+> El escaneo completo —incluida la explicación del CWE— **no necesita pgvector, ni
+> embeddings, ni Docker**: el CWE se trae por clave exacta y los XML de MITRE ya están
+> en `data/raw/`. La Fase 3 sigue siendo la integración arquitectónica correcta, pero
+> **no bloquea** tener algo que mostrar.
 >
 > **Restricción de diseño: no cambia la arquitectura.** Se respeta el desacople
 > indexación (escribe) / inferencia (lee) descrito en
@@ -319,22 +324,69 @@ severities").
 
 ### Fase 2 — Lógica pura (sin Docker, sin LLM, testeable) ← *camino crítico*
 
-5. **`src/pipeline/deps/resolver.py`** — **ya prototipado y verificado.**
+5. **`src/pipeline/deps/resolver.py`** — **hecho.**
    - Normalización PEP 503 (`re.sub(r"[-_.]+", "-", name).lower()`).
-   - Parseo del `requirements.txt`.
+   - Parseo del `requirements.txt` vía `packaging.requirements` (soporta extras y
+     markers de entorno). Lo que no se puede escanear vuelve con `skip_reason` en vez
+     de descartarse en silencio: el escaneo tiene que poder decir *qué no miró*.
    - Algoritmo de rangos del esquema OSV: `versions[]` explícito, o recorrer `events`
-     ordenados alternando estado en `introduced` / `fixed` / `last_affected`.
+     ordenados alternando estado en `introduced` / `fixed` / `last_affected` / `limit`.
    - Comparación PEP 440 vía `packaging.version`.
-   - *Pendiente*: extender más allá de `==` (`>=`, `~=`, extras, markers de entorno, `-r`).
-6. **`src/pipeline/deps/prioritize.py`** — **ya prototipado y verificado.**
-   - Base score CVSS 3.1 calculado desde el vector (OSV entrega vector, no número).
+   - *Pendiente*: extender más allá de `==` (`>=`, `~=`, `-r`).
+6. **`src/pipeline/deps/prioritize.py`** — **hecho.**
+   - Base score CVSS 3.1 calculado desde el vector, con el `Roundup()` de la
+     especificación de FIRST (no el `round()` de Python). Verificado contra los scores
+     que publica NVD para esas mismas CVE.
    - Join con EPSS y KEV por identificador de CVE.
    - Orden: KEV primero, después EPSS descendente, CVSS como desempate.
-7. **Tests.** Ya existen fixtures en `test_requirements/`
-   (`requirements_1vuln.txt`, `requirements_1de3vuln.txt`, `requirements_3vuln.txt`).
-   Dado un requirements fijo, deben salir exactamente estas CVEs. **Corre en segundos, sin
-   GPU, sin stack, sin LLM.** Es el único pedazo del sistema que se *verifica* en lugar de
-   *medirse estadísticamente*.
+   - Los vectores CVSS v4 (7,3% del dump) quedan **sin puntuar** en vez de estimados:
+     el número llega después por enriquecimiento con NVD.
+7. **Tests** — **hecho.** 54 tests en `tests/`, con fixtures de OSV reales congelados
+   (`tests/fixtures/osv/`) para que no dependan del dump del día. Dado un requirements
+   fijo, salen exactamente estas CVE. **Corre en 0,06 s, sin GPU, sin stack, sin LLM.**
+   Es el único pedazo del sistema que se *verifica* en lugar de *medirse
+   estadísticamente*.
+8. **`src/pipeline/deps/cli.py`** — no estaba en el plan; sirve para verificar el
+   resolver contra el dump real y para alimentar la extensión (`--json`):
+
+   ```
+   python -m deps.cli requirements.txt --data data/raw [--json] [--top N]
+   ```
+
+#### Cuatro cosas que aparecieron al implementar (no estaban en el plan)
+
+Las cuatro salieron de correr el código contra el dump real, no de leer el esquema:
+
+- **Deduplicar por CVE es obligatorio, y sale gratis un beneficio.** GHSA y PYSEC
+  publican el mismo fallo por separado: sin colapsarlos, un manifiesto de 10
+  dependencias devuelve 362 hallazgos en vez de 144. Y como **ningún PYSEC trae
+  `cwe_ids`** (0 de 7.346) mientras que el 96,1% de los GHSA sí, unir los advisories
+  hermanos **sube la cobertura de CWE del 61% al 98%**. Esto cubre buena parte del
+  hueco que el paso 4 quería cerrar bajando el catálogo completo de MITRE.
+- **La versión de arreglo es el menor `fixed` estrictamente mayor que la instalada.**
+  El mínimo global propone downgrades: para `django==2.2.0`, CVE-2019-11358 publica
+  `fixed` en 2.1.9 y en 2.2.2, y la respuesta correcta es 2.2.2.
+- **Los advisories `withdrawn` hay que excluirlos** (492, 3,7% del dump). No son
+  inocuos: GHSA-56pw-mpj4-fxww duplica CVE-2023-4863 sin declarar aliases, así que la
+  deduplicación no lo agarra y aparece como hallazgo extra con el texto *"Duplicate
+  Advisory"* a la vista.
+- **Los rangos `GIT` se ignoran** (1.581). Su `fixed` es un hash de commit; sin filtrar
+  por tipo de rango, el parseo PEP 440 revienta.
+
+#### Verificado el 2026-08-28 sobre el dump real
+
+Con `requirements.txt` de 10 dependencias con versiones viejas fijadas:
+
+| | Doc original (26/08) | Código de producción (28/08) |
+|---|---|---|
+| CVEs que afectan tus versiones | 152 | 150 |
+| CVSS >= 7.0 | 80 (53%) | 77 (51%) |
+| EPSS >= 10% | 13 (9%) | 12 (8%) |
+| CISA KEV | 1 (1%) | 1 (1%) |
+
+Índice de OSV en **0,8 s**, escaneo en **9 ms**. La cadena multi-hop sale entera:
+`pillow 5.2.0` → `GHSA-j7hp-h8jx-5ppr` → `CVE-2023-4863` → CVSS 8.8 · EPSS 100% · KEV
+→ `CWE-787` → *"Out-of-bounds Write"* (`data/raw/CWEtop25.xml`, ya en el repo).
 
 ### Fase 3 — Integración (necesita el stack; depende de la Fase 2)
 
