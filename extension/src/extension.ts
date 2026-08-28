@@ -19,11 +19,33 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand("cibersec.scanRequirements", scanCommand),
   );
+
+  // Señal visible de que la extensión está cargada. Sin esto, la ventana de prueba se ve
+  // idéntica a una normal y no hay forma de distinguir "cargó y espera" de "no cargó".
+  const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+  status.command = "cibersec.scanRequirements";
+  status.text = "$(shield) Escanear dependencias";
+  status.tooltip = "Buscar dependencias vulnerables en este requirements.txt";
+  context.subscriptions.push(status);
+
+  const refresh = () => {
+    const file = vscode.window.activeTextEditor?.document.uri.fsPath;
+    if (file && IS_MANIFEST.test(path.basename(file))) {
+      status.show();
+    } else {
+      status.hide();
+    }
+  };
+  context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(refresh));
+  refresh();
 }
 
 export function deactivate(): void {
   // Sin recursos de larga vida: el panel se limpia solo al cerrarse.
 }
+
+/** Mismo criterio que el `when` de los menús en package.json. */
+const IS_MANIFEST = /requirements.*\.txt$/;
 
 async function scanCommand(resource?: vscode.Uri): Promise<void> {
   const manifest = resource ?? vscode.window.activeTextEditor?.document.uri;
