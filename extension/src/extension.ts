@@ -3,13 +3,14 @@
  *
  * Un solo comando: escanear un requirements.txt y mostrar los hallazgos priorizados.
  * La extensión no sabe cómo se resuelve el escaneo — eso lo decide el `ScanProvider`
- * que elige `buildProvider()` según el ajuste `cibersec.provider`. Cuando exista la
- * Fase 3, ahí se devuelve un RagProvider y no cambia nada más.
+ * que arma `buildProvider()` a partir de los ajustes. Las explicaciones del LLM entran
+ * como un decorador sobre ese proveedor, no como un proveedor distinto.
  */
 
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as vscode from "vscode";
+import { ExplainedProvider } from "./scan/explainedProvider";
 import { ResultsPanel } from "./panel";
 import { LocalScannerProvider } from "./scan/localProvider";
 import { RagProvider } from "./scan/ragProvider";
@@ -86,9 +87,10 @@ async function scanCommand(resource?: vscode.Uri): Promise<void> {
 /**
  * Elige quién resuelve el escaneo.
  *
- * Es la costura de la que habla docs/escaneo_dependencias.md: hoy sólo `local` funciona;
- * `rag` está declarado para que la integración de la Fase 3 sea cambiar este `switch`
- * y el cuerpo de RagProvider.scan(), sin tocar la vista ni el contrato.
+ * Es la costura de la que habla docs/escaneo_dependencias.md. `local` resuelve el escaneo
+ * offline; encima va el decorador que le pide las explicaciones al pipeline (ajuste
+ * `cibersec.explain`, ver docs/explicacion_hallazgos.md). `rag` —que resolvería TODO el
+ * escaneo en el servidor— sigue declarado y sin implementar.
  */
 function buildProvider(workspaceRoot: string): ScanProvider {
   const config = vscode.workspace.getConfiguration("cibersec");
@@ -100,10 +102,21 @@ function buildProvider(workspaceRoot: string): ScanProvider {
     });
   }
 
-  return new LocalScannerProvider({
+  const local = new LocalScannerProvider({
     pythonPath: pythonFor(workspaceRoot, config.get<string>("pythonPath", "")),
     scannerRoot: resolve(workspaceRoot, config.get<string>("scannerRoot", "src/pipeline")),
     dataDir: resolve(workspaceRoot, config.get<string>("dataDir", "data/raw")),
+  });
+
+  // El decorador no arriesga nada: si el servidor no está, devuelve el escaneo tal cual.
+  if (!config.get<boolean>("explain", true)) {
+    return local;
+  }
+  return new ExplainedProvider(local, {
+    url: config.get<string>("ragUrl", "http://localhost:9099"),
+    model: config.get<string>("explainModel", "pipeline_dependencias"),
+    apiKey: config.get<string>("ragApiKey", "0p3n-w3bui"),
+    topN: config.get<number>("explainTopN", 3),
   });
 }
 

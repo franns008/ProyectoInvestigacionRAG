@@ -79,6 +79,27 @@
           "type": "string",
           "default": "pipeline_dependencias",
           "description": "Pipeline que resuelve el escaneo. Sólo se usa con el proveedor `rag`."
+        },
+        "cibersec.ragApiKey": {
+          "type": "string",
+          "default": "0p3n-w3bui",
+          "description": "PIPELINES_API_KEY del servidor de Pipelines (el default es el de docker-compose)."
+        },
+        "cibersec.explain": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Pedirle al pipeline `pipeline_dependencias` una explicación corta de los primeros hallazgos. Si el servidor no está levantado, el escaneo se muestra igual, sin explicaciones."
+        },
+        "cibersec.explainModel": {
+          "type": "string",
+          "default": "pipeline_dependencias",
+          "description": "Pipeline que redacta las explicaciones."
+        },
+        "cibersec.explainTopN": {
+          "type": "number",
+          "default": 3,
+          "minimum": 0,
+          "description": "Cuántas tarjetas se explican. Explicarlas todas destruiría el sentido de haberlas priorizado."
         }
       }
     }
