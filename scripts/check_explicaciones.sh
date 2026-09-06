@@ -157,46 +157,61 @@ fi
 
 info "HTTP ${HTTP_CODE}"
 
+# El cuerpo se pasa por ARCHIVO, no por pipe: `python3 - <<EOF` toma el PROGRAMA de
+# stdin, así que un `printf ... | python3 - <<EOF` deja a sys.stdin.read() devolviendo
+# vacío y la respuesta se pierde en silencio.
+BODY_FILE="$(mktemp)"
+trap 'rm -f "$BODY_FILE"' EXIT
+printf '%s' "$OUT" > "$BODY_FILE"
 
-printf '%s' "$OUT" | python3 - <<'PY'
+python3 - "$BODY_FILE" <<'PYEOF'
 import json, sys
-raw = sys.stdin.read()
+
+OK, MAL, AVISO = "\033[32mOK\033[0m", "\033[31mMAL\033[0m", "\033[33mSIN EXPLICACION\033[0m"
+raw = open(sys.argv[1], encoding="utf-8").read()
+
 try:
     body = json.loads(raw)
 except json.JSONDecodeError:
-    print("  \033[31mMAL\033[0m  respuesta ilegible del servidor:"); print("      ", raw[:400]); sys.exit(1)
+    print(f"  {MAL}  el servidor devolvio algo que no es JSON:")
+    print("      ", raw[:400] if raw.strip() else "(cuerpo vacio)")
+    sys.exit(1)
 
 if "detail" in body:
-    print("  \033[31mMAL\033[0m  el servidor rechazó la llamada:", body["detail"]); sys.exit(1)
+    print(f"  {MAL}  el servidor rechazo la llamada:", body["detail"])
+    sys.exit(1)
 
 content = (body.get("choices") or [{}])[0].get("message", {}).get("content", "")
 try:
     payload = json.loads(content)
 except json.JSONDecodeError:
-    print("  \033[31mMAL\033[0m  el pipeline no devolvió JSON:"); print("      ", content[:400]); sys.exit(1)
+    print(f"  {MAL}  el pipeline no devolvio JSON:")
+    print("      ", content[:400] if content.strip() else "(contenido vacio)")
+    sys.exit(1)
 
 if payload.get("error"):
-    print("  \033[31mMAL\033[0m ", payload["error"]); sys.exit(1)
+    print(f"  {MAL} ", payload["error"])
+    sys.exit(1)
 
 explicaciones = payload.get("explanations", [])
 if not explicaciones:
-    print("  \033[33mSIN EXPLICACIÓN\033[0m  el pipeline respondió bien pero no explicó nada.")
-    print("       El LLM no contestó (revisá LLM_PROVIDER y GROQ_API_KEY en infrastructure/.env)")
-    print("       o el modelo dijo que el contexto no alcanzaba.")
+    print(f"  {AVISO}  el pipeline respondio bien pero no explico nada.")
+    print("       O el LLM no contesto (revisa LLM_PROVIDER y el modelo en ollama),")
+    print("       o el modelo respondio que el contexto no alcanzaba.")
     sys.exit(1)
 
 for e in explicaciones:
-    print(f"  \033[32mOK\033[0m   {e['identifier']}")
+    print(f"  {OK}   {e['identifier']}")
     print(f"       {e['explanation']}")
-    print(f"       fuentes usadas: {', '.join(e.get('kinds', [])) or '—'}")
-    print(f"       citas: {', '.join(e.get('citations', [])) or '—'}")
-PY
+    print(f"       fuentes usadas: {', '.join(e.get('kinds', [])) or '-'}")
+    print(f"       citas: {', '.join(e.get('citations', [])) or '-'}")
+PYEOF
 estado=$?
 
 printf '\n'
 if [ $estado -eq 0 ]; then
-    printf '\033[32mTodo bien.\033[0m Si la extensión igual no muestra nada, es del lado de VSCode:\n'
+    printf '\033[32mTodo bien.\033[0m Si la extension igual no muestra nada, es del lado de VSCode:\n'
     printf '  cd extension && npm install && npm run compile   (out/ NO viaja por git)\n'
-    printf '  y recargá la ventana (Developer: Reload Window).\n'
+    printf '  y recarga la ventana (Developer: Reload Window).\n'
 fi
 exit $estado
