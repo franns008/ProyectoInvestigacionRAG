@@ -1,0 +1,4 @@
+# Una sola dependencia y es vulnerable. El caso mínimo del escaneo.
+# pillow 5.2.0 arrastra CVE-2023-4863 (libwebp), la única del corpus de fixtures
+# que está en el catálogo CISA KEV.
+pillow==5.2.0

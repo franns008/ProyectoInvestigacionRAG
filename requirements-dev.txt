@@ -1,0 +1,5 @@
+# Dependencias sólo de desarrollo: NO van a la imagen de pipelines.
+# Los tests del escaneo de dependencias (tests/) corren sin stack, sin GPU y sin LLM:
+#     pip install -r requirements.txt -r requirements-dev.txt && pytest
+-r requirements.txt
+pytest>=8,<9

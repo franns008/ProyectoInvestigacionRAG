@@ -16,6 +16,10 @@ mdit-plain
 nltk
 requests
 python-dotenv
+# Comparación de versiones PEP 440 y parseo de requirements.txt (PEP 508) para el
+# escaneo de dependencias (src/pipeline/deps/). Ya venía como dependencia transitiva
+# de haystack, pero ahora se importa directo, así que se declara.
+packaging
 
 # marker-pdf NO va acá: lo instala condicionalmente Dockerfile.pipelines según el
 # build-arg INSTALL_MARKER (default false → imagen slim, ~3 GB menos). Sólo hace falta
