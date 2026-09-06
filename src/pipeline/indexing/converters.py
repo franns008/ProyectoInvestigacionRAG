@@ -202,7 +202,7 @@ def cve_to_document(cve: dict):
     }
     # id determinístico: reindexar el mismo CVE actualiza la fila, no la duplica.
     doc_id = hashlib.sha256(cve_id.encode()).hexdigest()
-    return Document(id=doc_id, content=description, meta=meta)
+    return Document(id=doc_id, content=f"Vulnerabilidad {cve_id}: {description}", meta=meta)
 
 class NVDJsonConverter:
     """Páginas JSON crudas de la NVD (cves_page_*.json de fetch_nvd.py) → un
