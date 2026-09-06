@@ -13,11 +13,10 @@ respuesta.
 > a la vez**. El runtime de producción **no cambió**: el pipeline sigue usando
 > `DocumentSplitter(word/200/20)`. Todo lo nuevo vive aparte y en tablas pgvector separadas.
 
-> **Recordatorio de arquitectura:** los **embeddings** se calculan **local** en Ollama
-> (`bge-m3`, 1024 dims) y sólo la **generación** va a **Groq**. El chunking **no consume
-> tokens de Groq durante la indexación**; sólo influye en Groq por la cantidad de
-> contexto que termina en el prompt de cada consulta. Ver
-> [arquitectura_groq.md](arquitectura_groq.md).
+> **Recordatorio de arquitectura:** embeddings y generación corren **local** en Ollama.
+> El chunking no cuesta nada extra **durante la indexación** más allá de embeddar; donde
+> se paga es en **cada consulta**, por la cantidad de contexto que termina en el prompt
+> (y por lo tanto en la latencia de generación). Ver [arquitectura.md](arquitectura.md).
 
 ---
 
@@ -107,10 +106,10 @@ ignora.
 
 ---
 
-## 4. Impacto en consumo de tokens (Groq)
+## 4. Impacto en el contexto del prompt
 
-El chunking **no** toca la cuota de embeddings (local). Impacta en Groq **sólo** por el
-contexto del prompt: `nº_docs_al_prompt × tamaño_chunk` + plantilla + pregunta + salida.
+El chunking impacta en la generación **sólo** por el contexto del prompt:
+`nº_docs_al_prompt × tamaño_chunk` + plantilla + pregunta + salida.
 Hoy el **techo duro** de docs al prompt lo pone el **reranker** (`ranker_top_k=4`), no el
 joiner (ver [reranker_cross_encoder.md](reranker_cross_encoder.md)). Por eso subir el
 tamaño de chunk sí sube tokens/query, pero acotado a 4 piezas.
@@ -124,9 +123,10 @@ Estimación (~1,4 tokens/palabra en el tokenizer de Llama), con `ranker_top_k=4`
 | 490 (recursive)| ~686         | ~2.744           | ~150                 | 512            | **~3.400**  |
 
 Trade-off: chunks más grandes dan más contexto por pieza (mejor para respuestas
-"explicá y prevení") a cambio de más tokens/query, lo que baja el techo de queries/minuto
-antes del 429 de Groq. El **overlap se paga doble** si dos chunks solapados entran ambos
-al prompt.
+"explicá y prevení") a cambio de más tokens/query. Con la generación local eso no choca
+contra ninguna cuota, pero sí contra la **ventana de contexto** del modelo y contra la
+**latencia**: más tokens de prompt es más tiempo de procesamiento por consulta. El
+**overlap se paga doble** si dos chunks solapados entran ambos al prompt.
 
 ---
 
@@ -206,8 +206,8 @@ de control de "no rompí el retrieval de lo atómico".
 
 > **Retrieval puro (sin LLM).** El experimento arma el pipeline con
 > `build_rag_pipeline(include_llm=False)` — retrievers + joiner + reranker, sin
-> `prompt_builder` ni generador. Así **no exige `GROQ_API_KEY` ni paga la latencia de
-> generación**, y el chunking se juzga por lo que realmente mueve: el retrieval. La
+> `prompt_builder` ni generador. Así **no carga el modelo de generación ni paga su
+> latencia**, y el chunking se juzga por lo que realmente mueve: el retrieval. La
 > **Tier 2 `SAS`** (calidad de respuesta generada) se mide aparte con
 > [run_eval.py](../src/pipeline/eval/run_eval.py) una vez elegida la estrategia, no en
 > este barrido.

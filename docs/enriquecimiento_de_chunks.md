@@ -71,7 +71,7 @@ justo después de filtrar `new_docs` (así solo se enriquecen chunks nuevos):
 PDFs ─marker─▶ Markdown ─▶ DocumentSplitter ─▶ filtro new_docs
                                                      │
                                                      ▼
-                                      _enrich_chunks (LLM Groq)  ◀── PASO NUEVO
+                                      _enrich_chunks (LLM local)  ◀── PASO NUEVO
                                                      │
                                                      ▼
                               OllamaDocumentEmbedder (meta_fields_to_embed)
@@ -82,7 +82,7 @@ PDFs ─marker─▶ Markdown ─▶ DocumentSplitter ─▶ filtro new_docs
 
 ## 5. Componente de enriquecimiento (esbozo)
 
-Genera los metadatos con una llamada al LLM de Groq por chunk, pidiendo JSON:
+Genera los metadatos con una llamada al LLM local por chunk, pidiendo JSON:
 
 ```python
 ENRICH_TEMPLATE = """Sos un asistente que prepara fragmentos de documentos técnicos de
@@ -98,11 +98,10 @@ Respondé SOLO con el JSON."""
 
 def _enrich_chunks(self, docs: list[Document]) -> list[Document]:
     import json
-    enricher = OpenAIGenerator(
-        api_key=Secret.from_env_var("GROQ_API_KEY"),
-        api_base_url=GROQ_BASE_URL,
+    enricher = OllamaGenerator(
         model=self.valves.llm_model,
-        generation_kwargs={"temperature": 0.0, "response_format": {"type": "json_object"}},
+        url=OLLAMA_URL,
+        generation_kwargs={"temperature": 0.0, "format": "json"},
     )
     builder = PromptBuilder(template=ENRICH_TEMPLATE)
     for doc in docs:
@@ -128,13 +127,14 @@ new_docs = self._enrich_chunks(new_docs)
 
 ## 6. Consideraciones para este proyecto
 
-1. **Costo / rate-limit de Groq.** El enriquecimiento es **1 llamada LLM por
-   chunk**. Con `split_length=200` habrá muchos chunks por documento. Mitigantes:
+1. **Costo en tiempo de indexación.** El enriquecimiento es **1 llamada LLM por
+   chunk**, y con generación local eso se paga en minutos de cómputo, no en cuota.
+   Con `split_length=200` habrá muchos chunks por documento. Mitigantes:
    - Corre solo sobre `new_docs` (la indexación ya es incremental) → costo de una
      sola vez por documento.
-   - Considerar un modelo chico/barato para esta tarea (p. ej.
-     `llama-3.1-8b-instant`), distinto del de generación.
-   - Vigilar el límite TPM de Groq; si hace falta, agregar `time.sleep` o batching.
+   - Considerar un modelo chico y rápido para esta tarea, distinto del de generación.
+   - Sin GPU esto puede volverse prohibitivo: medir sobre un documento antes de
+     lanzarlo sobre el corpus entero.
 
 2. **Guardar lo enriquecido en `meta`, NO en `content`.** Si se mete en `content`,
    se contamina el contexto del LLM y el `keyword_retriever` (BM25) empieza a

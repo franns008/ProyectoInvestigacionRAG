@@ -115,7 +115,7 @@ práctica:
   retrieval a cambio de mejor relevancia y **menos tokens** enviados al LLM (el reranker
   recorta de ~6 a 4 docs), lo que puede **compensar** en latencia total de generación.
 
-- **Sin costo de API ni de red en runtime.** Todo local; no toca Groq ni cuotas externas.
+- **Sin costo de API ni de red en runtime.** Todo local; no toca APIs ni cuotas externas.
 
 - **Reconstrucción del pipeline.** Al cambiar valves (`on_valves_updated`) el pipeline se
   rearma; el modelo ya está en disco (pre-bakeado) pero se vuelve a hacer `warm_up` en el
@@ -162,7 +162,7 @@ Pendiente a evaluar: subir `ranker_top_k` a 5 o agregar `score_threshold` para r
 1. **Build:** `docker compose -f infrastructure/docker-compose.yml build pipelines` —
    deben pasar las verificaciones nuevas del Dockerfile (sentence-transformers, descarga
    del modelo, import del ranker).
-2. **Arranque + consulta real** (modo Groq por defecto, ver [modos_llm.md](modos_llm.md)):
+2. **Arranque + consulta real** (ver [arquitectura.md](arquitectura.md) §7):
    preguntar por XSS o un CVE concreto y revisar `src/pipeline/logCiberseguridad.txt`.
    El bloque `[RANKER]` debe mostrar ~4 docs finales con su score; el `[DOCUMENT JOINER]`,
    más candidatos.

@@ -112,5 +112,5 @@ la imagen y el runtime lo lee directo desde ahí. Son dos ahorros independientes
 
 - [reranker_cross_encoder.md](reranker_cross_encoder.md) — el reranker que se hornea en la
   imagen (esos ~4.3 GB no son opcionales: se usan en cada query).
-- [arquitectura_groq.md](arquitectura_groq.md) — arquitectura general (CPU / GPU).
-- [modos_llm.md](modos_llm.md) — Groq vs Ollama para la generación.
+- [arquitectura.md](arquitectura.md) — arquitectura general, puesta en marcha y
+  ejecución (CPU / GPU).
