@@ -117,6 +117,7 @@ function buildProvider(workspaceRoot: string): ScanProvider {
     model: config.get<string>("explainModel", "pipeline_dependencias"),
     apiKey: config.get<string>("ragApiKey", "0p3n-w3bui"),
     topN: config.get<number>("explainTopN", 3),
+    timeoutMs: config.get<number>("explainTimeoutSeconds", 240) * 1000,
   });
 }
 

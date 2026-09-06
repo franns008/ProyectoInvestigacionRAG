@@ -116,9 +116,47 @@ fi
 paso "4. Una explicación real, punta a punta"
 PAYLOAD='{"model":"'"${MODEL}"'","stream":false,"messages":[{"role":"user","content":"{\"findings\":[{\"package\":\"pillow\",\"installed_version\":\"5.2.0\",\"cve\":\"CVE-2023-4863\",\"osv_ids\":[\"GHSA-j7hp-h8jx-5ppr\"],\"cwe_ids\":[\"CWE-787\"],\"summary\":\"libwebp: OOB write in BuildHuffmanTable\",\"details\":\"Heap buffer overflow in libwebp allows a remote attacker to perform an out of bounds memory write via a crafted HTML page.\"}]}"}]}'
 
-OUT="$(curl -s -m 120 -X POST "${BASE}/v1/chat/completions" \
+# Se separa el cuerpo del codigo HTTP y del codigo de salida de curl: sin eso, un
+# timeout (el LLM tardando) y un error del servidor se ven exactamente igual -un cuerpo
+# vacio- y se busca el problema en el lugar equivocado.
+RAW="$(curl -s -m 180 -w '\n%{http_code}' -X POST "${BASE}/v1/chat/completions" \
         -H "Authorization: Bearer ${KEY}" -H "Content-Type: application/json" \
         -d "$PAYLOAD")"
+CURL_RC=$?
+HTTP_CODE="$(printf '%s' "$RAW" | tail -n1)"
+OUT="$(printf '%s' "$RAW" | sed '$d')"
+
+logs() {
+    docker compose -f "${REPO}/infrastructure/docker-compose.yml" logs --tail "${1:-40}" pipelines 2>/dev/null
+}
+
+if [ $CURL_RC -eq 28 ]; then
+    bad "el servidor no respondio en 180 s: la generacion se esta colgando"
+    info "El lookup es instantaneo; lo que tarda es el LLM. Casos tipicos:"
+    info "  - LLM_PROVIDER=groq sin GROQ_API_KEY valida -> 5 reintentos de 60 s cada uno"
+    info "  - LLM_PROVIDER=ollama con un modelo que todavia se esta descargando"
+    info ""
+    info "Que alcanzo a hacer el pipeline:"
+    logs 60 | grep -E "DepsExplain|explicando|Error|Traceback" | tail -10 | sed 's/^/       /'
+    info ""
+    info "Proveedor configurado (esto NO muestra la key, solo si esta definida):"
+    info "    grep LLM_PROVIDER infrastructure/.env"
+    info "    grep -c '^GROQ_API_KEY=.\\+' infrastructure/.env   # 1 = tiene valor, 0 = vacia"
+    exit 1
+elif [ $CURL_RC -ne 0 ]; then
+    bad "curl fallo (codigo $CURL_RC) contra ${BASE}"
+    exit 1
+fi
+
+if [ -z "$OUT" ]; then
+    bad "el servidor respondio HTTP ${HTTP_CODE} con el cuerpo vacio"
+    info "Ultimas lineas del log del servidor:"
+    logs 40 | tail -15 | sed 's/^/       /'
+    exit 1
+fi
+
+info "HTTP ${HTTP_CODE}"
+
 
 printf '%s' "$OUT" | python3 - <<'PY'
 import json, sys

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Mapping, Sequence
 
@@ -97,11 +98,19 @@ def explain_findings(
             logger.info("%s: sin contexto en ninguna fuente, no se explica", identifier)
             continue
 
+        # El tiempo se loguea siempre: con LLM_PROVIDER=ollama la generación corre en CPU
+        # y tarda decenas de segundos por tarjeta. Sin este número, "lento" y "colgado"
+        # son indistinguibles desde afuera.
+        started = time.perf_counter()
         try:
             raw = generate(build_prompt(finding, context))
         except Exception as error:  # noqa: BLE001 — una tarjeta sin explicación, no un escaneo roto
-            logger.warning("%s: la generación falló (%s)", identifier, error)
+            logger.warning(
+                "%s: la generación falló tras %.1f s (%s)",
+                identifier, time.perf_counter() - started, error,
+            )
             continue
+        logger.info("%s: generado en %.1f s", identifier, time.perf_counter() - started)
 
         texto = _clean(raw)
         if not texto:

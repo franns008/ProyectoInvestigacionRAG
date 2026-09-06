@@ -25,10 +25,17 @@ export interface ExplainOptions {
   apiKey: string;
   /** Cuántas tarjetas se explican. */
   topN: number;
+  /** Cuánto esperar al servidor, en milisegundos. */
+  timeoutMs?: number;
 }
 
-/** El LLM tarda ~1 s por tarjeta; con margen para un modelo local lento. */
-const TIMEOUT_MS = 90_000;
+/**
+ * Cuánto se espera al servidor. El default (240 s) está calibrado para el caso lento:
+ * `LLM_PROVIDER=ollama` genera en CPU dentro del container, entre 20 y 40 s por tarjeta
+ * más la carga del modelo en RAM la primera vez. Con Groq son ~1 s por tarjeta y esto
+ * sobra. Se puede subir o bajar con `cibersec.explainTimeoutSeconds`.
+ */
+const DEFAULT_TIMEOUT_MS = 240_000;
 
 /** Recorte del texto del advisory que se manda. El servidor vuelve a recortar. */
 const MAX_TEXT_CHARS = 4_000;
@@ -66,7 +73,7 @@ export class ExplainedProvider implements ScanProvider {
       merge(targets, explanations);
     } catch (error) {
       // Degradación deliberada: se pierde la prosa, no el escaneo.
-      console.warn("[cibersec] no pude traer las explicaciones:", (error as Error).message);
+      console.warn("[cibersec] no pude traer las explicaciones:", describe(error, this.options));
     }
 
     return result;
@@ -84,7 +91,7 @@ export class ExplainedProvider implements ScanProvider {
         stream: false,
         messages: [{ role: "user", content: JSON.stringify({ findings: findings.map(payload) }) }],
       }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(this.options.timeoutMs ?? DEFAULT_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -142,6 +149,21 @@ function merge(findings: Finding[], explanations: WireExplanation[]): void {
 /** Mismo criterio que `Vulnerability.identifier` en Python: el CVE si existe, si no el OSV. */
 function identifierOf(finding: Finding): string {
   return finding.cve ?? finding.osv_ids[0] ?? "?";
+}
+
+/**
+ * Un timeout y un servidor caído se ven igual en el `catch` (`TimeoutError` vs
+ * `TypeError: fetch failed`) y se arreglan distinto. Vale la pena distinguirlos.
+ */
+function describe(error: unknown, options: ExplainOptions): string {
+  const segundos = Math.round((options.timeoutMs ?? DEFAULT_TIMEOUT_MS) / 1000);
+  if ((error as Error)?.name === "TimeoutError") {
+    return (
+      `el servidor no respondió en ${segundos} s. Con LLM_PROVIDER=ollama la generación ` +
+      `corre en CPU y tarda; subí cibersec.explainTimeoutSeconds o bajá cibersec.explainTopN.`
+    );
+  }
+  return (error as Error).message;
 }
 
 function trimSlash(url: string): string {

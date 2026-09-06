@@ -95,6 +95,12 @@
           "default": "pipeline_dependencias",
           "description": "Pipeline que redacta las explicaciones."
         },
+        "cibersec.explainTimeoutSeconds": {
+          "type": "number",
+          "default": 240,
+          "minimum": 10,
+          "markdownDescription": "Cuánto esperar las explicaciones. El default sirve para generación local en CPU (`LLM_PROVIDER=ollama`), que tarda 20-40 s por tarjeta. Con Groq alcanza con mucho menos."
+        },
         "cibersec.explainTopN": {
           "type": "number",
           "default": 3,
