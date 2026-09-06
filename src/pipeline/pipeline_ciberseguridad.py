@@ -52,13 +52,11 @@ from haystack.components.builders import PromptBuilder
 from haystack.components.joiners import DocumentJoiner
 from haystack.components.rankers import SentenceTransformersSimilarityRanker
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
-from haystack.components.generators.openai import OpenAIGenerator
 from haystack_integrations.components.generators.ollama import OllamaGenerator
 
 # --- Configuración fija de infraestructura ---
 DB_CONNECTION       = "postgresql://avdbuser:avdbpass@vdb:5432/pgvdb"
 OLLAMA_URL          = "http://ollama:11434"
-GROQ_BASE_URL       = "https://api.groq.com/openai/v1"
 DB_TABLE            = "ciberseguridad_docs"
 EMBEDDING_DIMENSION = 2560  # nativa de qwen3-embedding:4b (sin truncar vía MRL)
 DEFAULT_OLLAMA_LLM  = "qwen2.5:3b-instruct"
@@ -290,32 +288,21 @@ def get_document_store(
         keyword_index_name=keyword_index_name,
     )
 
-def _llm_provider() -> str:
-    return os.getenv("LLM_PROVIDER", "groq").strip().lower()
-
 def build_generator(valves):
+    """La generación corre siempre en el Ollama local (ver docs/arquitectura.md).
+
+    El modelo sale de `LLM_MODEL` si está seteada; si no, del valve `llm_model`
+    (que ya trae `DEFAULT_OLLAMA_LLM` como default). La variable de entorno gana
+    para poder cambiar de modelo sin tocar la UI de OpenWebUI.
+    """
     v = valves
-    provider = _llm_provider()
-    if provider == "ollama":
-        model = os.getenv("LLM_MODEL") or DEFAULT_OLLAMA_LLM
-        return OllamaGenerator(
-            model=model,
-            url=OLLAMA_URL,
-            timeout=120,
-            generation_kwargs={
-                "num_predict": v.max_tokens,
-                "temperature": v.temperature,
-            },
-        )
     model = os.getenv("LLM_MODEL") or v.llm_model
-    return OpenAIGenerator(
-        api_key=Secret.from_env_var("GROQ_API_KEY"),
-        api_base_url=GROQ_BASE_URL,
+    return OllamaGenerator(
         model=model,
-        max_retries=5,
-        timeout=60.0,
+        url=OLLAMA_URL,
+        timeout=120,
         generation_kwargs={
-            "max_tokens":  v.max_tokens,
+            "num_predict": v.max_tokens,
             "temperature": v.temperature,
         },
     )
@@ -325,7 +312,7 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves, include_llm: bool =
 
     `include_llm=False` arma el pipeline SOLO hasta el reranker (sin prompt_builder ni
     LLM): útil para medir retrieval puro (recall@k / source_recall del experimento de
-    chunking) sin exigir GROQ_API_KEY ni pagar la latencia de generación. El runtime de
+    chunking) sin cargar el generador ni pagar la latencia de generación. El runtime de
     producción usa el default (True). Ver src/pipeline/eval/run_chunking_experiment.py.
     """
     v = valves
@@ -355,7 +342,7 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves, include_llm: bool =
 class Pipeline:
 
     class Valves(BaseModel):
-        llm_model:       str   = "meta-llama/llama-4-scout-17b-16e-instruct"
+        llm_model:       str   = DEFAULT_OLLAMA_LLM
         embedding_model: str   = "qwen3-embedding:4b"
         retriever_top_k: int   = 15
         ranker_model:    str   = "BAAI/bge-reranker-v2-m3"
