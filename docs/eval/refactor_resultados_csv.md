@@ -1,5 +1,10 @@
 # Refactor: resultados del eval en CSV (plan de implementación)
 
+> **Nota (2026-09-06): Groq fue removido del repo.** La generación es ahora
+> exclusivamente local sobre Ollama. Lo que sigue es el registro de cuando existía el
+> modo dual (`LLM_PROVIDER=groq|ollama`) y **se deja tal cual**. Las referencias a Groq,
+> a `GROQ_API_KEY` y a `docs/modos_llm.md` (borrado) hay que leerlas en ese contexto.
+
 > **Estado (2026-08-12): PLAN APROBADO — pendiente de implementación.** Este documento es
 > una especificación paso a paso, pensada para ejecutarse sin tomar decisiones nuevas:
 > toda ambigüedad se resolvió acá. Contexto de diseño en [eval_harness.md](eval_harness.md)
@@ -264,6 +269,7 @@ Principio: **escribe crudo, no compara**. Cambios sobre el archivo actual:
    - `llm_model` **efectivo**: replicar la resolución de `run_eval_llm.py` actual
      (líneas 103-108): con provider `ollama` es `os.getenv("LLM_MODEL") or
      rag.DEFAULT_OLLAMA_LLM`; con `groq` es `os.getenv("LLM_MODEL") or valves.llm_model`.
+     (Hoy, sin Groq, colapsó a `os.getenv("LLM_MODEL") or valves.llm_model` a secas.)
      Extraer eso a una función compartida `effective_llm_model(valves)` (puede vivir en
      `csv_store.py` o en un helper común del eval) y usarla en ambos runners.
    - `judge_model`, `n_judge`, `faithfulness`, `context_relevance` → vacías.

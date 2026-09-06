@@ -1,5 +1,11 @@
 # Bitácora de implementación: refactor de resultados a CSV
 
+> **Nota (2026-09-06): Groq fue removido del repo.** La generación es ahora
+> exclusivamente local sobre Ollama. Lo que sigue es el registro de cuando existía el
+> modo dual (`LLM_PROVIDER=groq|ollama`) y **se deja tal cual**: es la historia de por
+> qué el código quedó como quedó. Las referencias a Groq, a `GROQ_API_KEY` y a
+> `docs/modos_llm.md` (borrado) hay que leerlas en ese contexto.
+
 > **Estado (2026-08-18): TERMINADO.** Los 11 pasos hechos y verificados, y los tres
 > criterios de terminado del plan pasan. `report.py` tiene los cuatro modos
 > (`compare`, `runs`, `question`, `html`), y la imagen se rebuildeó, así que la
@@ -202,7 +208,7 @@ Si `.env` no declara `LLM_PROVIDER`, toma el default `groq` y `build_generator()
 pide `GROQ_API_KEY` → excepción → el pipeline va a `failed/` (hallazgo 3).
 
 `.env.example` ya trae ambas variables; los `.env` viejos (previos a
-[modos_llm.md](../modos_llm.md)) no. Además, con `LLM_PROVIDER=ollama` hay que
+`modos_llm.md`, ya borrado) no. Además, con `LLM_PROVIDER=ollama` hay que
 setear `LLM_MODEL` explícito si no se tiene bajado el default
 `qwen2.5:3b-instruct` (`DEFAULT_OLLAMA_LLM`).
 
@@ -498,7 +504,7 @@ tiene 4k de contexto (justo para un prompt con 4 documentos adentro).
 
 Dos consecuencias: **(1)** hoy el repo no arranca con Groq para nadie con key nueva, y
 está escrito en 4 lugares (`pipeline_ciberseguridad.py`, `.env.example`,
-`docs/modos_llm.md`, `docs/arquitectura_groq.md`); **(2)** el baseline histórico del
+`docs/modos_llm.md`, `docs/arquitectura_groq.md` — ambos ya no existen); **(2)** el baseline histórico del
 2026-07-03 se corrió con scout y **ya no se puede reproducir**. Pendiente de definir
 con el equipo qué modelo se adopta.
 
@@ -884,4 +890,5 @@ Si algún desvío real aparece más adelante, se registra acá **antes** de code
 - [mejoras_harness.md](mejoras_harness.md) — H1/H3/H6/H9/H10, fuera del alcance de este
   refactor pero validados por los hallazgos 6 y 7.
 - [eval_harness.md](eval_harness.md) — diseño vigente del harness (Tiers 1–3).
-- [../modos_llm.md](../modos_llm.md) — `LLM_PROVIDER`/`LLM_MODEL` (hallazgos 4 y 8).
+- `../modos_llm.md` — `LLM_PROVIDER`/`LLM_MODEL` (hallazgos 4 y 8). Borrado al remover
+  Groq; su parte vigente vive en [../arquitectura.md](../arquitectura.md).
