@@ -152,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
                     "findings": [dataclasses.asdict(v) for v in vulnerabilities],
                 },
                 indent=2,
-                ensure_ascii=False,
+                ensure_ascii=True,
             )
         )
     else:
