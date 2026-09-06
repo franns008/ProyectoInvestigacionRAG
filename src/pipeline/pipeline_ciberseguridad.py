@@ -41,7 +41,7 @@ if not logger.handlers:
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
-from haystack import Pipeline as HaystackPipeline
+from haystack import Pipeline as HaystackPipeline, Document, component
 from haystack.utils import Secret
 from haystack_integrations.document_stores.pgvector import PgvectorDocumentStore
 from haystack_integrations.components.retrievers.pgvector import (
@@ -129,17 +129,78 @@ _STOPWORDS = {
 }
 
 def _extract_vuln_ids(text: str) -> list[str]:
-    ids: list[str] = []
+    """IDs en ORDEN DE APARICIÓN en el texto, no agrupados por tipo.
+
+    Antes se recorrían todos los CWE y después todos los CVE, así que el orden
+    reflejaba el tipo y no la pregunta: "¿qué CVE explota CWE-502?" ponía siempre
+    el CWE primero. El orden importa porque decide el desempate y el corte por
+    top_k en VulnIdLookup (y, vía RRF, cuánto pesa cada uno).
+    """
+    found: list[tuple[int, str]] = []
     for m in _CWE_ID_RE.finditer(text):
-        ids.append(f"CWE-{int(m.group(1))}")
+        found.append((m.start(), f"CWE-{int(m.group(1))}"))
     for m in _CVE_ID_RE.finditer(text):
-        ids.append(f"CVE-{m.group(1)}-{m.group(2)}")
+        found.append((m.start(), f"CVE-{m.group(1)}-{m.group(2)}"))
+    found.sort(key=lambda t: t[0])
     seen, out = set(), []
-    for i in ids:
-        if i not in seen:
-            seen.add(i)
-            out.append(i)
+    for _, vid in found:
+        if vid not in seen:
+            seen.add(vid)
+            out.append(vid)
     return out
+
+
+# Marcadores de los prompts internos de OpenWebUI (generación de títulos, tags...).
+# No se heredan IDs desde ellos: traen <chat_history> embebido y contaminarían la query.
+_META_PROMPT_MARKERS = ("### Task:", "<chat_history>")
+_HISTORY_TURNS = 4   # ~2 intercambios hacia atrás
+_MAX_VULN_IDS  = 6
+
+
+def _message_text(msg: dict) -> str:
+    """El content de OpenWebUI puede ser str o una lista de partes (multimodal)."""
+    content = msg.get("content")
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return " ".join(p.get("text", "") for p in content if isinstance(p, dict))
+    return ""
+
+
+def resolve_vuln_ids(
+    user_message: str,
+    messages: list[dict] | None = None,
+    history_turns: int = _HISTORY_TURNS,
+    max_ids: int = _MAX_VULN_IDS,
+) -> tuple[list[str], str]:
+    """IDs del turno actual; si no hay ninguno, los hereda de los últimos turnos.
+
+    El turno actual manda: sólo se mira hacia atrás cuando no trae ningún ID, así
+    un cambio explícito de tema nunca queda contaminado. Dentro del historial se
+    acumulan del más reciente al más viejo, y ese orden ES el peso: VulnIdLookup
+    lo respeta y el RRF le da 1/(k+rango) a cada documento.
+
+    Devuelve (ids, origen); `origen` se loguea para poder auditar el arrastre.
+    """
+    current = _extract_vuln_ids(user_message)
+    if current:
+        return current[:max_ids], "turno"
+    if not messages:
+        return [], "ninguno"
+
+    inherited: list[str] = []
+    for msg in reversed(messages[-history_turns:]):
+        text = _message_text(msg)
+        if not text or text.strip() == user_message.strip():
+            continue  # OpenWebUI repite el turno actual al final de messages
+        if any(marker in text for marker in _META_PROMPT_MARKERS):
+            continue
+        for vid in _extract_vuln_ids(text):
+            if vid not in inherited:
+                inherited.append(vid)
+    if not inherited:
+        return [], "ninguno"
+    return inherited[:max_ids], "historial"
 
 def _find_security_terms(text_low: str) -> list[str]:
     found = []
@@ -171,6 +232,42 @@ def build_keyword_query(user_message: str) -> str:
     tokens = re.findall(r"[a-záéíóúñü0-9][a-záéíóúñü0-9\-]*", low)
     keywords = [t for t in tokens if len(t) > 2 and t not in _STOPWORDS]
     return " ".join(keywords) or text
+
+
+@component
+class VulnIdLookup:
+    """Canal determinístico de IDs: resuelve CWE-x / CVE-x por metadata.
+
+    Un ID es una clave primaria disfrazada, no tiene sentido recuperarlo por
+    similitud de coseno ni por BM25. Además el PgvectorKeywordRetriever usa
+    plainto_tsquery, que AND-ea los lexemas: con dos IDs ningún documento los
+    contiene a ambos y devuelve 0. Por eso este canal sale de BM25.
+
+    Se filtra por `meta.source` y no por `cwe_id`/`cve_id` porque `cwe_id` es int
+    y `cve_id` es str, mientras que `source` es str en ambos y guarda exactamente
+    la forma canónica que produce _extract_vuln_ids ("CWE-79", "CVE-2021-44228").
+    Las guías INCIBE tienen un nombre de archivo en `source`, así que no colisionan.
+
+    `ids` es opcional a propósito: los scripts de eval que no lo pasan siguen
+    corriendo sin tocarlos (el lookup simplemente no aporta candidatos).
+    """
+
+    def __init__(self, document_store, top_k: int = 10):
+        self.document_store = document_store
+        self.top_k = top_k
+
+    @component.output_types(documents=list[Document])
+    def run(self, ids: list[str] | None = None):
+        ids = ids or []
+        if not ids:
+            return {"documents": []}
+        wanted = ids[: self.top_k]
+        docs = self.document_store.filter_documents(
+            filters={"field": "meta.source", "operator": "in", "value": wanted}
+        )
+        rank = {vid: i for i, vid in enumerate(wanted)}
+        docs.sort(key=lambda d: rank.get(d.meta.get("source"), 10 ** 6))
+        return {"documents": docs[: self.top_k]}
 
 
 # ======================================================================
@@ -236,12 +333,14 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves, include_llm: bool =
     pipeline.add_component("text_embedder",       OllamaTextEmbedder(model=v.embedding_model, url=OLLAMA_URL))
     pipeline.add_component("embedding_retriever", PgvectorEmbeddingRetriever(document_store=store, top_k=v.retriever_top_k))
     pipeline.add_component("keyword_retriever",   PgvectorKeywordRetriever(document_store=store, top_k=v.retriever_top_k))
+    pipeline.add_component("id_lookup",           VulnIdLookup(document_store=store, top_k=getattr(v, "id_lookup_top_k", 10)))
     pipeline.add_component("document_joiner",     DocumentJoiner(join_mode="reciprocal_rank_fusion", top_k=v.retriever_top_k * 2))
     pipeline.add_component("ranker",              SentenceTransformersSimilarityRanker(model=v.ranker_model, top_k=v.ranker_top_k))
 
     pipeline.connect("text_embedder.embedding", "embedding_retriever.query_embedding")
     pipeline.connect("embedding_retriever",     "document_joiner")
     pipeline.connect("keyword_retriever",       "document_joiner")
+    pipeline.connect("id_lookup",               "document_joiner")
     pipeline.connect("document_joiner",         "ranker.documents")
 
     if include_llm:
@@ -261,6 +360,7 @@ class Pipeline:
         retriever_top_k: int   = 15
         ranker_model:    str   = "BAAI/bge-reranker-v2-m3"
         ranker_top_k:    int   = 4
+        id_lookup_top_k: int   = 10
         max_tokens:      int   = 512
         temperature:     float = 0.5
         # NOTA: split_length y split_overlap se movieron al script de indexación.
@@ -300,16 +400,21 @@ class Pipeline:
         keyword_query = build_keyword_query(user_message)
         logger.info(f"[KEYWORD QUERY] -> {keyword_query!r}")
 
+        vuln_ids, ids_origin = resolve_vuln_ids(user_message, messages)
+        logger.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin})")
+
         result = self.rag_pipeline.run(
             {
                 "text_embedder":     {"text": build_embedding_query(user_message)},
                 "keyword_retriever": {"query": keyword_query},
+                "id_lookup":         {"ids": vuln_ids},
                 "ranker":            {"query": user_message},
                 "prompt_builder":    {"question": user_message},
             },
             include_outputs_from={
                 "embedding_retriever",
                 "keyword_retriever",
+                "id_lookup",
                 "document_joiner",
                 "ranker",
                 "prompt_builder",
@@ -370,6 +475,12 @@ class Pipeline:
             source  = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
             snippet = (doc.content or "")[:200].replace("\n", " ")
             logger.info(f"  [{i+1}] score={score} | fuente={source}\n        snippet: {snippet}...")
+
+        lookup_docs = result.get("id_lookup", {}).get("documents", [])
+        logger.info(f"{sep}")
+        logger.info(f"[ID LOOKUP] {len(lookup_docs)} documentos por metadata:")
+        for i, doc in enumerate(lookup_docs):
+            logger.info(f"  [{i+1}] source={doc.meta.get('source')}")
 
         joined_docs = result.get("document_joiner", {}).get("documents", [])
         logger.info(f"{sep}")
