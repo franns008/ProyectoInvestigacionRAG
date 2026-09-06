@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 # surya-ocr (dep de marker) y sigue sirviendo para el reranker.
 #
 # Por defecto se instala la build de CPU (corre en cualquier máquina; la generación va
-# por Groq/Ollama y el reranker en CPU alcanza). Para NVIDIA, buildear con:
+# por Ollama y el reranker en CPU alcanza). Para NVIDIA, buildear con:
 #   --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cu126
 # (lo hace automáticamente docker-compose.nvidia.yml)
 ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu

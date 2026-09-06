@@ -61,11 +61,9 @@ services:
         environment:
             PG_CONN_STR: postgresql://${PGVECTOR_USR:-avdbuser}:${PGVECTOR_PASS:-avdbpass}@vdb/pgvdb?sslmode=disable
             TORCH_DEVICE: cpu
-            # Proveedor del LLM de generación: groq (API Key, default) u ollama (local, GPU).
-            # Ver docs/modos_llm.md. GROQ_API_KEY puede ir vacío cuando LLM_PROVIDER=ollama.
-            LLM_PROVIDER: ${LLM_PROVIDER:-groq}
+            # Modelo de generación en el Ollama local. Vacío = el default del
+            # pipeline (DEFAULT_OLLAMA_LLM). Ver docs/arquitectura.md.
             LLM_MODEL: ${LLM_MODEL:-}
-            GROQ_API_KEY: ${GROQ_API_KEY:-}
             PIPELINES_API_KEY: ${PIPESERVER_KEY:-0p3n-w3bui}
         ports:
             - "${PIPELINES_PORT:-9099}:9099"
