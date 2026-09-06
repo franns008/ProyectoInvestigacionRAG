@@ -90,4 +90,6 @@ docker exec -it infrastructure-pipelines-1 python /app/pipelines/indexing/run_in
 
 ---
 
-*Nota: Asegurate de tener configuradas correctamente tus variables de entorno (como `LLM_PROVIDER=ollama`) en el archivo `.env` raíz para que el sistema utilice tu modelo local adecuadamente.*
+*Nota: la generación corre siempre en el Ollama local. El modelo se elige con `LLM_MODEL`
+en `infrastructure/.env` (vacío = `qwen2.5:3b-instruct`) y tiene que estar `ollama pull`-eado.
+Ver [arquitectura.md](arquitectura.md).*

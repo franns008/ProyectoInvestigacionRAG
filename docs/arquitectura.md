@@ -239,6 +239,11 @@ cd infrastructure
 ### 7.3 Troubleshooting
 
 - **Respuesta vacía / error de modelo** → falta `ollama pull <LLM_MODEL>`.
+- **Error de modelo inexistente con un nombre que no configuraste** (p. ej.
+  `meta-llama/llama-4-...`) → OpenWebUI **persiste los valves** en
+  `<volumen pipelines>/<nombre_pipeline>/valves.json` y los restaura al arrancar, así
+  que puede estar reinyectando el modelo que se usaba en la etapa Groq. Se resuelve
+  seteando `LLM_MODEL` en el `.env` (le gana al valve) o borrando ese `valves.json`.
 - **Cambiaste `.env` y no toma efecto** → recreá el stack (`docker compose up -d`).
 - **El pipeline aparece en `failed/`** → OpenWebUI no pudo cargar el `.py` (suele ser
   una versión de dependencia). Ver el hallazgo 17 de

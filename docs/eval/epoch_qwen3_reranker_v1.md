@@ -220,11 +220,16 @@ docker compose up -d --no-deps pipelines
 
 ## Pendiente de fondo, sin resolver
 
+> **Cerrado el 2026-09-06.** Se resolvió por la vía de remover Groq: el default pasó a
+> ser `DEFAULT_OLLAMA_LLM` (`qwen2.5:3b-instruct`), los cuatro lugares donde estaba
+> hardcodeado el modelo viejo ya no existen o quedaron actualizados, y `modos_llm.md` /
+> `arquitectura_groq.md` se borró y se renombró respectivamente. Lo de abajo queda como
+> registro del problema que motivó la decisión.
+
 **El equipo sigue sin decidir el modelo de Groq.** `meta-llama/llama-4-scout-17b-16e-instruct`
 está hardcodeado en cuatro lugares (`pipeline_ciberseguridad.py`,
-`infrastructure/.env.example`, [`../modos_llm.md`](../modos_llm.md),
-`../arquitectura_groq.md`, hoy [`../arquitectura.md`](../arquitectura.md)) y ya no existe
-en Groq. Mientras
+`infrastructure/.env.example`, `../modos_llm.md`, `../arquitectura_groq.md`) y ya no
+existe en Groq. Mientras
 no se decida y se cambien esos cuatro lugares, cualquiera que levante el proyecto de
 cero se choca con el mismo 404.
 
