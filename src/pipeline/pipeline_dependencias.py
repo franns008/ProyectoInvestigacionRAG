@@ -3,31 +3,52 @@ title: Explicación de dependencias vulnerables
 author: Grupo Niños RAGtas
 version: 1.0
 requirements: haystack-ai, pgvector-haystack, ollama-haystack
-
-Segundo modelo del servidor de Pipelines, al lado del chat. **No escanea nada**: recibe
-los hallazgos que la extensión de VSCode ya resolvió de forma determinística y devuelve
-una explicación corta por hallazgo.
-
-Ese reparto es deliberado (docs/explicacion_hallazgos.md): el escaneo lo sigue haciendo
-la CLI local en la máquina del usuario, así que si este servidor está caído **el escaneo
-sigue funcionando** y sólo faltan los párrafos. Además este pipeline no necesita el dump
-de OSV, ni parsear requirements, ni la lógica de rangos de versiones.
-
-El camino de datos es un lookup por clave exacta contra pgvector — no hay retrieval, ni
-embeddings, ni reranker. Ver explain/lookup.py.
-
-Entrada (en el `content` del mensaje del usuario):
-
-    {"findings": [{"package": "pillow", "installed_version": "5.2.0",
-                   "cve": "CVE-2023-4863", "osv_ids": ["GHSA-..."],
-                   "cwe_ids": ["CWE-787"], "summary": "...", "details": "..."}]}
-
-Salida (string JSON):
-
-    {"explanations": [{"identifier": "CVE-2023-4863", "explanation": "...",
-                       "citations": ["CWE-787 (MITRE)", "GHSA-... (OSV)"],
-                       "kinds": ["cwe_weakness", "osv_advisory"]}]}
 """
+
+# El docstring de arriba es CORTO a propósito: el servidor de Pipelines lo parsea como
+# frontmatter (`parse_frontmatter` en su main.py) tomando cada línea con ":" como un par
+# clave/valor, y hace `pip install` de lo que encuentre bajo `requirements`. Toda la prosa
+# va acá abajo, donde no puede confundirse con metadata.
+#
+# ─────────────────────────────────────────────────────────────────────────────────────
+# Segundo modelo del servidor de Pipelines, al lado del chat. NO escanea nada: recibe los
+# hallazgos que la extensión de VSCode ya resolvió de forma determinística y devuelve una
+# explicación corta por hallazgo.
+#
+# Ese reparto es deliberado (docs/explicacion_hallazgos.md): el escaneo lo sigue haciendo
+# la CLI local en la máquina del usuario, así que si este servidor está caído el escaneo
+# sigue funcionando y sólo faltan los párrafos. Además este pipeline no necesita el dump de
+# OSV, ni parsear requirements, ni la lógica de rangos de versiones.
+#
+# El camino de datos es un lookup por clave exacta contra pgvector — no hay retrieval, ni
+# embeddings, ni reranker. Ver explain/lookup.py.
+#
+# Entrada (en el `content` del mensaje del usuario):
+#
+#     {"findings": [{"package": "pillow", "installed_version": "5.2.0",
+#                    "cve": "CVE-2023-4863", "osv_ids": ["GHSA-..."],
+#                    "cwe_ids": ["CWE-787"], "summary": "...", "details": "..."}]}
+#
+# Salida (string JSON):
+#
+#     {"explanations": [{"identifier": "CVE-2023-4863", "explanation": "...",
+#                        "citations": ["CWE-787 (MITRE)", "GHSA-... (OSV)"],
+#                        "kinds": ["cwe_weakness", "osv_advisory"]}]}
+
+import os
+import sys
+
+# El servidor carga cada pipeline con `importlib.util.spec_from_file_location`, que NO
+# agrega el directorio del archivo a `sys.path`: dentro del container, `sys.path` arranca
+# en `/app` y `/app/pipelines` no está. Sin esto, `import explain` (y `import
+# pipeline_ciberseguridad`) lanza ModuleNotFoundError, el servidor captura la excepción,
+# **mueve el archivo a `pipelines/failed/`** y el modelo nunca queda registrado — el
+# síntoma es un 404 "Pipeline pipeline_dependencias not found" en /v1/chat/completions.
+#
+# El pipeline de chat no lo necesita porque no importa ningún módulo hermano. Este sí.
+_PIPELINES_DIR = os.path.dirname(os.path.abspath(__file__))
+if _PIPELINES_DIR not in sys.path:
+    sys.path.insert(0, _PIPELINES_DIR)
 
 import json
 import logging

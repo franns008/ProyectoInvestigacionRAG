@@ -313,3 +313,43 @@ def test_parse_findings_rechaza_con_un_mensaje_legible(crudo):
 def test_parse_findings_acota_cuantos_acepta():
     muchos = '{"findings": [%s]}' % ",".join('{"cve": "CVE-%d"}' % n for n in range(50))
     assert len(parse_findings(muchos)) == 10
+
+
+# ======================================================================
+# Cómo carga el servidor de Pipelines
+# ======================================================================
+def test_el_servidor_de_pipelines_puede_cargar_el_modulo(monkeypatch):
+    """Regresión del 404 "Pipeline pipeline_dependencias not found".
+
+    El servidor carga cada pipeline con `importlib.util.spec_from_file_location`, que
+    **no** agrega el directorio del archivo a `sys.path`: dentro del container `sys.path`
+    arranca en `/app`, no en `/app/pipelines`. Un `import explain` sin la salvaguarda
+    lanza ModuleNotFoundError, el servidor lo captura, **mueve el archivo a
+    `pipelines/failed/`** y el modelo nunca se registra.
+
+    Este test reproduce esas condiciones: saca `src/pipeline` del path (lo pone
+    conftest.py, y enmascararía el bug) y carga el archivo como lo hace el servidor.
+    """
+    import importlib.util
+    import sys
+    import types
+    from pathlib import Path
+
+    pipeline_path = Path(__file__).resolve().parents[1] / "src" / "pipeline" / "pipeline_dependencias.py"
+    pipelines_dir = str(pipeline_path.parent)
+
+    monkeypatch.setattr(sys, "path", [p for p in sys.path if p != pipelines_dir])
+    for name in [m for m in sys.modules if m == "explain" or m.startswith("explain.")]:
+        monkeypatch.delitem(sys.modules, name)
+
+    if "pydantic" not in sys.modules:
+        # El servidor la tiene; el venv de los tests no. Sólo se necesita la clase base.
+        stub = types.ModuleType("pydantic")
+        stub.BaseModel = type("BaseModel", (), {})
+        monkeypatch.setitem(sys.modules, "pydantic", stub)
+
+    spec = importlib.util.spec_from_file_location("pipeline_dependencias", pipeline_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    assert hasattr(module, "Pipeline"), "sin clase Pipeline el servidor descarta el archivo"
