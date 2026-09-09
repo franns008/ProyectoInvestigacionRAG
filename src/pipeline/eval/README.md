@@ -9,8 +9,8 @@ Persistencia en CSV: [../../../docs/eval/refactor_resultados_csv.md](../../../do
 
 ## Requisitos
 
-Se corre **dentro del container `pipelines`** (ahí resuelven `vdb`, `ollama` y
-`GROQ_API_KEY`). El stack tiene que estar levantado:
+Se corre **dentro del container `pipelines`** (ahí resuelven `vdb` y `ollama`). El
+stack tiene que estar levantado:
 
 ```bash
 cd infrastructure && docker compose up -d
@@ -118,14 +118,16 @@ justamente lo que el delta tiene que medir.
 |---|---|---|---|
 | **1 — Retrieval** | recall@k, hit@k, MRR contra `expected_doc_ids` | siempre (`run_eval.py`) | gratis, determinístico |
 | **2 — SAS** | coseno entre respuesta y `reference_answer` (bge-m3 local) | siempre (`run_eval.py`) | gratis, local |
-| **3 — Juez LLM** | faithfulness + context relevance | manual (`run_eval_llm.py`) | caro, rate-limited |
+| **3 — Juez LLM** | faithfulness + context relevance | manual (`run_eval_llm.py`) | lento, varias generaciones por pregunta |
 
 `run_eval.py` hace **1 generación por pregunta**; Tier 3 hace varias por pregunta.
 
-**Las métricas de retrieval no dependen del LLM.** Verificado empíricamente
-(2026-08-18): la misma corrida con Ollama y con Groq da delta **exactamente 0.000** en
-`recall_eff`, `hit_eff`, `mrr_eff` y `source_recall`. Sólo el `sas_mean` se mueve. O
-sea que si cambiás de proveedor, el retrieval sigue siendo comparable y el SAS no.
+**Las métricas de retrieval no dependen del LLM.** Verificado empíricamente en su
+momento (2026-08-18), cuando el repo todavía podía correr la generación por Groq o por
+Ollama: la misma corrida con uno y con otro dio delta **exactamente 0.000** en
+`recall_eff`, `hit_eff`, `mrr_eff` y `source_recall`, y sólo se movió el `sas_mean`. La
+conclusión sigue valiendo al cambiar de **modelo** dentro de Ollama: el retrieval sigue
+siendo comparable, el SAS no.
 
 ## Dataset (`dataset.yaml`)
 

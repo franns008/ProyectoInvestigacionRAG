@@ -1,5 +1,11 @@
 # Epoch `qwen3-reranker-v1`: apertura, limpieza de `runs.csv` y baseline pendiente
 
+> **Nota (2026-09-06): Groq fue removido del repo.** La generación es ahora
+> exclusivamente local sobre Ollama. Lo que sigue es el registro de cuando existía el
+> modo dual (`LLM_PROVIDER=groq|ollama`) y **se deja tal cual**: es la historia de por
+> qué el código quedó como quedó. Las referencias a Groq, a `GROQ_API_KEY` y a
+> `docs/modos_llm.md` (borrado) hay que leerlas en ese contexto.
+
 > **Estado (2026-08-27): COMPLETO.** Epoch abierta, historial limpio y baseline nuevo
 > fijado en `20260827T160439Z` — la primera corrida completa de `qwen3-reranker-v1`
 > sobre `main` (`17e9960`), 39 preguntas, **0 errores**. Los números están en
@@ -214,10 +220,16 @@ docker compose up -d --no-deps pipelines
 
 ## Pendiente de fondo, sin resolver
 
+> **Cerrado el 2026-09-06.** Se resolvió por la vía de remover Groq: el default pasó a
+> ser `DEFAULT_OLLAMA_LLM` (`qwen2.5:3b-instruct`), los cuatro lugares donde estaba
+> hardcodeado el modelo viejo ya no existen o quedaron actualizados, y `modos_llm.md` /
+> `arquitectura_groq.md` se borró y se renombró respectivamente. Lo de abajo queda como
+> registro del problema que motivó la decisión.
+
 **El equipo sigue sin decidir el modelo de Groq.** `meta-llama/llama-4-scout-17b-16e-instruct`
 está hardcodeado en cuatro lugares (`pipeline_ciberseguridad.py`,
-`infrastructure/.env.example`, [`../modos_llm.md`](../modos_llm.md),
-[`../arquitectura_groq.md`](../arquitectura_groq.md)) y ya no existe en Groq. Mientras
+`infrastructure/.env.example`, `../modos_llm.md`, `../arquitectura_groq.md`) y ya no
+existe en Groq. Mientras
 no se decida y se cambien esos cuatro lugares, cualquiera que levante el proyecto de
 cero se choca con el mismo 404.
 
@@ -232,6 +244,7 @@ construya sobre el supuesto de que el embedder ayudó.
 - [bitacora_refactor_csv.md](bitacora_refactor_csv.md) — hallazgos 18–19 sobre por qué
   el SAS miente en las preguntas negativas.
 - [mejoras_harness.md](mejoras_harness.md) — H5/H6, abstención y umbral de regresión.
-- [../modos_llm.md](../modos_llm.md) — `LLM_PROVIDER` / `LLM_MODEL`.
+- `../modos_llm.md` — `LLM_PROVIDER` / `LLM_MODEL`. Borrado al remover Groq; ver
+  [../arquitectura.md](../arquitectura.md).
 - [../../src/pipeline/eval/README.md](../../src/pipeline/eval/README.md) — uso diario y
   diccionario de columnas.

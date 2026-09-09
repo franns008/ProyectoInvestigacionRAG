@@ -9,7 +9,7 @@ embeben una sola vez y se reutilizan en cada tabla; solo se re-chunkea el corpus
 splittable (guías INCIBE). Ver docs/data_splitting.md.
 
 Retrieval puro: arma el pipeline SIN LLM (build_rag_pipeline(include_llm=False)), así
-NO exige GROQ_API_KEY ni paga la latencia de generación. El chunking se juzga por
+NO carga el modelo de generación ni paga su latencia. El chunking se juzga por
 retrieval, que es lo que mueve; la generación (SAS) se evalúa aparte con run_eval.py.
 
 Ejecutar como container EFÍMERO que saltea el server de Open WebUI (aislamiento: no hace
@@ -202,7 +202,7 @@ def retrieval_only_question(pipeline, question: str):
 
 
 def run_eval_on_store(store, dataset: list[dict], valves) -> list[dict]:
-    # Retrieval puro: sin LLM (no exige GROQ_API_KEY ni paga latencia de generación).
+    # Retrieval puro: sin LLM (no carga el generador ni paga su latencia).
     # El chunking se juzga por recall@k (doc-id CWE) y source_recall (fuente de las guías).
     pipeline = rag.build_rag_pipeline(store, valves, include_llm=False)
     per_question: list[dict] = []

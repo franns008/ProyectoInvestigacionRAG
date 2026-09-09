@@ -13,7 +13,7 @@
 > [../src/pipeline/eval/](../../src/pipeline/eval/) y corre dentro del container `pipelines`.
 > Las tres fases (0–3) están operativas. Baseline inicial (27 preguntas, `top_k=3`, `temp=0`):
 > **recall@k=0.841, hit_rate=0.864, MRR=0.693** (Tier 1, n=22 con ground truth) y
-> **SAS=0.755** (Tier 2, n=14). Tier 3 (juez Groq) probado sobre subsets.
+> **SAS=0.755** (Tier 2, n=14). Tier 3 (juez LLM) probado sobre subsets.
 >
 > **Hallazgos del baseline:** las categorías débiles son `concepto_es` (recall 0.333) y
 > `multi_doc` (0.250) — la brecha es→en descrita en
@@ -59,11 +59,10 @@ tocaste, mirás la fila relevante y las demás como control de "no rompí nada".
 
 El pipeline hardcodea hostnames de la red interna de Docker —
 `vdb:5432` y `ollama:11434` ([pipeline_ciberseguridad.py](../../src/pipeline/pipeline_ciberseguridad.py#L65-L66))—
-y `GROQ_API_KEY` se inyecta desde `env/pipelines.env`. Desde el host esos nombres no resuelven
-y el secreto no está a mano.
+— que desde el host no resuelven.
 
-Decisión: **el harness se ejecuta con `docker compose exec pipelines …`**, donde `vdb`,
-`ollama` y `GROQ_API_KEY` ya resuelven. Como el compose monta `../src/pipeline/ →
+Decisión: **el harness se ejecuta con `docker compose exec pipelines …`**, donde `vdb` y
+`ollama` ya resuelven. Como el compose monta `../src/pipeline/ →
 /app/pipelines`
 ([docker-compose.yml](../../infrastructure/docker-compose.yml#L103-L108)), si el harness vive en
 `src/pipeline/eval/` aparece en `/app/pipelines/eval/` **sin rebuild ni copy**.
@@ -97,7 +96,9 @@ harness **no** dispara la carga pesada. El harness arma sus propias `Valves` (co
 
 ## Los tres tiers de métricas
 
-La clave para poder correrlo seguido sin morir en el rate limit de Groq es escalonar por costo.
+La clave para poder correrlo seguido sin que cada iteración cueste minutos es escalonar
+por costo. Con la generación local no hay cuotas que agotar, pero sí tiempo de cómputo: un
+juez LLM sobre el dataset completo es lento.
 
 ### Tier 1 — Retrieval (determinístico, gratis, segundos)
 
@@ -120,7 +121,7 @@ Métricas sobre los documentos que el `DocumentJoiner` pasó al prompt:
 
 Aprovecha que **ya corre Ollama con bge-m3 local y gratis**: se mide **SAS (Semantic Answer
 Similarity)** = coseno entre el embedding de la respuesta generada y el de la `reference_answer`
-del dataset. Captura regresiones de prompt/LLM **sin gastar una sola llamada a Groq de juez**.
+del dataset. Captura regresiones de prompt/LLM **sin una sola llamada al LLM juez**.
 
 > Se calcula con `OllamaTextEmbedder` directo (reusa bge-m3) en vez del `SASEvaluator` de
 > Haystack, para no descargar un modelo sentence-transformers nuevo.
@@ -130,16 +131,16 @@ Este es el **gate diario** para cambios de generación.
 ### Tier 3 — Juez LLM (caro, rate-limited, profundo)
 
 Faithfulness (¿la respuesta está fundada en los chunks recuperados?), answer relevancy y
-context relevance, usando **Groq como juez** reusando el `OpenAIGenerator` ya cableado
-([pipeline_ciberseguridad.py](../../src/pipeline/pipeline_ciberseguridad.py#L747-L757)).
+context relevance, usando el **LLM local como juez** (`OllamaChatGenerator` con structured
+output; ver `make_judge` en [run_eval_llm.py](../../src/pipeline/eval/run_eval_llm.py)).
 
 > **Recomendación:** usar los evaluators nativos de Haystack (`FaithfulnessEvaluator`,
-> `ContextRelevanceEvaluator`) en vez de agregar Ragas como dependencia — reusan el wiring de
-> Groq existente y evitan una capa extra. Ragas queda como alternativa si más adelante se
+> `ContextRelevanceEvaluator`) en vez de agregar Ragas como dependencia — reusan el wiring
+> existente y evitan una capa extra. Ragas queda como alternativa si más adelante se
 > quieren sus métricas específicas.
 
-Multiplica llamadas (varias por pregunta y métrica), así que con ~10 preguntas ya se rozan los
-429 de Groq. Se corre **a mano antes de un merge grande**, no en cada iteración.
+Multiplica llamadas (varias por pregunta y métrica), así que sobre el dataset completo se
+vuelve lento. Se corre **a mano antes de un merge grande**, no en cada iteración.
 
 **Regla operativa:** Tier 1 + 2 en cada cambio (gratis, ~segundos, 1 sola generación por
 pregunta). Tier 3 puntual.
@@ -237,7 +238,7 @@ De ese único resultado:
   retriever.
 - **Tier 2:** SAS entre `answer` y `reference_answer` (embeddings Ollama).
 
-Costo: **1 generación Groq por pregunta** (~30 calls) — trivial para el rate limit.
+Costo: **1 generación local por pregunta** (~30 calls).
 
 Salida: `results/<timestamp>.json` con métricas agregadas, **por categoría** y **por pregunta**,
 más el **delta contra `baseline.json`**. En consola, una tabla resumen y la lista de preguntas
@@ -245,7 +246,7 @@ que regresaron (para ver *cuál*, no solo el promedio).
 
 ### `run_eval_llm.py` — Tier 3 (manual)
 
-Recorre el dataset y aplica los evaluators de Haystack con Groq como juez (faithfulness, answer
+Recorre el dataset y aplica los evaluators de Haystack con el LLM local como juez (faithfulness, answer
 relevancy, context relevance). Salida análoga, en su propio archivo de resultados. Se corre a
 mano antes de un merge grande.
 
@@ -317,8 +318,8 @@ delta por categoría → decido si el cambio entra.
 
 ## ¿Cuándo se ejecuta? — decisión: manual, antes de mergear
 
-El harness **no es un test unitario**: necesita el stack docker levantado (pgvector poblado,
-Ollama, `GROQ_API_KEY`) y gasta llamadas a Groq. No corre en cada save.
+El harness **no es un test unitario**: necesita el stack docker levantado (pgvector poblado
+y Ollama con los modelos pulleados) y cuesta minutos de cómputo. No corre en cada save.
 
 **Decisión adoptada:** ejecución **manual, antes de mergear un cambio.** Se toca una pieza
 (retriever / chunking / prompt / LLM / valves), se corre `run_eval.py` a mano, se lee el delta
@@ -328,8 +329,9 @@ infra extra y da el grueso del valor ("cambio → script → delta").
 Descartado por ahora (se puede reconsiderar más adelante):
 - **Git hook `pre-push`:** el hook corre en el host pero el eval necesita el container arriba;
   frágil si el stack no está levantado. Quedaría como opcional no bloqueante para Tier 1+2.
-- **CI en cada PR:** levantar y **poblar** pgvector + Ollama en el runner es pesado, y Groq en
-  CI arriesga 429. Fuera de alcance por ahora; si algún día entra, solo Tier 1+2, nunca el juez.
+- **CI en cada PR:** levantar y **poblar** pgvector + Ollama en el runner es pesado, y correr
+  un LLM local en CI más todavía. Fuera de alcance por ahora; si algún día entra, solo
+  Tier 1+2, nunca el juez.
 
 > **Actualización (2026-08-18): ya existe la pieza que faltaba para automatizarlo.**
 > `report.py --strict` devuelve **exit 1 si hubo regresiones** y 0 si no (sin el flag
@@ -353,8 +355,9 @@ primero **reindexar el store**, después correr el eval. Si no, se estaría midi
 nuevo contra chunks viejos. Para cambios que no tocan la indexación (prompt, LLM, `top_k`, RRF,
 `build_keyword_query`) se corre directo.
 
-Por tier: **Tier 1 + 2** se corren juntos en cada evaluación (barato, ~1 call Groq/pregunta).
-**Tier 3** (juez LLM) se corre aparte y puntual, antes de un merge grande, por el riesgo de 429.
+Por tier: **Tier 1 + 2** se corren juntos en cada evaluación (barato, ~1 generación local por
+pregunta). **Tier 3** (juez LLM) se corre aparte y puntual, antes de un merge grande, porque
+multiplica generaciones y es lento.
 
 ## Fases de implementación — estado
 
@@ -366,7 +369,7 @@ Por tier: **Tier 1 + 2** se corren juntos en cada evaluación (barato, ~1 call G
 3. **Fase 2 — Tier 2 + reporte. ✅** SAS local (bge-m3 vía Ollama) + `report.py` con baseline y
    delta (global, por categoría y regresiones por pregunta). Loop "cambio → script → delta" cerrado.
 4. **Fase 3 — Tier 3. ✅** `run_eval_llm.py` con `FaithfulnessEvaluator` y
-   `ContextRelevanceEvaluator` de Haystack, usando Groq como juez en modo JSON. Manual, con `--limit`.
+   `ContextRelevanceEvaluator` de Haystack, usando el LLM local como juez en modo JSON. Manual, con `--limit`.
 
 Umbral de regresión de SAS: `SAS_REGRESSION_THRESHOLD = 0.05` en `report.py`. Se observó que las
 negativas tienen SAS algo ruidoso aun con `temp=0` (variación ~0.06 en la respuesta del LLM), así

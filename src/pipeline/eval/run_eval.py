@@ -11,7 +11,7 @@ el baseline, regresiones, evolución) vive en `report.py`, que lee esas tablas. 
 se invoca el reporte por cortesía, pero los datos se escriben ANTES de cualquier
 análisis: si el reporte falla, la corrida no se pierde.
 
-Ejecutar DENTRO del container `pipelines` (donde resuelven vdb/ollama/GROQ_API_KEY):
+Ejecutar DENTRO del container `pipelines` (donde resuelven los hosts `vdb` y `ollama`):
 
     docker compose exec pipelines python /app/pipelines/eval/run_eval.py
 
@@ -369,7 +369,7 @@ def run_row(run_id: str, valves, meta: dict, per_question: list[dict],
         "epoch":           meta["epoch"],
         "label":           label,
         **git_metadata(),
-        "llm_provider":    rag._llm_provider(),
+        "llm_provider":    "ollama",
         # Modelo EFECTIVO, no el default de los valves: ver csv_store.effective_llm_model.
         "llm_model":       csv_store.effective_llm_model(valves),
         "judge_model":     None,          # sólo suite=judge

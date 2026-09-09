@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Eval harness — Tier 3: juez LLM (MANUAL, rate-limited).
+"""Eval harness — Tier 3: juez LLM (MANUAL, lento).
 
-Mide la calidad de la RESPUESTA con evaluators nativos de Haystack usando Groq
-como juez (endpoint compatible con OpenAI, modo JSON):
+Mide la calidad de la RESPUESTA con evaluators nativos de Haystack usando el
+Ollama local como juez (structured output, ver `JSON_SCHEMAS`):
 
   - Faithfulness       : ¿las afirmaciones de la respuesta están fundadas en los
                          documentos recuperados? (anti-alucinación)
   - Context Relevance  : ¿los documentos recuperados son relevantes a la pregunta?
 
-Multiplica llamadas a Groq (varias por pregunta) → correr a mano y sobre subsets
-(--limit) para no comerse los 429. NO va en cada iteración ni en CI.
+Multiplica llamadas al LLM local (varias por pregunta) → correr a mano y sobre
+subsets (--limit) para no esperar de más. NO va en cada iteración ni en CI.
 
     scripts/eval_llm.sh --limit 8
 
@@ -37,7 +37,6 @@ sys.path.insert(0, str(EVAL_DIR.parent))
 import csv_store  # noqa: E402
 import pipeline_ciberseguridad as rag  # noqa: E402
 
-from haystack.components.generators.chat import OpenAIChatGenerator  # noqa: E402
 from haystack_integrations.components.generators.ollama import OllamaChatGenerator  # noqa: E402
 from haystack.components.evaluators import (  # noqa: E402
     FaithfulnessEvaluator,
@@ -102,8 +101,9 @@ def git_metadata() -> dict:
 # el "promedio" termina en cientos de miles. Ver bitácora, hallazgo 16.
 #
 # `boolean` y NO `integer` con `enum: [0,1]`: con el enum el modelo igual genera
-# `10`, Groq lo rechaza contra el esquema y devuelve 400. Con booleanos genera
-# `[true, false]` bien, y Haystack los promedia igual (True==1).
+# `10` y el backend lo rechaza contra el esquema (Groq devolvía 400 cuando el juez
+# corría por API). Con booleanos genera `[true, false]` bien, y Haystack los
+# promedia igual (True==1).
 SCHEMA_FAITHFULNESS = {
     "type": "array", "items": {"type": "boolean"},
 }
@@ -119,35 +119,33 @@ JSON_SCHEMAS = {
 
 
 def _response_format(nombre: str) -> dict:
+    """El JSON Schema que se le pasa a Ollama como `response_format`.
+
+    Ollama espera el schema **pelado** (`{"type": "object", ...}`), a diferencia del
+    envoltorio `{"type": "json_schema", "json_schema": {...}}` que pedía la API de
+    OpenAI/Groq cuando el juez corría por ahí.
+    """
     props = JSON_SCHEMAS[nombre]
-    return {"type": "json_schema", "json_schema": {
-        "name": nombre, "strict": True, "schema": {
-            "type": "object", "properties": props,
-            "required": list(props), "additionalProperties": False}}}
+    return {"type": "object", "properties": props,
+            "required": list(props), "additionalProperties": False}
 
 
 def make_judge(model: str, schema: str | None = None):
-    """Juez LLM determinístico y en modo JSON. Sigue LLM_PROVIDER (ver docs/modos_llm.md):
-    - ollama : OllamaChatGenerator local → Tier-3 corre sin key de Groq (modo GPU).
-    - groq   : OpenAIChatGenerator contra el endpoint OpenAI-compatible de Groq.
+    """Juez LLM determinístico y en modo JSON sobre el Ollama local.
 
     `schema` es la clave de JSON_SCHEMAS que corresponde al evaluador que va a usar
-    este juez. Sólo se aplica en el modo groq; el modo ollama sigue con `format:
-    json` a secas y **no está validado** contra el problema del hallazgo 16.
+    este juez, y va por `response_format` para forzar la FORMA de la salida, no sólo
+    que sea JSON válido: sin eso reaparece el hallazgo 16 (`statement_scores: [10]`
+    en vez de `[true, false]`, que dispara la métrica a cientos de miles).
+
+    Sin `schema` cae en `"json"` a secas, que garantiza sintaxis pero no forma.
     """
-    if rag._llm_provider() == "ollama":
-        return OllamaChatGenerator(
-            model=model,
-            url=rag.OLLAMA_URL,
-            timeout=120,
-            generation_kwargs={"format": "json", "temperature": 0},
-        )
-    formato = _response_format(schema) if schema else {"type": "json_object"}
-    return OpenAIChatGenerator(
-        api_key=rag.Secret.from_env_var("GROQ_API_KEY"),
-        api_base_url=rag.GROQ_BASE_URL,
+    return OllamaChatGenerator(
         model=model,
-        generation_kwargs={"response_format": formato, "seed": 42, "temperature": 0},
+        url=rag.OLLAMA_URL,
+        timeout=120,
+        response_format=_response_format(schema) if schema else "json",
+        generation_kwargs={"temperature": 0, "seed": 42},
     )
 
 
@@ -216,7 +214,7 @@ def run_row(run_id: str, valves, meta: dict, judge_model: str, dataset_n: int,
         "epoch":             meta["epoch"],
         "label":             label,
         **git_metadata(),
-        "llm_provider":      rag._llm_provider(),
+        "llm_provider":      "ollama",
         "llm_model":         csv_store.effective_llm_model(valves),
         "judge_model":       judge_model,
         "temperature":       0,
@@ -234,7 +232,7 @@ def run_row(run_id: str, valves, meta: dict, judge_model: str, dataset_n: int,
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Eval harness Tier 3 (juez LLM sobre Groq)")
+    ap = argparse.ArgumentParser(description="Eval harness Tier 3 (juez LLM local sobre Ollama)")
     ap.add_argument("--dataset", type=Path, default=EVAL_DIR / "dataset.yaml")
     ap.add_argument("--out", type=Path, default=EVAL_DIR / "results")
     ap.add_argument("--judge-model", type=str, default=None, help="modelo juez (default: el del pipeline)")
@@ -262,15 +260,9 @@ def main() -> None:
     valves = rag.Pipeline.Valves(temperature=0.0)
     pipeline = rag.build_rag_pipeline(store, valves)
 
-    # Modelo del juez: --judge-model gana; si no, el mismo que usa el generador activo.
-    # En modo ollama, valves.llm_model es un nombre de modelo Groq (no existe en Ollama),
-    # así que se resuelve con LLM_MODEL / DEFAULT_OLLAMA_LLM igual que build_generator.
-    if args.judge_model:
-        judge_model = args.judge_model
-    elif rag._llm_provider() == "ollama":
-        judge_model = os.getenv("LLM_MODEL") or rag.DEFAULT_OLLAMA_LLM
-    else:
-        judge_model = os.getenv("LLM_MODEL") or valves.llm_model
+    # Modelo del juez: --judge-model gana; si no, el mismo que usa el generador,
+    # resuelto con la misma precedencia que build_generator (LLM_MODEL > valve).
+    judge_model = args.judge_model or os.getenv("LLM_MODEL") or valves.llm_model
 
     print(f"Tier 3 — run_id={run_id} epoch={meta['epoch']}  |  juez={judge_model}  "
           f"|  {len(dataset)} preguntas\n")

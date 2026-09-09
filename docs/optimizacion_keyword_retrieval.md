@@ -51,8 +51,8 @@ Preprocesado por reglas antes del keyword retriever:
 **Contras:** frágil con sinónimos y lenguaje natural ("dejar credenciales en el código" no
 llega a "CWE-798 Hardcoded Credentials"); mantener listas de stopwords; no capta intención.
 
-### Opción B — Preprocesado con una llamada al LLM (Groq)
-Una primera llamada barata (modelo chico, ej. `llama-3.1-8b-instant`) que reciba el
+### Opción B — Preprocesado con una llamada al LLM
+Una primera llamada barata (un modelo chico de Ollama, distinto del de generación) que reciba el
 `user_message` y devuelva JSON estructurado, p. ej.:
 ```json
 { "intent": "explicar_y_prevenir",
@@ -65,9 +65,9 @@ van por el fast-path exacto.
 
 **Pros:** entiende intención y sinónimos, traduce español→inglés (clave, porque los CWE están
 en inglés), robusto ante frases largas; unifica extracción de IDs + keyphrases.
-**Contras:** +1 llamada por query (latencia +~300-800 ms y costo/quota de Groq — ya vimos 429s
-que motivaron `max_retries=5`); no determinístico; puede alucinar IDs (hay que validar contra
-el store).
+**Contras:** +1 llamada por query, que con generación local se paga íntegra en latencia
+(bastante más que los ~300-800 ms de una API rápida, sobre todo sin GPU); no determinístico;
+puede alucinar IDs (hay que validar contra el store).
 
 ### Opción C — Híbrido (recomendada como default a evaluar)
 - **Fast-path estático** siempre: regex de `CWE-\d+`/`CVE-…` → si hay IDs, keyword retriever
@@ -88,13 +88,18 @@ el store).
 | Robustez ante lenguaje natural / sinónimos | alto | ✗ | ✓ | ✓ |
 | Traducción es→en (docs CWE en inglés) | alto | ✗ | ✓ | ✓ |
 | Latencia | medio | ✓✓ | ✗ | ~ |
-| Costo / quota Groq (riesgo 429) | medio | ✓✓ | ✗ | ~ |
+| Costo de cómputo local por query | medio | ✓✓ | ✗ | ~ |
 | Determinismo / testeabilidad | medio | ✓✓ | ✗ | ~ |
 
 **Recomendación:** empezar por **A** para el fast-path de IDs (resuelve ya el caso más
 sangrante con costo cero) y evaluar sumar **B** solo para queries sin ID — es decir, converger
-a **C**. Decisión final pendiente de: (a) tolerancia de latencia del equipo, (b) presupuesto de
-llamadas a Groq, (c) cuánto pesa el retrieval por concepto en español vs por ID.
+a **C**. Decisión final pendiente de: (a) tolerancia de latencia del equipo, (b) cuánto pesa el
+retrieval por concepto en español vs por ID.
+
+> **Nota (2026-09, generación 100% local).** Cuando se escribió esto, la llamada extra de la
+> opción B iba a una API rápida. Ahora se pagaría en cómputo propio, sumada a la generación
+> que ya corre local: el argumento **refuerza** la recomendación de A/C en vez de debilitarla.
+> La decisión de fondo no cambia; lo que cambia es que B es más cara que antes, no menos.
 
 ## Nota técnica: además del preprocesado
 

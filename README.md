@@ -15,17 +15,16 @@ docker compose run
 ```
 And a bit of luck.
 
-## Dos modos de generación (API Key ↔ Ollama local) — CRUCIAL
+## Generación local en Ollama
 
-La generación del RAG se puede levantar de dos maneras según tu hardware, eligiendo
-con la variable `LLM_PROVIDER` en `infrastructure/.env`:
+Todo el RAG corre local: los **embeddings** (`qwen3-embedding:4b`) y la **generación**
+salen del mismo Ollama del compose. No hace falta ninguna API Key.
 
-- **`groq`** (default): generación por **API Key** (Groq). Corre en cualquier máquina (CPU).
-- **`ollama`**: generación **local** en Ollama, orientada a **GPU Nvidia**. Sin API Key.
+El modelo de generación se elige con `LLM_MODEL` en `infrastructure/.env` (vacío = el
+default del pipeline, `qwen2.5:3b-instruct`) y tiene que estar `ollama pull`-eado.
+Anda en CPU; con GPU Nvidia va bastante más rápido.
 
-Los embeddings (`bge-m3`) son siempre locales y no cambian entre modos.
-
-👉 **Guía completa e instrucciones de uso: [`docs/modos_llm.md`](docs/modos_llm.md)** (doc crucial).
+👉 **Guía completa e instrucciones de uso: [`docs/arquitectura.md`](docs/arquitectura.md)** (doc crucial).
 
 ## Escaneo de dependencias vulnerables
 

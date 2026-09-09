@@ -258,20 +258,14 @@ def load_questions(path: Path) -> "pd.DataFrame":
 def effective_llm_model(valves) -> str:
     """El modelo de generación que REALMENTE se usó, no el default de los valves.
 
-    `valves.llm_model` es el default de Groq y queda igual aunque se corra con
-    `LLM_PROVIDER=ollama`: sin esto, una corrida local se registra como si hubiera
-    sido por Groq y queda incomparable para siempre. La resolución replica la de
-    `build_generator()` en el pipeline.
+    `LLM_MODEL` le gana al valve, igual que en `build_generator()`: si no replicara
+    esa precedencia, una corrida hecha con otro modelo quedaría registrada bajo el
+    default y sería incomparable para siempre.
 
     La usan los dos runners (`run_eval.py` y `run_eval_llm.py`) para que registren
     lo mismo.
     """
-    import pipeline_ciberseguridad as rag  # lazy: csv_store se importa solo en tests
-
-    modelo_env = os.getenv("LLM_MODEL")
-    if rag._llm_provider() == "ollama":
-        return modelo_env or rag.DEFAULT_OLLAMA_LLM
-    return modelo_env or valves.llm_model
+    return os.getenv("LLM_MODEL") or valves.llm_model
 
 
 def load_meta(path: Path) -> dict:

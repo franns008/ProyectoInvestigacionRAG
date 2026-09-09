@@ -19,9 +19,12 @@ schema_version: 1
 # (2560 dims): un delta contra él restaría números medidos en dos espacios vectoriales
 # distintos. Esa fila sigue en runs.csv como referencia histórica.
 #
-# Sigue PROVISORIO en un solo eje: `sas_mean` está atado a openai/gpt-oss-120b, que el
-# equipo todavía no confirmó como modelo oficial (meta-llama/llama-4-scout, el default
-# hardcodeado, ya no existe en Groq). Retrieval no depende del LLM y es firme.
+# Sigue PROVISORIO en un solo eje: `sas_mean` está atado a openai/gpt-oss-120b, que se
+# corría por Groq. Desde 2026-09-06 el repo es Ollama-only (Groq removido), así que ese
+# número ya NO es reproducible: la próxima corrida de Tier 2 va a dar distinto por
+# cambio de generador, no por regresión. Hay que re-basear `sas_mean` con el modelo local
+# que el equipo adopte. Retrieval no depende del LLM y sigue firme: esas métricas del
+# baseline se comparan sin problema.
 baseline_run_id: 20260827T160439Z
 
 # Epoch vigente: nombre del período de topología actual. Se estampa en cada corrida.

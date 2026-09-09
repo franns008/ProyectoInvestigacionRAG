@@ -1,16 +1,14 @@
 # CLAUDE.md
 
 Guía rápida del repo para asistentes y contribuidores. RAG de ciberseguridad sobre
-**Haystack** + **OpenWebUI Pipelines** + **pgvector**. Embeddings locales (`bge-m3`
-en Ollama); generación intercambiable (Groq API o Ollama local).
+**Haystack** + **OpenWebUI Pipelines** + **pgvector**. Todo local sobre Ollama:
+embeddings (`qwen3-embedding:4b`) y generación.
 
 ## Documentación crucial (leer primero)
 
-- **[`docs/modos_llm.md`](docs/modos_llm.md) — CRUCIAL.** Cómo el repo levanta la
-  generación en dos modos (API Key Groq ↔ Ollama local/Nvidia) con una sola variable
-  `LLM_PROVIDER`. Leer antes de tocar la generación, el arranque de la infra o el eval.
-- [`docs/arquitectura_groq.md`](docs/arquitectura_groq.md) — arquitectura general y
-  ejecución (CPU por defecto / GPU Nvidia opcional).
+- **[`docs/arquitectura.md`](docs/arquitectura.md) — CRUCIAL.** Arquitectura general,
+  puesta en marcha y ejecución (CPU por defecto / GPU Nvidia opcional). Leer antes de
+  tocar la generación, el arranque de la infra o el eval.
 - [`docs/eval/`](docs/eval/) — todo sobre el harness de evaluación:
   [`eval_harness.md`](docs/eval/eval_harness.md) (diseño vigente, Tiers 1-3) y
   [`mejoras_harness.md`](docs/eval/mejoras_harness.md) (plan de mejoras priorizado, propuesto).
@@ -31,7 +29,7 @@ en Ollama); generación intercambiable (Groq API o Ollama local).
 ## Mapa rápido
 
 - `src/pipeline/pipeline_ciberseguridad.py` — el RAG (pipeline OpenWebUI). La
-  generación la arma `build_generator(valves)` según `LLM_PROVIDER`.
+  generación la arma `build_generator(valves)` sobre el Ollama local.
 - `src/pipeline/eval/` — harness de evaluación (corre dentro del container `pipelines`).
 - `src/pipeline/deps/` — escaneo de dependencias (resolver + priorización + CLI). Lógica
   pura: no importa Haystack ni toca la base. Se testea con `pytest` sin levantar nada.

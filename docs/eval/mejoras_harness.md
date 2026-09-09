@@ -1,5 +1,10 @@
 # Plan de mejoras del harness de evaluación
 
+> **Nota (2026-09-06): Groq fue removido del repo.** La generación es ahora exclusivamente
+> local sobre Ollama. Las mediciones citadas más abajo se tomaron con Groq como generador
+> y **se dejan tal cual** (son el registro de lo que se midió); las propuestas siguen
+> vigentes, pero hay que leerlas contra un pipeline sin proveedor externo.
+
 > **Estado (2026-07-16): PROPUESTO — no implementado.** Documenta los refactors
 > priorizados sobre el harness actual ([eval_harness.md](eval_harness.md) es el diseño
 > vigente). Cada inciso arranca con **el problema** que resuelve, después el paso a paso.
@@ -14,9 +19,14 @@ Los grupos están ordenados por retorno/costo. Ver el [orden de implementación]
 
 ## Refactor compartido (habilitante)
 
-**Problema:** la extracción de tokens (normalización Groq vs. Ollama) vive embebida dentro
+**Problema:** la extracción de tokens vive embebida dentro
 de `pipe()` ([pipeline_ciberseguridad.py:658-670](../../src/pipeline/pipeline_ciberseguridad.py#L658-L670)),
 así que el eval no puede reusarla y tendría que duplicarla para H9.
+
+> Al remover Groq esto se simplifica: `_log_token_usage` todavía tiene dos ramas — la de
+> `meta["usage"]` (formato OpenAI/Groq) y la de `prompt_eval_count`/`eval_count` (formato
+> Ollama). Con generación 100% local la primera quedó **sin uso**, así que la función a
+> extraer sólo necesita la segunda.
 
 **Paso a paso:**
 1. Extraer a una función módulo-level `extract_usage(reply_meta) -> {prompt, completion, total}`.
