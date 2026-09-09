@@ -55,3 +55,5 @@ src/pipeline/eval/results/*
 
 # NVD
 data/raw/nvdsrc/pipeline/logCiberseguridad.txt
+infrastructure/.env.bak.*
+.env.bak.*

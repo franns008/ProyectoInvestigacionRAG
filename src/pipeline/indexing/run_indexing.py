@@ -44,7 +44,9 @@ CONVERTED_DIR       = INPUT_DIR / "_converted_md"
 # Variables de chunking y embedding (antes vivían en los Valves del pipeline)
 SPLIT_LENGTH        = 200
 SPLIT_OVERLAP       = 20
-EMBEDDING_MODEL     = "qwen3-embedding:4b"
+# Overrideable por env para máquinas con poca VRAM, que usan una variante derivada
+# (mismos pesos, distinto num_ctx/num_gpu). Ver infrastructure/docker-compose.nvidia-3gb.yml.
+EMBEDDING_MODEL     = os.getenv("EMBEDDING_MODEL", "qwen3-embedding:4b")
 EMBED_BATCH_SIZE    = 64
 # Requests concurrentes a Ollama. Debe ser <= OLLAMA_NUM_PARALLEL (infrastructure/env/ollama.env)
 # para que efectivamente se procesen en paralelo y no se encolen del lado del servidor.
