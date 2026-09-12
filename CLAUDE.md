@@ -40,7 +40,9 @@ embeddings (`qwen3-embedding:4b`) y generación.
 - `extension/` — extensión de VSCode que muestra el escaneo. Cliente del `deps.cli` hoy,
   del pipeline RAG cuando exista (`src/scan/types.ts` es el contrato compartido).
 - `infrastructure/` — stack Docker Compose. `docker-compose.yml` (base, CPU) +
-  `docker-compose.nvidia.yml` (overlay GPU). Config en `.env` (plantilla `.env.example`).
+  `docker-compose.nvidia.yml` (overlay GPU NVIDIA, vía CUDA) +
+  `docker-compose.amd.yml` (overlay GPU AMD, vía Vulkan; sólo acelera Ollama).
+  Config en `.env` (plantilla `.env.example`).
 
 ## Convenciones
 

@@ -1,0 +1,35 @@
+# Override para máquinas con GPU AMD sin ROCm (p. ej. RX 570 / Polaris, gfx803) vía Vulkan.
+# Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.amd.yml up -d --build
+# Requiere Mesa con RADV en el host: `vulkaninfo --summary | grep deviceName` debe listar
+# la placa. El compose base (docker-compose.yml) corre todo en CPU y no necesita esto.
+#
+# A diferencia del override NVIDIA, este NO toca `pipelines`: torch no tiene backend
+# Vulkan y ROCm no soporta gfx803, así que el reranker sigue en CPU y no hace falta
+# rebuildear la imagen. Sólo se acelera Ollama (generación + embeddings).
+services:
+    ollama:
+        # Vulkan sobre RADV sólo necesita el nodo de render. /dev/kfd es para ROCm/HSA
+        # (la doc de Ollama lo pasa porque documenta ese caso); acá no aplica.
+        devices:
+            - /dev/dri:/dev/dri
+        # GIDs NUMÉRICOS a propósito: con nombres, Docker los busca en el /etc/group
+        # del *container*, y la imagen de Ollama no tiene un grupo `render`
+        # ("unable to find group render"). Los números no necesitan esa búsqueda.
+        # Los defaults son los de Fedora; en otras distros cambian (Debian/Ubuntu
+        # suele usar video=44). Averiguá los tuyos con `getent group render video`
+        # y overrideálos en el .env si no coinciden.
+        group_add:
+            - "${RENDER_GID:-105}"
+            - "${VIDEO_GID:-39}"
+        # `environment` le gana a `env_file`, así que esto pisa a env/ollama.env sin
+        # tocar ese archivo (que sigue sirviendo al resto del grupo).
+        environment:
+            # Redundante en Ollama >= 0.12.11 (Vulkan se activa solo al ver los devices),
+            # explícito como documentación y por si la imagen :latest quedara atrás.
+            OLLAMA_VULKAN: "1"
+            # env/ollama.env asume 12 GB de VRAM: KEEP_ALIVE=-1 (nunca descargar) y
+            # NUM_PARALLEL=2. Con 4 GB no entran embeddings y generación a la vez, así
+            # que Ollama tiene que poder descargar uno para cargar el otro.
+            OLLAMA_KEEP_ALIVE: "5m"
+            OLLAMA_NUM_PARALLEL: "1"

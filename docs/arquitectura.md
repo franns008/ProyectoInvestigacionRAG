@@ -205,6 +205,9 @@ cd infrastructure
 
    # NVIDIA (requiere nvidia-container-toolkit en el host):
    docker compose -f docker-compose.yml -f docker-compose.nvidia.yml up -d --build
+
+   # AMD sin ROCm, vía Vulkan (requiere Mesa/RADV en el host):
+   docker compose -f docker-compose.yml -f docker-compose.amd.yml up -d --build
    ```
 
 3. **Descargar los modelos** en Ollama (una sola vez): embeddings **y** el LLM de
@@ -248,18 +251,37 @@ cd infrastructure
 - **El pipeline aparece en `failed/`** → OpenWebUI no pudo cargar el `.py` (suele ser
   una versión de dependencia). Ver el hallazgo 17 de
   [`eval/bitacora_refactor_csv.md`](eval/bitacora_refactor_csv.md).
-- **Generación muy lenta** → estás en CPU (sin el overlay `docker-compose.nvidia.yml`)
-  o el modelo no entra en VRAM; probá uno más chico vía `LLM_MODEL`.
+- **Generación muy lenta** → estás en CPU (sin el overlay de GPU que corresponda a tu
+  placa) o el modelo no entra en VRAM; probá uno más chico vía `LLM_MODEL`.
+- **`vulkaninfo` no lista tu placa AMD en el host** → falta el driver Vulkan de Mesa
+  (`mesa-vulkan-drivers`). Ojo: `vulkaninfo --summary | grep -A3 GPU0` **no** alcanza
+  para verificar, corta antes de `deviceName`; usá
+  `vulkaninfo --summary | grep -E 'deviceName|driverName'`. Los warnings del loader
+  sobre `libvulkan_dzn.so` son ruido esperado (ICD Dozen, no aplica en Linux).
+- **Levantaste con el overlay AMD y Ollama sigue en CPU** → revisá
+  `docker compose logs ollama | grep -i vulkan`. Si no hay mención de Vulkan, la imagen
+  `ollama/ollama` es anterior a 0.12.11 (`docker compose exec ollama ollama --version`);
+  si la hay pero no encuentra device, faltan los `/dev/dri` en el container.
+- **`VK_ERROR_DEVICE_LOST` con una GPU Polaris** → bug conocido del backend Vulkan en
+  gfx803. El fallback es correr sin el overlay (CPU).
+- **Levantaste un solo servicio y perdiste la GPU** → `docker compose up -d pipelines`
+  arrastra `ollama` por `depends_on` y lo recrea **sin** el overlay. Restaurarlo
+  pasando los dos `-f` y apuntando sólo a `ollama`. Ver el detalle en
+  [`eval/epoch_qwen3_reranker_v1.md`](eval/epoch_qwen3_reranker_v1.md).
 
 ## 8. Ejecución en CPU vs GPU
 
 El grupo tiene hardware mixto (AMD y NVIDIA), por lo que el compose base corre
-**todo en CPU** (funciona en cualquier máquina) y la GPU NVIDIA es un override opcional.
+**todo en CPU** (funciona en cualquier máquina) y cada familia de GPU tiene su override
+opcional: `docker-compose.nvidia.yml` (§8.1) y `docker-compose.amd.yml` (§8.2).
 
 - El `Dockerfile.pipelines` usa `ARG TORCH_INDEX_URL` (default CPU; el override
   NVIDIA pasa la build CUDA `cu126`).
 - Ahora que la generación también es local, la GPU pesa **más** que antes: acelera
   embeddings, reranker, conversión de PDFs **y** generación.
+- Los dos overrides **no** cubren lo mismo: el de NVIDIA acelera todo lo anterior,
+  mientras que el de AMD acelera **sólo Ollama** (generación y embeddings). El motivo
+  está en §8.2.
 
 ### 8.1 El override `docker-compose.nvidia.yml`
 
@@ -272,6 +294,10 @@ algunos integrantes tienen GPU **AMD** (que no usa CUDA) y otros **NVIDIA**. Si 
 compose exigiera GPU NVIDIA de forma fija, no arrancaría en las máquinas AMD ni en
 las que no tienen `nvidia-container-toolkit`. La solución es separar
 responsabilidades:
+
+> Las máquinas AMD ya no están condenadas a CPU: desde que Ollama trae el backend
+> **Vulkan**, tienen su propio override (§8.2). Pero la separación base/override sigue
+> siendo necesaria por la misma razón de siempre.
 
 - **`docker-compose.yml` (base):** corre **todo en CPU**, sin reservas de GPU.
   Funciona en cualquier máquina del grupo sin instalar nada extra.
@@ -292,11 +318,84 @@ superpone lo del override. Si se omite el segundo `-f`, se corre en CPU. Requisi
 para la variante NVIDIA: tener instalado el **nvidia-container-toolkit** en el host;
 si falla con `could not select device driver "nvidia"`, es que falta ese paquete.
 
+### 8.2 El override `docker-compose.amd.yml`
+
+**Para qué sirve:** acelerar **Ollama** (generación y embeddings) en placas AMD, incluidas
+las que ROCm ya no soporta. Se probó en una **Radeon RX 570** (Polaris10 / gfx803, 4 GB).
+
+**Por qué Vulkan y no ROCm:** ROCm cubre oficialmente RDNA1 (RX 5000) en adelante, así que
+Polaris queda afuera; los workarounds tipo `HSA_OVERRIDE_GFX_VERSION` no sirven porque el
+silicio no tiene los bloques que esos binarios esperan. **Vulkan** sí: el driver **RADV**
+de Mesa soporta GCN/Polaris desde hace años, y desde **Ollama 0.12.11** el backend Vulkan
+viene **incluido en la imagen oficial `ollama/ollama`** y se activa solo cuando el
+container ve los devices de GPU. No hace falta una imagen alternativa ni un fork.
+
+**Qué agrega el override** (sólo al servicio `ollama`):
+
+1. `devices: /dev/dri:/dev/dri` → el container ve el nodo de render. **No** se pasa
+   `/dev/kfd`: ese device es para ROCm/HSA, no para Vulkan.
+2. `group_add` con los GIDs de `render` y `video` → permisos sobre esos nodos en hosts
+   donde no son 666. Van como **números**, no como nombres: con nombres Docker los busca
+   en el `/etc/group` del *container*, y la imagen de Ollama no tiene grupo `render`
+   (falla con `unable to find group render`). Los defaults son los de Fedora
+   (render=105, video=39); si tu distro usa otros (`getent group render video`),
+   overrideálos con `RENDER_GID` / `VIDEO_GID` en el `.env`.
+3. `OLLAMA_VULKAN: "1"` → explícito (redundante en ≥ 0.12.11, pero documenta la intención).
+4. `OLLAMA_KEEP_ALIVE: "5m"` y `OLLAMA_NUM_PARALLEL: "1"` → ver "presupuesto de VRAM".
+
+**Qué NO toca (y por qué):** a diferencia del override NVIDIA, **no toca `pipelines`**, no
+usa build-args y **no requiere rebuildear la imagen**. El reranker cross-encoder corre con
+torch, y torch no tiene backend Vulkan; ROCm tampoco es opción en gfx803. Así que el
+reranker y la conversión de PDFs con marker siguen en **CPU**. Es una limitación real, no
+un olvido.
+
+**Presupuesto de VRAM (4 GB):** `qwen3-embedding:4b` pesa ~2.5 GB y el LLM de generación
+por defecto (`qwen2.5:3b-instruct`) ~1.9 GB: **no entran juntos**. Se decidió no cambiar el
+modelo de embeddings —`EMBEDDING_DIMENSION = 2560` está fijo en el pipeline y en la
+indexación, y cambiarlo obligaría a recrear la tabla de pgvector y **reindexar todo el
+corpus**, rompiendo compatibilidad con la base del resto del grupo. La alternativa elegida
+es dejar que Ollama **descargue un modelo para cargar el otro**, a costa de unos segundos
+de recarga por consulta. Para que eso sea posible, el override pisa dos valores de
+`env/ollama.env` que están calculados para 12 GB de VRAM: `OLLAMA_KEEP_ALIVE=-1` (que
+significa "no descargar nunca") y `OLLAMA_NUM_PARALLEL=2`. Como en Compose `environment`
+le gana a `env_file`, no hace falta tocar ese archivo compartido.
+
+**Rendimiento medido** (RX 570 4 GB + i3-10100F, Ollama 0.34, Vulkan/RADV). Ollama reporta
+`total=4.0 GiB available=3.2 GiB`: el resto se lo lleva el escritorio, porque el i3-10100**F**
+no tiene iGPU y la misma placa maneja el display.
+
+| | VRAM en runtime | Reparto | Medición |
+|---|---|---|---|
+| `qwen2.5:3b-instruct` (generación) | 2.2 GB | **100% GPU** | 54-63 tok/s |
+| `qwen3-embedding:4b` (embeddings) | 6.7 GB | 48%/52% CPU/GPU | 0,33 s por chunk en lote |
+
+Dos cosas que sorprenden y conviene tener presentes:
+
+- **El embedder no entra en 4 GB.** Pesa 2.5 GB en disco pero pide **6.7 GB** en runtime:
+  la diferencia son los buffers de cómputo, que escalan con el contexto. Bajándole
+  `num_ctx` a 512 baja a 2.9 GB y 80% GPU, pero sigue sin entrar del todo. **No** se
+  arregla con `OLLAMA_CONTEXT_LENGTH`, que es global y le recortaría el contexto al LLM
+  de generación (que necesita ~1600 tokens: 4 chunks + pregunta + 512 de respuesta).
+  Se convive con el split; en la práctica no duele, por lo que sigue.
+- **Embeber de a uno vs en lote cambia todo**: 1,95 s por chunk suelto contra 0,33 s en
+  lotes de 32. La indexación ya usa lotes (`EMBED_BATCH_SIZE=64` en `run_indexing.py`),
+  así que el número que importa es el segundo. En consulta se embebe un solo texto corto:
+  **0,13 s**, irrelevante.
+
+**Costo del swap:** ~4,7 s cada vez que Ollama tiene que descargar un modelo para cargar el
+otro. Se paga una vez por consulta si venís de indexar, y no se paga en consultas seguidas.
+
+**Requisito del host:** Mesa con RADV. Verificar con
+`vulkaninfo --summary | grep -E 'deviceName|driverName'` (ver §7.3 para los falsos
+positivos). Si el modelo elegido no entra en VRAM, `ollama ps` lo muestra como split
+`x%/y%` CPU/GPU: la palanca sin tocar código es `LLM_MODEL` en el `.env` con uno más chico.
+
 ## 9. Resumen de decisiones de arquitectura
 
 - **Todo local sobre Ollama:** sin dependencia de APIs externas, sin claves, sin
   cuotas ni rate limits. El costo se paga en latencia y hardware.
 - **Recuperación híbrida (vector + keyword + IDs) con RRF y reranking:** mejor
   cobertura que sólo búsqueda semántica.
-- **CPU por defecto:** portabilidad sobre todo el grupo; GPU como optimización.
+- **CPU por defecto:** portabilidad sobre todo el grupo; GPU como optimización, con un
+  override por familia de placa (NVIDIA vía CUDA, AMD vía Vulkan).
 - **Caché de conversión marker-pdf:** evita el costo alto de OCR/layout en CPU.

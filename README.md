@@ -22,7 +22,8 @@ salen del mismo Ollama del compose. No hace falta ninguna API Key.
 
 El modelo de generación se elige con `LLM_MODEL` en `infrastructure/.env` (vacío = el
 default del pipeline, `qwen2.5:3b-instruct`) y tiene que estar `ollama pull`-eado.
-Anda en CPU; con GPU Nvidia va bastante más rápido.
+Anda en CPU; con GPU va bastante más rápido, y hay un overlay de Compose por familia de
+placa (NVIDIA vía CUDA, AMD vía Vulkan). Ver `docs/arquitectura.md` §8.
 
 👉 **Guía completa e instrucciones de uso: [`docs/arquitectura.md`](docs/arquitectura.md)** (doc crucial).
 
