@@ -13,12 +13,18 @@ actualización incremental y librerías recomendadas. Exploit-DB (Capa 3) queda 
 este documento porque no es una fuente "estructurada" en el mismo sentido (mezcla código
 y prosa) — se investigará por separado si hace falta.
 
-Nota sobre lo ya presente en el repo: los XML en `infrastructure/appdata/rawdata/`
+> **Estado (2026-09-11):** los fetchers de NVD, CWE, EPSS, KEV y OSV ya están
+> implementados — ver [`ingestion_fetchers.md`](ingestion_fetchers.md). Queda pendiente
+> sólo ATT&CK. Lo de abajo es la investigación que los fundamenta.
+
+Nota sobre lo ya presente en el repo: los XML en `data/raw/`
 (`CrossSection.xml`, `CWEtop25.xml`, `OWASPTopTenRC2025.xml`, `WeaknessBaseElements.xml`,
 `WrittenInJava.xml`) son **vistas parciales de CWE** (CWE-884, CWE-1435, CWE-1450, CWE-677,
-CWE-660) descargadas manualmente, no el catálogo completo. Sirven para explorar la
-estructura del XML pero no reemplazan la descarga programática del catálogo completo
-(ver sección CWE).
+CWE-660) descargadas manualmente, no el catálogo completo: cubren 710 de las 969
+weaknesses. Sirven para explorar la estructura del XML pero no reemplazan la descarga
+programática del catálogo completo (ver sección CWE). Quedaron redundantes una vez que
+`fetch_cwe.py` trae el catálogo entero; no molestan porque la indexación deduplica por
+CWE-ID, pero se pueden podar.
 
 ---
 
@@ -75,14 +81,18 @@ GitHub versionado como colecciones STIX 2.1).
   `https://cwe.mitre.org/data/xml/cwec_latest.xml.zip` (o versión fija, ej.
   `cwec_v4.20.xml.zip`, en `https://cwe.mitre.org/data/downloads.html`). Esto es el
   catálogo completo — no confundir con las "views" (como las 5 que ya están en
-  `infrastructure/appdata/rawdata/`), que son subconjuntos temáticos (Top 25, OWASP Top
+  `data/raw/`), que son subconjuntos temáticos (Top 25, OWASP Top
   Ten, etc.) pensados para consulta puntual, no para poblar la base completa.
+  El zip trae un único XML con nombre versionado (`cwec_v4.20.xml`), 2 MB comprimido y
+  18 MB crudo. **Implementado en `src/ingestion/fetch_cwe.py`.**
 - **REST API (para consultas puntuales / relaciones jerárquicas):**
-  root en `https://cwe-api.mitre.org/api/v1/`, sin auth. Expone `weakness/{id}`,
-  `category/{id}`, `view/{id}`, y los endpoints `children` / `parents` / `descendants` /
-  `ancestors` para navegar la jerarquía padre-hijo que pide `data_transform_spec.md`
-  (relaciones `parent_ids[]`). Devuelve `[]` con 200 si no hay relaciones, y 404 si el ID
-  no existe.
+  root en `https://cwe-api.mitre.org/api/v1/`, sin auth. Expone `cwe/weakness/{id}`,
+  `cwe/category/{id}`, `cwe/view/{id}`, y los endpoints `children` / `parents` /
+  `descendants` / `ancestors` para navegar la jerarquía padre-hijo que pide
+  `data_transform_spec.md` (relaciones `parent_ids[]`). Devuelve `[]` con 200 si no hay
+  relaciones, y 404 si el ID no existe.
+  **No sirve para bulk:** el endpoint no documentado `cwe/weakness/all` responde 200 con
+  el JSON truncado (corta a los ~10 MB), así que la carga masiva va sí o sí por el zip.
 - Formato: XML (descarga completa) o JSON (API). Ambos representan el mismo esquema
   (`cwe_schema_v7.3.xsd`), por lo que el parser XML que se escriba para el bulk sirve como
   referencia de campos para el JSON de la API.
@@ -127,6 +137,20 @@ diario (ideal para carga masiva/batch).
   cron fijo tipo "todos los días a las X"); alcanza con polling diario y comparar
   `catalogVersion`/`dateReleased` contra el último snapshot guardado para detectar cambios.
 
+6) OSV
+------
+**Método de acceso:** dump estático por ecosistema (no estaba en el alcance original de
+esta investigación; entró después con el escaneo de dependencias).
+
+- Dump de PyPI: `https://storage.googleapis.com/osv-vulnerabilities/PyPI/all.zip`
+  (34 MB, un JSON por advisory adentro). La lista de ecosistemas está en
+  `https://osv-vulnerabilities.storage.googleapis.com/ecosystems.txt`.
+- Auth: ninguna.
+- **Actualización:** diaria. OSV publica un `modified_id.csv` que permitiría bajar sólo lo
+  que cambió; hoy se rebaja el zip entero porque tarda segundos.
+- Es la única fuente **obligatoria** del escaneo de dependencias: aporta los rangos de
+  versión afectados, que es lo que NVD no da de forma utilizable por paquete.
+
 ---
 
 Tabla comparativa
@@ -139,6 +163,7 @@ Tabla comparativa
 | CWE | Descarga XML completa + REST API | No | No documentado | XML / JSON | por versión (hoy 4.20) |
 | EPSS | API REST + CSV diario | No | No documentado | JSON / CSV | diaria |
 | CISA KEV | Archivo estático JSON/CSV | No | N/A | JSON / CSV | días hábiles, sin cadencia fija |
+| OSV | Dump estático por ecosistema | No | N/A | ZIP de JSONs | diaria |
 
 Consideraciones transversales
 ------------------------------
@@ -159,16 +184,19 @@ Consideraciones transversales
   `data_transform_spec.md`: cada CVE, técnica ATT&CK o CWE debe indexarse como una unidad
   con metadata filtrable, no partirse en fragmentos de tamaño fijo.
 
-Próximos pasos (no implementados todavía)
-------------------------------------------
+Próximos pasos
+---------------
+Hecho:
 - Pedir la API key de NVD.
-- Definir en qué carpeta viven los parsers (`src/ingestion/` ya existe vacía en el repo —
-  encaja con el `Folder ingest/` que pide `data_transform_spec.md`).
+- Los parsers/fetchers viven en `src/ingestion/`, un archivo por fuente
+  (`fetch_<fuente>.py`) más el orquestador `fetch_all.py`. Sólo descargan y guardan el
+  raw, sin tocar la transformación — ver [`ingestion_fetchers.md`](ingestion_fetchers.md).
+
+Pendiente:
+- El fetcher de ATT&CK (es el único que falta; todavía no lo consume nada en el repo).
 - Decidir el mecanismo de scheduling (cron simple vs. Airflow/Prefect) — el plan de
   trabajo no lo fija todavía.
-- Escribir un fetcher mínimo por fuente (NVD, EPSS, KEV, ATT&CK, CWE) que solo descargue y
-  guarde el raw (JSON/XML crudo) antes de tocar la lógica de transformación ya
-  especificada.
+- Incrementales de OSV vía `modified_id.csv`.
 
 Fuentes consultadas
 --------------------

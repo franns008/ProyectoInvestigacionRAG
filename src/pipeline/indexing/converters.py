@@ -51,6 +51,12 @@ class XMLCWEConverter:
                     skipped += 1
                     continue
 
+                # El catálogo completo trae ~25 deprecadas, cuya descripción es sólo el
+                # aviso de deprecación: ruido puro para el retrieval.
+                if weakness.get('Status') == 'Deprecated':
+                    skipped += 1
+                    continue
+
                 desc_elem = weakness.find('cwe:Description', ns)
                 description = self._extract_text(desc_elem)
 

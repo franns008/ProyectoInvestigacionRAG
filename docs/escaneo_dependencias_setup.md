@@ -15,7 +15,7 @@ presentación, [`escaneo_dependencias_demo.md`](escaneo_dependencias_demo.md).
 |---|---|---|
 | Python | el escáner | 3.10+ (usa `X \| Y` en anotaciones) |
 | `packaging` | comparar versiones PEP 440 y parsear PEP 508 | cualquiera |
-| `curl` | bajar los datos | — |
+| `requests` | bajar los datos (`src/ingestion/`) | cualquiera |
 | Node.js + npm | compilar la extensión | Node 18+ |
 | VSCode | correr la extensión | 1.90+ |
 
@@ -30,7 +30,7 @@ dos paquetes y nada más. El `requirements.txt` del repo es para el RAG, que es 
 ```bash
 git clone <repo> && cd ProyectoInvestigacionRAG
 python3 -m venv .venv
-.venv/bin/pip install packaging pytest
+.venv/bin/pip install packaging pytest requests
 ```
 
 Si además vas a tocar el RAG, `pip install -r requirements.txt -r requirements-dev.txt`.
@@ -39,10 +39,10 @@ Para el escaneo solo, con lo de arriba alcanza.
 ### 2. Datos
 
 ```bash
-./scripts/fetch_deps_data.sh
+.venv/bin/python src/ingestion/fetch_all.py --only osv epss kev
 ```
 
-Baja tres archivos a `data/raw/` (~37 MB, unos 6 segundos):
+Baja tres archivos a `data/raw/` (~38 MB, unos 6 segundos):
 
 | Fuente | Tamaño | Qué aporta |
 |---|---|---|
@@ -51,7 +51,12 @@ Baja tres archivos a `data/raw/` (~37 MB, unos 6 segundos):
 | `kev/known_exploited_vulnerabilities.json` | 1,6 MB | las ~1.700 que CISA confirma explotadas |
 
 Están en `.gitignore`: son dumps regenerables, no artefactos del repo. EPSS y KEV cambian
-a diario, así que conviene volver a correrlo antes de una demo (`--force` rebaja todo).
+a diario, así que conviene volver a correrlo antes de una demo: las descargas son
+condicionales, así que sólo baja lo que efectivamente cambió y sobre datos al día no
+transfiere nada.
+
+Sin `--only` el fetcher baja además el catálogo completo de CWE, que el escaneo no
+necesita pero sí el RAG — ver [`ingestion_fetchers.md`](ingestion_fetchers.md).
 
 ### 3. Verificar
 
@@ -187,7 +192,7 @@ implementado"— recibe un cuerpo que hace un POST al `9099`.
 
 | | |
 |---|---|
-| Fase 1 — fetchers de OSV/EPSS/KEV y catálogo CWE completo | **pendiente**. `scripts/fetch_deps_data.sh` cubre la descarga de forma provisional; falta el catálogo completo de CWE y los fetchers en Python con incrementales. |
+| Fase 1 — fetchers de OSV/EPSS/KEV y catálogo CWE completo | hecho. `src/ingestion/fetch_all.py` y un `fetch_<fuente>.py` por feed — ver [`ingestion_fetchers.md`](ingestion_fetchers.md). |
 | Fase 2 — resolver, priorización, tests | hecho |
 | Fase 3 — converter de OSV a pgvector, lookup de CWE, `pipeline_dependencias` | **pendiente**. Es lo que habilita la explicación. |
 | Fase 4 — extensión | hecho, contra el escáner local |

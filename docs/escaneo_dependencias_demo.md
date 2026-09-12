@@ -10,7 +10,7 @@ Dura **3 a 5 minutos**. No necesita Docker, ni pgvector, ni LLM, ni red.
 
 ```bash
 git checkout feature/requirements
-./scripts/fetch_deps_data.sh          # EPSS y KEV cambian a diario: rebajalos hoy
+.venv/bin/python src/ingestion/fetch_all.py --only osv epss kev   # baja sólo lo que cambió
 .venv/bin/python -m pytest            # 54 en <1 s: confirma que todo está sano
 ```
 
@@ -139,6 +139,6 @@ Si hay tiempo, o si preguntan por qué no analizan código fuente:
 | Síntoma | Qué hacer |
 |---|---|
 | El botón no aparece | El archivo tiene que llamarse `requirements*.txt`. Alternativa: `Ctrl+Shift+P` → "Escanear". |
-| "No encontré el dump de OSV" | Falta `./scripts/fetch_deps_data.sh`. |
+| "No encontré el dump de OSV" | Falta `python src/ingestion/fetch_all.py --only osv epss kev`. |
 | Cero hallazgos | Estás sobre un manifiesto sin pines `==`. Abrí `requirements_demo.txt`. |
 | La extensión no responde | Plan B: la misma salida en la terminal, que no depende de VSCode. Vale la pena tenerla ya escrita en una pestaña: `PYTHONPATH=src/pipeline .venv/bin/python -m deps.cli requirements_demo.txt --data data/raw --top 3` |

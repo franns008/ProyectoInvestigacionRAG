@@ -19,6 +19,10 @@ embeddings (`qwen3-embedding:4b`) y generación.
   [`escaneo_dependencias_demo.md`](docs/escaneo_dependencias_demo.md).
   **El escaneo vive en la rama `feature/requirements`, no en `main`.** Un clon nuevo cae
   en `main`, que todavía no lo tiene: hay que hacer `git checkout feature/requirements`.
+- [`docs/ingestion_fetchers.md`](docs/ingestion_fetchers.md) — cómo bajar los datos crudos
+  (OSV, EPSS, KEV, CWE, NVD) con `src/ingestion/fetch_all.py`. El detalle de NVD, que es el
+  único con API key y checkpoint, está en
+  [`ingestion_nvd_setup.md`](docs/ingestion_nvd_setup.md).
 - [`docs/explicacion_hallazgos.md`](docs/explicacion_hallazgos.md) — cómo se explican los 3 primeros hallazgos del escaneo trayendo el CVE/CWE del
   corpus **por clave exacta** (filtro por metadata, sin retrieval) y mandándoselo al LLM como
   contexto. **Implementado**; incluye la medición de qué hay realmente en los datos.

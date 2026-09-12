@@ -15,7 +15,10 @@ Documentos relacionados (leer si hace falta más contexto):
   transformación/indexado descripto ahí para NVD (ver sección "Qué falta").
 - `docs/data_sourcing_research.md` — investigación de las 5 fuentes de Capa 1
   (NVD, ATT&CK, CWE, EPSS, CISA KEV): endpoints, auth, rate limits, formato.
-  Este documento solo implementa la parte de NVD; las otras 4 quedan pendientes.
+- `docs/ingestion_fetchers.md` — el orquestador (`src/ingestion/fetch_all.py`) y el resto
+  de los fetchers (OSV, EPSS, KEV, CWE). Este documento cubre sólo NVD, que es el único
+  con API key y checkpoint; `fetch_nvd.py` sigue corriéndose igual que acá, y además entra
+  al orquestador con `--include-nvd`.
 
 ---
 

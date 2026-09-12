@@ -10,6 +10,8 @@ data/raw/nvd/
 data/raw/osv/
 data/raw/epss/
 data/raw/kev/
+data/raw/cwe/
+data/raw/cwec_latest.xml
 
 # Python
 __pycache__/
