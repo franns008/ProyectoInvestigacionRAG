@@ -13,6 +13,7 @@
 import * as vscode from "vscode";
 import { ChatPanel, ChatOptions } from "./chatPanel";
 import { Finding, ScanResult } from "./scan/types";
+import { BASE_STYLES, escapeHtml as escape, nonceValue } from "./styles";
 
 export class ResultsPanel {
   private static current: ResultsPanel | undefined;
@@ -73,7 +74,7 @@ export class ResultsPanel {
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="${csp}">
-<style>${STYLES}</style>
+<style>${BASE_STYLES}${STYLES}</style>
 <script nonce="${nonce}">
   const vscode = acquireVsCodeApi();
   document.addEventListener("click", (event) => {
@@ -189,7 +190,7 @@ function renderFinding(finding: Finding): string {
           ? `<p class="muted">Clase de debilidad: ${finding.cwe_ids.map(escape).join(", ")}</p>`
           : ""
       }
-      <button class="chat-button" data-finding="${escapeAttribute(JSON.stringify(finding))}">
+      <button class="button chat-button" data-finding="${escape(JSON.stringify(finding))}">
         Hablar en profundidad
       </button>
       ${renderSources(finding)}
@@ -239,37 +240,8 @@ function plural(n: number, singular: string, plural_: string): string {
   return `${n} ${n === 1 ? singular : plural_}`;
 }
 
-function escape(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function escapeAttribute(value: string): string {
-  return escape(value).replace(/'/g, "&#39;");
-}
-
-function nonceValue(): string {
-  return Math.random().toString(36).slice(2);
-}
-
+/** Específicos del panel de resultados; la base compartida está en styles.ts. */
 const STYLES = `
-  body {
-    font-family: var(--vscode-font-family);
-    font-size: var(--vscode-font-size);
-    color: var(--vscode-foreground);
-    padding: 1.5rem 2rem 3rem;
-    line-height: 1.5;
-    max-width: 60rem;
-  }
-  h1 { font-size: 1.3rem; font-weight: 600; margin: 0 0 .25rem; }
-  h2 { font-size: 1rem; font-weight: 600; margin: 0 0 .4rem; }
-  h3 { font-size: .9rem; font-weight: 600; margin: 0 0 .5rem; }
-  p { margin: .4rem 0; }
-  code { font-family: var(--vscode-editor-font-family); font-size: .9em; }
-  .muted { color: var(--vscode-descriptionForeground); }
   .lead { margin: 1.25rem 0 .75rem; }
   .closing { margin-top: 1.5rem; color: var(--vscode-descriptionForeground); }
 
@@ -301,23 +273,9 @@ const STYLES = `
   .facts strong { color: var(--vscode-foreground); }
   .explanation { margin: .6rem 0; }
   .sources { font-size: .85em; margin-top: .6rem; }
-  .chat-button {
-    border: 1px solid var(--vscode-button-border, transparent);
-    border-radius: 3px;
-    padding: .35rem .65rem;
-    color: var(--vscode-button-foreground);
-    background: var(--vscode-button-background);
-    cursor: pointer;
-    margin-top: .5rem;
-  }
-  .chat-button:hover { background: var(--vscode-button-hoverBackground); }
+  .chat-button { margin-top: .5rem; }
 
   .skipped { margin-top: 2rem; border-top: 1px solid var(--vscode-panel-border); padding-top: 1rem; }
   .skipped ul { margin: 0; padding-left: 1.2rem; }
   .skipped li { margin: .2rem 0; color: var(--vscode-descriptionForeground); }
-
-  pre {
-    background: var(--vscode-textCodeBlock-background);
-    padding: .75rem; border-radius: 3px; overflow-x: auto; white-space: pre-wrap;
-  }
 `;
