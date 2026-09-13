@@ -5849,3 +5849,129 @@ Explain
 2026-08-27 15:26:34,132 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
 2026-08-27 16:05:14,986 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
 2026-08-27 16:05:15,887 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 965
+2026-09-12 23:19:04,573 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-09-12 23:19:12,963 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 0
+2026-09-13 15:57:37,470 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-09-13 15:57:45,905 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 176
+2026-09-13 17:16:48,914 - INFO - [HaystackRAG_Query] - Pipeline RAG inicializado. Listo para responder.
+2026-09-13 17:16:57,175 - INFO - [HaystackRAG_Query] - Conexión a store verificada. Documentos en BD: 0
+2026-09-13 18:49:06,996 - INFO - [HaystackRAG_Query] - Ejecutando RAG para: ### Task:
+Generate a concise title summarizing the chat history.
+### Guidelines:
+- The title should clearly represent the main theme or subject of the conversation.
+- Keep it short: 2-4 words is best.
+- Do not use emojis, quotation marks, or special formatting.
+- Write the title in the chat's primary language; default to English if multilingual.
+- Prioritize accuracy over creativity.
+- Your entire response must consist solely of the JSON object, without any introductory or concluding text.
+- The output must be a single, raw JSON object, without any markdown code fences or other encapsulating text.
+- Ensure no conversational text, affirmations, or explanations precede or follow the raw JSON output, as this will cause direct parsing failure.
+### Output:
+JSON format: { "title": "your concise title here" }
+### Examples:
+- { "title": "Stock Trends" },
+- { "title": "Chocolate Chip Cookies" },
+- { "title": "Music Streaming" },
+- { "title": "Remote Work" }
+### Chat History:
+<chat_history>
+USER: Que es el cwe-79?
+ASSISTANT: 
+</chat_history>
+2026-09-13 18:49:06,996 - INFO - [HaystackRAG_Query] - [KEYWORD QUERY] -> 'CWE-79'
+2026-09-13 18:49:06,996 - INFO - [HaystackRAG_Query] - [VULN IDS] -> ['CWE-79'] (origen=turno)
+2026-09-13 18:49:07,083 - INFO - [HaystackRAG_Query] - Ejecutando RAG para: Que es el cwe-79?
+2026-09-13 18:49:07,083 - INFO - [HaystackRAG_Query] - [KEYWORD QUERY] -> 'CWE-79'
+2026-09-13 18:49:07,083 - INFO - [HaystackRAG_Query] - [VULN IDS] -> ['CWE-79'] (origen=turno)
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] - ------------------------------------------------------------
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] - [EMBEDDING RETRIEVER] 15 documentos recuperados:
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] -   [1] score=0.5473766502638099 | fuente=CVE-2026-87804
+        snippet: Vulnerabilidad CVE-2026-87804: Rejected reason: no security impact...
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] -   [2] score=0.5425118198286268 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] -   [3] score=0.5425118198286268 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] -   [4] score=0.5425118198286268 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] -   [5] score=0.5425118198286268 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] -   [6] score=0.5425118198286268 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] -   [7] score=0.5425118198286268 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] -   [8] score=0.5425118198286268 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,049 - INFO - [HaystackRAG_Query] -   [9] score=0.5425118198286268 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [10] score=0.5425118198286268 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [11] score=0.5425115522117734 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [12] score=0.5416908239483891 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [13] score=0.5416908239483891 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [14] score=0.5416908239483891 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [15] score=0.5416908239483891 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        snippet:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - ------------------------------------------------------------
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - [KEYWORD RETRIEVER] 2 documentos recuperados:
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [1] score=0.1 | fuente=CWE-79
+        snippet: Vulnerabilidad CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') Descripción: The product does not neutralize or incorrectly neutralizes user-controllable in...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [2] score=0.1 | fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+        snippet: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberame...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - ------------------------------------------------------------
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - [ID LOOKUP] 1 documentos por metadata:
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [1] source=CWE-79
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - ------------------------------------------------------------
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - [DOCUMENT JOINER] 17 candidatos fusionados (RRF):
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [1] fuente=CWE-79
+        contenido: Vulnerabilidad CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') Descripción: The product does not neutralize or incorrectly neutralizes user-controllable input before it is placed in output that is used as a web page that is served to other users....
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [2] fuente=CVE-2026-87804
+        contenido: Vulnerabilidad CVE-2026-87804: Rejected reason: no security impact...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [3] fuente=INCIBE-CERT_ESTUDIO_VULNERABILIDADES_PERSISTENTES_XSS_v1.0.pdf
+        contenido: exigen un compromiso continuo con la mejora de la seguridad a través de la innovación tecnológica, el desarrollo de competencias especializadas y la adopción de una postura proactiva ante las ciberamenazas. La seguridad de las aplicaciones web, frente a vulnerabilidades como XSS, no es solo un desaf...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [4] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [5] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [6] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [7] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [8] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [9] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [10] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [11] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [12] fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [13] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [14] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [15] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [16] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [17] fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - ------------------------------------------------------------
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - [RANKER] 4 documentos re-rankeados enviados al prompt:
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [1] score=0.8478 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [2] score=0.8478 | fuente=Estudio_InfraestructurasCloud_SCI_V1_INCIBE.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [3] score=0.8478 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] -   [4] score=0.8478 | fuente=INCIBE&ULE_GuiaBuenasPracticasCiberseguridadRedesPrivadas5G.pdf
+        contenido:                                                                                                                                                                                                         ...
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - ------------------------------------------------------------
+2026-09-13 18:50:19,050 - INFO - [HaystackRAG_Query] - ------------------------------------------------------------
+2026-09-13 18:50:19,051 - INFO - [HaystackRAG_Query] - [TOKENS] docs_al_prompt=4 | prompt_chars=2763 | prompt_words=310
+2026-09-13 18:50:19,051 - INFO - [HaystackRAG_Query] - [TOKENS] prompt=485 | completion=16 | total=501 | model=qwen2.5:3b-instruct
+2026-09-13 18:50:19,051 - INFO - [HaystackRAG_Query] - ------------------------------------------------------------

@@ -43,7 +43,9 @@ ni LLM.
 
 **NVD queda afuera del set por defecto** a propósito: su carga inicial son ~250k CVEs y
 domina el tiempo por órdenes de magnitud, mientras que las otras cuatro son segundos. Es
-el mismo criterio que usa `run_indexing.py` con `--include-cve`.
+el mismo criterio que usa `run_indexing.py` con `--include-cve`. Para probar el RAG sin el
+catálogo entero, `fetch_nvd.py --kev` y/o `--since YYYY-MM-DD` bajan una muestra liviana
+sin tocar el checkpoint (ver [`ingestion_nvd_setup.md`](ingestion_nvd_setup.md) §5).
 
 Si una fuente falla, las demás siguen; al final se imprime un resumen y el proceso sale
 con código 1 si alguna falló.

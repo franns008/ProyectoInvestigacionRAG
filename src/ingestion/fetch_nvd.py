@@ -8,6 +8,11 @@ en cada corrida.
 Uso:
     python src/ingestion/fetch_nvd.py            # incremental (usa el checkpoint si existe)
     python src/ingestion/fetch_nvd.py --full      # ignora el checkpoint, trae el catálogo completo
+
+Muestras livianas para probar el RAG (carpeta propia, no tocan el checkpoint):
+    python src/ingestion/fetch_nvd.py --kev                      # ~1.700 CVE explotados (KEV)
+    python src/ingestion/fetch_nvd.py --since 2026-08-01         # publicados desde esa fecha
+    python src/ingestion/fetch_nvd.py --kev --since 2025-01-01   # KEV recientes
 """
 
 import argparse
@@ -66,18 +71,16 @@ def _date_windows(start: datetime, end: datetime) -> list[tuple[datetime, dateti
 
 
 def _fetch_window(api_key: str, run_dir: Path, page_counter: list[int],
-                   window_start: datetime | None, window_end: datetime | None) -> int:
+                   filters: dict | None = None, url: str = BASE_URL) -> int:
+    """Pagina una consulta completa. `filters` son parámetros de la API (fechas, etc.)."""
     headers = {"apiKey": api_key}
-    params: dict = {"resultsPerPage": RESULTS_PER_PAGE, "startIndex": 0}
-    if window_start is not None:
-        params["lastModStartDate"] = window_start.strftime(DATE_FMT)
-        params["lastModEndDate"] = window_end.strftime(DATE_FMT)
+    params: dict = {"resultsPerPage": RESULTS_PER_PAGE, "startIndex": 0, **(filters or {})}
 
     total_results = None
     fetched = 0
 
     while total_results is None or params["startIndex"] < total_results:
-        data = get_with_retries(BASE_URL, SOURCE, headers=headers, params=params).json()
+        data = get_with_retries(url, SOURCE, headers=headers, params=params).json()
         total_results = data["totalResults"]
         vulnerabilities = data.get("vulnerabilities", [])
         fetched += len(vulnerabilities)
@@ -102,13 +105,53 @@ def fetch_cves(api_key: str, last_mod_start: str | None, run_start_dt: datetime)
     page_counter = [0]
 
     if last_mod_start is None:
-        return _fetch_window(api_key, run_dir, page_counter, None, None)
+        return _fetch_window(api_key, run_dir, page_counter)
 
     start_dt = datetime.strptime(last_mod_start, DATE_FMT).replace(tzinfo=timezone.utc)
     total = 0
     for window_start, window_end in _date_windows(start_dt, run_start_dt):
-        total += _fetch_window(api_key, run_dir, page_counter, window_start, window_end)
+        total += _fetch_window(api_key, run_dir, page_counter, {
+            "lastModStartDate": window_start.strftime(DATE_FMT),
+            "lastModEndDate": window_end.strftime(DATE_FMT),
+        })
     return total
+
+
+def fetch_sample(kev: bool, since: str | None) -> Result:
+    """Muestra liviana para probar el RAG sin bajar ni embeber el catálogo entero (~390k).
+
+    - `kev`: sólo los CVE del catálogo CISA KEV (`hasKev`, ~1.700 en un pedido).
+    - `since`: sólo los publicados desde esa fecha (YYYY-MM-DD), en ventanas de 120 días.
+    Combinables. Los rechazados se bajan igual: dicen "rechazado / duplicado de CVE-X".
+
+    Va a su propia carpeta (`<ts>_kev`, `<ts>_since-<fecha>`) y NO toca el checkpoint: si lo
+    escribiera, el próximo incremental creería que el catálogo completo ya está bajado.
+    """
+    api_key = _load_api_key()
+    run_start_dt = datetime.now(timezone.utc)
+    label = "_".join(part for part in ("kev" if kev else "",
+                                       f"since-{since}" if since else "") if part)
+    run_dir = RAW_DIR / f"{run_start_dt.strftime('%Y%m%dT%H%M%SZ')}_{label}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    page_counter = [0]
+    # `hasKev` es un flag sin valor: va en la URL porque `params` le agregaría un "=".
+    url = f"{BASE_URL}?hasKev" if kev else BASE_URL
+    print(f"[{SOURCE}] iniciando muestra {label} (sin checkpoint)")
+
+    if since is None:
+        total = _fetch_window(api_key, run_dir, page_counter, url=url)
+    else:
+        since_dt = datetime.strptime(since, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        total = 0
+        for window_start, window_end in _date_windows(since_dt, run_start_dt):
+            total += _fetch_window(api_key, run_dir, page_counter, {
+                "pubStartDate": window_start.strftime(DATE_FMT),
+                "pubEndDate": window_end.strftime(DATE_FMT),
+            }, url=url)
+
+    detail = f"{total} CVEs -> {run_dir.relative_to(REPO_ROOT)}"
+    print(f"[{SOURCE}] {NUEVO}: {detail}")
+    return Result(NUEVO, detail)
 
 
 def fetch(force: bool = False) -> Result:
@@ -142,9 +185,23 @@ def fetch(force: bool = False) -> Result:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fetch NVD/CVE (Capa 1) a data/raw/nvd/")
     parser.add_argument("--full", action="store_true", help="Ignora el checkpoint y trae el catálogo completo")
+    parser.add_argument("--kev", action="store_true",
+                        help="Muestra: sólo CVE del catálogo CISA KEV (~1.700). No toca el checkpoint")
+    parser.add_argument("--since", metavar="YYYY-MM-DD",
+                        help="Muestra: sólo CVE publicados desde esa fecha. No toca el checkpoint")
     args = parser.parse_args()
 
-    fetch(force=args.full)
+    if args.kev or args.since:
+        if args.full:
+            parser.error("--full no se combina con --kev/--since (esos no tocan el checkpoint)")
+        if args.since:
+            try:
+                datetime.strptime(args.since, "%Y-%m-%d")
+            except ValueError:
+                parser.error(f"--since espera YYYY-MM-DD, llegó {args.since!r}")
+        fetch_sample(kev=args.kev, since=args.since)
+    else:
+        fetch(force=args.full)
 
 
 if __name__ == "__main__":

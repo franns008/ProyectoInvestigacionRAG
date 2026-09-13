@@ -198,6 +198,9 @@ def cve_to_document(cve: dict):
         "source_type": "nvd_cve",
         "source": cve_id,
         "cve_id": cve_id,
+        # "Rejected", "Analyzed", "Awaiting Analysis"...: un rechazado se indexa igual (su
+        # descripción dice por qué, p. ej. duplicado de otro CVE), pero queda marcado.
+        "vuln_status": cve.get("vulnStatus"),
         "published_date": cve.get("published"),
         "last_modified": cve.get("lastModified"),
         "vendors": vendors,

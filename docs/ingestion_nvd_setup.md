@@ -121,6 +121,28 @@ Desde la raíz del repo, con el venv activado (o usando `.venv/bin/python` direc
 .venv/bin/python src/ingestion/fetch_nvd.py
 ```
 
+### Muestra liviana (para probar el RAG sin embeber ~390k CVEs)
+
+El catálogo completo tarda decenas de horas en embeberse en una GPU chica. Para probar
+el RAG alcanza con una muestra:
+
+```bash
+.venv/bin/python src/ingestion/fetch_nvd.py --kev                      # ~1.700 CVE explotados (CISA KEV), 1 request
+.venv/bin/python src/ingestion/fetch_nvd.py --since 2026-08-01         # publicados desde esa fecha
+.venv/bin/python src/ingestion/fetch_nvd.py --kev --since 2025-01-01   # KEV recientes (~350)
+```
+
+- Usan los filtros de la API `hasKev` y `pubStartDate/pubEndDate` (este último partido
+  en ventanas de 120 días, igual que el incremental).
+- Escriben en su propia carpeta (`<ts>_kev/`, `<ts>_since-<fecha>/`) y **no tocan el
+  checkpoint**: el incremental del catálogo completo sigue intacto.
+- Los CVE rechazados se bajan igual: su descripción dice por qué (p. ej. "duplicado de
+  CVE-X") y el indexer los marca con `meta.vuln_status = "Rejected"`.
+- Corpus sugerido para pruebas: `--kev` + `--since` del último mes.
+- **Ojo:** `run_indexing.py --include-cve` lee **todas** las subcarpetas de
+  `data/raw/nvd/`. Para indexar sólo la muestra, mover las demás corridas fuera de
+  `data/raw/` antes de indexar.
+
 **Qué hace exactamente** (`src/ingestion/fetch_nvd.py`):
 - Pega contra `https://services.nvd.nist.gov/rest/json/cves/2.0` con la
   `NVD_API_KEY` del `.env` (header `apiKey`).

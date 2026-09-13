@@ -330,7 +330,7 @@ de Mesa soporta GCN/Polaris desde hace años, y desde **Ollama 0.12.11** el back
 viene **incluido en la imagen oficial `ollama/ollama`** y se activa solo cuando el
 container ve los devices de GPU. No hace falta una imagen alternativa ni un fork.
 
-**Qué agrega el override** (sólo al servicio `ollama`):
+**Qué agrega el override** (al servicio `ollama`, puntos 1-4, y a `pipelines`, punto 5):
 
 1. `devices: /dev/dri:/dev/dri` → el container ve el nodo de render. **No** se pasa
    `/dev/kfd`: ese device es para ROCm/HSA, no para Vulkan.
@@ -342,9 +342,20 @@ container ve los devices de GPU. No hace falta una imagen alternativa ni un fork
    overrideálos con `RENDER_GID` / `VIDEO_GID` en el `.env`.
 3. `OLLAMA_VULKAN: "1"` → explícito (redundante en ≥ 0.12.11, pero documenta la intención).
 4. `OLLAMA_KEEP_ALIVE: "5m"` y `OLLAMA_NUM_PARALLEL: "1"` → ver "presupuesto de VRAM".
+5. Variables de la indexación en `pipelines` (las lee `src/pipeline/indexing/run_indexing.py`):
 
-**Qué NO toca (y por qué):** a diferencia del override NVIDIA, **no toca `pipelines`**, no
-usa build-args y **no requiere rebuildear la imagen**. El reranker cross-encoder corre con
+   | Variable | Default (sin overlay) | Overlay AMD | Por qué |
+   |---|---|---|---|
+   | `EMBED_BATCH_SIZE` | 64 | 16 | si parte del modelo cae a CPU, el lote igual entra en el timeout |
+   | `EMBED_CONCURRENCY` | 2 | 1 | debe ser ≤ `OLLAMA_NUM_PARALLEL` |
+   | `EMBED_TIMEOUT_SECONDS` | 120 | 900 | por request; con split CPU/GPU un lote tarda más |
+   | `EMBED_NUM_CTX` | (el de Ollama) | 512 | hace entrar el embedder en GPU (ver abajo) |
+
+   Sin el overlay rigen los defaults de siempre, así que las demás máquinas no cambian.
+   Cambiarlas sólo requiere recrear el container (`up -d pipelines`), no rebuild.
+
+**Qué NO toca (y por qué):** a diferencia del override NVIDIA, **no le da GPU a
+`pipelines`**, no usa build-args y **no requiere rebuildear la imagen**. El reranker cross-encoder corre con
 torch, y torch no tiene backend Vulkan; ROCm tampoco es opción en gfx803. Así que el
 reranker y la conversión de PDFs con marker siguen en **CPU**. Es una limitación real, no
 un olvido.
@@ -372,14 +383,17 @@ no tiene iGPU y la misma placa maneja el display.
 Dos cosas que sorprenden y conviene tener presentes:
 
 - **El embedder no entra en 4 GB.** Pesa 2.5 GB en disco pero pide **6.7 GB** en runtime:
-  la diferencia son los buffers de cómputo, que escalan con el contexto. Bajándole
-  `num_ctx` a 512 baja a 2.9 GB y 80% GPU, pero sigue sin entrar del todo. **No** se
-  arregla con `OLLAMA_CONTEXT_LENGTH`, que es global y le recortaría el contexto al LLM
-  de generación (que necesita ~1600 tokens: 4 chunks + pregunta + 512 de respuesta).
-  Se convive con el split; en la práctica no duele, por lo que sigue.
+  la diferencia son los buffers de cómputo, que escalan con el contexto. Con `num_ctx`
+  512 baja a 2.9 GB y ~33/37 capas en GPU, pero sigue sin entrar del todo. Por eso la
+  indexación lo fija **por request** (`EMBED_NUM_CTX=512` en el overlay, ver punto 5) y
+  **no** con `OLLAMA_CONTEXT_LENGTH`, que es global y le recortaría el contexto al LLM de
+  generación (que necesita ~1600 tokens: 4 chunks + pregunta + 512 de respuesta). Trunca
+  ~0,5% de los CVE (p99 = 396 tokens).
 - **Embeber de a uno vs en lote cambia todo**: 1,95 s por chunk suelto contra 0,33 s en
-  lotes de 32. La indexación ya usa lotes (`EMBED_BATCH_SIZE=64` en `run_indexing.py`),
-  así que el número que importa es el segundo. En consulta se embebe un solo texto corto:
+  lotes de 32. La indexación usa lotes (`EMBED_BATCH_SIZE`, 16 con el overlay AMD), así que
+  el número que importa es el segundo. Aun así, el catálogo completo de NVD (~390k CVE)
+  son ~48 h en esta placa: para probar el RAG usar una muestra (`fetch_nvd.py --kev`,
+  ver [`ingestion_nvd_setup.md`](ingestion_nvd_setup.md) §5). En consulta se embebe un solo texto corto:
   **0,13 s**, irrelevante.
 
 **Costo del swap:** ~4,7 s cada vez que Ollama tiene que descargar un modelo para cargar el
