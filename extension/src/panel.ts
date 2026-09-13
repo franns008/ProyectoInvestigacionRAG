@@ -11,7 +11,9 @@
  */
 
 import * as vscode from "vscode";
+import { ChatPanel, ChatOptions } from "./chatPanel";
 import { Finding, ScanResult } from "./scan/types";
+import { BASE_STYLES, escapeHtml as escape, nonceValue } from "./styles";
 
 export class ResultsPanel {
   private static current: ResultsPanel | undefined;
@@ -23,7 +25,16 @@ export class ResultsPanel {
       "cibersec.results",
       "Dependencias vulnerables",
       vscode.ViewColumn.Beside,
-      { enableScripts: false, retainContextWhenHidden: true },
+      { enableScripts: true, retainContextWhenHidden: true },
+    );
+    this.panel.webview.onDidReceiveMessage(
+      (message: { type?: string; finding?: Finding }) => {
+        if (message.type === "openChat" && message.finding) {
+          ChatPanel.show(message.finding, this.chatOptions());
+        }
+      },
+      null,
+      this.disposables,
     );
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
   }
@@ -56,16 +67,35 @@ export class ResultsPanel {
   }
 
   private wrap(body: string): string {
-    const csp = "default-src 'none'; style-src 'unsafe-inline';";
+    const nonce = nonceValue();
+    const csp = `default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';`;
     return `<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="${csp}">
-<style>${STYLES}</style>
+<style>${BASE_STYLES}${STYLES}</style>
+<script nonce="${nonce}">
+  const vscode = acquireVsCodeApi();
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-finding]");
+    if (!button) return;
+    vscode.postMessage({ type: "openChat", finding: JSON.parse(button.dataset.finding) });
+  });
+</script>
 </head>
 <body>${body}</body>
 </html>`;
+  }
+
+  private chatOptions(): ChatOptions {
+    const config = vscode.workspace.getConfiguration("cibersec");
+    return {
+      url: config.get<string>("ragUrl", "http://localhost:9099"),
+      model: config.get<string>("chatModel", "pipeline_ciberseguridad"),
+      apiKey: config.get<string>("ragApiKey", "0p3n-w3bui"),
+      timeoutMs: config.get<number>("chatTimeoutSeconds", 240) * 1000,
+    };
   }
 
   private dispose(): void {
@@ -160,6 +190,9 @@ function renderFinding(finding: Finding): string {
           ? `<p class="muted">Clase de debilidad: ${finding.cwe_ids.map(escape).join(", ")}</p>`
           : ""
       }
+      <button class="button chat-button" data-finding="${escape(JSON.stringify(finding))}">
+        Hablar en profundidad
+      </button>
       ${renderSources(finding)}
     </section>`;
 }
@@ -207,29 +240,8 @@ function plural(n: number, singular: string, plural_: string): string {
   return `${n} ${n === 1 ? singular : plural_}`;
 }
 
-function escape(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
+/** Específicos del panel de resultados; la base compartida está en styles.ts. */
 const STYLES = `
-  body {
-    font-family: var(--vscode-font-family);
-    font-size: var(--vscode-font-size);
-    color: var(--vscode-foreground);
-    padding: 1.5rem 2rem 3rem;
-    line-height: 1.5;
-    max-width: 60rem;
-  }
-  h1 { font-size: 1.3rem; font-weight: 600; margin: 0 0 .25rem; }
-  h2 { font-size: 1rem; font-weight: 600; margin: 0 0 .4rem; }
-  h3 { font-size: .9rem; font-weight: 600; margin: 0 0 .5rem; }
-  p { margin: .4rem 0; }
-  code { font-family: var(--vscode-editor-font-family); font-size: .9em; }
-  .muted { color: var(--vscode-descriptionForeground); }
   .lead { margin: 1.25rem 0 .75rem; }
   .closing { margin-top: 1.5rem; color: var(--vscode-descriptionForeground); }
 
@@ -261,13 +273,9 @@ const STYLES = `
   .facts strong { color: var(--vscode-foreground); }
   .explanation { margin: .6rem 0; }
   .sources { font-size: .85em; margin-top: .6rem; }
+  .chat-button { margin-top: .5rem; }
 
   .skipped { margin-top: 2rem; border-top: 1px solid var(--vscode-panel-border); padding-top: 1rem; }
   .skipped ul { margin: 0; padding-left: 1.2rem; }
   .skipped li { margin: .2rem 0; color: var(--vscode-descriptionForeground); }
-
-  pre {
-    background: var(--vscode-textCodeBlock-background);
-    padding: .75rem; border-radius: 3px; overflow-x: auto; white-space: pre-wrap;
-  }
 `;

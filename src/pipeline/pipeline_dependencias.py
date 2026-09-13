@@ -132,7 +132,7 @@ class Pipeline:
 
         from explain import explain_findings
 
-        logger.info("explicando %d hallazgo(s)", len(findings))
+        logger.info("explicando %d hallazgo(s), findings: %s", len(findings), ", ".join(str(f) for f in findings))
         explicaciones = explain_findings(
             findings,
             generate=self._generate,
