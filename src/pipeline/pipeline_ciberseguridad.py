@@ -30,6 +30,8 @@ import logging
 import os
 import re
 import threading
+import time
+import uuid
 
 # Configurar el logger específico para nuestra app
 logger = logging.getLogger("HaystackRAG_Query")
@@ -203,6 +205,32 @@ def resolve_vuln_ids(
         return [], "ninguno"
     return inherited[:max_ids], "historial"
 
+class _RequestLog(logging.LoggerAdapter):
+    """Prefija cada línea con el id de la corrida (`[rid]`)."""
+
+    def process(self, msg, kwargs):
+        return f"[{self.extra['rid']}] {msg}", kwargs
+
+
+def _classify_request(user_message: str) -> str:
+    """'user' para una pregunta real; 'meta:<tarea>' para los prompts internos de
+    OpenWebUI (título, follow-ups, tags), que también pasan por el pipeline."""
+    if not user_message.lstrip().startswith("### Task:"):
+        return "user"
+    task = next((l for l in user_message.splitlines()[1:] if l.strip()), "").lower()
+    if "title" in task:
+        return "meta:title"
+    if "follow-up" in task:
+        return "meta:follow_ups"
+    if "tags" in task:
+        return "meta:tags"
+    return "meta:otro"
+
+
+def _one_line(text: str) -> str:
+    return (text or "").strip().replace("\n", " ⏎ ")
+
+
 def _find_security_terms(text_low: str) -> list[str]:
     found = []
     for term in _SECURITY_TERMS:
@@ -219,6 +247,20 @@ def build_embedding_query(user_message: str) -> str:
     """qwen3-embedding es instruction-tuned: prefijar la query (no los documentos)
     con la tarea de retrieval mejora el recall ~1-5% frente a no usarlo."""
     return f"Instruct: {_EMBED_TASK_INSTRUCTION}\nQuery: {user_message.strip()}"
+
+
+def build_ranker_query(user_message: str, vuln_ids: list[str]) -> str:
+    """Query contra la que puntúa el cross-encoder.
+
+    Si los IDs se heredaron del historial ("dame un ejemplo de esta vulnerabilidad"),
+    la pregunta no los nombra y el ranker deja los docs de VulnIdLookup por debajo
+    de CVEs al azar. Se agregan los IDs que el texto no menciona.
+    """
+    mentioned = set(_extract_vuln_ids(user_message))
+    missing = [vid for vid in vuln_ids if vid not in mentioned]
+    if not missing:
+        return user_message
+    return f"{user_message.strip()} ({', '.join(missing)})"
 
 
 def build_keyword_query(user_message: str) -> str:
@@ -385,38 +427,58 @@ class Pipeline:
         body: dict,
     ) -> Union[str, Generator, Iterator]:
         
-        logger.info(f"Ejecutando RAG para: {user_message}")
+        # OpenWebUI dispara corridas concurrentes (chat + título + follow-ups + tags):
+        # sin un id por request sus líneas quedan intercaladas y no se pueden separar.
+        log = _RequestLog(logger, {"rid": uuid.uuid4().hex[:8]})
+        kind = _classify_request(user_message)
+        t0 = time.perf_counter()
+
+        if kind == "user":
+            log.info(f"[INICIO] kind=user | pregunta={_one_line(user_message)}")
+        else:
+            # El prompt interno trae todo el chat embebido: no se vuelca entero.
+            log.info(f"[INICIO] kind={kind} | prompt interno de OpenWebUI ({len(user_message)} chars)")
 
         keyword_query = build_keyword_query(user_message)
-        logger.info(f"[KEYWORD QUERY] -> {keyword_query!r}")
+        log.info(f"[KEYWORD QUERY] -> {keyword_query!r}")
 
         vuln_ids, ids_origin = resolve_vuln_ids(user_message, messages)
-        logger.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin})")
+        log.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin})")
 
-        result = self.rag_pipeline.run(
-            {
-                "text_embedder":     {"text": build_embedding_query(user_message)},
-                "keyword_retriever": {"query": keyword_query},
-                "id_lookup":         {"ids": vuln_ids},
-                "ranker":            {"query": user_message},
-                "prompt_builder":    {"question": user_message},
-            },
-            include_outputs_from={
-                "embedding_retriever",
-                "keyword_retriever",
-                "id_lookup",
-                "document_joiner",
-                "ranker",
-                "prompt_builder",
-            },
-        )
+        ranker_query = build_ranker_query(user_message, vuln_ids)
+        log.info(f"[RANKER QUERY] -> {_one_line(ranker_query)!r}")
 
-        self._log_retrieved_docs(result)
-        self._log_token_usage(result)
+        try:
+            result = self.rag_pipeline.run(
+                {
+                    "text_embedder":     {"text": build_embedding_query(user_message)},
+                    "keyword_retriever": {"query": keyword_query},
+                    "id_lookup":         {"ids": vuln_ids},
+                    "ranker":            {"query": ranker_query},
+                    "prompt_builder":    {"question": user_message},
+                },
+                include_outputs_from={
+                    "embedding_retriever",
+                    "keyword_retriever",
+                    "id_lookup",
+                    "document_joiner",
+                    "ranker",
+                    "prompt_builder",
+                },
+            )
+        except Exception:
+            log.exception(f"[ERROR] kind={kind} | falló tras {time.perf_counter() - t0:.1f}s")
+            raise
 
-        return result["llm"]["replies"][0]
+        answer = result["llm"]["replies"][0]
+        self._log_retrieved_docs(log, result)
+        self._log_token_usage(log, result)
+        log.info(f"[RESPUESTA] {_one_line(answer)}")
+        log.info(f"[FIN] kind={kind} | {time.perf_counter() - t0:.1f}s")
 
-    def _log_token_usage(self, result: dict) -> None:
+        return answer
+
+    def _log_token_usage(self, log: logging.LoggerAdapter, result: dict) -> None:
         sep = "-" * 60
         prompt = result.get("prompt_builder", {}).get("prompt") or ""
         n_docs = len(result.get("ranker", {}).get("documents", []))
@@ -436,59 +498,48 @@ class Pipeline:
         if total_tokens is None and (prompt_tokens is not None or completion_tokens is not None):
             total_tokens = (prompt_tokens or 0) + (completion_tokens or 0)
 
-        logger.info(f"{sep}")
-        logger.info(f"[TOKENS] docs_al_prompt={n_docs} | prompt_chars={len(prompt)} | prompt_words={len(prompt.split())}")
+        log.info(f"[TOKENS] docs_al_prompt={n_docs} | prompt_chars={len(prompt)} | prompt_words={len(prompt.split())}")
         if prompt_tokens is None and completion_tokens is None:
             model = meta.get("model", "desconocido")
-            logger.info(f"[TOKENS] uso no reportado por el generador (model={model}).")
+            log.info(f"[TOKENS] uso no reportado por el generador (model={model}).")
         else:
-            logger.info(f"[TOKENS] prompt={prompt_tokens} | completion={completion_tokens} | total={total_tokens} | model={meta.get('model', 'desconocido')}")
-        logger.info(f"{sep}")
+            log.info(f"[TOKENS] prompt={prompt_tokens} | completion={completion_tokens} | total={total_tokens} | model={meta.get('model', 'desconocido')}")
 
-    def _log_retrieved_docs(self, result: dict) -> None:
-        sep = "-" * 60
+    def _log_retrieved_docs(self, log: logging.LoggerAdapter, result: dict) -> None:
+        # Una línea por documento: con saltos de línea las continuaciones quedan
+        # sin request id y no se pueden filtrar con grep.
+        def doc_line(i: int, doc: Document, with_score: bool, width: int) -> str:
+            source  = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
+            snippet = " ".join((doc.content or "")[:width].split())
+            if not with_score:
+                return f"  [{i+1}] fuente={source} | {snippet}..."
+            score = f"{doc.score:.4f}" if doc.score is not None else "N/A"
+            return f"  [{i+1}] score={score} | fuente={source} | {snippet}..."
 
         emb_docs = result.get("embedding_retriever", {}).get("documents", [])
-        logger.info(f"{sep}")
-        logger.info(f"[EMBEDDING RETRIEVER] {len(emb_docs)} documentos recuperados:")
+        log.info(f"[EMBEDDING RETRIEVER] {len(emb_docs)} documentos recuperados:")
         for i, doc in enumerate(emb_docs):
-            score   = doc.score if doc.score is not None else "N/A"
-            source  = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
-            snippet = (doc.content or "")[:200].replace("\n", " ")
-            logger.info(f"  [{i+1}] score={score} | fuente={source}\n        snippet: {snippet}...")
+            log.info(doc_line(i, doc, True, 200))
 
         kw_docs = result.get("keyword_retriever", {}).get("documents", [])
-        logger.info(f"{sep}")
-        logger.info(f"[KEYWORD RETRIEVER] {len(kw_docs)} documentos recuperados:")
+        log.info(f"[KEYWORD RETRIEVER] {len(kw_docs)} documentos recuperados:")
         for i, doc in enumerate(kw_docs):
-            score   = doc.score if doc.score is not None else "N/A"
-            source  = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
-            snippet = (doc.content or "")[:200].replace("\n", " ")
-            logger.info(f"  [{i+1}] score={score} | fuente={source}\n        snippet: {snippet}...")
+            log.info(doc_line(i, doc, True, 200))
 
         lookup_docs = result.get("id_lookup", {}).get("documents", [])
-        logger.info(f"{sep}")
-        logger.info(f"[ID LOOKUP] {len(lookup_docs)} documentos por metadata:")
+        log.info(f"[ID LOOKUP] {len(lookup_docs)} documentos por metadata:")
         for i, doc in enumerate(lookup_docs):
-            logger.info(f"  [{i+1}] source={doc.meta.get('source')}")
+            log.info(f"  [{i+1}] source={doc.meta.get('source')}")
 
         joined_docs = result.get("document_joiner", {}).get("documents", [])
-        logger.info(f"{sep}")
-        logger.info(f"[DOCUMENT JOINER] {len(joined_docs)} candidatos fusionados (RRF):")
+        log.info(f"[DOCUMENT JOINER] {len(joined_docs)} candidatos fusionados (RRF):")
         for i, doc in enumerate(joined_docs):
-            source  = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
-            snippet = (doc.content or "")[:300].replace("\n", " ")
-            logger.info(f"  [{i+1}] fuente={source}\n        contenido: {snippet}...")
+            log.info(doc_line(i, doc, False, 300))
 
         ranked_docs = result.get("ranker", {}).get("documents", [])
-        logger.info(f"{sep}")
-        logger.info(f"[RANKER] {len(ranked_docs)} documentos re-rankeados enviados al prompt:")
+        log.info(f"[RANKER] {len(ranked_docs)} documentos re-rankeados enviados al prompt:")
         for i, doc in enumerate(ranked_docs):
-            score   = f"{doc.score:.4f}" if doc.score is not None else "N/A"
-            source  = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
-            snippet = (doc.content or "")[:300].replace("\n", " ")
-            logger.info(f"  [{i+1}] score={score} | fuente={source}\n        contenido: {snippet}...")
-        logger.info(f"{sep}")
+            log.info(doc_line(i, doc, True, 300))
 
     def _get_document_store(self) -> PgvectorDocumentStore:
         return get_document_store()
