@@ -56,4 +56,7 @@ src/pipeline/eval/results/*
 !src/pipeline/eval/results/runs.csv
 
 # NVD
-data/raw/nvdsrc/pipeline/logCiberseguridad.txt
+data/raw/nvd
+
+# Log del pipeline RAG (lo escribe el container en el volumen montado)
+src/pipeline/logCiberseguridad.txt
