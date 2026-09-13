@@ -10,8 +10,12 @@ Se encarga de:
 
 import logging
 import os
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from itertools import islice
 from pathlib import Path
+
+import psycopg
 
 from haystack import Document
 from haystack.utils import Secret
@@ -45,10 +49,25 @@ CONVERTED_DIR       = INPUT_DIR / "_converted_md"
 SPLIT_LENGTH        = 200
 SPLIT_OVERLAP       = 20
 EMBEDDING_MODEL     = "qwen3-embedding:4b"
-EMBED_BATCH_SIZE    = 64
-# Requests concurrentes a Ollama. Debe ser <= OLLAMA_NUM_PARALLEL (infrastructure/env/ollama.env)
-# para que efectivamente se procesen en paralelo y no se encolen del lado del servidor.
-EMBED_CONCURRENCY   = 2
+
+# Ajustes de embedding que dependen del hardware. Los defaults son los de siempre (GPU con
+# VRAM de sobra); cada máquina los pisa por variable de entorno del container `pipelines`.
+# El overlay AMD (infrastructure/docker-compose.amd.yml) fija los valores para placas de 4 GB.
+def _env_int(name: str, default: int | None) -> int | None:
+    value = os.environ.get(name, "").strip()
+    return int(value) if value else default
+
+EMBED_BATCH_SIZE    = _env_int("EMBED_BATCH_SIZE", 64)
+# Requests concurrentes a Ollama. Debe ser <= OLLAMA_NUM_PARALLEL o el request de más queda
+# encolado del lado del servidor y se come el timeout sin haber empezado.
+EMBED_CONCURRENCY   = _env_int("EMBED_CONCURRENCY", 2)
+# Por request, no total. 120 s es el default de la librería: alcanza con GPU, no cuando el
+# embedding cae a CPU (ahí un lote puede tardar minutos).
+EMBED_TIMEOUT_SECONDS = _env_int("EMBED_TIMEOUT_SECONDS", 120)
+# Contexto por request de embedding (`options.num_ctx`), no global. Sin definir = el de
+# Ollama. Con 4 GB de VRAM, 512 es lo que hace entrar el modelo en GPU (33/37 capas contra
+# 0/37 sin fijarlo) y trunca ~0,5% de los CVE (p99 = 396 tokens).
+EMBED_NUM_CTX       = _env_int("EMBED_NUM_CTX", None)
 
 # --- Logger ---
 logger = logging.getLogger("IndexingRAG")
@@ -58,6 +77,22 @@ if not logger.handlers:
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - [%(name)s] - %(message)s')
     ch.setFormatter(formatter)
     logger.addHandler(ch)
+
+def _chunk_key(doc: Document) -> tuple[str, str] | None:
+    """Clave de un chunk. `split_id` se normaliza a texto porque de la BD vuelve
+    como texto y en memoria es un entero: sin esto, ningún chunk deduplicaría."""
+    file_path = doc.meta.get("file_path")
+    if not file_path:
+        return None
+    split_id = doc.meta.get("split_id")
+    return (str(file_path), "" if split_id is None else str(split_id))
+
+
+def _in_groups(items: list, size: int):
+    it = iter(items)
+    while group := list(islice(it, size)):
+        yield group
+
 
 class Indexer:
     def __init__(self, include_cve: bool = False):
@@ -123,6 +158,29 @@ class Indexer:
         except Exception as e:
             logger.error(f"Error convirtiendo {pdf_path.name}: {e}")
             return None
+
+    def _stored_keys(self) -> tuple[set[str], set[tuple[str, str]]]:
+        """Qué hay ya en la base, con un SELECT de sólo las columnas necesarias.
+
+        No usa `store.filter_documents()` a propósito: eso trae los documentos completos
+        *con su embedding*, y con cientos de miles de filas son varios GB de RAM nada más
+        que para saber qué estaba. Acá se traen el id y dos campos de metadata.
+        """
+        # Fuerza la creación de la tabla si es una base nueva, antes de consultarla.
+        self.store.count_documents()
+
+        ids: set[str] = set()
+        keys: set[tuple[str, str]] = set()
+        with psycopg.connect(DB_CONNECTION) as conn, conn.cursor() as cursor:
+            cursor.execute(
+                f"SELECT id, meta->>'file_path', meta->>'split_id' FROM {DB_TABLE}"  # noqa: S608
+            )
+            for doc_id, file_path, split_id in cursor:
+                ids.add(doc_id)
+                if file_path:
+                    keys.add((file_path, "" if split_id is None else split_id))
+        logger.info(f"Ya en la base: {len(ids)} documentos (se saltean).")
+        return ids, keys
 
     def load_documents(self) -> tuple[list[Document], list[Document]]:
         splittable: list[Document] = []
@@ -190,16 +248,13 @@ class Indexer:
             splitter = DocumentSplitter(split_by="word", split_length=SPLIT_LENGTH, split_overlap=SPLIT_OVERLAP)
             splittable_docs = splitter.run(documents=splittable_docs)["documents"]
 
-        # Deduplicación contra la BD
-        stored = self.store.filter_documents()
-        existing_keys = {
-            (d.meta.get("file_path"), d.meta.get("split_id")) 
-            for d in stored if d.meta.get("file_path")
-        }
-        
-        new_splittable = [d for d in splittable_docs if (d.meta.get("file_path"), d.meta.get("split_id")) not in existing_keys]
-        
-        seen_ids = {d.id for d in stored}
+        # Deduplicación contra la BD. Es también lo que hace la indexación retomable:
+        # lo que ya se escribió en una corrida anterior no se vuelve a embeber.
+        stored_ids, existing_keys = self._stored_keys()
+
+        new_splittable = [d for d in splittable_docs if _chunk_key(d) not in existing_keys]
+
+        seen_ids = set(stored_ids)
         new_atomic = []
         for d in atomic_docs:
             if d.id not in seen_ids:
@@ -217,36 +272,52 @@ class Indexer:
             model=EMBEDDING_MODEL,
             url=OLLAMA_URL,
             batch_size=EMBED_BATCH_SIZE,
+            timeout=EMBED_TIMEOUT_SECONDS,
+            generation_kwargs={"num_ctx": EMBED_NUM_CTX} if EMBED_NUM_CTX else None,
         )
-
-        embedded_docs = []
-        failed_count = 0
 
         batches = [new_docs[i:i + EMBED_BATCH_SIZE] for i in range(0, len(new_docs), EMBED_BATCH_SIZE)]
         logger.info(
             f"Embebiendo {len(batches)} lotes de hasta {EMBED_BATCH_SIZE} docs "
-            f"({EMBED_CONCURRENCY} en paralelo)..."
+            f"({EMBED_CONCURRENCY} en paralelo, timeout={EMBED_TIMEOUT_SECONDS}s, "
+            f"num_ctx={EMBED_NUM_CTX or 'default de Ollama'})..."
         )
 
-        # Requests concurrentes a Ollama en vez de una a la vez: con GPU hay
-        # margen para tener varios lotes en vuelo simultáneamente.
-        with ThreadPoolExecutor(max_workers=EMBED_CONCURRENCY) as executor:
-            future_to_batch = {executor.submit(doc_embedder.run, batch): batch for batch in batches}
-            for n, future in enumerate(as_completed(future_to_batch), start=1):
-                batch = future_to_batch[future]
-                try:
-                    embedded_docs.extend(future.result()["documents"])
-                except Exception as e:
-                    failed_count += len(batch)
-                    logger.error(f"Fallo en lote: {e}")
-                if n % 10 == 0 or n == len(batches):
-                    logger.info(f"Progreso embedding: {n}/{len(batches)} lotes procesados")
+        written = 0
+        failed_count = 0
+        started = time.perf_counter()
 
-        if embedded_docs:
-            self.store.write_documents(embedded_docs, policy=DuplicatePolicy.OVERWRITE)
-            
-        logger.info(f"Indexación finalizada. {len(embedded_docs)} agregados, {failed_count} fallidos.")
-        logger.info(f"Total en store: {len(self.store.filter_documents())}")
+        with ThreadPoolExecutor(max_workers=EMBED_CONCURRENCY) as executor:
+            # Ventana acotada en vez de encolar los N lotes de una: con cientos de miles
+            # de documentos, tener todos los lotes vivos a la vez son varios GB de RAM.
+            for done, group in enumerate(_in_groups(batches, EMBED_CONCURRENCY), start=1):
+                futures = {executor.submit(doc_embedder.run, batch): batch for batch in group}
+                for future in as_completed(futures):
+                    try:
+                        embedded = future.result()["documents"]
+                    except Exception as e:
+                        failed_count += len(futures[future])
+                        logger.error(f"Fallo en lote: {e}")
+                        continue
+                    # Se escribe lote a lote, no todo al final: así una corrida larga se
+                    # puede cortar y retomar sin perder lo hecho, y la memoria no crece
+                    # con el tamaño del corpus.
+                    self.store.write_documents(embedded, policy=DuplicatePolicy.OVERWRITE)
+                    written += len(embedded)
+
+                processed = done * EMBED_CONCURRENCY
+                if processed % 20 < EMBED_CONCURRENCY or processed >= len(batches):
+                    elapsed = time.perf_counter() - started
+                    rate = written / elapsed if elapsed else 0
+                    remaining = len(new_docs) - written - failed_count
+                    eta = remaining / rate / 3600 if rate else 0
+                    logger.info(
+                        f"Progreso: {written}/{len(new_docs)} escritos "
+                        f"({rate:.1f} docs/s, quedan ~{eta:.1f} h)"
+                    )
+
+        logger.info(f"Indexación finalizada. {written} agregados, {failed_count} fallidos.")
+        logger.info(f"Total en store: {self.store.count_documents()}")
 
 
 if __name__ == "__main__":

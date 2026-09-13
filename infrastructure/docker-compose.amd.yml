@@ -4,10 +4,23 @@
 # Requiere Mesa con RADV en el host: `vulkaninfo --summary | grep deviceName` debe listar
 # la placa. El compose base (docker-compose.yml) corre todo en CPU y no necesita esto.
 #
-# A diferencia del override NVIDIA, este NO toca `pipelines`: torch no tiene backend
+# A diferencia del override NVIDIA, este no le da GPU a `pipelines`: torch no tiene backend
 # Vulkan y ROCm no soporta gfx803, así que el reranker sigue en CPU y no hace falta
-# rebuildear la imagen. Sólo se acelera Ollama (generación + embeddings).
+# rebuildear la imagen. Sólo se acelera Ollama (generación + embeddings). A `pipelines`
+# sólo le ajusta la indexación a 4 GB de VRAM (variables de entorno, sin rebuild).
 services:
+    pipelines:
+        # Leídas por src/pipeline/indexing/run_indexing.py; sin el overlay rigen sus defaults
+        # (64 / 2 / 120 s / num_ctx de Ollama).
+        environment:
+            # Lotes chicos: si parte del modelo cae a CPU, el request igual entra en el timeout.
+            EMBED_BATCH_SIZE: "16"
+            # <= OLLAMA_NUM_PARALLEL (abajo lo bajamos a 1).
+            EMBED_CONCURRENCY: "1"
+            EMBED_TIMEOUT_SECONDS: "900"
+            # Hace entrar qwen3-embedding:4b en GPU (33/37 capas contra 0/37 sin fijarlo).
+            EMBED_NUM_CTX: "512"
+
     ollama:
         # Vulkan sobre RADV sólo necesita el nodo de render. /dev/kfd es para ROCm/HSA
         # (la doc de Ollama lo pasa porque documenta ese caso); acá no aplica.
