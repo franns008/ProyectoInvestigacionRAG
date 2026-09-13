@@ -29,6 +29,7 @@ from pydantic import BaseModel
 import logging
 import os
 import re
+import threading
 
 # Configurar el logger específico para nuestra app
 logger = logging.getLogger("HaystackRAG_Query")
@@ -60,6 +61,8 @@ OLLAMA_URL          = "http://ollama:11434"
 DB_TABLE            = "ciberseguridad_docs"
 EMBEDDING_DIMENSION = 2560  # nativa de qwen3-embedding:4b (sin truncar vía MRL)
 DEFAULT_OLLAMA_LLM  = "qwen2.5:3b-instruct"
+
+_WARM_UP_LOCK = threading.Lock()
 
 PROMPT_TEMPLATE = """
 You are a cybersecurity assistant. Answer strictly from the provided context.
@@ -491,4 +494,10 @@ class Pipeline:
         return get_document_store()
 
     def _build_rag_pipeline(self) -> HaystackPipeline:
-        return build_rag_pipeline(self.store, self.valves)
+        pipeline = build_rag_pipeline(self.store, self.valves)
+        # Warm-up eager y bajo lock: si se deja al primer run(), OpenWebUI dispara
+        # requests concurrentes (chat + título) y dos CrossEncoder cargando a la vez
+        # en threads distintos rompen con "Cannot copy out of meta tensor".
+        with _WARM_UP_LOCK:
+            pipeline.warm_up()
+        return pipeline
