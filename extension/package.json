@@ -95,6 +95,17 @@
           "default": "pipeline_dependencias",
           "description": "Pipeline que redacta las explicaciones."
         },
+        "cibersec.chatModel": {
+          "type": "string",
+          "default": "pipeline_ciberseguridad",
+          "description": "Pipeline RAG para conversar sobre una vulnerabilidad seleccionada."
+        },
+        "cibersec.chatTimeoutSeconds": {
+          "type": "number",
+          "default": 240,
+          "minimum": 10,
+          "description": "Cuánto esperar la respuesta del chat."
+        },
         "cibersec.explainTimeoutSeconds": {
           "type": "number",
           "default": 240,

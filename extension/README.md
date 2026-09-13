@@ -25,7 +25,10 @@ Después, cada vez que la quieras correr:
 4. Apretá el botón **Escanear dependencias vulnerables** arriba a la derecha de la barra
    del editor, o clic derecho sobre el archivo en el explorador.
 
-El panel con los resultados se abre al costado.
+El panel con los resultados se abre al costado. Cada hallazgo tiene un botón **Hablar en
+profundidad** que abre una conversación separada con el pipeline `pipeline_ciberseguridad`,
+incluyendo el CVE/OSV, paquete, versión, resumen y detalles del advisory. La clave del
+servidor se mantiene en la extensión y no se entrega al webview.
 
 > La ventana original queda como consola de depuración: los `console.log` y los errores
 > de la extensión aparecen ahí, no en la ventana de prueba.
@@ -43,6 +46,8 @@ detecta solo si hay un `.venv` en la raíz del repo.
 | `cibersec.dataDir` | `data/raw` | Dumps de OSV, EPSS y KEV. |
 | `cibersec.ragUrl` | `http://localhost:9099` | Servidor de Pipelines. Sólo con `provider: rag`. |
 | `cibersec.ragModel` | `pipeline_dependencias` | Sólo con `provider: rag`. |
+| `cibersec.chatModel` | `pipeline_ciberseguridad` | Pipeline RAG usado por el chat contextual. |
+| `cibersec.chatTimeoutSeconds` | `240` | Tiempo máximo de espera de cada respuesta. |
 
 Las rutas relativas se resuelven contra la raíz del workspace.
 
