@@ -114,9 +114,9 @@
         },
         "cibersec.explainTopN": {
           "type": "number",
-          "default": 3,
+          "default": 10,
           "minimum": 0,
-          "description": "Cuántas tarjetas se explican. Explicarlas todas destruiría el sentido de haberlas priorizado."
+          "description": "Cuántas librerías se explican, tomando la primera vulnerabilidad de cada una. Se limita a 10."
         }
       }
     }

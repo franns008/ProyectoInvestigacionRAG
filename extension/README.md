@@ -30,6 +30,27 @@ profundidad** que abre una conversación separada con el pipeline `pipeline_cibe
 incluyendo el CVE/OSV, paquete, versión, resumen y detalles del advisory. La clave del
 servidor se mantiene en la extensión y no se entrega al webview.
 
+### Resultados agrupados por librería
+
+El panel muestra primero un resumen por librería. Cada grupo indica el nombre, la cantidad
+de vulnerabilidades encontradas y la versión más alta que aparece como arreglo entre sus
+advisories. Esa versión máxima se usa solamente como recomendación común del grupo: cada
+vulnerabilidad conserva y muestra su propia `fixed_version` original.
+
+Antes del detalle por librería aparece una sección de prioridad inmediata con todas las
+vulnerabilidades explotadas que figuran en CISA KEV. Dentro de cada librería, los hallazgos
+se ordenan de mayor a menor severidad según su puntuación CVSS; los que no tienen CVSS
+quedan al final.
+
+Los grupos se pueden plegar de manera independiente desde su encabezado. Al plegar uno,
+queda visible únicamente la librería, la cantidad de vulnerabilidades y la versión común
+recomendada, lo que permite comparar rápidamente varias librerías.
+
+Cuando están activadas las explicaciones, la extensión envía al LLM la primera
+vulnerabilidad de cada librería siguiendo el orden de priorización del escaneo. Se explican
+como máximo diez librerías; `cibersec.explainTopN` permite reducir ese número, pero nunca
+ampliarlo por encima de diez.
+
 En el chat, **Enter** envía y **Shift+Enter** agrega una línea. Las respuestas se muestran
 con formato markdown (se escapa todo antes, así que el modelo no puede inyectar HTML).
 **Ver contexto cargado** muestra los IDs (CVE/OSV, CWE) y el JSON que se le mandó al
@@ -55,6 +76,10 @@ detecta solo si hay un `.venv` en la raíz del repo.
 | `cibersec.ragModel` | `pipeline_dependencias` | Sólo con `provider: rag`. |
 | `cibersec.chatModel` | `pipeline_ciberseguridad` | Pipeline RAG usado por el chat contextual. |
 | `cibersec.chatTimeoutSeconds` | `240` | Tiempo máximo de espera de cada respuesta. |
+| `cibersec.explain` | `true` | Solicita explicaciones al pipeline de dependencias. Si está desactivado, el escaneo sigue funcionando sin prosa del LLM. |
+| `cibersec.explainModel` | `pipeline_dependencias` | Pipeline que redacta las explicaciones. |
+| `cibersec.explainTimeoutSeconds` | `240` | Tiempo máximo de espera para obtener las explicaciones. |
+| `cibersec.explainTopN` | `10` | Cantidad máxima configurable de librerías explicadas. Se toma una vulnerabilidad por librería y el límite absoluto es 10. |
 
 Las rutas relativas se resuelven contra la raíz del workspace.
 
