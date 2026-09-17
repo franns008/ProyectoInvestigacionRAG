@@ -26,6 +26,10 @@ embeddings (`qwen3-embedding:4b`) y generación.
 - [`docs/explicacion_hallazgos.md`](docs/explicacion_hallazgos.md) — cómo se explican los 3 primeros hallazgos del escaneo trayendo el CVE/CWE del
   corpus **por clave exacta** (filtro por metadata, sin retrieval) y mandándoselo al LLM como
   contexto. **Implementado**; incluye la medición de qué hay realmente en los datos.
+- [`docs/historial_chat.md`](docs/historial_chat.md) — historial de mensajes en el chat de
+  la extensión (memoria conversacional en el prompt). **Propuesto y bloqueado:** primero hay
+  que mover el contexto del escaneo de `messages` al prompt. No romper OpenWebUI, que ya
+  tiene su propio historial, es la restricción central.
 - [`docs/reranker_cross_encoder.md`](docs/reranker_cross_encoder.md) — reranker cross-encoder
   (`bge-reranker-v2-m3`) tras el retrieval híbrido: retrieve-and-rerank, implicancias (modelo
   local en CPU, latencia) y cambios en pipeline/Dockerfile/eval.
