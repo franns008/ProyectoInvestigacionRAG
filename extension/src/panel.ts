@@ -294,7 +294,7 @@ function renderFunnel(f: ScanResult['funnel']): string {
     <h2>Resumen</h2>
     <table class="funnel">
       <thead>
-        <tr><th scope="col">Criterio</th><th scope="col" class="num">Quedan</th><th scope="col" class="num">%</th></tr>
+        <tr><th scope="col">Criterio</th><th scope="col" class="num">Vulnerabilidades</th><th scope="col" class="num">% de ${f.total}</th></tr>
       </thead>
       <tbody>
         ${row('severidad alta (CVSS ≥ 7)', f.cvss_alto)}
@@ -534,10 +534,17 @@ const STYLES = `
   .package-findings { padding: 0 var(--sp-3) var(--sp-2); }
 
   .funnel-section { margin-top: var(--sp-5); }
-  .funnel { width: 100%; max-width: 32rem; margin: var(--sp-2) 0 0; border-collapse: collapse; }
+  .funnel { max-width: 36rem; margin: var(--sp-2) 0 0; border-collapse: collapse; }
   .funnel th, .funnel td { padding: var(--sp-1) var(--sp-2) var(--sp-1) 0; text-align: left; }
   .funnel th { font-size: var(--fs-sm); font-weight: 400; color: var(--muted); }
-  .funnel .num { width: 4rem; text-align: right; font-variant-numeric: tabular-nums; }
+  /* Sin ancho fijo: los encabezados dicen qué se cuenta y sobre qué base, y eso no
+     entra en 4rem. El padding izquierdo los separa del criterio. */
+  .funnel .num {
+    padding-left: var(--sp-4);
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
   .funnel-section h2 { margin-bottom: var(--sp-2); }
 
   /* El hallazgo es la superficie compartida; lo único propio es la marca de urgencia. */
