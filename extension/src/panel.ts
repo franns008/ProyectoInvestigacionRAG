@@ -229,6 +229,21 @@ function renderNoUrgentFindings(): string {
         </section>`;
 }
 
+/**
+ * Agrupa por librería conservando el orden en que llegan los hallazgos.
+ *
+ * Acá se los reordenaba por CVSS descendente, con el CVSS ausente valiendo -1. Eso
+ * hundía justo lo que hay que mirar primero: en el grupo de pyspark, CVE-2022-33891
+ * —que CISA confirma explotada, EPSS 93%— caía tercera debajo de una con CVSS 9.9 y
+ * EPSS 1,1%, y CVE-2023-32007, con EPSS 76%, quedaba última de once por no tener CVSS
+ * publicado. La vista terminaba ordenando por la métrica que el proyecto demuestra que
+ * no ordena el trabajo (ver el embudo, arriba en esta misma pantalla).
+ *
+ * `prioritize()` en Python ya los manda ordenados por KEV, después EPSS y CVSS sólo
+ * como desempate. El Map conserva el orden de inserción, así que no reordenar es
+ * respetar esa decisión — y es la regla que fija types.ts: los campos duros los arma
+ * Python, la vista no calcula.
+ */
 function renderPackageGroups(findings: Finding[]): string {
     const groups = new Map<string, Finding[]>();
     for (const finding of findings) {
@@ -238,15 +253,7 @@ function renderPackageGroups(findings: Finding[]): string {
         groups.set(key, group);
     }
 
-    return [...groups.values()].map((group) =>
-        renderPackageGroup([...group].sort(compareFindingsBySeverity)),
-    ).join('');
-}
-
-function compareFindingsBySeverity(left: Finding, right: Finding): number {
-    const leftScore = left.cvss_score ?? -1;
-    const rightScore = right.cvss_score ?? -1;
-    return rightScore - leftScore;
+    return [...groups.values()].map(renderPackageGroup).join('');
 }
 
 function renderPackageGroup(findings: Finding[]): string {
