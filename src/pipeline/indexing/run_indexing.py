@@ -10,6 +10,7 @@ Se encarga de:
 
 import logging
 import os
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import islice
@@ -18,6 +19,7 @@ from pathlib import Path
 import psycopg
 
 from haystack import Document
+from haystack.dataclasses import ByteStream
 from haystack.utils import Secret
 from haystack.components.preprocessors import DocumentSplitter
 from haystack.components.converters import (
@@ -104,6 +106,26 @@ def _is_blank(doc: Document) -> bool:
     cuando se arregle el parsing, que es donde está la causa.
     """
     return not (doc.content or "").strip()
+
+
+_BR_RE = re.compile(r"<br\s*/?>", re.IGNORECASE)
+
+
+def _md_source(md_path: Path) -> ByteStream:
+    """El markdown de marker, con los `<br>` pasados a espacio.
+
+    marker usa `<br>` para los saltos de línea DENTRO de las celdas de tabla, y
+    `MarkdownToDocument` los borra sin dejar nada en su lugar: "de<br>seguridad" termina
+    como "deseguridad", y "| 14<br>16<br>16 |" como "141616". Eso rompe las dos vías de
+    retrieval a la vez — el embedder tokeniza mal esos engendros y el keyword retriever no
+    encuentra `seguridad` porque como término dejó de existir.
+
+    Se pasa el markdown ya corregido como ByteStream en vez de la ruta, que es lo que
+    `MarkdownToDocument` acepta además de los paths, para no tocar el `.md` cacheado:
+    es la salida cruda de marker y reconvertir un PDF cuesta una corrida de OCR.
+    """
+    text = _BR_RE.sub(" ", md_path.read_text(encoding="utf-8"))
+    return ByteStream(data=text.encode("utf-8"), meta={"file_path": str(md_path)})
 
 
 def _in_groups(items: list, size: int):
@@ -215,7 +237,7 @@ class Indexer:
                     source_names.append(pdf_path)
 
             if md_paths:
-                result = MarkdownToDocument().run(sources=md_paths)
+                result = MarkdownToDocument().run(sources=[_md_source(m) for m in md_paths])
                 for doc, original_pdf in zip(result["documents"], source_names):
                     doc.meta["file_path"] = str(original_pdf)
                     doc.meta["source"] = original_pdf.name
