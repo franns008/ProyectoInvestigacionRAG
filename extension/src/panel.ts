@@ -339,7 +339,7 @@ function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
       ${renderExplanation(finding)}
       <div class="finding-foot">
         <span class="finding-meta nums">${meta.join(' · ')}</span>
-        <button class="button secondary chat-button" data-finding="${escape(findingKey(finding))}">
+        <button class="button chat-button" data-finding="${escape(findingKey(finding))}">
           Hablar en profundidad
         </button>
       </div>

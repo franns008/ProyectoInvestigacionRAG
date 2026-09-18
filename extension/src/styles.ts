@@ -51,7 +51,7 @@ export const BASE_STYLES = `
      * tarjetas seguidas los límites se pierden. Se deriva del propio color de texto del
      * tema, así que sigue al tema en claro y en oscuro en vez de ser un gris fijo.
      */
-    --border-strong: color-mix(in srgb, var(--vscode-foreground) 22%, transparent);
+    --border-strong: color-mix(in srgb, var(--vscode-foreground) 32%, transparent);
     --surface: var(--vscode-textCodeBlock-background, rgba(128, 128, 128, .08));
     --muted: var(--vscode-descriptionForeground);
     --danger: var(--vscode-editorError-foreground);
@@ -130,6 +130,10 @@ export const BASE_STYLES = `
    * finas, que es lo que la hace ver de neón. Rellenando, el color queda en una
    * superficie y el borde apenas la cierra.
    *
+   * Sin borde: la línea de contorno suma una frecuencia más por etiqueta y, con dos
+   * etiquetas por tarjeta sobre más de cien tarjetas, es textura que compite con la
+   * lectura. El relleno ya delimita.
+   *
    * Los fondos salen de tokens que el tema ya calibra para esto: badge para lo
    * neutro, inputValidation para error y advertencia. Así el contraste con el
    * texto lo resolvió el autor del tema y no una mezcla inventada acá.
@@ -140,7 +144,6 @@ export const BASE_STYLES = `
     font-weight: 600;
     line-height: 1.6;
     padding: 0 .5em;
-    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     color: var(--vscode-badge-foreground);
     background: var(--vscode-badge-background);
@@ -149,12 +152,10 @@ export const BASE_STYLES = `
   .tag.danger {
     color: var(--vscode-foreground);
     background: var(--vscode-inputValidation-errorBackground);
-    border-color: var(--vscode-inputValidation-errorBorder, var(--danger));
   }
   .tag.warning {
     color: var(--vscode-foreground);
     background: var(--vscode-inputValidation-warningBackground);
-    border-color: var(--vscode-inputValidation-warningBorder, var(--warning));
   }
 
   /* Identificador (CVE, CWE, OSV), enlazable o no. */
