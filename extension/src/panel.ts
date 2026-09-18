@@ -173,6 +173,8 @@ function renderResult(result: ScanResult): string {
             ${renderSummaryLine(funnel.total, funnel.paquetes, urgentes.length)}
         </header>
 
+        ${renderFunnel(funnel)}
+
         ${urgentes.length ? renderUrgentFindings(urgentes) : renderNoUrgentFindings()}
 
         <section class="library-section">
@@ -185,8 +187,6 @@ function renderResult(result: ScanResult): string {
             </div>
             ${renderPackageGroups(findings)}
         </section>
-
-    ${renderFunnel(funnel)}
 
     ${
         urgentes.length > 0 && resto > 0
@@ -278,17 +278,40 @@ function renderPackageGroup(findings: Finding[]): string {
   </details>`;
 }
 
-function renderFunnel(f: ReturnType<() => ScanResult['funnel']>): string {
+/**
+ * El embudo: cuántos hallazgos sobreviven a cada criterio de filtrado.
+ *
+ * Va arriba de todo, antes de los hallazgos. Es la premisa —por qué hay que mirar siete
+ * y no ciento quince— y estaba detrás de la conclusión, al final de una página de
+ * quince pantallas, donde no lo leía nadie.
+ *
+ * Lleva encabezados de columna de verdad: es una tabla de datos, y sin `th` un lector
+ * de pantalla la recorre sin saber qué significa cada celda.
+ */
+function renderFunnel(f: ScanResult['funnel']): string {
     const row = (label: string, value: number) =>
         `<tr><td>${label}</td><td class="num">${value}</td>
      <td class="num muted">${f.total ? Math.round((value / f.total) * 100) + '%' : ''}</td></tr>`;
 
-    return `<table class="funnel">
-    <tr><td>CVEs que afectan tus versiones</td><td class="num">${f.total}</td><td></td></tr>
-    ${row('filtrando por severidad alta (CVSS ≥ 7)', f.cvss_alto)}
-    ${row('filtrando por probabilidad de exploit (EPSS ≥ 10%)', f.epss_alto)}
-    ${row('explotadas hoy (catálogo CISA KEV)', f.kev)}
-  </table>`;
+    return `<section class="funnel-section">
+    <div class="section-heading">
+      <div>
+        <p class="label">Por qué estas y no las otras</p>
+        <h2>El embudo</h2>
+      </div>
+    </div>
+    <table class="funnel">
+      <thead>
+        <tr><th scope="col">Criterio</th><th scope="col" class="num">Quedan</th><th scope="col" class="num">%</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>CVEs que afectan tus versiones</td><td class="num">${f.total}</td><td></td></tr>
+        ${row('filtrando por severidad alta (CVSS ≥ 7)', f.cvss_alto)}
+        ${row('filtrando por probabilidad de exploit (EPSS ≥ 10%)', f.epss_alto)}
+        ${row('explotadas hoy (catálogo CISA KEV)', f.kev)}
+      </tbody>
+    </table>
+  </section>`;
 }
 
 /** Dónde se está dibujando el hallazgo, que cambia qué hace falta decir. */
@@ -340,7 +363,7 @@ function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
       <div class="finding-foot">
         <span class="finding-meta nums">${meta.join(' · ')}</span>
         <button class="button chat-button" data-finding="${escape(findingKey(finding))}">
-          Hablar en profundidad
+          Preguntar
         </button>
       </div>
     </article>`;
@@ -520,10 +543,12 @@ const STYLES = `
   .package-group > summary:hover { background: var(--vscode-list-hoverBackground); }
   .package-findings { padding: 0 var(--sp-3) var(--sp-2); }
 
-  .funnel { width: 100%; max-width: 32rem; margin: var(--sp-4) 0; border-collapse: collapse; }
-  .funnel td { padding: var(--sp-1) var(--sp-2) var(--sp-1) 0; }
-  .funnel td.num { width: 4rem; text-align: right; font-variant-numeric: tabular-nums; }
-  .funnel tr:first-child td { font-weight: 600; }
+  .funnel-section { margin-top: var(--sp-5); }
+  .funnel { width: 100%; max-width: 32rem; margin: var(--sp-2) 0 0; border-collapse: collapse; }
+  .funnel th, .funnel td { padding: var(--sp-1) var(--sp-2) var(--sp-1) 0; text-align: left; }
+  .funnel th { font-size: var(--fs-sm); font-weight: 400; color: var(--muted); }
+  .funnel .num { width: 4rem; text-align: right; font-variant-numeric: tabular-nums; }
+  .funnel tbody tr:first-child td { font-weight: 600; }
 
   /* El hallazgo es la superficie compartida; lo único propio es la marca de urgencia. */
   .finding { margin: var(--sp-2) 0; border-width: 2px; border-left-width: 3px; }
@@ -544,11 +569,12 @@ const STYLES = `
 
   /* Respaldo y acción en la misma línea: ninguno de los dos merece un renglón propio. */
   .finding-foot {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: var(--sp-3); flex-wrap: wrap;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: var(--sp-3);
     margin-top: var(--sp-3);
   }
-  .finding-meta { color: var(--muted); font-size: var(--fs-sm); }
+  /* min-width:0 deja que la meta envuelva por dentro en vez de empujar al botón. */
+  .finding-meta { min-width: 0; color: var(--muted); font-size: var(--fs-sm); }
   .chat-button { flex: none; }
 
   .skipped {

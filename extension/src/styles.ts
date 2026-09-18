@@ -134,9 +134,9 @@ export const BASE_STYLES = `
    * etiquetas por tarjeta sobre más de cien tarjetas, es textura que compite con la
    * lectura. El relleno ya delimita.
    *
-   * Los fondos salen de tokens que el tema ya calibra para esto: badge para lo
-   * neutro, inputValidation para error y advertencia. Así el contraste con el
-   * texto lo resolvió el autor del tema y no una mezcla inventada acá.
+   * Una sola regla para las tres variantes: el texto lleva el color que la etiqueta
+   * significa y el fondo es un tinte de ese mismo color. Así "media" no queda leyéndose
+   * distinto de "crítica" y "alta" por usar otro par de tokens.
    */
   .tag {
     display: inline-block;
@@ -145,8 +145,8 @@ export const BASE_STYLES = `
     line-height: 1.6;
     padding: 0 .5em;
     border-radius: var(--radius-sm);
-    color: var(--vscode-badge-foreground);
-    background: var(--vscode-badge-background);
+    color: var(--muted);
+    background: color-mix(in srgb, var(--vscode-foreground) 10%, transparent);
     white-space: nowrap;
   }
   .tag.danger {
