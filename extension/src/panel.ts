@@ -361,7 +361,7 @@ function renderVariantLegend(finding: Finding): string {
     ).join('');
     return `<section class="variant-legend card">
       <h2>Variantes del botón (prueba)</h2>
-      <p class="muted">Cada tarjeta usa una, ciclando. El número chico al lado del botón dice cuál.</p>
+      <p class="muted">Las tarjetas de abajo las van ciclando en este mismo orden: la 1.ª usa la 1, la 2.ª la 2, y así.</p>
       <ul>${items}</ul>
     </section>`;
 }
@@ -415,7 +415,7 @@ function renderFinding(finding: Finding, seccion: Seccion = 'grupo', indice = 0)
       ${renderExplanation(finding)}
       <div class="finding-foot">
         <span class="finding-meta nums">${meta.join(' · ')}</span>
-        <span class="variant-mark muted">${variante + 1}</span>${renderAction(finding, variante)}
+        ${renderAction(finding, variante)}
       </div>
     </article>`;
 }
@@ -637,8 +637,6 @@ const STYLES = `
   /* ============ PRUEBA DE VARIANTES — TEMPORAL, borrar con el bloque de arriba ====
      Estilos de los seis tratamientos. Ninguno introduce color fijo: todo sale del
      tema, igual que el resto del sistema. */
-  .finding-foot .chat-button { margin-left: var(--sp-2); }
-  .variant-mark { font-size: var(--fs-xs); }
 
   /* 2 y 5 — discreto: sin relleno, el borde apenas lo insinúa. */
   .button.quiet {
