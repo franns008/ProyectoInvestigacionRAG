@@ -53,6 +53,12 @@ export const BASE_STYLES = `
      */
     --border-strong: color-mix(in srgb, var(--vscode-foreground) 24%, transparent);
     --surface: var(--vscode-textCodeBlock-background, rgba(128, 128, 128, .08));
+    /*
+     * Relleno de las tarjetas: el fondo del editor corrido un poco hacia el color del
+     * texto. En temas oscuros queda apenas más claro que el fondo y en claros apenas más
+     * oscuro, así la tarjeta se despega en los dos sin un gris fijo.
+     */
+    --card-bg: color-mix(in srgb, var(--vscode-foreground) 2%, var(--vscode-editor-background));
     --muted: var(--vscode-descriptionForeground);
     --danger: var(--vscode-editorError-foreground);
     --warning: var(--vscode-editorWarning-foreground);
@@ -121,6 +127,7 @@ export const BASE_STYLES = `
     border: 1px solid var(--border-strong);
     border-radius: var(--radius);
     padding: var(--sp-3) var(--sp-4);
+    background: var(--card-bg);
   }
 
   /*

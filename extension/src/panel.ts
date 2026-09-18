@@ -563,16 +563,32 @@ const STYLES = `
   .package-group > summary:hover { background: var(--vscode-list-hoverBackground); }
   .package-findings { padding: 0 var(--sp-3) var(--sp-2); }
 
-  .funnel-section { margin-top: var(--sp-5); }
-  .funnel { max-width: 36rem; margin: var(--sp-2) 0 0; border-collapse: collapse; }
-  .funnel th, .funnel td { padding: var(--sp-1) var(--sp-2) var(--sp-1) 0; text-align: left; }
+  /* Mismo relleno que las tarjetas: el resumen es un bloque más, no texto suelto. */
+  .funnel-section {
+    margin-top: var(--sp-4);
+    padding: var(--sp-3) var(--sp-4);
+    border-radius: var(--radius);
+    background: var(--card-bg);
+    /* La tabla no envuelve: cuando no entra, scrollea adentro en vez de salirse. */
+    overflow-x: auto;
+  }
+  /* Todo el ancho de la caja: el criterio a la izquierda y las cifras contra el borde
+     derecho, con el mismo padding de los dos lados. */
+  .funnel { width: 100%; margin: var(--sp-2) 0 0; border-collapse: collapse; }
+  /* Sin envolver: si el panel es angosto, la caja scrollea (overflow-x en .funnel-section). */
+  .funnel th, .funnel td {
+    padding: var(--sp-1) var(--sp-2) var(--sp-1) 0;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .funnel th:last-child, .funnel td:last-child { padding-right: 0; }
   .funnel th { font-size: var(--fs-sm); font-weight: 400; color: var(--muted); }
-  /* Sin ancho fijo: los encabezados dicen qué se cuenta y sobre qué base, y eso no
-     entra en 4rem. El padding izquierdo los separa del criterio. */
+  /* width:1% encoge las cifras a su contenido y deja todo el sobrante al criterio. El
+     padding izquierdo las separa de él. */
   .funnel .num {
+    width: 1%;
     padding-left: var(--sp-4);
     text-align: right;
-    white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
   .funnel-section h2 { margin-bottom: var(--sp-2); }
