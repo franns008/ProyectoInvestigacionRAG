@@ -172,6 +172,8 @@ function renderResult(result: ScanResult): string {
             ${renderSummaryLine(funnel.total, funnel.paquetes, urgentes.length)}
         </header>
 
+        ${renderVariantLegend(findings[0])}
+
         ${renderFunnel(funnel)}
 
         ${urgentes.length ? renderUrgentFindings(urgentes) : renderNoUrgentFindings()}
@@ -218,7 +220,7 @@ function renderUrgentFindings(findings: Finding[]): string {
                 </div>
                 <span class="urgent-count">${plural(findings.length, 'hallazgo', 'hallazgos')}</span>
             </div>
-            ${findings.map((f) => renderFinding(f, 'urgente')).join('')}
+            ${findings.map((f, i) => renderFinding(f, 'urgente', i)).join('')}
         </section>`;
 }
 
@@ -274,7 +276,7 @@ function renderPackageGroup(findings: Finding[]): string {
 
     return `<details class="package-group" open>
     <summary><strong>${escape(packageName)}</strong> · ${plural(findings.length, 'vulnerabilidad', 'vulnerabilidades')} · ${arreglo}</summary>
-    <div class="package-findings">${findings.map((f) => renderFinding(f, 'grupo')).join('')}</div>
+    <div class="package-findings">${findings.map((f, i) => renderFinding(f, 'grupo', i)).join('')}</div>
   </details>`;
 }
 
@@ -312,6 +314,58 @@ function renderFunnel(f: ScanResult['funnel']): string {
   </section>`;
 }
 
+/* ===================== PRUEBA DE VARIANTES — TEMPORAL =====================
+ * Seis tratamientos del botón de la tarjeta, ciclados por índice para poder
+ * compararlos en contexto real. Al elegir uno, se borra todo este bloque, se deja
+ * `renderAction` con la variante ganadora y se quita el parámetro `indice` de
+ * `renderFinding`.
+ * ========================================================================== */
+
+/** Burbuja de chat. SVG inline: el CSP es `default-src 'none'` y no hay assets. */
+const ICONO_CHAT = `<svg class="icono" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" d="M2.75 2.5h10.5a.75.75 0 0 1 .75.75v6.5a.75.75 0 0 1-.75.75H6.25L3.5 13.25V10.5h-.75A.75.75 0 0 1 2 9.75v-6.5a.75.75 0 0 1 .75-.75Z"/></svg>`;
+
+const VARIANTES = [
+    'Texto, primario (actual)',
+    'Texto, discreto',
+    'Icono, primario',
+    'Icono, discreto',
+    'Icono + texto, discreto',
+    'Link con flecha',
+];
+
+function renderAction(finding: Finding, variante: number): string {
+    const clave = escape(findingKey(finding));
+    const nombre = escape(`Preguntar sobre ${finding.cve ?? finding.osv_ids[0] ?? 'este hallazgo'} en ${finding.package}`);
+    const attrs = `data-finding="${clave}" title="${nombre}" aria-label="${nombre}"`;
+
+    switch (variante) {
+        case 0:
+            return `<button class="button chat-button" ${attrs}>Profundizar</button>`;
+        case 1:
+            return `<button class="button quiet chat-button" ${attrs}>Profundizar</button>`;
+        case 2:
+            return `<button class="button icon chat-button" ${attrs}>${ICONO_CHAT}</button>`;
+        case 3:
+            return `<button class="button icon ghost chat-button" ${attrs}>${ICONO_CHAT}</button>`;
+        case 4:
+            return `<button class="button quiet with-icon chat-button" ${attrs}>${ICONO_CHAT}Profundizar</button>`;
+        default:
+            return `<button class="action-link chat-button" ${attrs}>Profundizar →</button>`;
+    }
+}
+
+/** Muestrario para comparar las seis de un vistazo. Temporal. */
+function renderVariantLegend(finding: Finding): string {
+    const items = VARIANTES.map(
+        (nombre, i) => `<li><span class="muted">${i + 1}.</span> ${renderAction(finding, i)} <span class="muted">${escape(nombre)}</span></li>`,
+    ).join('');
+    return `<section class="variant-legend card">
+      <h2>Variantes del botón (prueba)</h2>
+      <p class="muted">Cada tarjeta usa una, ciclando. El número chico al lado del botón dice cuál.</p>
+      <ul>${items}</ul>
+    </section>`;
+}
+
 /** Dónde se está dibujando el hallazgo, que cambia qué hace falta decir. */
 type Seccion = 'urgente' | 'grupo';
 
@@ -327,7 +381,8 @@ type Seccion = 'urgente' | 'grupo';
  *   2. Qué es         — el resumen del advisory.
  *   3. Con qué respaldo — identificadores enlazados a su fuente, y la acción.
  */
-function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
+function renderFinding(finding: Finding, seccion: Seccion = 'grupo', indice = 0): string {
+    const variante = indice % VARIANTES.length;
     const severity = severityLabel(finding.cvss_score);
     // Dentro de "Explotadas activamente" la marca sobra: lo dice el título de la
     // sección. En el grupo de la librería el hallazgo se lee fuera de ese contexto y
@@ -360,9 +415,7 @@ function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
       ${renderExplanation(finding)}
       <div class="finding-foot">
         <span class="finding-meta nums">${meta.join(' · ')}</span>
-        <button class="button chat-button" data-finding="${escape(findingKey(finding))}">
-          Profundizar
-        </button>
+        <span class="variant-mark muted">${variante + 1}</span>${renderAction(finding, variante)}
       </div>
     </article>`;
 }
@@ -580,6 +633,58 @@ const STYLES = `
   /* min-width:0 deja que la meta envuelva por dentro en vez de empujar al botón. */
   .finding-meta { min-width: 0; color: var(--muted); font-size: var(--fs-sm); }
   .chat-button { flex: none; }
+
+  /* ============ PRUEBA DE VARIANTES — TEMPORAL, borrar con el bloque de arriba ====
+     Estilos de los seis tratamientos. Ninguno introduce color fijo: todo sale del
+     tema, igual que el resto del sistema. */
+  .finding-foot .chat-button { margin-left: var(--sp-2); }
+  .variant-mark { font-size: var(--fs-xs); }
+
+  /* 2 y 5 — discreto: sin relleno, el borde apenas lo insinúa. */
+  .button.quiet {
+    color: var(--vscode-foreground);
+    background: transparent;
+    border-color: var(--border);
+  }
+  .button.quiet:hover { background: var(--vscode-list-hoverBackground); }
+
+  /* 3 y 4 — sólo ícono: caja cuadrada del alto de la línea. */
+  .button.icon {
+    display: inline-grid; place-items: center;
+    width: 1.9rem; height: 1.9rem;
+    padding: 0;
+  }
+  /* 4 — el idiom de VSCode para acciones de fila: invisible hasta que lo mirás. */
+  .button.ghost {
+    color: var(--muted);
+    background: transparent;
+    border-color: transparent;
+  }
+  .button.ghost:hover {
+    color: var(--vscode-foreground);
+    background: var(--vscode-toolbar-hoverBackground, var(--vscode-list-hoverBackground));
+  }
+
+  /* 5 — ícono y texto juntos. */
+  .button.with-icon { display: inline-flex; align-items: center; gap: .4em; }
+  .icono { flex: none; }
+
+  /* 6 — sin caja: se comporta como un link. */
+  .action-link {
+    padding: 0; border: 0; background: none; font: inherit;
+    color: var(--vscode-textLink-foreground);
+    cursor: pointer;
+  }
+  .action-link:hover { color: var(--vscode-textLink-activeForeground); text-decoration: underline; }
+
+  .variant-legend { margin-top: var(--sp-5); }
+  .variant-legend h2 { margin-bottom: var(--sp-1); }
+  .variant-legend ul { margin: var(--sp-3) 0 0; padding: 0; list-style: none; }
+  .variant-legend li {
+    display: flex; align-items: center; gap: var(--sp-2);
+    padding: var(--sp-1) 0;
+  }
+  /* ============ FIN DE LA PRUEBA ============================================= */
 
   .skipped {
     margin-top: var(--sp-6);
