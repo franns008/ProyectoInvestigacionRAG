@@ -1,0 +1,53 @@
+# Manifiesto de cobertura: dependencias elegidas para que el escaneo toque TODOS los
+# estados que el corpus local puede producir.
+#
+# No es el manifiesto de la demo (ese es requirements_demo.txt, con cinco librerías
+# conocidas y una sola KEV). Este existe para probar la herramienta contra los datos
+# reales: verificar el render con volumen, revisar estilos, y no descubrir en vivo que
+# un caso no estaba contemplado.
+#
+# Las versiones NO son inventadas: salen de los propios eventos `introduced` / `fixed`
+# de los advisories de OSV, así que son releases que existieron. Para cada paquete se
+# eligió la que arrastra más vulnerabilidades conocidas.
+#
+# Medido contra data/raw del 12/09/2026 (OSV all.zip + CISA KEV + EPSS):
+#
+#   115 vulnerabilidades en 13 librerías
+#     45 con CVSS >= 7      14 con EPSS >= 10%      7 en CISA KEV (5 librerías)
+#     27 sin CVSS calculable (advisory sin severidad o vector v4)
+#      6 sin alias a CVE — se identifican por su id de OSV
+#      7 sin versión de arreglo publicada
+#
+#   Por severidad: 12 críticas · 33 altas · 38 medias · 5 bajas · 27 sin score
+#
+# Los números se mueven cuando se re-bajan los datos; el que importa es que siga
+# habiendo KEV, algún hallazgo sin CVSS, alguno sin CVE y alguno sin arreglo.
+#
+#   PYTHONPATH=src/pipeline .venv/bin/python -m deps.cli requirements_cves.txt --data data/raw
+
+# --- Explotadas hoy (CISA KEV). Son las que abren el informe. -------------------------
+litellm==1.81.16
+ray==2.8.1
+pyspark==1.0.2
+starlette==0.13.5
+marimo==0.9.20
+
+# --- Alta explotabilidad (EPSS) sin estar en KEV --------------------------------------
+cryptography==3.1
+werkzeug==0.11.6
+paramiko==1.5.1
+
+# --- Volumen y variedad de severidad: acá aparecen las medias, las bajas y las que no
+# --- tienen CVSS calculable.
+urllib3==1.24
+requests==2.1.0
+jinja2==2.7.2
+pyyaml==5.1
+flask==0.12.3
+
+# --- Líneas que el escáner NO puede resolver. Están a propósito: el informe tiene que
+# --- decir qué quedó afuera y por qué, en lugar de callarlo.
+pandas
+boto3>=1.26.0
+numpy~=1.24.0
+scipy!=1.10.0
