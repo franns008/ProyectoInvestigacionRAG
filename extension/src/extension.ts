@@ -13,6 +13,7 @@ import * as vscode from 'vscode';
 import { ExplainedProvider } from './scan/explainedProvider';
 import { ResultsPanel } from './panel';
 import { LocalScannerProvider } from './scan/localProvider';
+import { previewPackages } from './scan/manifest';
 import { RagProvider } from './scan/ragProvider';
 import { ScanError, ScanProvider } from './scan/types';
 
@@ -73,12 +74,18 @@ async function scanCommand(resource?: vscode.Uri): Promise<void> {
         return;
     }
 
+    // El panel se abre antes que el proveedor para poder pasarle el aviso de etapa.
+    const panel = ResultsPanel.show();
     const provider = buildProvider(
         workspace.uri.fsPath,
         path.dirname(manifest.fsPath),
+        (count) => panel.explaining(count),
     );
-    const panel = ResultsPanel.show();
-    panel.loading(path.basename(manifest.fsPath), provider.label);
+    panel.loading(
+        path.basename(manifest.fsPath),
+        provider.label,
+        await readPreview(manifest.fsPath),
+    );
 
     try {
         const result = await vscode.window.withProgress(
@@ -109,6 +116,7 @@ async function scanCommand(resource?: vscode.Uri): Promise<void> {
 function buildProvider(
     workspaceRoot: string,
     manifestDirectory: string,
+    onExplainStart?: (count: number) => void,
 ): ScanProvider {
     const config = vscode.workspace.getConfiguration('cibersec');
 
@@ -145,12 +153,25 @@ function buildProvider(
         return local;
     }
     return new ExplainedProvider(local, {
+        onExplainStart,
         url: config.get<string>('ragUrl', 'http://localhost:9099'),
         model: config.get<string>('explainModel', 'pipeline_dependencias'),
         apiKey: config.get<string>('ragApiKey', '0p3n-w3bui'),
         topN: config.get<number>('explainTopN', 10),
         timeoutMs: config.get<number>('explainTimeoutSeconds', 240) * 1000,
     });
+}
+
+/**
+ * Los nombres que se muestran mientras se escanea. Es decorado: si el archivo no se
+ * puede leer acá, el escáner lo va a leer igual y el error sale por su camino normal.
+ */
+async function readPreview(fsPath: string) {
+    try {
+        return previewPackages(await fs.promises.readFile(fsPath, 'utf8'));
+    } catch {
+        return [];
+    }
 }
 
 /**

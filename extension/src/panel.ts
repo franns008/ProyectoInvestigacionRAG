@@ -12,6 +12,7 @@
 
 import * as vscode from 'vscode';
 import { ChatPanel, ChatOptions } from './chatPanel';
+import { PreviewPackage } from './scan/manifest';
 import { Finding, ScanResult } from './scan/types';
 import { BASE_STYLES, escapeHtml as escape, nonceValue } from './styles';
 
@@ -48,10 +49,19 @@ export class ResultsPanel {
         return ResultsPanel.current;
     }
 
-    loading(manifest: string, provider: string): void {
+    loading(manifest: string, provider: string, packages: PreviewPackage[]): void {
         this.panel.webview.html = this.wrap(
-            `<p class="muted">Escaneando <code>${escape(manifest)}</code> con el ${escape(provider)}…</p>`,
+            renderScanning(manifest, provider, packages),
         );
+    }
+
+    /**
+     * La segunda etapa (redactar las explicaciones con el LLM) es la larga: hasta 240 s
+     * contra el escaneo local de ~2 s. Cambia el rótulo por `postMessage` en vez de
+     * re-renderizar, así la animación no se reinicia a mitad de camino.
+     */
+    explaining(count: number): void {
+        this.panel.webview.postMessage({ type: 'explaining', count });
     }
 
     error(message: string, detail?: string): void {
@@ -77,6 +87,15 @@ export class ResultsPanel {
 <style>${BASE_STYLES}${STYLES}</style>
 <script nonce="${nonce}">
   const vscode = acquireVsCodeApi();
+  window.addEventListener("message", (event) => {
+    if (event.data.type !== "explaining") return;
+    const stage = document.getElementById("stage");
+    const note = document.getElementById("stage-note");
+    if (!stage) return;
+    const n = event.data.count;
+    stage.textContent = "Redactando " + n + (n === 1 ? " explicación" : " explicaciones") + " con el modelo";
+    if (note) note.textContent = "El escaneo ya está resuelto. Esta parte genera texto en tu máquina y es la que tarda.";
+  });
   document.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-finding]");
     if (!button) return;
@@ -104,6 +123,48 @@ export class ResultsPanel {
         this.disposables.forEach((d) => d.dispose());
         this.disposables = [];
     }
+}
+
+/**
+ * Pantalla de espera. Ocupa todo el panel y muestra las dependencias reales del
+ * manifiesto: la extensión ya tiene el archivo, así que no cuesta nada y el usuario ve
+ * su propio requirements en vez de un spinner genérico.
+ *
+ * La animación es ambiental a propósito. No dice "voy por el paquete 7 de 13": el
+ * resolver tarda 3,5 ms por paquete (61 ms de los 1.742 del escaneo completo), así que
+ * un avance por paquete habría que frenarlo a mano para que se viera, y sería fingir un
+ * progreso que no existe. Lo que sí es cierto —y es lo que se dice— es sobre qué
+ * archivo y sobre qué dependencias está trabajando.
+ */
+function renderScanning(
+    manifest: string,
+    provider: string,
+    packages: PreviewPackage[],
+): string {
+    const items = packages
+        .map((item, index) => {
+            const version = item.version
+                ? `<span class="scan-version">${escape(item.version)}</span>`
+                : `<span class="scan-version muted">sin pin</span>`;
+            return `<li class="scan-item ${item.pinned ? '' : 'loose'}" style="--i:${index}">
+                <span class="scan-name">${escape(item.name)}</span>${version}
+            </li>`;
+        })
+        .join('');
+
+    // Sólo se escanea lo que tiene pin exacto; el resto se muestra, pero atenuado.
+    const fijadas = packages.filter((item) => item.pinned).length;
+
+    return `<div class="scanning">
+        <header class="page-header">
+            <p class="label">Informe de seguridad</p>
+            <h1>Analizando dependencias</h1>
+            <p class="muted"><code>${escape(manifest)}</code> · ${escape(provider)}</p>
+        </header>
+        <p class="scan-stage" aria-live="polite"><span class="scan-spinner" aria-hidden="true"></span><span id="stage">Cruzando ${plural(fijadas, 'dependencia fijada', 'dependencias fijadas')} con el catálogo de advisories</span></p>
+        <ul class="scan-grid" aria-label="Dependencias del manifiesto">${items}</ul>
+        <p class="scan-note muted" id="stage-note">Todo corre en tu máquina: no se envía el manifiesto a ningún servicio.</p>
+    </div>`;
 }
 
 function renderResult(result: ScanResult): string {
@@ -456,4 +517,57 @@ const STYLES = `
   }
   .skipped ul { margin: 0; padding-left: var(--sp-5); }
   .skipped li { margin: var(--sp-1) 0; color: var(--muted); }
+
+  /* --- Pantalla de espera ------------------------------------------------------- */
+  /* Ocupa el alto del panel para que la espera no se lea como una página a medio cargar. */
+  .scanning {
+    display: flex; flex-direction: column; gap: var(--sp-4);
+    min-height: calc(100vh - var(--sp-5) - var(--sp-6));
+  }
+  .scan-stage { display: flex; align-items: center; gap: var(--sp-2); margin: 0; }
+  .scan-spinner {
+    flex: none; width: .85em; height: .85em;
+    border: 2px solid var(--border);
+    border-top-color: var(--vscode-progressBar-background, var(--vscode-textLink-foreground));
+    border-radius: 50%;
+    animation: scan-spin .9s linear infinite;
+  }
+  .scan-grid {
+    flex: 1; align-content: start;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: var(--sp-2);
+    margin: 0; padding: 0; list-style: none;
+  }
+  .scan-item {
+    display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--muted);
+    /*
+     * Una onda que recorre la lista y vuelve a empezar. El retardo escalonado por
+     * índice es lo que la hace viajar; el ciclo largo con la mayor parte en reposo
+     * evita que la pantalla titile mientras se espera.
+     */
+    animation: scan-wave 2.6s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 90ms);
+  }
+  .scan-item.loose { opacity: .55; animation: none; }
+  .scan-name { font-family: var(--vscode-editor-font-family); font-size: var(--fs-sm); }
+  .scan-version { font-size: var(--fs-xs); font-variant-numeric: tabular-nums; }
+  .scan-note { margin: 0; font-size: var(--fs-sm); }
+
+  @keyframes scan-spin { to { transform: rotate(360deg); } }
+  @keyframes scan-wave {
+    0%, 55%, 100% { border-color: var(--border); color: var(--muted); background: transparent; }
+    22% {
+      border-color: var(--vscode-focusBorder);
+      color: var(--vscode-foreground);
+      background: var(--surface);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scan-spinner { animation-duration: 2.4s; }
+    .scan-item { animation: none; }
+  }
 `;
