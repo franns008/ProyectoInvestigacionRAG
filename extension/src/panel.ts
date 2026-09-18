@@ -375,7 +375,7 @@ function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
     return `
     <article class="finding card ${finding.kev ? 'urgent' : ''}">
       <h3 class="finding-head">
-        <span>${escape(finding.package)} ${escape(finding.installed_version)} ${destino}</span>
+        <span class="finding-title">${escape(finding.package)} ${escape(finding.installed_version)} ${destino}</span>
         <span class="finding-tags">
           ${explotada ? '<span class="tag danger">Explotada</span>' : ''}
           <span class="tag ${severity.variant}">${severity.label}</span>
@@ -566,6 +566,9 @@ const STYLES = `
     padding: var(--sp-3) var(--sp-4);
     color: var(--vscode-foreground);
     background: var(--surface);
+    /* .package-group recorta (overflow:hidden), así que sin esto un nombre de paquete
+       largo se corta contra el borde en vez de envolver. */
+    overflow-wrap: anywhere;
   }
   .package-group > summary:hover { background: var(--vscode-list-hoverBackground); }
   .package-findings { padding: 0 var(--sp-3) var(--sp-2); }
@@ -611,6 +614,12 @@ const STYLES = `
     font-size: var(--fs-lg);
     font-weight: 700;
   }
+  /* Mismo criterio que .finding-meta en el pie: el título envuelve por dentro en vez de
+     empujar a los tags fuera de la tarjeta. Un ítem flex tiene min-width:auto, así que
+     sin esto el nombre del paquete impone su ancho mínimo y desborda la línea entera.
+     overflow-wrap cubre el caso en que un solo token ya no entra: min-width:0 deja que
+     el span se encoja, pero no parte la palabra. */
+  .finding-title { min-width: 0; overflow-wrap: anywhere; }
   .finding-tags { flex: none; display: flex; gap: var(--sp-2); }
   .finding-fix { font-weight: 400; color: var(--muted); }
 
@@ -689,4 +698,33 @@ const STYLES = `
     }
   }
   @media (prefers-reduced-motion: reduce) { .scan-item { animation: none; } }
+
+  /* --- Panel angosto ------------------------------------------------------------ *
+   *
+   * Mismo umbral que en BASE_STYLES, donde la página achica su margen.
+   *
+   * Las dos líneas de la tarjeta —título contra tags, respaldo contra acción— son
+   * pares de "contenido a la izquierda, estado a la derecha". El de la derecha no
+   * puede encogerse (los tags y el botón son cajas de tamaño fijo) y el de la
+   * izquierda ya envuelve todo lo que puede, así que por debajo de cierto ancho la
+   * línea no cierra y lo fijo termina fuera de la tarjeta.
+   *
+   * Envolver dentro de la misma línea no alcanza: con space-between, lo que baja al
+   * segundo renglón queda pegado a la izquierda, o sea en columna pero a medias y con
+   * el alineado roto. Se pasa a columna de una vez, que es lo que efectivamente es.
+   * Se pierde el barrido vertical por la derecha, pero a este ancho ese barrido no
+   * existía: cabe una tarjeta y se lee de arriba a abajo.
+   */
+  @media (max-width: 30rem) {
+    .finding-head, .finding-foot, .section-heading {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--sp-2);
+    }
+    /* Dos tags no siempre entran juntos a este ancho. */
+    .finding-tags { flex-wrap: wrap; }
+    .section-heading { gap: var(--sp-1); }
+    /* Ya no compite con la meta por la línea: puede ocupar el ancho que necesite. */
+    .chat-button { max-width: 100%; }
+  }
 `;

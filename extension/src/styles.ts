@@ -220,6 +220,19 @@ export const BASE_STYLES = `
 
   summary { cursor: pointer; }
 
+  /*
+   * Panel angosto. El webview vive en una columna lateral que el usuario arrastra, así
+   * que 30rem no es un caso raro: es media jornada de trabajo con el informe al costado.
+   *
+   * Lo único que cambia acá es el margen de la página. Con --sp-6 a cada lado se van
+   * 4rem de un panel de 20rem —un quinto del ancho— y ese sobrante es justo lo que le
+   * falta al contenido de las tarjetas para entrar. Lo que hace cada pantalla con el
+   * espacio que esto le devuelve es asunto suyo, y vive en su archivo.
+   */
+  @media (max-width: 30rem) {
+    .page { padding: var(--sp-4) var(--sp-3) var(--sp-5); }
+  }
+
   pre {
     background: var(--surface);
     padding: var(--sp-3);
