@@ -84,7 +84,7 @@ export class ResultsPanel {
   });
 </script>
 </head>
-<body>${body}</body>
+<body><div class="page">${body}</div></body>
 </html>`;
     }
 
@@ -121,10 +121,10 @@ function renderResult(result: ScanResult): string {
 
     return `
         <header class="page-header">
-            <p class="eyebrow">INFORME DE SEGURIDAD</p>
+            <p class="label">Informe de seguridad</p>
             <h1>${plural(funnel.paquetes, 'dependencia', 'dependencias')} con vulnerabilidades conocidas</h1>
             <p class="muted">${escape(basename(result.manifest))}</p>
-            <div class="summary-strip">
+            <div class="summary-strip nums">
                 <div><strong>${funnel.total}</strong><span>vulnerabilidades</span></div>
                 <div><strong>${funnel.paquetes}</strong><span>librerías</span></div>
                 <div class="${urgentes.length ? 'danger' : ''}"><strong>${urgentes.length}</strong><span>explotadas</span></div>
@@ -136,7 +136,7 @@ function renderResult(result: ScanResult): string {
         <section class="library-section">
             <div class="section-heading">
                 <div>
-                    <p class="eyebrow">DETALLE POR LIBRERIA</p>
+                    <p class="label">Detalle por librería</p>
                     <h2>Vulnerabilidades agrupadas</h2>
                 </div>
                 <span class="section-count">${plural(funnel.paquetes, 'librería', 'librerías')}</span>
@@ -157,9 +157,9 @@ function renderResult(result: ScanResult): string {
 
 function renderUrgentFindings(findings: Finding[]): string {
         return `<section class="urgent-section">
-            <div class="section-heading urgent-heading">
+            <div class="section-heading">
                 <div>
-                    <p class="eyebrow">PRIORIDAD INMEDIATA</p>
+                    <p class="label">Prioridad inmediata</p>
                     <h2>Explotadas activamente</h2>
                 </div>
                 <span class="urgent-count">${findings.length}</span>
@@ -171,7 +171,7 @@ function renderUrgentFindings(findings: Finding[]): string {
 
 function renderNoUrgentFindings(): string {
         return `<section class="quiet-section">
-            <p class="eyebrow">PRIORIDAD INMEDIATA</p>
+            <p class="label">Prioridad inmediata</p>
             <p><strong>No hay vulnerabilidades explotadas activamente.</strong> Ningún hallazgo aparece en el catálogo CISA KEV.</p>
         </section>`;
 }
@@ -248,12 +248,12 @@ function renderFinding(finding: Finding): string {
 
         const severity = severityLabel(finding.cvss_score);
         return `
-        <section class="finding ${finding.kev ? 'urgent' : ''} ${severity.className}">
+        <section class="finding card ${finding.kev ? 'urgent' : ''}">
       <h2>
-        ${finding.kev ? '<span class="flag">EXPLOTADA</span>' : ''}
+        ${finding.kev ? '<span class="badge solid">Explotada</span>' : ''}
                 ${escape(finding.package)} ${escape(finding.installed_version)} <span class="finding-fix">— ${arreglo}</span>
       </h2>
-            <p class="facts"><span class="severity-badge">${severity.label}</span> ${datos.join(' · ')}</p>
+            <p class="facts nums"><span class="badge ${severity.variant}">${severity.label}</span> ${datos.join(' · ')}</p>
       ${finding.summary ? `<p>${escape(finding.summary)}</p>` : ''}
       ${
           finding.explanation
@@ -265,19 +265,23 @@ function renderFinding(finding: Finding): string {
               ? `<p class="muted">Clase de debilidad: ${finding.cwe_ids.map(escape).join(', ')}</p>`
               : ''
       }
-      <button class="button chat-button" data-finding="${escape(JSON.stringify(finding))}">
+      <button class="button quiet chat-button" data-finding="${escape(JSON.stringify(finding))}">
         Hablar en profundidad
       </button>
       ${renderSources(finding)}
     </section>`;
 }
 
-function severityLabel(score: number | null): { label: string; className: string } {
-    if (score === null) return { label: 'SIN CVSS', className: 'severity-unknown' };
-    if (score >= 9) return { label: 'CRITICA', className: 'severity-critical' };
-    if (score >= 7) return { label: 'ALTA', className: 'severity-high' };
-    if (score >= 4) return { label: 'MEDIA', className: 'severity-medium' };
-    return { label: 'BAJA', className: 'severity-low' };
+/**
+ * Severidad → variante de `.badge`. El rojo lleno queda para KEV y sólo para KEV: acá
+ * la crítica llega hasta el contorno rojo, y de media para abajo no gasta color.
+ */
+function severityLabel(score: number | null): { label: string; variant: string } {
+    if (score === null) return { label: 'Sin CVSS', variant: '' };
+    if (score >= 9) return { label: 'Crítica', variant: 'danger' };
+    if (score >= 7) return { label: 'Alta', variant: 'warning' };
+    if (score >= 4) return { label: 'Media', variant: '' };
+    return { label: 'Baja', variant: '' };
 }
 
 function compareVersions(left: string, right: string): number {
@@ -374,77 +378,82 @@ function plural(n: number, singular: string, plural_: string): string {
     return `${n} ${n === 1 ? singular : plural_}`;
 }
 
-/** Específicos del panel de resultados; la base compartida está en styles.ts. */
+/**
+ * Sólo lo específico del informe. Todo lo que comparte con el chat —superficie,
+ * badges, chips, botones, escalas, foco— vive en BASE_STYLES y acá no se redefine.
+ */
 const STYLES = `
-    .page-header { padding-bottom: 1.25rem; border-bottom: 1px solid var(--vscode-panel-border); }
-    .eyebrow { margin: 0 0 .25rem; color: var(--vscode-textLink-foreground); font-size: .7rem; font-weight: 700; letter-spacing: .08em; }
-    .page-header h1 { margin-bottom: .1rem; }
-    .summary-strip { display: flex; gap: .5rem; margin-top: 1rem; flex-wrap: wrap; }
-    .summary-strip div { min-width: 8rem; padding: .65rem .8rem; border: 1px solid var(--vscode-panel-border); border-radius: 4px; background: var(--vscode-textCodeBlock-background); }
-    .summary-strip strong { display: block; font-size: 1.25rem; line-height: 1.1; }
-    .summary-strip span { color: var(--vscode-descriptionForeground); font-size: .8rem; }
-    .summary-strip .danger { border-color: var(--vscode-editorError-foreground); }
-    .summary-strip .danger strong { color: var(--vscode-editorError-foreground); }
-    .urgent-section, .library-section { margin-top: 1.5rem; }
-    .urgent-section { border-left: 3px solid var(--vscode-editorError-foreground); padding-left: 1rem; }
-    .quiet-section { margin-top: 1.5rem; padding: .8rem 1rem; border: 1px solid var(--vscode-panel-border); border-radius: 4px; }
-    .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .5rem; }
-    .section-heading h2 { margin: 0; font-size: 1.05rem; }
-    .section-count, .urgent-count { color: var(--vscode-descriptionForeground); font-size: .8rem; }
-    .urgent-count { display: inline-grid; place-items: center; min-width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--vscode-editorError-foreground); color: var(--vscode-editor-background); font-weight: 700; }
-    .urgent-heading .eyebrow { color: var(--vscode-editorError-foreground); }
-    .section-intro { color: var(--vscode-descriptionForeground); margin: 0 0 .75rem; }
-  .closing { margin-top: 1.5rem; color: var(--vscode-descriptionForeground); }
+  .page-header { padding-bottom: var(--sp-4); border-bottom: 1px solid var(--border); }
+  .page-header h1 { margin-bottom: var(--sp-1); }
 
-    .package-group { margin: .75rem 0; border: 1px solid var(--vscode-panel-border); border-radius: 4px; overflow: hidden; }
-  .package-group > summary {
-    cursor: pointer;
-        padding: .8rem 1rem;
-    color: var(--vscode-foreground);
-        background: var(--vscode-textCodeBlock-background);
-        list-style-position: inside;
+  .summary-strip { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-4); }
+  .summary-strip > div {
+    min-width: 8rem;
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
   }
-  .package-group > summary strong { font-size: 1.05em; }
-    .package-group > summary:hover { background: var(--vscode-list-hoverBackground); }
-    .package-findings { padding: .15rem .75rem .55rem; }
+  .summary-strip strong { display: block; font-size: var(--fs-xl); line-height: 1.2; }
+  .summary-strip span { color: var(--muted); font-size: var(--fs-sm); }
+  .summary-strip > .danger { border-color: var(--danger); }
+  .summary-strip > .danger strong { color: var(--danger); }
 
-  .funnel { border-collapse: collapse; margin: 1rem 0; width: 100%; max-width: 32rem; }
-  .funnel td { padding: .2rem .5rem .2rem 0; }
-  .funnel td.num { text-align: right; font-variant-numeric: tabular-nums; width: 4rem; }
+  .urgent-section, .library-section { margin-top: var(--sp-5); }
+  .urgent-section { border-left: 2px solid var(--danger); padding-left: var(--sp-4); }
+  .quiet-section {
+    margin-top: var(--sp-5);
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .section-heading {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: var(--sp-4); margin-bottom: var(--sp-2);
+  }
+  .section-heading h2 { margin: 0; }
+  .section-count, .urgent-count {
+    flex: none;
+    color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums;
+  }
+  .section-intro { margin: 0 0 var(--sp-3); color: var(--muted); }
+  .closing { margin-top: var(--sp-5); color: var(--muted); }
+
+  .package-group {
+    margin: var(--sp-3) 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .package-group > summary {
+    padding: var(--sp-3) var(--sp-4);
+    color: var(--vscode-foreground);
+    background: var(--surface);
+  }
+  .package-group > summary:hover { background: var(--vscode-list-hoverBackground); }
+  .package-findings { padding: 0 var(--sp-3) var(--sp-2); }
+
+  .funnel { width: 100%; max-width: 32rem; margin: var(--sp-4) 0; border-collapse: collapse; }
+  .funnel td { padding: var(--sp-1) var(--sp-2) var(--sp-1) 0; }
+  .funnel td.num { width: 4rem; text-align: right; font-variant-numeric: tabular-nums; }
   .funnel tr:first-child td { font-weight: 600; }
 
-  .finding {
-    border: 1px solid var(--vscode-panel-border);
-    border-left: 3px solid var(--vscode-panel-border);
-    border-radius: 3px;
-    padding: .85rem 1rem;
-    margin: .6rem 0;
-  }
-  .finding.urgent { border-left-color: var(--vscode-editorError-foreground); }
-    .finding h2 { line-height: 1.35; }
-    .finding-fix { font-weight: 400; }
-    .severity-badge { display: inline-block; font-size: .68rem; font-weight: 700; letter-spacing: .04em; padding: .08rem .35rem; border-radius: 2px; color: var(--vscode-editor-background); background: var(--vscode-descriptionForeground); }
-    .severity-critical .severity-badge, .severity-high .severity-badge { background: var(--vscode-editorError-foreground); }
-    .severity-medium .severity-badge { background: var(--vscode-editorWarning-foreground); }
-    .severity-low .severity-badge, .severity-unknown .severity-badge { color: var(--vscode-foreground); background: var(--vscode-badge-background); }
-  .flag {
-    background: var(--vscode-editorError-foreground);
-    color: var(--vscode-editor-background);
-    font-size: .7rem;
-    font-weight: 700;
-    letter-spacing: .04em;
-    padding: .1rem .4rem;
-    border-radius: 2px;
-    vertical-align: .1em;
-    margin-right: .3rem;
-  }
-  .facts { font-variant-numeric: tabular-nums; color: var(--vscode-descriptionForeground); }
+  /* El hallazgo es la superficie compartida; lo único propio es la marca de urgencia. */
+  .finding { margin: var(--sp-2) 0; border-left-width: 2px; }
+  .finding.urgent { border-left-color: var(--danger); }
+  .finding h2 { font-size: var(--fs-md); }
+  .finding-fix { font-weight: 400; color: var(--muted); }
+  .facts { color: var(--muted); font-size: var(--fs-sm); }
   .facts strong { color: var(--vscode-foreground); }
-  .explanation { margin: .6rem 0; }
-  .sources { font-size: .85em; margin-top: .6rem; }
-  .chat-button { margin-top: .5rem; }
+  .explanation { margin: var(--sp-2) 0; }
+  .sources { margin-top: var(--sp-2); color: var(--muted); font-size: var(--fs-sm); }
+  .chat-button { margin-top: var(--sp-2); }
 
-  .skipped { margin-top: 2rem; border-top: 1px solid var(--vscode-panel-border); padding-top: 1rem; }
-  .skipped ul { margin: 0; padding-left: 1.2rem; }
-  .skipped li { margin: .2rem 0; color: var(--vscode-descriptionForeground); }
+  .skipped {
+    margin-top: var(--sp-6);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--border);
+  }
+  .skipped ul { margin: 0; padding-left: var(--sp-5); }
+  .skipped li { margin: var(--sp-1) 0; color: var(--muted); }
 `;

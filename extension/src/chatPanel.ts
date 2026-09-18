@@ -116,7 +116,7 @@ export class ChatPanel {
 <style>${BASE_STYLES}${CHAT_STYLES}</style>
 </head>
 <body>
-<main>
+<main class="page">
   <header>
     <h1>${escape(identifierOf(finding))}</h1>
     <p class="muted">${escape(finding.package)} ${escape(finding.installed_version)} — ${fix}</p>
@@ -185,7 +185,7 @@ function renderCitedIds(answer: string, finding: Finding): string {
   );
   const outside = cited.filter((id) => !known.has(id));
   const items = cited
-    .map((id) => (known.has(id) ? chip(id) : `${chip(id)}<span class="outside" title="No viene del escaneo: puede salir del corpus del RAG o ser inventado">fuera del escaneo</span>`))
+    .map((id) => (known.has(id) ? chip(id) : `${chip(id)}<span class="badge warning outside" title="No viene del escaneo: puede salir del corpus del RAG o ser inventado">fuera del escaneo</span>`))
     .join(" ");
   return `<details class="cited">
     <summary class="muted">IDs citados en la respuesta (${cited.length}${outside.length ? `, ${outside.length} fuera del escaneo` : ""})</summary>
@@ -298,89 +298,104 @@ function addMessage(role, fill) {
 input.focus();
 `;
 
+/**
+ * Sólo lo específico del chat: el layout de columna a pantalla completa y el hilo de
+ * mensajes. Superficie, chips, badges, botones y escalas salen de BASE_STYLES.
+ */
 const CHAT_STYLES = `
   html, body { height: 100%; }
-  body { margin: 0; padding: 0; max-width: none; overflow: hidden; }
+  body { overflow: hidden; }
   main {
-    box-sizing: border-box;
     display: flex; flex-direction: column;
-    height: 100vh; max-width: 60rem;
-    padding: 1.5rem 2rem 1rem;
+    height: 100vh;
+    padding-bottom: var(--sp-4);
   }
   header { flex: none; }
 
-  details > summary { cursor: pointer; }
-  .loaded-context { margin: .15rem 0 0; }
+  /* Desplegable discreto: es una ayuda, no una sección del documento. */
+  .loaded-context { margin-top: var(--sp-1); }
   .loaded-context > summary {
     display: inline-block; list-style: none;
-    font-size: .85em; color: var(--vscode-textLink-foreground);
+    font-size: var(--fs-sm); color: var(--vscode-textLink-foreground);
   }
   .loaded-context > summary::-webkit-details-marker { display: none; }
   .loaded-context > summary::before { content: "▸ "; }
   .loaded-context[open] > summary::before { content: "▾ "; }
   .loaded-context > summary:hover { text-decoration: underline; }
-  .context-panel { max-height: 40vh; overflow-y: auto; }
-  .context-row { display: flex; gap: .75rem; margin: .3rem 0; flex-wrap: wrap; }
+  .context-panel { margin-top: var(--sp-2); max-height: 40vh; overflow-y: auto; }
+  .context-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin: var(--sp-1) 0; }
   .context-row > .muted { min-width: 8rem; }
-  .raw { margin-top: .6rem; }
+  .raw { margin-top: var(--sp-2); }
+  .raw > summary { font-size: var(--fs-sm); }
 
-  .chip {
-    font-family: var(--vscode-editor-font-family); font-size: .85em;
-    border: 1px solid var(--vscode-panel-border); border-radius: 2px;
-    padding: .05rem .35rem; text-decoration: none; white-space: nowrap;
-  }
-  .outside {
-    color: var(--vscode-editorWarning-foreground);
-    font-size: .75rem; margin: 0 .5rem 0 .25rem;
-  }
+  .outside { margin: 0 var(--sp-2) 0 var(--sp-1); }
 
-  #messages { flex: 1; min-height: 0; overflow-y: auto; margin: 1rem 0 .75rem; }
-  .intro { border-bottom: 1px solid var(--vscode-panel-border); padding-bottom: .75rem; }
-  .message { margin: .6rem 0; }
+  #messages { flex: 1; min-height: 0; overflow-y: auto; margin: var(--sp-4) 0 var(--sp-3); }
+  .intro { padding-bottom: var(--sp-3); border-bottom: 1px solid var(--border); }
+  .message { margin: var(--sp-2) 0; }
   .message.user {
     white-space: pre-wrap;
-    padding: .6rem .85rem; border-radius: 3px;
+    padding: var(--sp-2) var(--sp-3);
+    border-left: 2px solid var(--vscode-textLink-foreground);
+    border-radius: var(--radius-sm);
     background: var(--vscode-textBlockQuote-background);
-    border-left: 3px solid var(--vscode-textLink-foreground);
   }
   .message.error { color: var(--vscode-errorForeground); white-space: pre-wrap; }
+
+  /* Markdown de la respuesta: hereda del sistema y sólo ajusta el ritmo vertical. */
   .message.assistant > :first-child { margin-top: 0; }
-  .message.assistant ul, .message.assistant ol { margin: .4rem 0; padding-left: 1.4rem; }
-  .message.assistant li { margin: .15rem 0; }
-  .message.assistant h2, .message.assistant h3 { margin: .9rem 0 .4rem; }
+  .message.assistant > :last-child { margin-bottom: 0; }
+  .message.assistant ul, .message.assistant ol { margin: var(--sp-2) 0; padding-left: var(--sp-5); }
+  .message.assistant li { margin: var(--sp-1) 0; }
+  .message.assistant h2, .message.assistant h3 { margin: var(--sp-4) 0 var(--sp-2); }
   .message.assistant blockquote {
-    margin: .5rem 0; padding: .1rem .85rem;
-    border-left: 3px solid var(--vscode-textBlockQuote-border);
+    margin: var(--sp-2) 0;
+    padding: var(--sp-1) var(--sp-3);
+    border-left: 2px solid var(--vscode-textBlockQuote-border);
     background: var(--vscode-textBlockQuote-background);
   }
   .message.assistant :not(pre) > code {
-    background: var(--vscode-textCodeBlock-background); padding: .05rem .3rem; border-radius: 2px;
+    padding: 0 .3em;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
   }
-  .message.assistant hr { border: 0; border-top: 1px solid var(--vscode-panel-border); }
+  .message.assistant hr { border: 0; border-top: 1px solid var(--border); }
   .table { overflow-x: auto; }
-  .message.assistant table { border-collapse: collapse; margin: .5rem 0; }
+  .message.assistant table { margin: var(--sp-2) 0; border-collapse: collapse; }
   .message.assistant th, .message.assistant td {
-    border: 1px solid var(--vscode-panel-border); padding: .25rem .5rem; text-align: left;
+    padding: var(--sp-1) var(--sp-2);
+    border: 1px solid var(--border);
+    text-align: left;
   }
-  .cited { margin-top: .75rem; font-size: .9em; border-top: 1px solid var(--vscode-panel-border); padding-top: .5rem; }
+  .cited {
+    margin-top: var(--sp-3);
+    padding-top: var(--sp-2);
+    border-top: 1px solid var(--border);
+    font-size: var(--fs-sm);
+  }
 
-  form { flex: none; display: flex; gap: .5rem; align-items: flex-end; }
+  form { flex: none; display: flex; align-items: flex-end; gap: var(--sp-2); }
   textarea {
-    flex: 1; resize: none; overflow-y: hidden; box-sizing: border-box;
-    color: var(--vscode-input-foreground); background: var(--vscode-input-background);
-    border: 1px solid var(--vscode-input-border, var(--vscode-panel-border)); border-radius: 3px;
-    padding: .4rem .6rem; font: inherit; line-height: 1.4;
+    flex: 1; resize: none; overflow-y: hidden;
+    padding: var(--sp-1) var(--sp-2);
+    font: inherit; line-height: 1.5;
+    color: var(--vscode-input-foreground);
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border, var(--border));
+    border-radius: var(--radius-sm);
   }
-  form .button { padding-block: .4rem; line-height: 1.4; }
-  textarea:focus { outline: 1px solid var(--vscode-focusBorder); outline-offset: -1px; }
+  textarea::placeholder { color: var(--vscode-input-placeholderForeground, var(--muted)); }
+  form .button { padding-block: var(--sp-1); }
+
   .typing {
-    display: inline-flex; gap: .3rem; align-items: center;
-    padding: .7rem .9rem; border-radius: 3px;
-    border: 1px solid var(--vscode-panel-border);
+    display: inline-flex; align-items: center; gap: var(--sp-1);
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
   }
   .typing span {
     width: .45rem; height: .45rem; border-radius: 50%;
-    background: var(--vscode-descriptionForeground);
+    background: var(--muted);
     animation: typing 1.2s infinite ease-in-out;
   }
   .typing span:nth-child(2) { animation-delay: .2s; }
