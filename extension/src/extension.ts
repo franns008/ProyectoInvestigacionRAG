@@ -32,8 +32,10 @@ export function activate(context: vscode.ExtensionContext): void {
         100,
     );
     status.command = 'cibersec.scanRequirements';
-    status.text = '$(shield) Escanear dependencias';
-    status.tooltip = 'Buscar dependencias vulnerables en este requirements.txt';
+    // Etiqueta corta al lado del ícono; el detalle va al tooltip, igual que el botón
+    // de la barra de título del editor.
+    status.text = '$(shield) Escanear';
+    status.tooltip = 'Escanear dependencias vulnerables en este requirements.txt';
     context.subscriptions.push(status);
 
     const refresh = () => {

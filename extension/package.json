@@ -9,9 +9,13 @@
   "engines": {
     "vscode": "^1.90.0"
   },
-  "categories": ["Linters"],
+  "categories": [
+    "Linters"
+  ],
   "main": "./out/extension.js",
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": false,
@@ -23,7 +27,9 @@
       {
         "command": "cibersec.scanRequirements",
         "title": "Escanear dependencias vulnerables",
-        "category": "Ciberseguridad"
+        "category": "Ciberseguridad",
+        "shortTitle": "Escanear",
+        "icon": "$(shield)"
       }
     ],
     "menus": {
@@ -47,7 +53,10 @@
       "properties": {
         "cibersec.provider": {
           "type": "string",
-          "enum": ["local", "rag"],
+          "enum": [
+            "local",
+            "rag"
+          ],
           "default": "local",
           "enumDescriptions": [
             "Corre el escáner determinístico local (sin LLM, sin stack).",
