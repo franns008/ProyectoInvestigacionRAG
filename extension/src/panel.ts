@@ -164,7 +164,6 @@ function renderResult(result: ScanResult): string {
     }
 
     const urgentes = findings.filter((f) => f.kev);
-    const resto = funnel.total - urgentes.length;
 
     return `
         <header class="page-header">
@@ -187,12 +186,6 @@ function renderResult(result: ScanResult): string {
             </div>
             ${renderPackageGroups(findings)}
         </section>
-
-    ${
-        urgentes.length > 0 && resto > 0
-            ? `<p class="closing">Las otras ${resto} vulnerabilidades no tienen exploit conocido circulando.</p>`
-            : ''
-    }
 
     ${renderSkipped(skipped)}`;
 }
@@ -285,8 +278,11 @@ function renderPackageGroup(findings: Finding[]): string {
  * y no ciento quince— y estaba detrás de la conclusión, al final de una página de
  * quince pantallas, donde no lo leía nadie.
  *
- * Lleva encabezados de columna de verdad: es una tabla de datos, y sin `th` un lector
+ * Lleva encabezados de columna de verdad: es una tabla de datos, y sin th un lector
  * de pantalla la recorre sin saber qué significa cada celda.
+ *
+ * El total no es una fila de la tabla: es la base contra la que se calculan los
+ * porcentajes, y por eso era la única sin uno. Va en la línea que la introduce.
  */
 function renderFunnel(f: ScanResult['funnel']): string {
     const row = (label: string, value: number) =>
@@ -294,20 +290,15 @@ function renderFunnel(f: ScanResult['funnel']): string {
      <td class="num muted">${f.total ? Math.round((value / f.total) * 100) + '%' : ''}</td></tr>`;
 
     return `<section class="funnel-section">
-    <div class="section-heading">
-      <div>
-        <p class="label">Por qué estas y no las otras</p>
-        <h2>El embudo</h2>
-      </div>
-    </div>
+    <h2>Resumen</h2>
+    <p class="muted">De las ${f.total} que afectan tus versiones, cuántas quedan con cada criterio:</p>
     <table class="funnel">
       <thead>
         <tr><th scope="col">Criterio</th><th scope="col" class="num">Quedan</th><th scope="col" class="num">%</th></tr>
       </thead>
       <tbody>
-        <tr><td>CVEs que afectan tus versiones</td><td class="num">${f.total}</td><td></td></tr>
-        ${row('filtrando por severidad alta (CVSS ≥ 7)', f.cvss_alto)}
-        ${row('filtrando por probabilidad de exploit (EPSS ≥ 10%)', f.epss_alto)}
+        ${row('severidad alta (CVSS ≥ 7)', f.cvss_alto)}
+        ${row('probabilidad de explotación (EPSS ≥ 10%)', f.epss_alto)}
         ${row('explotadas hoy (catálogo CISA KEV)', f.kev)}
       </tbody>
     </table>
@@ -363,7 +354,7 @@ function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
       <div class="finding-foot">
         <span class="finding-meta nums">${meta.join(' · ')}</span>
         <button class="button chat-button" data-finding="${escape(findingKey(finding))}">
-          Preguntar
+          Profundizar
         </button>
       </div>
     </article>`;
@@ -527,7 +518,6 @@ const STYLES = `
     flex: none;
     color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums;
   }
-  .closing { margin-top: var(--sp-5); color: var(--muted); }
 
   .package-group {
     margin: var(--sp-3) 0;
@@ -548,7 +538,8 @@ const STYLES = `
   .funnel th, .funnel td { padding: var(--sp-1) var(--sp-2) var(--sp-1) 0; text-align: left; }
   .funnel th { font-size: var(--fs-sm); font-weight: 400; color: var(--muted); }
   .funnel .num { width: 4rem; text-align: right; font-variant-numeric: tabular-nums; }
-  .funnel tbody tr:first-child td { font-weight: 600; }
+  .funnel-section h2 { margin-bottom: var(--sp-1); }
+  .funnel-section > .muted { margin: 0 0 var(--sp-2); }
 
   /* El hallazgo es la superficie compartida; lo único propio es la marca de urgencia. */
   .finding { margin: var(--sp-2) 0; border-width: 2px; border-left-width: 3px; }
