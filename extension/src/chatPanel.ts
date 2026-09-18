@@ -12,6 +12,7 @@
 
 import * as vscode from "vscode";
 import { renderMarkdown } from "./markdown";
+import { chip } from "./references";
 import { Finding } from "./scan/types";
 import { BASE_STYLES, escapeHtml as escape, nonceValue } from "./styles";
 
@@ -191,21 +192,6 @@ function renderCitedIds(answer: string, finding: Finding): string {
     <summary class="muted">IDs citados en la respuesta (${cited.length}${outside.length ? `, ${outside.length} fuera del escaneo` : ""})</summary>
     <p>${items}</p>
   </details>`;
-}
-
-function chip(id: string): string {
-  const url = referenceUrl(id);
-  return url
-    ? `<a class="chip" href="${escape(url)}" title="${escape(url)}">${escape(id)}</a>`
-    : `<span class="chip">${escape(id)}</span>`;
-}
-
-function referenceUrl(id: string): string | null {
-  const cwe = id.match(/^CWE-(\d+)$/i);
-  if (cwe) return `https://cwe.mitre.org/data/definitions/${cwe[1]}.html`;
-  if (/^CVE-\d{4}-\d+$/i.test(id)) return `https://nvd.nist.gov/vuln/detail/${id.toUpperCase()}`;
-  if (/^[A-Z]+-[\w-]+$/i.test(id)) return `https://osv.dev/vulnerability/${encodeURIComponent(id)}`;
-  return null;
 }
 
 function unique(values: (string | null | undefined)[]): string[] {

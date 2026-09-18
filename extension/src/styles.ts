@@ -171,13 +171,6 @@ export const BASE_STYLES = `
     background: var(--vscode-button-secondaryBackground);
   }
   .button.secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
-  /* Para acciones que se repiten en cada ítem: disponibles, sin llamar la atención. */
-  .button.quiet {
-    color: var(--vscode-foreground);
-    background: transparent;
-    border-color: var(--border);
-  }
-  .button.quiet:hover { background: var(--vscode-list-hoverBackground); }
 
   summary { cursor: pointer; }
 

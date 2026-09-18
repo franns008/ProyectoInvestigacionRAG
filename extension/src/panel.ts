@@ -13,6 +13,7 @@
 import * as vscode from 'vscode';
 import { ChatPanel, ChatOptions } from './chatPanel';
 import { PreviewPackage } from './scan/manifest';
+import { chip } from './references';
 import { Finding, ScanResult } from './scan/types';
 import { BASE_STYLES, escapeHtml as escape, nonceValue } from './styles';
 
@@ -20,6 +21,13 @@ export class ResultsPanel {
     private static current: ResultsPanel | undefined;
     private readonly panel: vscode.WebviewPanel;
     private disposables: vscode.Disposable[] = [];
+    /**
+     * Los hallazgos del último escaneo, por clave. Serializar cada uno dentro de un
+     * atributo `data-` costaba 291 KB de HTML en un informe de 115 hallazgos, la mayor
+     * parte en `details` y `references`, que el DOM no usa para nada: el botón sólo
+     * necesita decir cuál se abre.
+     */
+    private findings = new Map<string, Finding>();
 
     private constructor() {
         this.panel = vscode.window.createWebviewPanel(
@@ -29,9 +37,14 @@ export class ResultsPanel {
             { enableScripts: true, retainContextWhenHidden: true },
         );
         this.panel.webview.onDidReceiveMessage(
-            (message: { type?: string; finding?: Finding }) => {
-                if (message.type === 'openChat' && message.finding) {
-                    ChatPanel.show(message.finding, this.chatOptions());
+            (message: { type?: string; key?: string; url?: string }) => {
+                if (message.type === 'openChat' && message.key) {
+                    const finding = this.findings.get(message.key);
+                    if (finding) ChatPanel.show(finding, this.chatOptions());
+                    return;
+                }
+                if (message.type === 'openExternal' && message.url && /^https?:\/\//i.test(message.url)) {
+                    void vscode.env.openExternal(vscode.Uri.parse(message.url));
                 }
             },
             null,
@@ -62,6 +75,7 @@ export class ResultsPanel {
     }
 
     render(result: ScanResult): void {
+        this.findings = new Map(result.findings.map((f) => [findingKey(f), f]));
         this.panel.webview.html = this.wrap(renderResult(result));
     }
 
@@ -78,8 +92,15 @@ export class ResultsPanel {
   const vscode = acquireVsCodeApi();
   document.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-finding]");
-    if (!button) return;
-    vscode.postMessage({ type: "openChat", finding: JSON.parse(button.dataset.finding) });
+    if (button) {
+      vscode.postMessage({ type: "openChat", key: button.dataset.finding });
+      return;
+    }
+    const link = event.target.closest("a[href]");
+    if (link) {
+      event.preventDefault();
+      vscode.postMessage({ type: "openExternal", url: link.getAttribute("href") });
+    }
   });
 </script>
 </head>
@@ -147,14 +168,9 @@ function renderResult(result: ScanResult): string {
 
     return `
         <header class="page-header">
-            <p class="label">Informe de seguridad</p>
             <h1>${plural(funnel.paquetes, 'dependencia', 'dependencias')} con vulnerabilidades conocidas</h1>
             <p class="muted">${escape(basename(result.manifest))}</p>
-            <div class="summary-strip nums">
-                <div><strong>${funnel.total}</strong><span>vulnerabilidades</span></div>
-                <div><strong>${funnel.paquetes}</strong><span>librerías</span></div>
-                <div class="${urgentes.length ? 'danger' : ''}"><strong>${urgentes.length}</strong><span>explotadas</span></div>
-            </div>
+            ${renderSummaryLine(funnel.total, funnel.paquetes, urgentes.length)}
         </header>
 
         ${urgentes.length ? renderUrgentFindings(urgentes) : renderNoUrgentFindings()}
@@ -181,6 +197,25 @@ function renderResult(result: ScanResult): string {
     ${renderSkipped(skipped)}`;
 }
 
+/**
+ * Los tres números de la cabecera, en una línea.
+ *
+ * Eran tres tiles con el número en grande sobre un recinto con fondo. Ese patrón es el
+ * de un dashboard, y acá lo que se busca es lo contrario (docs/escaneo_dependencias.md:
+ * "aburrida y profesional"). El único que lleva color es el de explotadas, que es el que
+ * decide qué se hace hoy.
+ */
+function renderSummaryLine(total: number, paquetes: number, explotadas: number): string {
+    const explotadasTexto = explotadas
+        ? `<span class="danger"><strong>${explotadas}</strong> explotadas</span>`
+        : `<span class="muted">ninguna explotada</span>`;
+    return `<p class="summary-line nums">
+        <strong>${total}</strong> vulnerabilidades ·
+        <strong>${paquetes}</strong> ${paquetes === 1 ? 'librería' : 'librerías'} ·
+        ${explotadasTexto}
+    </p>`;
+}
+
 function renderUrgentFindings(findings: Finding[]): string {
         return `<section class="urgent-section">
             <div class="section-heading">
@@ -188,9 +223,8 @@ function renderUrgentFindings(findings: Finding[]): string {
                     <p class="label">Prioridad inmediata</p>
                     <h2>Explotadas activamente</h2>
                 </div>
-                <span class="urgent-count">${findings.length}</span>
+                <span class="urgent-count">${plural(findings.length, 'hallazgo', 'hallazgos')}</span>
             </div>
-            <p class="section-intro">Estas vulnerabilidades aparecen en el catálogo CISA KEV y requieren atención prioritaria.</p>
             ${findings.map(renderFinding).join('')}
         </section>`;
 }
@@ -257,51 +291,97 @@ function renderFunnel(f: ReturnType<() => ScanResult['funnel']>): string {
   </table>`;
 }
 
+/**
+ * Una tarjeta de hallazgo, en tres líneas.
+ *
+ * Antes eran seis bloques con mucha repetición medida sobre los 115 hallazgos del
+ * manifiesto de cobertura: KEV se decía cuatro veces en la misma tarjeta (riel, badge,
+ * "en el catálogo CISA KEV" y "CISA KEV" en Fuentes), el CWE dos, y la línea de Fuentes
+ * repetía identificadores ya visibles en 109 de 115 casos. Cada cosa se dice una vez:
+ *
+ *   1. Qué hacer      — paquete, versión instalada, versión que lo arregla.
+ *   2. Qué es         — el resumen del advisory.
+ *   3. Con qué respaldo — identificadores enlazados a su fuente, y la acción.
+ */
 function renderFinding(finding: Finding): string {
-    const id = finding.cve ?? finding.osv_ids[0] ?? 'sin identificador';
-    const arreglo = finding.fixed_version
-        ? `actualizá a <strong>${escape(finding.fixed_version)}</strong>`
-        : `<span class="muted">sin versión de arreglo publicada</span>`;
+    const severity = severityLabel(finding.cvss_score);
+    // El título es la acción: "paquete versión → versión que lo arregla".
+    const destino = finding.fixed_version
+        ? `<span class="finding-fix">→ ${escape(finding.fixed_version)}</span>`
+        : `<span class="finding-fix muted">→ sin arreglo publicado</span>`;
 
-    const datos = [
-        escape(id),
-        finding.cvss_score !== null
-            ? `CVSS ${finding.cvss_score}`
-            : 'CVSS no disponible',
-        `EPSS ${(finding.epss * 100).toFixed(finding.epss >= 0.01 ? 0 : 1)}%`,
-        finding.kev ? '<strong>en el catálogo CISA KEV</strong>' : null,
-    ].filter(Boolean);
+    // Cuando no hay CVE el identificador es el propio OSV, y ahí sí hay que mostrarlo.
+    const identificadores = finding.cve ? [finding.cve] : finding.osv_ids;
+    const meta = [
+        ...identificadores.map(chip),
+        finding.cvss_score !== null ? `CVSS ${finding.cvss_score}` : 'sin CVSS',
+        `EPSS ${formatEpss(finding.epss)}`,
+        ...finding.cwe_ids.map(chip),
+    ];
 
-        const severity = severityLabel(finding.cvss_score);
-        return `
-        <section class="finding card ${finding.kev ? 'urgent' : ''}">
-      <h2>
-        ${finding.kev ? '<span class="badge solid">Explotada</span>' : ''}
-                ${escape(finding.package)} ${escape(finding.installed_version)} <span class="finding-fix">— ${arreglo}</span>
-      </h2>
-            <p class="facts nums"><span class="badge ${severity.variant}">${severity.label}</span> ${datos.join(' · ')}</p>
-      ${finding.summary ? `<p>${escape(finding.summary)}</p>` : ''}
-      ${
-          finding.explanation
-              ? `<div class="explanation">${escape(finding.explanation)}</div>`
-              : ''
-      }
-      ${
-          finding.cwe_ids.length
-              ? `<p class="muted">Clase de debilidad: ${finding.cwe_ids.map(escape).join(', ')}</p>`
-              : ''
-      }
-      <button class="button quiet chat-button" data-finding="${escape(JSON.stringify(finding))}">
-        Hablar en profundidad
-      </button>
-      ${renderSources(finding)}
-    </section>`;
+    return `
+    <article class="finding card ${finding.kev ? 'urgent' : ''}">
+      <h3 class="finding-head">
+        <span>${escape(finding.package)} ${escape(finding.installed_version)} ${destino}</span>
+        <span class="finding-badges">
+          ${finding.kev ? '<span class="badge solid">Explotada</span>' : ''}
+          <span class="badge ${severity.variant}">${severity.label}</span>
+        </span>
+      </h3>
+      ${renderSummary(finding)}
+      ${renderExplanation(finding)}
+      <div class="finding-foot">
+        <span class="finding-meta nums">${meta.join(' · ')}</span>
+        <button class="button secondary chat-button" data-finding="${escape(findingKey(finding))}">
+          Hablar en profundidad
+        </button>
+      </div>
+    </article>`;
 }
 
 /**
- * Severidad → variante de `.badge`. El rojo lleno queda para KEV y sólo para KEV: acá
- * la crítica llega hasta el contorno rojo, y de media para abajo no gasta color.
+ * El resumen del advisory, sin el prefijo con el nombre del paquete.
+ *
+ * 21 de los 115 hallazgos del manifiesto de cobertura arrancan con "Marimo: ", "Ray: "
+ * y similares. El paquete ya es el título de la tarjeta.
  */
+function renderSummary(finding: Finding): string {
+    if (!finding.summary) return '';
+    const prefijo = new RegExp(`^${escapeRegExp(finding.package)}\\s*:\\s*`, 'i');
+    const texto = finding.summary.replace(prefijo, '');
+    return `<p class="finding-summary">${escape(texto)}</p>`;
+}
+
+/**
+ * La explicación del LLM, con sus citas pegadas.
+ *
+ * Las citas viven acá y no en una línea de "Fuentes" al pie de la tarjeta: son las
+ * fuentes de la prosa que escribió el modelo, no de los campos duros que arma Python
+ * desde los datos estructurados. Mezclarlas sugería que todo el contenido tiene el
+ * mismo respaldo, y no lo tiene.
+ */
+function renderExplanation(finding: Finding): string {
+    if (!finding.explanation) return '';
+    const citas = (finding.citations ?? []).filter(Boolean);
+    return `<div class="explanation">
+      <p>${escape(finding.explanation)}</p>
+      ${citas.length ? `<p class="citations muted">Citado: ${citas.map(escape).join(' · ')}</p>` : ''}
+    </div>`;
+}
+
+function formatEpss(epss: number): string {
+    return `${(epss * 100).toFixed(epss >= 0.01 ? 0 : 1)}%`;
+}
+
+/** Identifica un hallazgo entre el webview y la extensión. `scan` dedupe por este par. */
+function findingKey(finding: Finding): string {
+    return `${finding.package}|${finding.cve ?? finding.osv_ids[0] ?? '?'}`;
+}
+
+function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function severityLabel(score: number | null): { label: string; variant: string } {
     if (score === null) return { label: 'Sin CVSS', variant: '' };
     if (score >= 9) return { label: 'Crítica', variant: 'danger' };
@@ -361,21 +441,6 @@ function parseVersion(version: string): {
     };
 }
 
-function renderSources(finding: Finding): string {
-    const fuentes = [
-        ...(finding.citations ?? []),
-        ...finding.osv_ids,
-        ...finding.cwe_ids.map((cwe) => `${cwe} (MITRE)`),
-    ];
-    if (finding.kev) {
-        fuentes.push('CISA KEV');
-    }
-    if (fuentes.length === 0) {
-        return '';
-    }
-    return `<p class="sources"><span class="muted">Fuentes:</span> ${fuentes.map(escape).join(' · ')}</p>`;
-}
-
 function renderSkipped(skipped: ScanResult['skipped']): string {
     const relevantes = skipped.filter((s) => !s.raw.startsWith('--'));
     if (relevantes.length === 0) {
@@ -412,21 +477,11 @@ const STYLES = `
   .page-header { padding-bottom: var(--sp-4); border-bottom: 1px solid var(--border); }
   .page-header h1 { margin-bottom: var(--sp-1); }
 
-  .summary-strip { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-4); }
-  .summary-strip > div {
-    min-width: 8rem;
-    padding: var(--sp-2) var(--sp-3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-  }
-  .summary-strip strong { display: block; font-size: var(--fs-xl); line-height: 1.2; }
-  .summary-strip span { color: var(--muted); font-size: var(--fs-sm); }
-  .summary-strip > .danger { border-color: var(--danger); }
-  .summary-strip > .danger strong { color: var(--danger); }
+  .summary-line { margin: var(--sp-2) 0 0; color: var(--muted); }
+  .summary-line strong { color: var(--vscode-foreground); }
+  .summary-line .danger, .summary-line .danger strong { color: var(--danger); }
 
   .urgent-section, .library-section { margin-top: var(--sp-5); }
-  .urgent-section { border-left: 2px solid var(--danger); padding-left: var(--sp-4); }
   .quiet-section {
     margin-top: var(--sp-5);
     padding: var(--sp-3) var(--sp-4);
@@ -442,7 +497,6 @@ const STYLES = `
     flex: none;
     color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums;
   }
-  .section-intro { margin: 0 0 var(--sp-3); color: var(--muted); }
   .closing { margin-top: var(--sp-5); color: var(--muted); }
 
   .package-group {
@@ -467,13 +521,27 @@ const STYLES = `
   /* El hallazgo es la superficie compartida; lo único propio es la marca de urgencia. */
   .finding { margin: var(--sp-2) 0; border-left-width: 2px; }
   .finding.urgent { border-left-color: var(--danger); }
-  .finding h2 { font-size: var(--fs-md); }
-  .finding-fix { font-weight: 400; color: var(--muted); }
-  .facts { color: var(--muted); font-size: var(--fs-sm); }
-  .facts strong { color: var(--vscode-foreground); }
-  .explanation { margin: var(--sp-2) 0; }
-  .sources { margin-top: var(--sp-2); color: var(--muted); font-size: var(--fs-sm); }
-  .chat-button { margin-top: var(--sp-2); }
+
+  /* Título a la izquierda, estado a la derecha: los badges se leen en columna. */
+  .finding-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: var(--sp-3); margin: 0;
+  }
+  .finding-badges { flex: none; display: flex; gap: var(--sp-1); }
+  .finding-fix { font-weight: 400; }
+
+  .finding-summary { margin: var(--sp-2) 0 0; }
+  .explanation { margin: var(--sp-3) 0 0; }
+  .citations { margin: var(--sp-1) 0 0; font-size: var(--fs-sm); }
+
+  /* Respaldo y acción en la misma línea: ninguno de los dos merece un renglón propio. */
+  .finding-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--sp-3); flex-wrap: wrap;
+    margin-top: var(--sp-3);
+  }
+  .finding-meta { color: var(--muted); font-size: var(--fs-sm); }
+  .chat-button { flex: none; }
 
   .skipped {
     margin-top: var(--sp-6);
