@@ -45,6 +45,13 @@ export const BASE_STYLES = `
 
     /* Alias semánticos: el resto del CSS nombra el rol, no el token de VSCode. */
     --border: var(--vscode-panel-border, rgba(128, 128, 128, .35));
+    /*
+     * Borde de las tarjetas. panel.border es deliberadamente tenue en casi todos los
+     * temas —está pensado para separar paneles, no para dibujar recintos— y con 115
+     * tarjetas seguidas los límites se pierden. Se deriva del propio color de texto del
+     * tema, así que sigue al tema en claro y en oscuro en vez de ser un gris fijo.
+     */
+    --border-strong: color-mix(in srgb, var(--vscode-foreground) 22%, transparent);
     --surface: var(--vscode-textCodeBlock-background, rgba(128, 128, 128, .08));
     --muted: var(--vscode-descriptionForeground);
     --danger: var(--vscode-editorError-foreground);
@@ -111,25 +118,44 @@ export const BASE_STYLES = `
 
   /* Superficie base. La usan los hallazgos del informe y las respuestas del chat. */
   .card {
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius);
     padding: var(--sp-3) var(--sp-4);
   }
 
   /*
-   * Etiqueta de estado (severidad, "explotada"). Es texto, no una caja: encerrar dos
-   * palabras en una píldora con borde propio dentro de una tarjeta que ya tiene borde
-   * mete un recinto adentro de otro y no agrega información. El color hace todo el
-   * trabajo, y se gasta sólo cuando hay algo que señalar.
+   * Etiqueta de estado (severidad, "explotada"): rellena, no de contorno.
+   *
+   * Una caja vacía con el borde del color del texto deja el color sólo en las líneas
+   * finas, que es lo que la hace ver de neón. Rellenando, el color queda en una
+   * superficie y el borde apenas la cierra.
+   *
+   * Los fondos salen de tokens que el tema ya calibra para esto: badge para lo
+   * neutro, inputValidation para error y advertencia. Así el contraste con el
+   * texto lo resolvió el autor del tema y no una mezcla inventada acá.
    */
   .tag {
-    font-size: var(--fs-sm);
+    display: inline-block;
+    font-size: var(--fs-xs);
     font-weight: 600;
-    color: var(--muted);
+    line-height: 1.6;
+    padding: 0 .5em;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--vscode-badge-foreground);
+    background: var(--vscode-badge-background);
     white-space: nowrap;
   }
-  .tag.danger { color: var(--danger); }
-  .tag.warning { color: var(--warning); }
+  .tag.danger {
+    color: var(--vscode-foreground);
+    background: var(--vscode-inputValidation-errorBackground);
+    border-color: var(--vscode-inputValidation-errorBorder, var(--danger));
+  }
+  .tag.warning {
+    color: var(--vscode-foreground);
+    background: var(--vscode-inputValidation-warningBackground);
+    border-color: var(--vscode-inputValidation-warningBorder, var(--warning));
+  }
 
   /* Identificador (CVE, CWE, OSV), enlazable o no. */
   .chip {
@@ -138,11 +164,12 @@ export const BASE_STYLES = `
     font-size: var(--fs-sm);
     line-height: 1.6;
     padding: 0 .4em;
-    border: 1px solid var(--border);
+    border: 1px solid transparent;
     border-radius: var(--radius-sm);
+    background: var(--surface);
     white-space: nowrap;
   }
-  a.chip:hover { border-color: var(--vscode-textLink-activeForeground); text-decoration: none; }
+  a.chip:hover { border-color: var(--border); text-decoration: none; }
 
   .button {
     border: 1px solid var(--vscode-button-border, transparent);
@@ -159,6 +186,7 @@ export const BASE_STYLES = `
   .button.secondary {
     color: var(--vscode-button-secondaryForeground);
     background: var(--vscode-button-secondaryBackground);
+    border-color: transparent;
   }
   .button.secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
 
