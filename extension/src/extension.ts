@@ -74,16 +74,13 @@ async function scanCommand(resource?: vscode.Uri): Promise<void> {
         return;
     }
 
-    // El panel se abre antes que el proveedor para poder pasarle el aviso de etapa.
-    const panel = ResultsPanel.show();
     const provider = buildProvider(
         workspace.uri.fsPath,
         path.dirname(manifest.fsPath),
-        (count) => panel.explaining(count),
     );
+    const panel = ResultsPanel.show();
     panel.loading(
         path.basename(manifest.fsPath),
-        provider.label,
         await readPreview(manifest.fsPath),
     );
 
@@ -116,7 +113,6 @@ async function scanCommand(resource?: vscode.Uri): Promise<void> {
 function buildProvider(
     workspaceRoot: string,
     manifestDirectory: string,
-    onExplainStart?: (count: number) => void,
 ): ScanProvider {
     const config = vscode.workspace.getConfiguration('cibersec');
 
@@ -153,7 +149,6 @@ function buildProvider(
         return local;
     }
     return new ExplainedProvider(local, {
-        onExplainStart,
         url: config.get<string>('ragUrl', 'http://localhost:9099'),
         model: config.get<string>('explainModel', 'pipeline_dependencias'),
         apiKey: config.get<string>('ragApiKey', '0p3n-w3bui'),

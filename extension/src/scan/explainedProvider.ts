@@ -27,12 +27,6 @@ export interface ExplainOptions {
     topN: number;
     /** Cuánto esperar al servidor, en milisegundos. */
     timeoutMs?: number;
-    /**
-     * Aviso de que arranca la etapa larga, con cuántas tarjetas se van a explicar.
-     * La vista lo usa para cambiar el rótulo de la pantalla de espera: el escaneo local
-     * tarda ~2 s y esto hasta 240, y sin decirlo la espera parece un cuelgue.
-     */
-    onExplainStart?: (count: number) => void;
 }
 
 /**
@@ -76,8 +70,6 @@ export class ExplainedProvider implements ScanProvider {
         if (targets.length === 0 || token?.isCancellationRequested) {
             return result;
         }
-
-        this.options.onExplainStart?.(targets.length);
 
         try {
             const explanations = await this.request(targets);
