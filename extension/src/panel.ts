@@ -390,7 +390,7 @@ function escapeRegExp(value: string): string {
 }
 
 function severityLabel(score: number | null): { label: string; variant: string } {
-    if (score === null) return { label: 'Sin CVSS', variant: '' };
+    if (score === null) return { label: 'Sin CVSS', variant: 'unknown' };
     if (score >= 9) return { label: 'Crítica', variant: 'danger' };
     if (score >= 7) return { label: 'Alta', variant: 'warning' };
     if (score >= 4) return { label: 'Media', variant: '' };
@@ -526,7 +526,7 @@ const STYLES = `
   .funnel tr:first-child td { font-weight: 600; }
 
   /* El hallazgo es la superficie compartida; lo único propio es la marca de urgencia. */
-  .finding { margin: var(--sp-2) 0; border-left-width: 2px; }
+  .finding { margin: var(--sp-2) 0; border-width: 2px; border-left-width: 3px; }
   .finding.urgent { border-left-color: var(--danger); }
 
   /* Título a la izquierda, estado a la derecha: los tags se leen en columna. */

@@ -51,7 +51,7 @@ export const BASE_STYLES = `
      * tarjetas seguidas los límites se pierden. Se deriva del propio color de texto del
      * tema, así que sigue al tema en claro y en oscuro en vez de ser un gris fijo.
      */
-    --border-strong: color-mix(in srgb, var(--vscode-foreground) 32%, transparent);
+    --border-strong: color-mix(in srgb, var(--vscode-foreground) 24%, transparent);
     --surface: var(--vscode-textCodeBlock-background, rgba(128, 128, 128, .08));
     --muted: var(--vscode-descriptionForeground);
     --danger: var(--vscode-editorError-foreground);
@@ -150,12 +150,22 @@ export const BASE_STYLES = `
     white-space: nowrap;
   }
   .tag.danger {
-    color: var(--vscode-foreground);
-    background: var(--vscode-inputValidation-errorBackground);
+    color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 20%, transparent);
   }
   .tag.warning {
-    color: var(--vscode-foreground);
-    background: var(--vscode-inputValidation-warningBackground);
+    color: var(--warning);
+    background: color-mix(in srgb, var(--warning) 20%, transparent);
+  }
+  /*
+   * Sin dato no es un nivel de la escala: es la ausencia de la escala. Va de contorno,
+   * que es la única forma de la familia que no afirma un peso, en vez de compartir el
+   * relleno neutro con "media" y hacerlas indistinguibles.
+   */
+  .tag.unknown {
+    color: var(--muted);
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--border-strong);
   }
 
   /* Identificador (CVE, CWE, OSV), enlazable o no. */
