@@ -381,8 +381,7 @@ function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
           <span class="tag ${severity.variant}">${severity.label}</span>
         </span>
       </h3>
-      ${renderSummary(finding)}
-      ${renderExplanation(finding)}
+      ${finding.explanation ? renderExplanation(finding) : renderSummary(finding)}
       <div class="finding-foot">
         <span class="finding-meta nums">${meta.join(' · ')}</span>
         ${renderAction(finding, seccion)}
@@ -396,27 +395,35 @@ function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
  * 21 de los 115 hallazgos del manifiesto de cobertura arrancan con "Marimo: ", "Ray: "
  * y similares. El paquete ya es el título de la tarjeta.
  */
-function renderSummary(finding: Finding): string {
+function summaryText(finding: Finding): string {
     if (!finding.summary) return '';
     const prefijo = new RegExp(`^${escapeRegExp(finding.package)}\\s*:\\s*`, 'i');
-    const texto = finding.summary.replace(prefijo, '');
-    return `<p class="finding-summary">${escape(texto)}</p>`;
+    return finding.summary.replace(prefijo, '');
+}
+
+/** Sin explicación del LLM, el resumen del advisory es el texto principal de la tarjeta. */
+function renderSummary(finding: Finding): string {
+    const texto = summaryText(finding);
+    return texto ? `<p class="finding-summary">${escape(texto)}</p>` : '';
 }
 
 /**
- * La explicación del LLM, con sus citas pegadas.
+ * La explicación del LLM, con el resumen original del advisory debajo.
  *
- * Las citas viven acá y no en una línea de "Fuentes" al pie de la tarjeta: son las
- * fuentes de la prosa que escribió el modelo, no de los campos duros que arma Python
- * desde los datos estructurados. Mezclarlas sugería que todo el contenido tiene el
- * mismo respaldo, y no lo tiene.
+ * El resumen no se descarta: casi siempre es la fuente de la explicación (el CVE rara
+ * vez está en el corpus y el advisory entra siempre al contexto), así que es contra lo
+ * que se contrasta la prosa del modelo. Va debajo y como cita, no como segunda
+ * descripción: es respaldo, no contenido.
+ *
+ * La línea de "Citado:" se sacó: el advisory citado es casi siempre el mismo que se
+ * muestra entre comillas, y los identificadores ya están en los chips del pie.
  */
 function renderExplanation(finding: Finding): string {
     if (!finding.explanation) return '';
-    const citas = (finding.citations ?? []).filter(Boolean);
+    const original = summaryText(finding);
     return `<div class="explanation">
       <p>${escape(finding.explanation)}</p>
-      ${citas.length ? `<p class="citations muted">Citado: ${citas.map(escape).join(' · ')}</p>` : ''}
+      ${original ? `<blockquote class="advisory-original" lang="en">${escape(original)}</blockquote>` : ''}
     </div>`;
 }
 
@@ -609,7 +616,15 @@ const STYLES = `
 
   .finding-summary { margin: var(--sp-2) 0 0; }
   .explanation { margin: var(--sp-3) 0 0; }
-  .citations { margin: var(--sp-1) 0 0; font-size: var(--fs-sm); }
+  .explanation > p:first-child { margin-top: 0; }
+  /* El texto del advisory, tal cual: se lee como fuente, más quieto que la explicación. */
+  .advisory-original {
+    margin: var(--sp-2) 0 0;
+    padding-left: var(--sp-3);
+    border-left: 2px solid var(--border-strong);
+    color: var(--muted);
+    font-size: var(--fs-sm);
+  }
 
   /* Respaldo y acción en la misma línea: ninguno de los dos merece un renglón propio. */
   .finding-foot {
