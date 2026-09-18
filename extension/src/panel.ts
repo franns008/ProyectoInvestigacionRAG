@@ -225,7 +225,7 @@ function renderUrgentFindings(findings: Finding[]): string {
                 </div>
                 <span class="urgent-count">${plural(findings.length, 'hallazgo', 'hallazgos')}</span>
             </div>
-            ${findings.map(renderFinding).join('')}
+            ${findings.map((f) => renderFinding(f, 'urgente')).join('')}
         </section>`;
 }
 
@@ -274,7 +274,7 @@ function renderPackageGroup(findings: Finding[]): string {
 
     return `<details class="package-group" open>
     <summary><strong>${escape(packageName)}</strong> · ${plural(findings.length, 'vulnerabilidad', 'vulnerabilidades')} · ${arreglo}</summary>
-    <div class="package-findings">${findings.map(renderFinding).join('')}</div>
+    <div class="package-findings">${findings.map((f) => renderFinding(f, 'grupo')).join('')}</div>
   </details>`;
 }
 
@@ -291,11 +291,14 @@ function renderFunnel(f: ReturnType<() => ScanResult['funnel']>): string {
   </table>`;
 }
 
+/** Dónde se está dibujando el hallazgo, que cambia qué hace falta decir. */
+type Seccion = 'urgente' | 'grupo';
+
 /**
  * Una tarjeta de hallazgo, en tres líneas.
  *
  * Antes eran seis bloques con mucha repetición medida sobre los 115 hallazgos del
- * manifiesto de cobertura: KEV se decía cuatro veces en la misma tarjeta (riel, badge,
+ * manifiesto de cobertura: KEV se decía cuatro veces en la misma tarjeta (riel, tag,
  * "en el catálogo CISA KEV" y "CISA KEV" en Fuentes), el CWE dos, y la línea de Fuentes
  * repetía identificadores ya visibles en 109 de 115 casos. Cada cosa se dice una vez:
  *
@@ -303,8 +306,12 @@ function renderFunnel(f: ReturnType<() => ScanResult['funnel']>): string {
  *   2. Qué es         — el resumen del advisory.
  *   3. Con qué respaldo — identificadores enlazados a su fuente, y la acción.
  */
-function renderFinding(finding: Finding): string {
+function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
     const severity = severityLabel(finding.cvss_score);
+    // Dentro de "Explotadas activamente" la marca sobra: lo dice el título de la
+    // sección. En el grupo de la librería el hallazgo se lee fuera de ese contexto y
+    // ahí sí hace falta, porque es lo único que lo distingue de sus vecinos.
+    const explotada = finding.kev && seccion === 'grupo';
     // El título es la acción: "paquete versión → versión que lo arregla".
     const destino = finding.fixed_version
         ? `<span class="finding-fix">→ ${escape(finding.fixed_version)}</span>`
@@ -323,9 +330,9 @@ function renderFinding(finding: Finding): string {
     <article class="finding card ${finding.kev ? 'urgent' : ''}">
       <h3 class="finding-head">
         <span>${escape(finding.package)} ${escape(finding.installed_version)} ${destino}</span>
-        <span class="finding-badges">
-          ${finding.kev ? '<span class="badge solid">Explotada</span>' : ''}
-          <span class="badge ${severity.variant}">${severity.label}</span>
+        <span class="finding-tags">
+          ${explotada ? '<span class="tag danger">Explotada</span>' : ''}
+          <span class="tag ${severity.variant}">${severity.label}</span>
         </span>
       </h3>
       ${renderSummary(finding)}
@@ -471,7 +478,7 @@ function plural(n: number, singular: string, plural_: string): string {
 
 /**
  * Sólo lo específico del informe. Todo lo que comparte con el chat —superficie,
- * badges, chips, botones, escalas, foco— vive en BASE_STYLES y acá no se redefine.
+ * tags, chips, botones, escalas, foco— vive en BASE_STYLES y acá no se redefine.
  */
 const STYLES = `
   .page-header { padding-bottom: var(--sp-4); border-bottom: 1px solid var(--border); }
@@ -522,13 +529,14 @@ const STYLES = `
   .finding { margin: var(--sp-2) 0; border-left-width: 2px; }
   .finding.urgent { border-left-color: var(--danger); }
 
-  /* Título a la izquierda, estado a la derecha: los badges se leen en columna. */
+  /* Título a la izquierda, estado a la derecha: los tags se leen en columna. */
   .finding-head {
     display: flex; align-items: baseline; justify-content: space-between;
     gap: var(--sp-3); margin: 0;
+    font-size: var(--fs-lg);
   }
-  .finding-badges { flex: none; display: flex; gap: var(--sp-1); }
-  .finding-fix { font-weight: 400; }
+  .finding-tags { flex: none; display: flex; gap: var(--sp-2); }
+  .finding-fix { font-weight: 400; color: var(--muted); }
 
   .finding-summary { margin: var(--sp-2) 0 0; }
   .explanation { margin: var(--sp-3) 0 0; }

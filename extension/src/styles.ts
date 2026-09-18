@@ -17,7 +17,7 @@
  *
  * El objetivo declarado en docs/escaneo_dependencias.md ("Disciplina de las dos
  * superficies") es que esto se vea aburrido y profesional, como una herramienta que ya
- * existe. Sin versalitas de dashboard ni badges de colores compitiendo entre sí.
+ * existe. Sin versalitas de dashboard ni píldoras de colores compitiendo entre sí.
  *
  * Lo que está acá lo usan las DOS pantallas. Lo específico de cada una vive en su
  * archivo, y sólo puede agregar lo que esta base no cubre: nunca redefinirlo.
@@ -117,29 +117,19 @@ export const BASE_STYLES = `
   }
 
   /*
-   * Badge. Por defecto es de contorno, no relleno: el relleno se reserva para el único
-   * caso que amerita gritar (KEV, con \`.solid\`). Así un CVSS alto sin exploit no pesa
-   * lo mismo que una vulnerabilidad que se está explotando hoy, que es justo la
-   * distinción que el informe tiene que dejar clara.
+   * Etiqueta de estado (severidad, "explotada"). Es texto, no una caja: encerrar dos
+   * palabras en una píldora con borde propio dentro de una tarjeta que ya tiene borde
+   * mete un recinto adentro de otro y no agrega información. El color hace todo el
+   * trabajo, y se gasta sólo cuando hay algo que señalar.
    */
-  .badge {
-    display: inline-block;
-    font-size: var(--fs-xs);
+  .tag {
+    font-size: var(--fs-sm);
     font-weight: 600;
-    line-height: 1.6;
-    padding: 0 .45em;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
     color: var(--muted);
     white-space: nowrap;
   }
-  .badge.danger { color: var(--danger); border-color: var(--danger); }
-  .badge.warning { color: var(--warning); border-color: var(--warning); }
-  .badge.solid {
-    color: var(--vscode-editor-background);
-    background: var(--danger);
-    border-color: var(--danger);
-  }
+  .tag.danger { color: var(--danger); }
+  .tag.warning { color: var(--warning); }
 
   /* Identificador (CVE, CWE, OSV), enlazable o no. */
   .chip {

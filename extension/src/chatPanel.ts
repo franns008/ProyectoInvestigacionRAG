@@ -186,7 +186,7 @@ function renderCitedIds(answer: string, finding: Finding): string {
   );
   const outside = cited.filter((id) => !known.has(id));
   const items = cited
-    .map((id) => (known.has(id) ? chip(id) : `${chip(id)}<span class="badge warning outside" title="No viene del escaneo: puede salir del corpus del RAG o ser inventado">fuera del escaneo</span>`))
+    .map((id) => (known.has(id) ? chip(id) : `${chip(id)}<span class="tag warning outside" title="No viene del escaneo: puede salir del corpus del RAG o ser inventado">fuera del escaneo</span>`))
     .join(" ");
   return `<details class="cited">
     <summary class="muted">IDs citados en la respuesta (${cited.length}${outside.length ? `, ${outside.length} fuera del escaneo` : ""})</summary>
@@ -286,7 +286,7 @@ input.focus();
 
 /**
  * Sólo lo específico del chat: el layout de columna a pantalla completa y el hilo de
- * mensajes. Superficie, chips, badges, botones y escalas salen de BASE_STYLES.
+ * mensajes. Superficie, chips, tags, botones y escalas salen de BASE_STYLES.
  */
 const CHAT_STYLES = `
   html, body { height: 100%; }
