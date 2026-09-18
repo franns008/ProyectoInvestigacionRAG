@@ -578,7 +578,7 @@ const STYLES = `
   .funnel-section h2 { margin-bottom: var(--sp-2); }
 
   /* El hallazgo es la superficie compartida; lo único propio es la marca de urgencia. */
-  .finding { margin: var(--sp-2) 0; border-width: 2px; border-left-width: 3px; }
+  .finding { margin: var(--sp-2) 0; border-width: 1.5px; border-left-width: 2.5px; }
   .finding.urgent { border-left-color: var(--danger); }
 
   /* Título a la izquierda, estado a la derecha: los tags se leen en columna. */
@@ -586,6 +586,7 @@ const STYLES = `
     display: flex; align-items: baseline; justify-content: space-between;
     gap: var(--sp-3); margin: 0;
     font-size: var(--fs-lg);
+    font-weight: 700;
   }
   .finding-tags { flex: none; display: flex; gap: var(--sp-2); }
   .finding-fix { font-weight: 400; color: var(--muted); }

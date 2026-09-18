@@ -40,8 +40,8 @@ export const BASE_STYLES = `
     --sp-5: 1.5rem;
     --sp-6: 2rem;
 
-    --radius: 4px;
-    --radius-sm: 2px;
+    --radius: 6px;
+    --radius-sm: 3px;
 
     /* Alias semánticos: el resto del CSS nombra el rol, no el token de VSCode. */
     --border: var(--vscode-panel-border, rgba(128, 128, 128, .35));
@@ -149,13 +149,16 @@ export const BASE_STYLES = `
     background: color-mix(in srgb, var(--vscode-foreground) 10%, transparent);
     white-space: nowrap;
   }
+  /* saturate() aviva el color del tema sin cambiarle el tono ni salir de sus tokens. */
   .tag.danger {
     color: var(--danger);
-    background: color-mix(in srgb, var(--danger) 20%, transparent);
+    background: color-mix(in srgb, var(--danger) 26%, transparent);
+    filter: saturate(1.35);
   }
   .tag.warning {
     color: var(--warning);
-    background: color-mix(in srgb, var(--warning) 20%, transparent);
+    background: color-mix(in srgb, var(--warning) 26%, transparent);
+    filter: saturate(1.35);
   }
   /*
    * Sin dato no es un nivel de la escala: es la ausencia de la escala. Va de contorno,
