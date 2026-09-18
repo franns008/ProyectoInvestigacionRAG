@@ -88,6 +88,24 @@ def _chunk_key(doc: Document) -> tuple[str, str] | None:
     return (str(file_path), "" if split_id is None else str(split_id))
 
 
+def _is_blank(doc: Document) -> bool:
+    """Chunk sin una sola letra: sólo espacios, saltos de línea y tabs.
+
+    marker-pdf rellena las celdas de sus tablas markdown hasta el ancho de la columna, así
+    que un índice deja corridas de cientos de espacios seguidos (592 en el estudio de Cloud
+    SCI). `split_by="word"` parte por el carácter " " literal, de modo que cada corrida
+    aporta N unidades vacías que igual cuentan para `split_length`: una sola corrida llena
+    tres chunks enteros sin una letra adentro. El `skip_empty_documents` de Haystack no los
+    ve, porque mide `len(txt) > 0` y un chunk de 200 espacios mide 200.
+
+    Se descarta sólo lo TOTALMENTE vacío, no lo corto: hay filas de tabla de 130-180
+    caracteres con datos reales (las comparativas de la guía 5G) que un mínimo por longitud
+    se llevaría puestas. Los chunks con escombros de tabla ("|", "| Requisitos") quedan para
+    cuando se arregle el parsing, que es donde está la causa.
+    """
+    return not (doc.content or "").strip()
+
+
 def _in_groups(items: list, size: int):
     it = iter(items)
     while group := list(islice(it, size)):
@@ -246,7 +264,19 @@ class Indexer:
         # Chunking solo para los splittables
         if splittable_docs:
             splitter = DocumentSplitter(split_by="word", split_length=SPLIT_LENGTH, split_overlap=SPLIT_OVERLAP)
-            splittable_docs = splitter.run(documents=splittable_docs)["documents"]
+            chunks = splitter.run(documents=splittable_docs)["documents"]
+
+            # Los chunks en blanco tienen todos el MISMO contenido, o sea el mismo
+            # embedding: no se recuperan sueltos sino en bloque, y con ranker_top_k=4 se
+            # comen casi todos los lugares del prompt dejando al LLM el nombre del PDF sin
+            # texto al lado. Ver _is_blank.
+            splittable_docs = [d for d in chunks if not _is_blank(d)]
+            blank = len(chunks) - len(splittable_docs)
+            if blank:
+                logger.info(
+                    f"Descartados {blank} chunks en blanco de {len(chunks)} "
+                    f"({blank / len(chunks) * 100:.1f}%)."
+                )
 
         # Deduplicación contra la BD. Es también lo que hace la indexación retomable:
         # lo que ya se escribió en una corrida anterior no se vuelve a embeber.
