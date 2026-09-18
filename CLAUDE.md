@@ -41,6 +41,9 @@ embeddings (`qwen3-embedding:4b`) y generación.
   corpus **por clave exacta** (sin retrieval) y arma el prompt. Recibe el store y el
   generador inyectados, así que también se testea sin stack. Lo expone
   `pipeline_dependencias.py` como segundo modelo del `:9099`.
+- `src/pipeline/chat/` — contexto del chat sobre un hallazgo: separa el hallazgo que la
+  extensión manda como mensaje `system` y recorta el historial que entra al prompt. Lógica
+  pura, se testea sin stack. Ver `docs/arquitectura.md` §4.4.
 - `extension/` — extensión de VSCode que muestra el escaneo. Cliente del `deps.cli` hoy,
   del pipeline RAG cuando exista (`src/scan/types.ts` es el contrato compartido).
 - `infrastructure/` — stack Docker Compose. `docker-compose.yml` (base, CPU) +

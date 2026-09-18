@@ -24,7 +24,7 @@ export interface ChatOptions {
 }
 
 interface ChatMessage {
-  role: "user" | "assistant";
+  role: "system" | "user" | "assistant";
   content: string;
 }
 
@@ -35,7 +35,9 @@ export class ChatPanel {
   private disposables: vscode.Disposable[] = [];
 
   private constructor(private readonly finding: Finding, private readonly options: ChatOptions) {
-    this.messages = [{ role: "user", content: JSON.stringify(contextFor(finding)) }];
+    // `system` y no `user`: es el tema de la charla, no algo que dijo el usuario. El
+    // pipeline lo lee aparte (src/pipeline/chat/context.py) y lo pone en el prompt.
+    this.messages = [{ role: "system", content: JSON.stringify(contextFor(finding)) }];
     this.panel = vscode.window.createWebviewPanel(
       "cibersec.vulnerabilityChat",
       `Chat: ${identifierOf(finding)}`,
@@ -150,6 +152,9 @@ function contextFor(finding: Finding) {
     installed_version: finding.installed_version,
     fixed_version: finding.fixed_version,
     cwe_ids: finding.cwe_ids,
+    cvss_score: finding.cvss_score,
+    epss: finding.epss,
+    kev: finding.kev,
     summary: finding.summary,
     details: finding.details,
   };

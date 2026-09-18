@@ -2,13 +2,29 @@
   "version": "0.2.0",
   "configurations": [
     {
+      // Configuración por defecto. No adjunta el depurador: en VSCode 1.137 el host de
+      // extensiones aborta (exit 134) al adjuntarse, y la ventana de prueba se cierra
+      // sola al segundo de abrirse. Sin depurador la extensión carga y funciona.
       "name": "Ejecutar la extensión",
       "type": "extensionHost",
       "request": "launch",
+      "noDebug": true,
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
         // Abre la raíz del repo como workspace en la ventana de prueba, así el
         // requirements.txt y los dumps de data/raw ya están a mano.
+        "${workspaceFolder}/.."
+      ],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "preLaunchTask": "npm: compile"
+    },
+    {
+      // Con breakpoints. Si la ventana se cierra sola, usar la configuración de arriba.
+      "name": "Ejecutar la extensión (con depurador)",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
         "${workspaceFolder}/.."
       ],
       "outFiles": ["${workspaceFolder}/out/**/*.js"],

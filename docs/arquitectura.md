@@ -99,7 +99,7 @@ OllamaGenerator(
     model=model,                       # LLM_MODEL, o el valve llm_model
     url="http://ollama:11434",
     timeout=120,
-    generation_kwargs={"num_predict": 512, "temperature": 0.5},
+    generation_kwargs={"num_predict": 512, "temperature": 0.5, "num_ctx": 8192},
 )
 ```
 
@@ -108,7 +108,10 @@ OllamaGenerator(
   entorno gana para poder cambiar de modelo sin tocar la UI.
 - Cualquier modelo que se configure tiene que estar **`ollama pull`-eado** en el
   container de Ollama, o la generación falla.
-- Parámetros de Ollama: `num_predict` (longitud de la respuesta) y `temperature`.
+- Parámetros de Ollama: `num_predict` (longitud de la respuesta), `temperature` y
+  `num_ctx` (ventana de contexto). `num_ctx` se fija explícito porque, si el prompt no
+  entra en el default de Ollama, éste recorta el **principio** sin avisar, que es donde
+  están las reglas. `pipeline_dependencias` comparte `build_generator` y no lo setea.
 
 ### 4.3 Valves (parámetros ajustables desde OpenWebUI)
 
@@ -122,9 +125,50 @@ OllamaGenerator(
 | `id_lookup_top_k` | `10`                       | Tope del canal determinístico por CWE/CVE     |
 | `max_tokens`      | `512`                      | Longitud máxima de la respuesta               |
 | `temperature`     | `0.5`                      | Creatividad de la generación                  |
+| `num_ctx`         | `8192`                     | Ventana de contexto de Ollama (prompt + respuesta) |
+| `history_max_messages` | `6`                   | Mensajes previos del chat que entran al prompt (0 lo desactiva) |
+| `history_max_chars`    | `600`                 | Recorte de cada mensaje previo                |
 
 > `split_length` / `split_overlap` ya no son valves: el chunking se decide en el
 > script de indexación. Ver [`data_splitting.md`](data_splitting.md).
+
+> OpenWebUI **persiste** las valves en `src/pipeline/pipeline_ciberseguridad/valves.json`
+> y las restaura al arrancar: un valor guardado ahí le gana al default del código (hoy,
+> por ejemplo, fija `retriever_top_k: 5`). Las valves que no están en el archivo toman
+> el default.
+
+### 4.4 Chat sobre un hallazgo (historial y contexto)
+
+La extensión de VSCode abre un chat por hallazgo ("Hablar en profundidad",
+`extension/src/chatPanel.ts`) contra este mismo pipeline. Cada request manda la
+conversación **entera**: el historial lo guarda el cliente y el pipeline no tiene estado.
+
+```
+messages = [
+  {role: "system",    content: '{"vulnerability": "CVE-...", "package": ..., "cvss_score": ...}'},
+  {role: "user",      content: "¿qué tan grave es?"},
+  {role: "assistant", content: "..."},
+  {role: "user",      content: "¿cómo lo mitigo?"}     ← user_message
+]
+```
+
+- **El hallazgo va como `system`**, no como `user`: es el tema de la charla, no algo que
+  dijo el usuario. `extract_finding_context` lo separa y `format_finding` lo pasa a
+  líneas con etiqueta, más fáciles de leer para un modelo chico que un JSON. Entra al
+  prompt en *"Vulnerability under discussion"*.
+- **Sus IDs (CVE/CWE) entran siempre a `VulnIdLookup`**, detrás de los que nombre la
+  pregunta. Así no dependen de la ventana de 4 mensajes de `resolve_vuln_ids`.
+- **El historial** (`select_history`) toma los últimos `history_max_messages` mensajes
+  `user`/`assistant` anteriores al turno actual, cada uno recortado a
+  `history_max_chars`. Entra en *"Conversation so far"*, justo antes de la pregunta.
+- Los dos bloques son **opcionales** en el template: sin mensaje `system` (el chat de
+  OpenWebUI, el eval) el prompt es el de siempre. A los prompts internos de OpenWebUI
+  (título, tags) no se les pasa ninguno.
+- La lógica vive en `src/pipeline/chat/` (pura, se testea con `pytest` sin stack). El log
+  deja `[HALLAZGO]` y `[HISTORIAL]` por request.
+
+Una conversación de dos turnos con hallazgo usa ~900 tokens de prompt, lejos de los 8192
+de `num_ctx`.
 
 ## 5. Flujos de datos
 

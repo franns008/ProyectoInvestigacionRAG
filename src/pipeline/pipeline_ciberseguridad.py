@@ -29,9 +29,19 @@ from pydantic import BaseModel
 import logging
 import os
 import re
+import sys
 import threading
 import time
 import uuid
+
+# El servidor carga cada pipeline con `spec_from_file_location`, que no agrega su
+# directorio a `sys.path`: sin esto `import chat` falla y el archivo termina en
+# `failed/`. Mismo arreglo que en pipeline_dependencias.py.
+_PIPELINES_DIR = os.path.dirname(os.path.abspath(__file__))
+if _PIPELINES_DIR not in sys.path:
+    sys.path.insert(0, _PIPELINES_DIR)
+
+from chat import extract_finding_context, finding_vuln_ids, format_finding, select_history
 
 # Configurar el logger específico para nuestra app
 logger = logging.getLogger("HaystackRAG_Query")
@@ -81,6 +91,13 @@ Rules:
 - NEVER invent CVE/CWE identifiers, CVSS scores or severities. Use only values present in the context.
 - If the context does not contain the answer, say explicitly that you don't know.
 - Answer in the language of the question, NOT the language of the documents.
+- The conversation so far is only there to understand follow-ups ("it", "this vulnerability").
+  Facts must still come from the context or the vulnerability under discussion.
+
+{% if finding %}
+Vulnerability under discussion (from the user's dependency scan; it is the topic of the conversation):
+{{ finding }}
+{% endif %}
 
 Context:
 {% for document in documents %}
@@ -88,6 +105,11 @@ Context:
   {% endif %}{{ document.content }}
 {% endfor %}
 
+{% if history %}
+Conversation so far:
+{% for turn in history %}{{ "User" if turn.role == "user" else "Assistant" }}: {{ turn.content }}
+{% endfor %}
+{% endif %}
 Question: {{question}}
 Answer:
 """
@@ -342,14 +364,21 @@ def build_generator(valves):
     """
     v = valves
     model = os.getenv("LLM_MODEL") or v.llm_model
+    generation_kwargs = {
+        "num_predict": v.max_tokens,
+        "temperature": v.temperature,
+    }
+    # Sin num_ctx, Ollama usa su default y, si el prompt no entra, recorta el PRINCIPIO
+    # sin avisar: justo las reglas. `getattr` porque pipeline_dependencias comparte esta
+    # función y sus valves no lo traen.
+    num_ctx = getattr(v, "num_ctx", None)
+    if num_ctx:
+        generation_kwargs["num_ctx"] = num_ctx
     return OllamaGenerator(
         model=model,
         url=OLLAMA_URL,
         timeout=120,
-        generation_kwargs={
-            "num_predict": v.max_tokens,
-            "temperature": v.temperature,
-        },
+        generation_kwargs=generation_kwargs,
     )
 
 def build_rag_pipeline(store: PgvectorDocumentStore, valves, include_llm: bool = True) -> HaystackPipeline:
@@ -395,6 +424,11 @@ class Pipeline:
         id_lookup_top_k: int   = 10
         max_tokens:      int   = 512
         temperature:     float = 0.5
+        num_ctx:         int   = 8192  # ventana de Ollama: prompt + respuesta
+        # Historial del chat que entra al prompt. El hallazgo de la extensión (mensaje
+        # system) va aparte y entra siempre. 0 desactiva el historial.
+        history_max_messages: int = 6
+        history_max_chars:    int = 600
         # NOTA: split_length y split_overlap se movieron al script de indexación.
 
     def __init__(self):
@@ -442,8 +476,29 @@ class Pipeline:
         keyword_query = build_keyword_query(user_message)
         log.info(f"[KEYWORD QUERY] -> {keyword_query!r}")
 
+        # Hallazgo e historial sólo para preguntas reales: los prompts internos de
+        # OpenWebUI ya traen el chat embebido.
+        finding = extract_finding_context(messages) if kind == "user" else None
+        history = (
+            select_history(
+                messages,
+                user_message,
+                max_messages=self.valves.history_max_messages,
+                max_chars=self.valves.history_max_chars,
+            )
+            if kind == "user"
+            else []
+        )
+        if finding:
+            log.info(f"[HALLAZGO] {finding.get('vulnerability')} | paquete={finding.get('package')} {finding.get('installed_version')}")
+        log.info(f"[HISTORIAL] {len(history)} mensajes al prompt")
+
         vuln_ids, ids_origin = resolve_vuln_ids(user_message, messages)
-        log.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin})")
+        # Los IDs del hallazgo van DETRÁS: si la pregunta nombra otro CVE, ese manda.
+        for vid in finding_vuln_ids(finding):
+            if vid not in vuln_ids:
+                vuln_ids.append(vid)
+        log.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin}{', +hallazgo' if finding else ''})")
 
         ranker_query = build_ranker_query(user_message, vuln_ids)
         log.info(f"[RANKER QUERY] -> {_one_line(ranker_query)!r}")
@@ -455,7 +510,11 @@ class Pipeline:
                     "keyword_retriever": {"query": keyword_query},
                     "id_lookup":         {"ids": vuln_ids},
                     "ranker":            {"query": ranker_query},
-                    "prompt_builder":    {"question": user_message},
+                    "prompt_builder":    {
+                        "question": user_message,
+                        "finding":  format_finding(finding) if finding else "",
+                        "history":  history,
+                    },
                 },
                 include_outputs_from={
                     "embedding_retriever",
