@@ -29,7 +29,6 @@ interface ChatMessage {
 }
 
 export class ChatPanel {
-  private static current: ChatPanel | undefined;
   private readonly panel: vscode.WebviewPanel;
   private readonly messages: ChatMessage[];
   private disposables: vscode.Disposable[] = [];
@@ -50,14 +49,7 @@ export class ChatPanel {
   }
 
   static show(finding: Finding, options: ChatOptions): void {
-    if (ChatPanel.current) {
-      if (identifierOf(ChatPanel.current.finding) === identifierOf(finding)) {
-        ChatPanel.current.panel.reveal(vscode.ViewColumn.Beside, true);
-        return;
-      }
-      ChatPanel.current.panel.dispose();
-    }
-    ChatPanel.current = new ChatPanel(finding, options);
+    new ChatPanel(finding, options);
   }
 
   private readonly onMessage = async (message: { type?: string; text?: string; url?: string }) => {
@@ -139,7 +131,6 @@ export class ChatPanel {
   }
 
   private dispose(): void {
-    ChatPanel.current = undefined;
     this.disposables.forEach((disposable) => disposable.dispose());
     this.disposables = [];
   }
