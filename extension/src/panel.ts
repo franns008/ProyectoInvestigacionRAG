@@ -282,7 +282,8 @@ function renderPackageGroup(findings: Finding[]): string {
  * de pantalla la recorre sin saber qué significa cada celda.
  *
  * El total no es una fila de la tabla: es la base contra la que se calculan los
- * porcentajes, y por eso era la única sin uno. Va en la línea que la introduce.
+ * porcentajes, y por eso era la única sin uno. No hace falta repetirlo acá — está dos
+ * renglones más arriba, en la línea de resumen del encabezado.
  */
 function renderFunnel(f: ScanResult['funnel']): string {
     const row = (label: string, value: number) =>
@@ -291,7 +292,6 @@ function renderFunnel(f: ScanResult['funnel']): string {
 
     return `<section class="funnel-section">
     <h2>Resumen</h2>
-    <p class="muted">De las ${f.total} que afectan tus versiones, cuántas quedan con cada criterio:</p>
     <table class="funnel">
       <thead>
         <tr><th scope="col">Criterio</th><th scope="col" class="num">Quedan</th><th scope="col" class="num">%</th></tr>
@@ -538,8 +538,7 @@ const STYLES = `
   .funnel th, .funnel td { padding: var(--sp-1) var(--sp-2) var(--sp-1) 0; text-align: left; }
   .funnel th { font-size: var(--fs-sm); font-weight: 400; color: var(--muted); }
   .funnel .num { width: 4rem; text-align: right; font-variant-numeric: tabular-nums; }
-  .funnel-section h2 { margin-bottom: var(--sp-1); }
-  .funnel-section > .muted { margin: 0 0 var(--sp-2); }
+  .funnel-section h2 { margin-bottom: var(--sp-2); }
 
   /* El hallazgo es la superficie compartida; lo único propio es la marca de urgencia. */
   .finding { margin: var(--sp-2) 0; border-width: 2px; border-left-width: 3px; }
