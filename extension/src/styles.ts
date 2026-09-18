@@ -200,6 +200,13 @@ export const BASE_STYLES = `
     border-color: transparent;
   }
   .button.secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
+  /* Para acciones que se repiten en cada ítem: presentes, sin competir con el contenido. */
+  .button.quiet {
+    color: var(--vscode-foreground);
+    background: transparent;
+    border-color: var(--border-strong);
+  }
+  .button.quiet:hover { background: var(--vscode-list-hoverBackground); }
 
   summary { cursor: pointer; }
 
