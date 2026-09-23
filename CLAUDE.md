@@ -26,6 +26,9 @@ embeddings (`qwen3-embedding:4b`) y generación.
 - [`docs/explicacion_hallazgos.md`](docs/explicacion_hallazgos.md) — cómo se explican los 3 primeros hallazgos del escaneo trayendo el CVE/CWE del
   corpus **por clave exacta** (filtro por metadata, sin retrieval) y mandándoselo al LLM como
   contexto. **Implementado**; incluye la medición de qué hay realmente en los datos.
+- [`docs/chat_proximos_pasos.md`](docs/chat_proximos_pasos.md) — próximos pasos del chat de
+  la extensión (propuesto): que el LLM cargue los hallazgos a demanda y que el contexto se
+  arme según la ventana del modelo.
 - [`docs/reranker_cross_encoder.md`](docs/reranker_cross_encoder.md) — reranker cross-encoder
   (`bge-reranker-v2-m3`) tras el retrieval híbrido: retrieve-and-rerank, implicancias (modelo
   local en CPU, latencia) y cambios en pipeline/Dockerfile/eval.

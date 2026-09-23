@@ -199,6 +199,9 @@ respuesta se cortó por largo, porque el servidor siempre cierra con `finish_rea
 > pasar un `dict` como `data:` tal cual. Con eso el medidor pasa a mostrar el uso real y el
 > aviso de respuesta cortada deja de ser una heurística.
 
+Los próximos pasos del chat (cargar los hallazgos a demanda y armar el contexto según el
+modelo) están en [`chat_proximos_pasos.md`](chat_proximos_pasos.md).
+
 ## 5. Flujos de datos
 
 ### 5.1 Indexación
