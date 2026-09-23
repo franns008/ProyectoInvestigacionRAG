@@ -25,10 +25,21 @@ Después, cada vez que la quieras correr:
 4. Apretá el botón **Escanear dependencias vulnerables** arriba a la derecha de la barra
    del editor, o clic derecho sobre el archivo en el explorador.
 
-El panel con los resultados se abre al costado. Cada hallazgo tiene un botón **Hablar en
-profundidad** que abre una conversación separada con el pipeline `pipeline_ciberseguridad`,
-incluyendo el CVE/OSV, paquete, versión, resumen y detalles del advisory. La clave del
-servidor se mantiene en la extensión y no se entrega al webview.
+El panel con los resultados se abre al costado. Cada hallazgo tiene un botón con un clip,
+**Agregar al chat**, que lo adjunta al chat de la barra lateral (ícono de escudo en la barra
+de actividad). Es el mismo gesto que adjuntar un archivo en Copilot: el hallazgo aparece
+como una ficha arriba del input, con su CVE/OSV, paquete, versión, resumen y detalles del
+advisory. Tocar de nuevo el botón, o la × de la ficha, lo quita. La clave del servidor se
+mantiene en la extensión y no se entrega a los webviews.
+
+### Chat
+
+Hay un único chat, siempre disponible, contra el pipeline `pipeline_ciberseguridad`. Sin
+adjuntos es un chat común sobre el corpus del RAG. Los adjuntos son **contexto
+persistente**: viajan en cada pregunta hasta que se quitan, así que se puede comparar
+varios hallazgos en la misma conversación (hasta seis). El botón **+** de la barra de
+título de la vista abre un chat nuevo, sin historial ni adjuntos. La vista se puede
+arrastrar a la barra lateral secundaria para tenerla a la derecha, como Copilot.
 
 ### Resultados agrupados por librería
 
@@ -53,9 +64,9 @@ ampliarlo por encima de diez.
 
 En el chat, **Enter** envía y **Shift+Enter** agrega una línea. Las respuestas se muestran
 con formato markdown (se escapa todo antes, así que el modelo no puede inyectar HTML).
-**Ver contexto cargado** muestra los IDs (CVE/OSV, CWE) y el JSON que se le mandó al
+**Ver contexto enviado** muestra el JSON exacto de los adjuntos que se le manda al
 pipeline. Debajo de cada respuesta se listan los CVE/CWE citados, marcando los que no
-venían del escaneo: pueden salir del corpus del RAG o ser inventados. Los documentos que
+venían de los hallazgos adjuntos: pueden salir del corpus del RAG o ser inventados. Los documentos que
 recuperó el RAG todavía no se ven, porque el pipeline no los devuelve.
 
 > La ventana original queda como consola de depuración: los `console.log` y los errores
@@ -74,7 +85,7 @@ detecta solo si hay un `.venv` en la raíz del repo.
 | `cibersec.dataDir` | `data/raw` | Dumps de OSV, EPSS y KEV. |
 | `cibersec.ragUrl` | `http://localhost:9099` | Servidor de Pipelines. Sólo con `provider: rag`. |
 | `cibersec.ragModel` | `pipeline_dependencias` | Sólo con `provider: rag`. |
-| `cibersec.chatModel` | `pipeline_ciberseguridad` | Pipeline RAG usado por el chat contextual. |
+| `cibersec.chatModel` | `pipeline_ciberseguridad` | Pipeline RAG del chat de la barra lateral. |
 | `cibersec.chatTimeoutSeconds` | `240` | Tiempo máximo de espera de cada respuesta. |
 | `cibersec.explain` | `true` | Solicita explicaciones al pipeline de dependencias. Si está desactivado, el escaneo sigue funcionando sin prosa del LLM. |
 | `cibersec.explainModel` | `pipeline_dependencias` | Pipeline que redacta las explicaciones. |

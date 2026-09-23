@@ -50,7 +50,9 @@ CONVERTED_DIR       = INPUT_DIR / "_converted_md"
 # Variables de chunking y embedding (antes vivían en los Valves del pipeline)
 SPLIT_LENGTH        = 200
 SPLIT_OVERLAP       = 20
-EMBEDDING_MODEL     = "qwen3-embedding:4b"
+# Overrideable por env para máquinas con poca VRAM, que usan una variante derivada
+# (mismos pesos, distinto num_ctx/num_gpu). Ver infrastructure/docker-compose.nvidia-3gb.yml.
+EMBEDDING_MODEL     = os.getenv("EMBEDDING_MODEL", "qwen3-embedding:4b")
 
 # Ajustes de embedding que dependen del hardware. Los defaults son los de siempre (GPU con
 # VRAM de sobra); cada máquina los pisa por variable de entorno del container `pipelines`.

@@ -137,25 +137,30 @@ OllamaGenerator(
 > por ejemplo, fija `retriever_top_k: 5`). Las valves que no están en el archivo toman
 > el default.
 
-### 4.4 Chat sobre un hallazgo (historial y contexto)
+### 4.4 Chat con hallazgos adjuntos (historial y contexto)
 
-La extensión de VSCode abre un chat por hallazgo ("Hablar en profundidad",
-`extension/src/chatPanel.ts`) contra este mismo pipeline. Cada request manda la
-conversación **entera**: el historial lo guarda el cliente y el pipeline no tiene estado.
+La extensión de VSCode tiene un chat permanente en la barra lateral
+(`extension/src/chatView.ts`) contra este mismo pipeline. El usuario le adjunta hallazgos
+desde el informe del escaneo, como se adjuntan archivos en Copilot, y quedan como contexto
+**persistente**: viajan en cada pregunta hasta que los quita. Cada request manda la
+conversación **entera** y los adjuntos vigentes: el pipeline no tiene estado.
 
 ```
 messages = [
-  {role: "system",    content: '{"vulnerability": "CVE-...", "package": ..., "cvss_score": ...}'},
+  {role: "system",    content: '{"findings": [{"vulnerability": "CVE-...", "package": ..., "cvss_score": ...}, ...]}'},
   {role: "user",      content: "¿qué tan grave es?"},
   {role: "assistant", content: "..."},
   {role: "user",      content: "¿cómo lo mitigo?"}     ← user_message
 ]
 ```
 
-- **El hallazgo va como `system`**, no como `user`: es el tema de la charla, no algo que
-  dijo el usuario. `extract_finding_context` lo separa y `format_finding` lo pasa a
-  líneas con etiqueta, más fáciles de leer para un modelo chico que un JSON. Entra al
-  prompt en *"Vulnerability under discussion"*.
+- **Los hallazgos van como `system`**, no como `user`: son el tema de la charla, no algo
+  que dijo el usuario. Sin adjuntos no se manda el `system` y es un chat común.
+  `extract_findings_context` los separa (sin repetidos; también acepta la forma vieja,
+  un hallazgo suelto en el `system`) y `format_findings` los pasa a líneas con etiqueta,
+  numeradas si son varios, más fáciles de leer para un modelo chico que un JSON. Entran
+  al prompt en *"Vulnerabilities under discussion"*. Con varios adjuntos el advisory de
+  cada uno se recorta más, repartiendo un presupuesto fijo; la extensión admite hasta 6.
 - **Sus IDs (CVE/CWE) entran siempre a `VulnIdLookup`**, detrás de los que nombre la
   pregunta. Así no dependen de la ventana de 4 mensajes de `resolve_vuln_ids`.
 - **El historial** (`select_history`) toma los últimos `history_max_messages` mensajes
@@ -165,9 +170,9 @@ messages = [
   OpenWebUI, el eval) el prompt es el de siempre. A los prompts internos de OpenWebUI
   (título, tags) no se les pasa ninguno.
 - La lógica vive en `src/pipeline/chat/` (pura, se testea con `pytest` sin stack). El log
-  deja `[HALLAZGO]` y `[HISTORIAL]` por request.
+  deja un `[HALLAZGO]` por adjunto y `[HISTORIAL]` por request.
 
-Una conversación de dos turnos con hallazgo usa ~900 tokens de prompt, lejos de los 8192
+Una conversación de dos turnos con un hallazgo adjunto usa ~900 tokens de prompt, lejos de los 8192
 de `num_ctx`.
 
 ## 5. Flujos de datos

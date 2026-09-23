@@ -25,6 +25,7 @@ _rnn.pad_sequence = _patched_pad_sequence
 _torch.nn.utils.rnn.pad_sequence = _patched_pad_sequence
 
 from typing import List, Union, Generator, Iterator
+from queue import Queue
 from pydantic import BaseModel
 import logging
 import os
@@ -41,7 +42,7 @@ _PIPELINES_DIR = os.path.dirname(os.path.abspath(__file__))
 if _PIPELINES_DIR not in sys.path:
     sys.path.insert(0, _PIPELINES_DIR)
 
-from chat import extract_finding_context, finding_vuln_ids, format_finding, select_history
+from chat import extract_findings_context, findings_vuln_ids, format_findings, select_history
 
 # Configurar el logger específico para nuestra app
 logger = logging.getLogger("HaystackRAG_Query")
@@ -92,11 +93,11 @@ Rules:
 - If the context does not contain the answer, say explicitly that you don't know.
 - Answer in the language of the question, NOT the language of the documents.
 - The conversation so far is only there to understand follow-ups ("it", "this vulnerability").
-  Facts must still come from the context or the vulnerability under discussion.
+  Facts must still come from the context or the vulnerabilities under discussion.
 
-{% if finding %}
-Vulnerability under discussion (from the user's dependency scan; it is the topic of the conversation):
-{{ finding }}
+{% if findings %}
+Vulnerabilities under discussion (attached by the user from their dependency scan; they are the topic of the conversation):
+{{ findings }}
 {% endif %}
 
 Context:
@@ -417,7 +418,9 @@ class Pipeline:
 
     class Valves(BaseModel):
         llm_model:       str   = DEFAULT_OLLAMA_LLM
-        embedding_model: str   = "qwen3-embedding:4b"
+        # Mismo override que run_indexing.py: query e indexación DEBEN usar el mismo
+        # modelo de embeddings o los vectores no matchean.
+        embedding_model: str   = os.getenv("EMBEDDING_MODEL", "qwen3-embedding:4b")
         retriever_top_k: int   = 15
         ranker_model:    str   = "BAAI/bge-reranker-v2-m3"
         ranker_top_k:    int   = 4
@@ -466,6 +469,7 @@ class Pipeline:
         log = _RequestLog(logger, {"rid": uuid.uuid4().hex[:8]})
         kind = _classify_request(user_message)
         t0 = time.perf_counter()
+        stream = bool(body.get("stream"))
 
         if kind == "user":
             log.info(f"[INICIO] kind=user | pregunta={_one_line(user_message)}")
@@ -476,9 +480,9 @@ class Pipeline:
         keyword_query = build_keyword_query(user_message)
         log.info(f"[KEYWORD QUERY] -> {keyword_query!r}")
 
-        # Hallazgo e historial sólo para preguntas reales: los prompts internos de
-        # OpenWebUI ya traen el chat embebido.
-        finding = extract_finding_context(messages) if kind == "user" else None
+        # Hallazgos adjuntos e historial sólo para preguntas reales: los prompts internos
+        # de OpenWebUI ya traen el chat embebido.
+        findings = extract_findings_context(messages) if kind == "user" else []
         history = (
             select_history(
                 messages,
@@ -489,33 +493,37 @@ class Pipeline:
             if kind == "user"
             else []
         )
-        if finding:
+        for finding in findings:
             log.info(f"[HALLAZGO] {finding.get('vulnerability')} | paquete={finding.get('package')} {finding.get('installed_version')}")
         log.info(f"[HISTORIAL] {len(history)} mensajes al prompt")
 
         vuln_ids, ids_origin = resolve_vuln_ids(user_message, messages)
-        # Los IDs del hallazgo van DETRÁS: si la pregunta nombra otro CVE, ese manda.
-        for vid in finding_vuln_ids(finding):
+        # Los IDs de los hallazgos van DETRÁS: si la pregunta nombra otro CVE, ese manda.
+        for vid in findings_vuln_ids(findings):
             if vid not in vuln_ids:
                 vuln_ids.append(vid)
-        log.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin}{', +hallazgo' if finding else ''})")
+        log.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin}{f', +{len(findings)} hallazgo(s)' if findings else ''})")
 
         ranker_query = build_ranker_query(user_message, vuln_ids)
         log.info(f"[RANKER QUERY] -> {_one_line(ranker_query)!r}")
 
+        inputs = {
+            "text_embedder":     {"text": build_embedding_query(user_message)},
+            "keyword_retriever": {"query": keyword_query},
+            "id_lookup":         {"ids": vuln_ids},
+            "ranker":            {"query": ranker_query},
+            "prompt_builder":    {
+                "question": user_message,
+                "findings": format_findings(findings),
+                "history":  history,
+            },
+        }
+        if stream:
+            return self._stream(inputs, log, kind, t0)
+
         try:
             result = self.rag_pipeline.run(
-                {
-                    "text_embedder":     {"text": build_embedding_query(user_message)},
-                    "keyword_retriever": {"query": keyword_query},
-                    "id_lookup":         {"ids": vuln_ids},
-                    "ranker":            {"query": ranker_query},
-                    "prompt_builder":    {
-                        "question": user_message,
-                        "finding":  format_finding(finding) if finding else "",
-                        "history":  history,
-                    },
-                },
+                inputs,
                 include_outputs_from={
                     "embedding_retriever",
                     "keyword_retriever",
@@ -536,6 +544,59 @@ class Pipeline:
         log.info(f"[FIN] kind={kind} | {time.perf_counter() - t0:.1f}s")
 
         return answer
+
+    def _stream(
+        self,
+        inputs: dict,
+        log: logging.LoggerAdapter,
+        kind: str,
+        t0: float,
+    ) -> Iterator[str]:
+        """Ejecuta Haystack en segundo plano y entrega los tokens al servidor HTTP."""
+        events: Queue[object] = Queue()
+        finished = object()
+
+        def on_chunk(chunk) -> None:
+            content = getattr(chunk, "content", "")
+            if content:
+                events.put(content)
+
+        def run() -> None:
+            try:
+                result = self.rag_pipeline.run(
+                    {
+                        **inputs,
+                        "llm": {"streaming_callback": on_chunk},
+                    },
+                    include_outputs_from={
+                        "embedding_retriever",
+                        "keyword_retriever",
+                        "id_lookup",
+                        "document_joiner",
+                        "ranker",
+                        "prompt_builder",
+                    },
+                )
+                answer = result["llm"]["replies"][0]
+                self._log_retrieved_docs(log, result)
+                self._log_token_usage(log, result)
+                log.info(f"[RESPUESTA] {_one_line(answer)}")
+                log.info(f"[FIN] kind={kind} | {time.perf_counter() - t0:.1f}s")
+            except Exception as error:
+                log.exception(f"[ERROR] kind={kind} | falló tras {time.perf_counter() - t0:.1f}s")
+                events.put(error)
+            finally:
+                events.put(finished)
+
+        worker = threading.Thread(target=run, daemon=True)
+        worker.start()
+        while True:
+            event = events.get()
+            if event is finished:
+                break
+            if isinstance(event, BaseException):
+                raise event
+            yield event
 
     def _log_token_usage(self, log: logging.LoggerAdapter, result: dict) -> None:
         sep = "-" * 60

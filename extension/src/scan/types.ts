@@ -93,3 +93,11 @@ export class ScanError extends Error {
     this.name = "ScanError";
   }
 }
+
+/**
+ * Identidad estable de un hallazgo dentro de un escaneo: la usan el informe (qué botón se
+ * tocó) y el chat (qué hallazgos ya están adjuntos).
+ */
+export function findingKey(finding: Finding): string {
+  return `${finding.package}|${finding.cve ?? finding.osv_ids[0] ?? "?"}`;
+}

@@ -1,18 +1,22 @@
 """
-Contexto del hallazgo e historial para el chat "Hablar en profundidad".
+Hallazgos adjuntos e historial para el chat de la extensión de VSCode.
 
-La extensión de VSCode abre el chat mandando el hallazgo del escaneo como primer mensaje,
-con `role: "system"`: no es algo que haya dicho el usuario, es el tema de la charla.
+El chat de la extensión de VSCode manda los hallazgos que el usuario adjuntó como primer
+mensaje, con `role: "system"`: no es algo que haya dicho el usuario, es el tema de la charla.
 
-    [{"role": "system",    "content": '{"vulnerability": "CVE-...", "package": ...}'},
+    [{"role": "system",    "content": '{"findings": [{"vulnerability": "CVE-...", ...}, ...]}'},
      {"role": "user",      "content": "¿qué tan grave es?"},
      {"role": "assistant", "content": "..."},
      {"role": "user",      "content": "¿cómo lo mitigo?"}]   ← el turno actual
 
-Cada request trae la conversación entera (el historial lo guarda el cliente), así que el
-pipeline no guarda estado: sólo decide qué parte de `messages` entra al prompt.
+También se acepta la forma vieja, un único hallazgo suelto en el `system`
+(`'{"vulnerability": "CVE-...", "package": ...}'`), que era lo que mandaba el chat por
+hallazgo antes del chat con contexto adjunto.
 
-Sin mensaje `system` (el chat normal de OpenWebUI) no hay hallazgo y todo sigue como antes.
+Cada request trae la conversación entera y el contexto vigente (los guarda el cliente), así
+que el pipeline no guarda estado: sólo decide qué parte de `messages` entra al prompt.
+
+Sin mensaje `system` (el chat normal de OpenWebUI) no hay hallazgos y todo sigue como antes.
 """
 
 from __future__ import annotations
@@ -23,6 +27,10 @@ from typing import Any, Mapping, Sequence
 
 # Recorte de summary + details del advisory. Mismo criterio que explain/prompt.py.
 MAX_ADVISORY_CHARS = 1200
+# Con varios hallazgos adjuntos el presupuesto de advisory se reparte entre ellos, con un
+# piso: el prompt entero tiene que entrar en el num_ctx del generador junto al corpus.
+MAX_ADVISORY_CHARS_TOTAL = 3000
+MIN_ADVISORY_CHARS = 300
 
 _VULN_ID_RE = re.compile(r"^(CVE-\d{4}-\d{4,7}|CWE-\d{1,5})$")
 
@@ -37,8 +45,25 @@ def _message_text(msg: Mapping[str, Any]) -> str:
     return ""
 
 
-def extract_finding_context(messages: Sequence[Mapping[str, Any]] | None) -> dict | None:
-    """El hallazgo del primer mensaje `system` que sea un JSON de la extensión, o None."""
+def _is_finding(value: Any) -> bool:
+    return isinstance(value, dict) and ("vulnerability" in value or "package" in value)
+
+
+def _finding_key(finding: Mapping[str, Any]) -> tuple:
+    return (
+        finding.get("vulnerability") or finding.get("cve"),
+        finding.get("package"),
+        finding.get("installed_version"),
+    )
+
+
+def extract_findings_context(messages: Sequence[Mapping[str, Any]] | None) -> list[dict]:
+    """Los hallazgos adjuntos en los mensajes `system` de la extensión, sin repetidos.
+
+    Acepta `{"findings": [...]}` y también un hallazgo suelto (la forma vieja).
+    """
+    found: list[dict] = []
+    seen: set[tuple] = set()
     for msg in messages or []:
         if msg.get("role") != "system":
             continue
@@ -46,9 +71,15 @@ def extract_finding_context(messages: Sequence[Mapping[str, Any]] | None) -> dic
             payload = json.loads(_message_text(msg))
         except (TypeError, json.JSONDecodeError):
             continue  # un system prompt de texto (p. ej. de OpenWebUI): no es un hallazgo
-        if isinstance(payload, dict) and ("vulnerability" in payload or "package" in payload):
-            return payload
-    return None
+        if isinstance(payload, dict) and isinstance(payload.get("findings"), list):
+            candidates = payload["findings"]
+        else:
+            candidates = [payload]
+        for candidate in candidates:
+            if _is_finding(candidate) and _finding_key(candidate) not in seen:
+                seen.add(_finding_key(candidate))
+                found.append(candidate)
+    return found
 
 
 def finding_vuln_ids(finding: Mapping[str, Any] | None) -> list[str]:
@@ -70,7 +101,17 @@ def finding_vuln_ids(finding: Mapping[str, Any] | None) -> list[str]:
     return out
 
 
-def format_finding(finding: Mapping[str, Any]) -> str:
+def findings_vuln_ids(findings: Sequence[Mapping[str, Any]]) -> list[str]:
+    """La unión de `finding_vuln_ids` de cada hallazgo, en orden de adjunto."""
+    out: list[str] = []
+    for finding in findings:
+        for vid in finding_vuln_ids(finding):
+            if vid not in out:
+                out.append(vid)
+    return out
+
+
+def format_finding(finding: Mapping[str, Any], max_advisory_chars: int = MAX_ADVISORY_CHARS) -> str:
     """El hallazgo como líneas con etiqueta: un modelo chico las lee mejor que un JSON."""
     lines: list[str] = []
 
@@ -103,9 +144,21 @@ def format_finding(finding: Mapping[str, Any]) -> str:
 
     advisory = "\n".join(t for t in (finding.get("summary"), finding.get("details")) if t).strip()
     if advisory:
-        lines.append(f"- Advisory (OSV): {_trim(advisory, MAX_ADVISORY_CHARS)}")
+        lines.append(f"- Advisory (OSV): {_trim(advisory, max_advisory_chars)}")
 
     return "\n".join(lines)
+
+
+def format_findings(findings: Sequence[Mapping[str, Any]]) -> str:
+    """Todos los hallazgos adjuntos, numerados. Uno solo sale igual que `format_finding`."""
+    if not findings:
+        return ""
+    if len(findings) == 1:
+        return format_finding(findings[0])
+    budget = max(MIN_ADVISORY_CHARS, MAX_ADVISORY_CHARS_TOTAL // len(findings))
+    return "\n\n".join(
+        f"[{i}]\n{format_finding(finding, budget)}" for i, finding in enumerate(findings, 1)
+    )
 
 
 def select_history(
