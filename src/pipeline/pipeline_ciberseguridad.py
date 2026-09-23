@@ -417,7 +417,9 @@ class Pipeline:
 
     class Valves(BaseModel):
         llm_model:       str   = DEFAULT_OLLAMA_LLM
-        embedding_model: str   = "qwen3-embedding:4b"
+        # Mismo override que run_indexing.py: query e indexación DEBEN usar el mismo
+        # modelo de embeddings o los vectores no matchean.
+        embedding_model: str   = os.getenv("EMBEDDING_MODEL", "qwen3-embedding:4b")
         retriever_top_k: int   = 15
         ranker_model:    str   = "BAAI/bge-reranker-v2-m3"
         ranker_top_k:    int   = 4

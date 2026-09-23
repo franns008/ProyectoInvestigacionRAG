@@ -60,3 +60,7 @@ data/raw/nvd
 
 # Log del pipeline RAG (lo escribe el container en el volumen montado)
 src/pipeline/logCiberseguridad.txt
+
+# Backups locales del .env
+infrastructure/.env.bak.*
+.env.bak.*

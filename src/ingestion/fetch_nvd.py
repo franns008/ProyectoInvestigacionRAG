@@ -31,6 +31,7 @@ SOURCE = "nvd"
 BASE_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 RESULTS_PER_PAGE = 2000
 REQUEST_DELAY_SECONDS = 0.7  # ~43 req/30s, margen bajo el límite de 50/30s con API key
+REQUEST_DELAY_NO_KEY_SECONDS = 6.5  # sin key el límite es 5 req/30s
 MAX_DATE_RANGE_DAYS = 120    # restricción de la API para lastMod*Date
 
 # Escribe dentro de data/raw/, que el docker-compose bind-montea como el volumen
@@ -41,11 +42,13 @@ CHECKPOINT_PATH = RAW_DIR / "_checkpoint.json"
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.000Z"
 
 
-def _load_api_key() -> str:
+def _load_api_key() -> str | None:
     load_dotenv(REPO_ROOT / "infrastructure" / ".env")
     api_key = os.environ.get("NVD_API_KEY")
     if not api_key:
-        raise RuntimeError("NVD_API_KEY no encontrada (se esperaba en infrastructure/.env)")
+        # Sin key la API responde igual, pero con 5 req/30s: sirve para muestras chicas
+        # (--since de un mes son pocas páginas), no para --full.
+        print("[nvd] AVISO: sin NVD_API_KEY, se usa el límite público (5 req/30s).")
     return api_key
 
 
@@ -70,10 +73,11 @@ def _date_windows(start: datetime, end: datetime) -> list[tuple[datetime, dateti
     return windows
 
 
-def _fetch_window(api_key: str, run_dir: Path, page_counter: list[int],
+def _fetch_window(api_key: str | None, run_dir: Path, page_counter: list[int],
                    filters: dict | None = None, url: str = BASE_URL) -> int:
     """Pagina una consulta completa. `filters` son parámetros de la API (fechas, etc.)."""
-    headers = {"apiKey": api_key}
+    headers = {"apiKey": api_key} if api_key else {}
+    delay = REQUEST_DELAY_SECONDS if api_key else REQUEST_DELAY_NO_KEY_SECONDS
     params: dict = {"resultsPerPage": RESULTS_PER_PAGE, "startIndex": 0, **(filters or {})}
 
     total_results = None
@@ -94,12 +98,12 @@ def _fetch_window(api_key: str, run_dir: Path, page_counter: list[int],
 
         params["startIndex"] += RESULTS_PER_PAGE
         if params["startIndex"] < total_results:
-            time.sleep(REQUEST_DELAY_SECONDS)
+            time.sleep(delay)
 
     return fetched
 
 
-def fetch_cves(api_key: str, last_mod_start: str | None, run_start_dt: datetime) -> int:
+def fetch_cves(api_key: str | None, last_mod_start: str | None, run_start_dt: datetime) -> int:
     run_dir = RAW_DIR / run_start_dt.strftime("%Y%m%dT%H%M%SZ")
     run_dir.mkdir(parents=True, exist_ok=True)
     page_counter = [0]
