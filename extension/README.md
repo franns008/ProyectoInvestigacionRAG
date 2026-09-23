@@ -38,7 +38,10 @@ Hay un único chat, siempre disponible, contra el pipeline `pipeline_ciberseguri
 adjuntos es un chat común sobre el corpus del RAG. Los adjuntos son **contexto
 persistente**: viajan en cada pregunta hasta que se quitan, así que se puede comparar
 varios hallazgos en la misma conversación (hasta seis). El botón **+** de la barra de
-título de la vista abre un chat nuevo, sin historial ni adjuntos. La vista se puede
+título de la vista abre un chat nuevo, sin historial ni adjuntos; el de al lado
+(**Limpiar conversación**) borra el historial pero conserva los adjuntos. El anillo junto
+al botón de enviar estima cuánto de la ventana de contexto está ocupado ahora, con el
+desglose en un tooltip. La vista se puede
 arrastrar a la barra lateral secundaria para tenerla a la derecha, como Copilot.
 
 ### Resultados agrupados por librería

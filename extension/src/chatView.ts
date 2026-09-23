@@ -16,6 +16,15 @@
  */
 
 import * as vscode from "vscode";
+import {
+  DEFAULT_LIMITS,
+  estimateTokens,
+  looksTruncated,
+  meterData,
+  MeterData,
+  parseLimits,
+  PipelineLimits,
+} from "./contextMeter";
 import { renderMarkdown } from "./markdown";
 import { chip } from "./references";
 import { Finding, findingKey } from "./scan/types";
@@ -53,6 +62,12 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
   private transcript: Entry[] = [];
   private readonly attachments = new Map<string, Finding>();
   private busy = false;
+  /** Sube con cada pregunta y con cada limpieza: una respuesta de un turno viejo se descarta. */
+  private turn = 0;
+  private inFlight: AbortController | undefined;
+  /** Valves del pipeline para el medidor; hasta leerlos, los defaults del código. */
+  private limits: PipelineLimits = DEFAULT_LIMITS;
+  private limitsFromPipeline = false;
   private readonly changed = new vscode.EventEmitter<ReadonlySet<string>>();
 
   /** Avisa qué hallazgos quedaron adjuntos, para que el informe marque sus botones. */
@@ -68,6 +83,29 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
     view.onDidDispose(() => {
       if (this.view === view) this.view = undefined;
     });
+    void this.loadLimits();
+  }
+
+  /**
+   * Lee los valves del pipeline (`GET /<pipeline>/valves` del servidor de Pipelines) para
+   * que el medidor use la misma ventana y los mismos topes que el prompt real. Se relee
+   * al abrir la vista, al cambiar la configuración y después de cada respuesta, así sigue
+   * a los cambios hechos desde OpenWebUI. Si falla, quedan los últimos valores leídos.
+   */
+  async loadLimits(): Promise<void> {
+    const { url, model, apiKey } = this.options();
+    try {
+      const response = await fetch(`${trimSlash(url)}/${encodeURIComponent(model)}/valves`, {
+        headers: { Authorization: `Bearer ${apiKey}` },
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!response.ok) throw new Error(`${response.status}`);
+      this.limits = parseLimits(await response.json());
+      this.limitsFromPipeline = true;
+    } catch {
+      // Servidor caído o pipeline sin valves: el medidor lo aclara en el tooltip.
+    }
+    this.refreshMeter();
   }
 
   attachedKeys(): ReadonlySet<string> {
@@ -98,11 +136,28 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
 
   /** Vacía historial y adjuntos: una conversación nueva no hereda el tema de la anterior. */
   newChat(): void {
-    this.history = [];
-    this.transcript = [];
     this.attachments.clear();
     this.changed.fire(this.attachedKeys());
+    this.clear();
+  }
+
+  /**
+   * Borra la conversación pero deja los adjuntos: sirve para liberar contexto sin perder
+   * el tema. Si hay una respuesta en camino, se cancela.
+   */
+  clear(): void {
+    this.turn++;
+    this.inFlight?.abort();
+    this.inFlight = undefined;
+    this.busy = false;
+    this.history = [];
+    this.transcript = [];
     if (this.view) this.view.webview.html = this.html();
+  }
+
+  /** Redibuja el medidor: cambió el historial, los adjuntos o la configuración. */
+  refreshMeter(): void {
+    void this.view?.webview.postMessage({ type: "meter", meter: this.meter() });
   }
 
   dispose(): void {
@@ -124,6 +179,18 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
       type: "context",
       html: renderAttachments([...this.attachments.values()]),
     });
+    this.refreshMeter();
+  }
+
+  private meter(): MeterData {
+    return meterData({
+      limits: this.limits,
+      fromPipeline: this.limitsFromPipeline,
+      advisories: [...this.attachments.values()].map((finding) =>
+        [finding.summary, finding.details].filter(Boolean).join("\n"),
+      ),
+      history: this.history,
+    });
   }
 
   private readonly onMessage = async (message: { type?: string; text?: string; url?: string; key?: string }) => {
@@ -141,34 +208,67 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
     // Se congela lo adjunto al momento de preguntar: si el usuario quita una ficha
     // mientras espera, los IDs citados se comparan contra lo que efectivamente se mandó.
     const findings = [...this.attachments.values()];
+    const turn = ++this.turn;
+    const controller = new AbortController();
+    this.inFlight = controller;
     this.history.push({ role: "user", content: text });
     this.transcript.push({ role: "user", html: escape(text) });
     this.busy = true;
+    this.refreshMeter();
+    let answer = "";
+    let failure: Error | undefined;
+    let finishReason: string | undefined;
     try {
-      const answer = await this.ask(findings, (text) => {
-        void this.view?.webview.postMessage({ type: "answerDelta", text });
+      finishReason = await this.ask(findings, controller.signal, (delta) => {
+        answer += delta;
+        if (turn === this.turn) void this.view?.webview.postMessage({ type: "answerDelta", text: delta });
       });
-      this.history.push({ role: "assistant", content: answer });
-      const html = renderMarkdown(answer) + renderCitedIds(answer, findings);
-      this.transcript.push({ role: "assistant", html });
-      void this.view?.webview.postMessage({ type: "answer", html });
+      if (!answer) throw new Error("la respuesta no trae contenido");
     } catch (error) {
+      failure = error as Error;
+    }
+    // Se limpió el chat mientras esperaba: esta respuesta ya no tiene dónde ir.
+    if (turn !== this.turn) return;
+    this.inFlight = undefined;
+    this.busy = false;
+
+    if (failure && !answer) {
       // El turno fallido sale del historial: si quedara, la próxima pregunta llevaría
       // dos mensajes de usuario seguidos y uno sin respuesta.
       this.history.pop();
-      const text = `No se pudo consultar el pipeline: ${(error as Error).message}`;
+      const text = `No se pudo consultar el pipeline: ${describe(failure)}`;
       this.transcript.push({ role: "error", html: escape(text) });
       void this.view?.webview.postMessage({ type: "error", text });
-    } finally {
-      this.busy = false;
+      this.refreshMeter();
+      return;
     }
+
+    // Una respuesta cortada a la mitad se queda, con el aviso: lo que llegó sirve y la
+    // conversación puede seguir desde ahí.
+    const maxTokens = this.limits.max_tokens;
+    const truncation = failure
+      ? `La respuesta quedó incompleta: ${describe(failure)}.`
+      : finishReason === "length" || looksTruncated(answer, maxTokens)
+        ? `La respuesta parece cortada por el límite de largo (≈${estimateTokens(answer)} de ${maxTokens} tokens).`
+        : undefined;
+    this.history.push({ role: "assistant", content: answer });
+    const html = renderMarkdown(answer) + (truncation ? renderTruncation(truncation, false) : "") + renderCitedIds(answer, findings);
+    this.transcript.push({ role: "assistant", html });
+    const live = renderMarkdown(answer) + (truncation ? renderTruncation(truncation, true) : "") + renderCitedIds(answer, findings);
+    void this.view?.webview.postMessage({ type: "answer", html: live });
+    void this.loadLimits();
   };
 
   /**
    * Pide la respuesta en streaming (SSE de OpenAI) y va pasando cada trozo a `onDelta`.
-   * Devuelve el texto completo: el hilo final se renderiza como markdown recién al cerrar.
+   * Devuelve el `finish_reason` si el servidor lo informó; el texto lo va juntando
+   * quien llama, así una respuesta que se corta a la mitad no se pierde.
    */
-  private async ask(findings: Finding[], onDelta: (text: string) => void): Promise<string> {
+  private async ask(
+    findings: Finding[],
+    cancel: AbortSignal,
+    onDelta: (text: string) => void,
+  ): Promise<string | undefined> {
     const { url, model, apiKey, timeoutMs } = this.options();
     // `system` y no `user`: es el tema de la charla, no algo que dijo el usuario.
     const context: ChatMessage[] = findings.length
@@ -181,7 +281,7 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({ model, stream: true, messages: [...context, ...this.history] }),
-      signal: AbortSignal.timeout(timeoutMs),
+      signal: AbortSignal.any([cancel, AbortSignal.timeout(timeoutMs)]),
     });
     if (!response.ok) {
       throw new Error(`${response.status} ${response.statusText}`);
@@ -190,7 +290,7 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
-    let answer = "";
+    let finishReason: string | undefined;
     while (true) {
       const { value, done } = await reader.read();
       buffer += decoder.decode(value, { stream: !done });
@@ -201,18 +301,20 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
         const data = line.slice(5).trim();
         if (!data || data === "[DONE]") continue;
         const chunk = JSON.parse(data) as {
-          choices?: { delta?: { content?: string }; message?: { content?: string } }[];
+          choices?: {
+            delta?: { content?: string };
+            message?: { content?: string };
+            finish_reason?: string | null;
+          }[];
         };
-        const text = chunk.choices?.[0]?.delta?.content ?? chunk.choices?.[0]?.message?.content ?? "";
-        if (text) {
-          answer += text;
-          onDelta(text);
-        }
+        const choice = chunk.choices?.[0];
+        finishReason = choice?.finish_reason ?? finishReason;
+        const text = choice?.delta?.content ?? choice?.message?.content ?? "";
+        if (text) onDelta(text);
       }
       if (done) break;
     }
-    if (!answer) throw new Error("la respuesta no trae contenido");
-    return answer;
+    return finishReason;
   }
 
   private html(): string {
@@ -237,11 +339,15 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
     <div id="context">${renderAttachments([...this.attachments.values()])}</div>
     <form id="form">
       <textarea id="input" rows="1" placeholder="Preguntá sobre ciberseguridad…" title="Enter envía, Shift+Enter agrega una línea" aria-label="Pregunta" required${this.busy ? " disabled" : ""}></textarea>
+      <div class="meter" id="meter">
+        <button type="button" class="meter-ring" aria-describedby="meter-tip" aria-label="Contexto usado">${ICONO_ANILLO}</button>
+        <div class="meter-tip" id="meter-tip" role="tooltip"></div>
+      </div>
       <button id="send" class="send" type="submit" title="Enviar (Enter)" aria-label="Enviar"${this.busy ? " disabled" : ""}>${ICONO_ENVIAR}</button>
     </form>
   </div>
 </main>
-<script nonce="${nonce}">${CHAT_SCRIPT}</script>
+<script nonce="${nonce}">let meter = ${JSON.stringify(this.meter())};${CHAT_SCRIPT}</script>
 </body>
 </html>`;
   }
@@ -310,6 +416,21 @@ function renderCitedIds(answer: string, findings: Finding[]): string {
   </details>`;
 }
 
+/** Aviso bajo una respuesta cortada. `live` agrega el botón de seguir, sólo en el hilo en vivo. */
+function renderTruncation(text: string, live: boolean): string {
+  const button = live
+    ? ` <button type="button" class="link-button" data-continue>Continuar la respuesta</button>`
+    : "";
+  return `<p class="truncated"><span class="tag warning">cortada</span> ${escape(text)}${button}</p>`;
+}
+
+/** Texto legible para un error del fetch: el timeout y la cancelación traen nombres crípticos. */
+function describe(error: Error): string {
+  if (error.name === "TimeoutError") return "se agotó el tiempo de espera";
+  if (error.name === "AbortError") return "se canceló la consulta";
+  return error.message;
+}
+
 function unique(values: (string | null | undefined)[]): string[] {
   return [...new Set(values.filter((value): value is string => Boolean(value)))];
 }
@@ -325,6 +446,12 @@ function trimSlash(url: string): string {
 /** Flecha de enviar. SVG inline: el CSP es default-src 'none' y no hay assets. */
 const ICONO_ENVIAR = `<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M1.72 1.05a.5.5 0 0 1 .54-.07l12.5 6.5a.5.5 0 0 1 0 .89l-12.5 6.5a.5.5 0 0 1-.7-.6L3.43 8 1.56 1.73a.5.5 0 0 1 .16-.68ZM4.37 8.5l-1.4 4.63L13.4 8 2.97 2.87 4.37 7.5H9a.5.5 0 0 1 0 1H4.37Z"/></svg>`;
 
+/** Anillo del medidor de contexto; el script ajusta el arco con stroke-dasharray. */
+const ICONO_ANILLO = `<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/><circle class="meter-arc" cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" transform="rotate(-90 8 8)" stroke-dasharray="0 38"/></svg>`;
+
+/** Lo que manda "Continuar la respuesta": el historial ya trae la parte cortada. */
+const CONTINUE_TEXT = "Continuá la respuesta anterior desde donde se cortó, sin repetir lo que ya dijiste.";
+
 const TYPING = `<div class="message typing" aria-label="El asistente está escribiendo"><span></span><span></span><span></span></div>`;
 
 const CHAT_SCRIPT = `
@@ -334,7 +461,10 @@ const input = document.getElementById("input");
 const send = document.getElementById("send");
 const messages = document.getElementById("messages");
 const context = document.getElementById("context");
+const meterBox = document.getElementById("meter");
+const meterTip = document.getElementById("meter-tip");
 const MAX_LINES = 5;
+const CONTINUE_TEXT = ${JSON.stringify(CONTINUE_TEXT)};
 let streaming = null;
 
 // Arranca en una línea y crece con el contenido hasta MAX_LINES; de ahí en más
@@ -353,6 +483,54 @@ function autosize() {
 input.addEventListener("input", autosize);
 autosize();
 
+// Medidor de contexto: lo que el chat tiene cargado ahora, según las partes que estima el host.
+function formatTokens(n) {
+  return n.toLocaleString("es-AR");
+}
+function renderMeter() {
+  const used = meter.parts.reduce((sum, part) => sum + part.tokens, 0);
+  const ratio = used / meter.window;
+  const percent = Math.round(ratio * 100);
+  const level = ratio >= 1 ? "over" : ratio >= 0.9 ? "danger" : ratio >= 0.75 ? "warning" : "ok";
+  meterBox.dataset.level = level;
+  const circumference = 2 * Math.PI * 6;
+  meterBox.querySelector(".meter-arc").setAttribute(
+    "stroke-dasharray", (Math.min(ratio, 1) * circumference).toFixed(2) + " " + circumference.toFixed(2),
+  );
+  meterBox.querySelector(".meter-ring").setAttribute("aria-label", "Contexto usado: " + percent + "%");
+
+  meterTip.replaceChildren();
+  const title = document.createElement("strong");
+  title.textContent = "Contexto: ≈" + formatTokens(used) + " de " + formatTokens(meter.window) + " tokens (" + percent + "%)";
+  const table = document.createElement("table");
+  for (const part of meter.parts) {
+    const row = table.insertRow();
+    row.insertCell().textContent = part.label;
+    const tokens = row.insertCell();
+    tokens.textContent = formatTokens(part.tokens);
+    tokens.className = "num";
+  }
+  const note = document.createElement("p");
+  note.className = "muted";
+  note.textContent = level === "over"
+    ? "No entra en la ventana: Ollama recorta el principio del prompt, que son las instrucciones. Quitá adjuntos o limpiá la conversación."
+    : level === "danger" || level === "warning"
+      ? "Queda poco lugar. Limpiar la conversación libera el historial y deja los adjuntos."
+      : used
+        ? "Estimación: el prompt real lo arma el pipeline con los documentos que recupera."
+        : "El chat está vacío: todavía no hay nada en el contexto.";
+  meterTip.append(title);
+  if (meter.parts.length) meterTip.append(table);
+  meterTip.append(note);
+  if (!meter.fromPipeline) {
+    const source = document.createElement("p");
+    source.className = "muted";
+    source.textContent = "No se pudieron leer los valves del pipeline: se usan sus valores por defecto.";
+    meterTip.append(source);
+  }
+}
+renderMeter();
+
 input.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
     event.preventDefault();
@@ -363,15 +541,24 @@ form.addEventListener("submit", (event) => {
   event.preventDefault();
   const text = input.value.trim();
   if (!text || input.disabled) return;
+  input.value = "";
+  autosize();
+  sendText(text);
+});
+function sendText(text) {
+  // Un "Continuar" viejo ya no aplica: la respuesta que cortó dejó de ser la última.
+  for (const button of messages.querySelectorAll("button[data-continue]")) button.remove();
   const intro = messages.querySelector(".intro");
   if (intro) intro.remove();
   addMessage("user", (item) => { item.textContent = text; });
-  input.value = "";
-  autosize();
   setBusy(true);
   vscode.postMessage({ type: "send", text });
-});
+}
 document.addEventListener("click", (event) => {
+  if (event.target.closest("button[data-continue]")) {
+    if (!input.disabled) sendText(CONTINUE_TEXT);
+    return;
+  }
   const remove = event.target.closest("button[data-remove]");
   if (remove) {
     vscode.postMessage({ type: "remove", key: remove.dataset.remove });
@@ -412,6 +599,7 @@ window.addEventListener("message", (event) => {
     setBusy(false);
   }
   if (message.type === "context") { context.innerHTML = message.html; }
+  if (message.type === "meter") { meter = message.meter; renderMeter(); }
 });
 function setBusy(busy) {
   input.disabled = busy;
@@ -497,12 +685,22 @@ const CHAT_STYLES = `
     font-size: var(--fs-sm);
   }
   .outside { margin: 0 var(--sp-2) 0 var(--sp-1); }
+  .truncated { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--muted); }
+  .truncated .tag { margin-right: var(--sp-1); }
+  .link-button {
+    padding: 0; font: inherit;
+    color: var(--vscode-textLink-foreground);
+    background: none; border: 0;
+    cursor: pointer;
+  }
+  .link-button:hover { text-decoration: underline; }
 
   /*
    * Adjuntos + input: el bloque fijo de abajo, como el de Copilot. Una sola caja con un
    * solo indicador de foco (el borde): el textarea no dibuja el suyo.
    */
   .composer {
+    position: relative;
     flex: none;
     display: flex; flex-direction: column; gap: var(--sp-2);
     margin-top: var(--sp-2);
@@ -560,6 +758,37 @@ const CHAT_STYLES = `
   }
   textarea:focus, textarea:focus-visible { outline: none; }
   textarea::placeholder { color: var(--vscode-input-placeholderForeground, var(--muted)); }
+  /* Medidor de contexto: un anillo al lado de enviar, con el desglose en un tooltip. */
+  .meter { flex: none; display: flex; }
+  .meter-ring {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2em; height: 2em; padding: 0;
+    color: var(--muted);
+    background: none; border: 0; border-radius: var(--radius-sm);
+    cursor: default;
+  }
+  .meter-ring:hover { background: var(--vscode-toolbar-hoverBackground); }
+  .meter[data-level="warning"] .meter-ring { color: var(--warning); }
+  .meter[data-level="danger"] .meter-ring,
+  .meter[data-level="over"] .meter-ring { color: var(--danger); }
+  .meter-tip {
+    display: none;
+    position: absolute; right: 0; bottom: calc(100% + var(--sp-1));
+    z-index: 1;
+    width: min(20rem, 100%);
+    padding: var(--sp-2) var(--sp-3);
+    font-size: var(--fs-sm);
+    color: var(--vscode-editorHoverWidget-foreground, var(--vscode-foreground));
+    background: var(--vscode-editorHoverWidget-background, var(--vscode-editor-background));
+    border: 1px solid var(--vscode-editorHoverWidget-border, var(--border-strong));
+    border-radius: var(--radius-sm);
+  }
+  .meter:hover .meter-tip, .meter:focus-within .meter-tip { display: block; }
+  .meter-tip table { width: 100%; margin: var(--sp-1) 0; border-collapse: collapse; }
+  .meter-tip td { padding: 1px 0; }
+  .meter-tip .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .meter-tip p { margin: 0; }
+
   .send {
     flex: none;
     display: inline-flex; align-items: center; justify-content: center;

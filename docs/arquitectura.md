@@ -175,6 +175,30 @@ messages = [
 Una conversación de dos turnos con un hallazgo adjunto usa ~900 tokens de prompt, lejos de los 8192
 de `num_ctx`.
 
+**Medidor de contexto de la extensión.** Junto al botón de enviar, un anillo con tooltip
+estima cuánto de `num_ctx` ocupa lo que el chat tiene cargado ahora: adjuntos, historial y,
+desde la primera pregunta, instrucciones y documentos (`extension/src/contextMeter.ts`).
+Es el estado actual: no suma lo que se está escribiendo ni lo reservado para la respuesta.
+Los valves que deciden el tamaño del prompt (`num_ctx`, `max_tokens`, `ranker_top_k`,
+`history_max_messages`, `history_max_chars`) los lee en vivo de `GET
+/pipeline_ciberseguridad/valves` del servidor de Pipelines: al abrir la vista, al cambiar
+la configuración y tras cada respuesta. `max_tokens` también sirve para inferir si una
+respuesta se cortó por largo, porque el servidor siempre cierra con `finish_reason: "stop"`.
+
+> **Pendiente — sincronizar lo que no es valve.** El medidor todavía copia a mano
+> constantes del pipeline que la extensión no puede leer:
+> - `MAX_ADVISORY_CHARS` / `_TOTAL` / `MIN_` de `chat/context.py`;
+> - el largo de `PROMPT_TEMPLATE` (~450 tokens);
+> - el tamaño de chunk (~280 tokens por documento; los CVE/CWE atómicos varían);
+> - la relación caracteres/token (3,5).
+>
+> Si cambian en el pipeline, el medidor se desfasa sin avisar. La solución es que el
+> pipeline informe sus límites y el uso real de tokens: una consulta de info que no corra
+> el RAG (body `{"cibersec": {"info": true}}`) y un último chunk del stream con
+> `prompt_eval_count`, `eval_count` y `done_reason` de Ollama. El servidor de Pipelines deja
+> pasar un `dict` como `data:` tal cual. Con eso el medidor pasa a mostrar el uso real y el
+> aviso de respuesta cortada deja de ser una heurística.
+
 ## 5. Flujos de datos
 
 ### 5.1 Indexación

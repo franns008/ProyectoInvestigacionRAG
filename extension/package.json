@@ -36,6 +36,12 @@
         "title": "Nuevo chat",
         "category": "Ciberseguridad",
         "icon": "$(add)"
+      },
+      {
+        "command": "cibersec.clearChat",
+        "title": "Limpiar conversación",
+        "category": "Ciberseguridad",
+        "icon": "$(clear-all)"
       }
     ],
     "viewsContainers": {
@@ -73,9 +79,14 @@
       ],
       "view/title": [
         {
+          "command": "cibersec.clearChat",
+          "when": "view == cibersec.chat",
+          "group": "navigation@1"
+        },
+        {
           "command": "cibersec.newChat",
           "when": "view == cibersec.chat",
-          "group": "navigation"
+          "group": "navigation@2"
         }
       ]
     },

@@ -29,6 +29,10 @@ export function activate(context: vscode.ExtensionContext): void {
             webviewOptions: { retainContextWhenHidden: true },
         }),
         vscode.commands.registerCommand('cibersec.newChat', () => chat.newChat()),
+        vscode.commands.registerCommand('cibersec.clearChat', () => chat.clear()),
+        vscode.workspace.onDidChangeConfiguration((event) => {
+            if (event.affectsConfiguration('cibersec')) void chat.loadLimits();
+        }),
         vscode.commands.registerCommand(
             'cibersec.scanRequirements',
             (resource?: vscode.Uri) => scanCommand(chat, resource),
