@@ -25,6 +25,7 @@ _rnn.pad_sequence = _patched_pad_sequence
 _torch.nn.utils.rnn.pad_sequence = _patched_pad_sequence
 
 from typing import List, Union, Generator, Iterator
+from queue import Queue
 from pydantic import BaseModel
 import logging
 import os
@@ -468,6 +469,7 @@ class Pipeline:
         log = _RequestLog(logger, {"rid": uuid.uuid4().hex[:8]})
         kind = _classify_request(user_message)
         t0 = time.perf_counter()
+        stream = bool(body.get("stream"))
 
         if kind == "user":
             log.info(f"[INICIO] kind=user | pregunta={_one_line(user_message)}")
@@ -505,19 +507,23 @@ class Pipeline:
         ranker_query = build_ranker_query(user_message, vuln_ids)
         log.info(f"[RANKER QUERY] -> {_one_line(ranker_query)!r}")
 
+        inputs = {
+            "text_embedder":     {"text": build_embedding_query(user_message)},
+            "keyword_retriever": {"query": keyword_query},
+            "id_lookup":         {"ids": vuln_ids},
+            "ranker":            {"query": ranker_query},
+            "prompt_builder":    {
+                "question": user_message,
+                "findings": format_findings(findings),
+                "history":  history,
+            },
+        }
+        if stream:
+            return self._stream(inputs, log, kind, t0)
+
         try:
             result = self.rag_pipeline.run(
-                {
-                    "text_embedder":     {"text": build_embedding_query(user_message)},
-                    "keyword_retriever": {"query": keyword_query},
-                    "id_lookup":         {"ids": vuln_ids},
-                    "ranker":            {"query": ranker_query},
-                    "prompt_builder":    {
-                        "question": user_message,
-                        "findings": format_findings(findings),
-                        "history":  history,
-                    },
-                },
+                inputs,
                 include_outputs_from={
                     "embedding_retriever",
                     "keyword_retriever",
@@ -538,6 +544,59 @@ class Pipeline:
         log.info(f"[FIN] kind={kind} | {time.perf_counter() - t0:.1f}s")
 
         return answer
+
+    def _stream(
+        self,
+        inputs: dict,
+        log: logging.LoggerAdapter,
+        kind: str,
+        t0: float,
+    ) -> Iterator[str]:
+        """Ejecuta Haystack en segundo plano y entrega los tokens al servidor HTTP."""
+        events: Queue[object] = Queue()
+        finished = object()
+
+        def on_chunk(chunk) -> None:
+            content = getattr(chunk, "content", "")
+            if content:
+                events.put(content)
+
+        def run() -> None:
+            try:
+                result = self.rag_pipeline.run(
+                    {
+                        **inputs,
+                        "llm": {"streaming_callback": on_chunk},
+                    },
+                    include_outputs_from={
+                        "embedding_retriever",
+                        "keyword_retriever",
+                        "id_lookup",
+                        "document_joiner",
+                        "ranker",
+                        "prompt_builder",
+                    },
+                )
+                answer = result["llm"]["replies"][0]
+                self._log_retrieved_docs(log, result)
+                self._log_token_usage(log, result)
+                log.info(f"[RESPUESTA] {_one_line(answer)}")
+                log.info(f"[FIN] kind={kind} | {time.perf_counter() - t0:.1f}s")
+            except Exception as error:
+                log.exception(f"[ERROR] kind={kind} | falló tras {time.perf_counter() - t0:.1f}s")
+                events.put(error)
+            finally:
+                events.put(finished)
+
+        worker = threading.Thread(target=run, daemon=True)
+        worker.start()
+        while True:
+            event = events.get()
+            if event is finished:
+                break
+            if isinstance(event, BaseException):
+                raise event
+            yield event
 
     def _log_token_usage(self, log: logging.LoggerAdapter, result: dict) -> None:
         sep = "-" * 60

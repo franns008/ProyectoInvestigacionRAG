@@ -145,7 +145,9 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
     this.transcript.push({ role: "user", html: escape(text) });
     this.busy = true;
     try {
-      const answer = await this.ask(findings);
+      const answer = await this.ask(findings, (text) => {
+        void this.view?.webview.postMessage({ type: "answerDelta", text });
+      });
       this.history.push({ role: "assistant", content: answer });
       const html = renderMarkdown(answer) + renderCitedIds(answer, findings);
       this.transcript.push({ role: "assistant", html });
@@ -162,7 +164,11 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
     }
   };
 
-  private async ask(findings: Finding[]): Promise<string> {
+  /**
+   * Pide la respuesta en streaming (SSE de OpenAI) y va pasando cada trozo a `onDelta`.
+   * Devuelve el texto completo: el hilo final se renderiza como markdown recién al cerrar.
+   */
+  private async ask(findings: Finding[], onDelta: (text: string) => void): Promise<string> {
     const { url, model, apiKey, timeoutMs } = this.options();
     // `system` y no `user`: es el tema de la charla, no algo que dijo el usuario.
     const context: ChatMessage[] = findings.length
@@ -174,16 +180,37 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ model, stream: false, messages: [...context, ...this.history] }),
+      body: JSON.stringify({ model, stream: true, messages: [...context, ...this.history] }),
       signal: AbortSignal.timeout(timeoutMs),
     });
     if (!response.ok) {
       throw new Error(`${response.status} ${response.statusText}`);
     }
-    const body = (await response.json()) as {
-      choices?: { message?: { content?: string } }[];
-    };
-    const answer = body.choices?.[0]?.message?.content;
+    if (!response.body) throw new Error("la respuesta no permite streaming");
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let answer = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      buffer += decoder.decode(value, { stream: !done });
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop() ?? "";
+      for (const line of lines) {
+        if (!line.startsWith("data:")) continue;
+        const data = line.slice(5).trim();
+        if (!data || data === "[DONE]") continue;
+        const chunk = JSON.parse(data) as {
+          choices?: { delta?: { content?: string }; message?: { content?: string } }[];
+        };
+        const text = chunk.choices?.[0]?.delta?.content ?? chunk.choices?.[0]?.message?.content ?? "";
+        if (text) {
+          answer += text;
+          onDelta(text);
+        }
+      }
+      if (done) break;
+    }
     if (!answer) throw new Error("la respuesta no trae contenido");
     return answer;
   }
@@ -308,6 +335,7 @@ const send = document.getElementById("send");
 const messages = document.getElementById("messages");
 const context = document.getElementById("context");
 const MAX_LINES = 5;
+let streaming = null;
 
 // Arranca en una línea y crece con el contenido hasta MAX_LINES; de ahí en más
 // scrollea, dejando visibles las últimas líneas (el overflow queda arriba).
@@ -356,8 +384,33 @@ document.addEventListener("click", (event) => {
 });
 window.addEventListener("message", (event) => {
   const message = event.data;
-  if (message.type === "answer") { addMessage("assistant", (item) => { item.innerHTML = message.html; }); setBusy(false); }
-  if (message.type === "error") { addMessage("error", (item) => { item.textContent = message.text; }); setBusy(false); }
+  // Mientras llega, la respuesta es texto plano; al cerrar se reemplaza por el markdown
+  // que renderizó el host.
+  if (message.type === "answerDelta") {
+    if (!streaming) {
+      const typing = messages.querySelector(".typing");
+      if (typing) typing.remove();
+      addMessage("assistant", (item) => { item.classList.add("streaming"); streaming = item; });
+    }
+    streaming.textContent += message.text;
+    messages.scrollTop = messages.scrollHeight;
+  }
+  if (message.type === "answer") {
+    if (streaming) {
+      streaming.classList.remove("streaming");
+      streaming.innerHTML = message.html;
+      streaming = null;
+    } else {
+      addMessage("assistant", (item) => { item.innerHTML = message.html; });
+    }
+    setBusy(false);
+  }
+  if (message.type === "error") {
+    // Una respuesta cortada a la mitad no queda en el hilo: el host tampoco la guarda.
+    if (streaming) { streaming.remove(); streaming = null; }
+    addMessage("error", (item) => { item.textContent = message.text; });
+    setBusy(false);
+  }
   if (message.type === "context") { context.innerHTML = message.html; }
 });
 function setBusy(busy) {
@@ -409,6 +462,7 @@ const CHAT_STYLES = `
     background: var(--vscode-textBlockQuote-background);
   }
   .message.error { color: var(--vscode-errorForeground); white-space: pre-wrap; }
+  .message.assistant.streaming { white-space: pre-wrap; }
 
   /* Markdown de la respuesta: hereda del sistema y sólo ajusta el ritmo vertical. */
   .message.assistant > :first-child { margin-top: 0; }
