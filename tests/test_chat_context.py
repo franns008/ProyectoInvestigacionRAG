@@ -4,7 +4,14 @@ Tests del contexto del chat (src/pipeline/chat/). Corren sin stack: es lógica p
 
 import json
 
-from chat import extract_finding_context, finding_vuln_ids, format_finding, select_history
+from chat import (
+    extract_findings_context,
+    finding_vuln_ids,
+    findings_vuln_ids,
+    format_finding,
+    format_findings,
+    select_history,
+)
 
 FINDING = {
     "vulnerability": "CVE-2023-4863",
@@ -26,25 +33,57 @@ def conversation(*turns):
 
 
 # ======================================================================
-# extract_finding_context
+# extract_findings_context
 # ======================================================================
-def test_extrae_el_hallazgo_del_mensaje_system():
-    assert extract_finding_context(conversation({"role": "user", "content": "hola"})) == FINDING
+OTHER = {
+    "vulnerability": "CVE-2019-11358",
+    "package": "django",
+    "installed_version": "2.2.0",
+    "cwe_ids": ["CWE-79"],
+    "summary": "XSS",
+}
+
+
+def attached(*findings):
+    return {"role": "system", "content": json.dumps({"findings": list(findings)})}
+
+
+def test_extrae_los_hallazgos_adjuntos():
+    messages = [attached(FINDING, OTHER), {"role": "user", "content": "hola"}]
+    assert extract_findings_context(messages) == [FINDING, OTHER]
+
+
+def test_acepta_el_hallazgo_suelto_de_antes():
+    assert extract_findings_context(conversation({"role": "user", "content": "hola"})) == [FINDING]
+
+
+def test_no_repite_un_hallazgo_adjunto_dos_veces():
+    messages = [attached(FINDING, OTHER), attached(FINDING)]
+    assert extract_findings_context(messages) == [FINDING, OTHER]
+
+
+def test_lista_de_adjuntos_vacia_no_trae_hallazgos():
+    assert extract_findings_context([attached()]) == []
+
+
+def test_descarta_lo_que_no_es_un_hallazgo_dentro_de_la_lista():
+    messages = [{"role": "system", "content": json.dumps({"findings": [FINDING, {"foo": 1}, "x"]})}]
+    assert extract_findings_context(messages) == [FINDING]
 
 
 def test_sin_system_no_hay_hallazgo():
-    assert extract_finding_context([{"role": "user", "content": json.dumps(FINDING)}]) is None
-    assert extract_finding_context(None) is None
+    assert extract_findings_context([{"role": "user", "content": json.dumps(FINDING)}]) == []
+    assert extract_findings_context(None) == []
 
 
 def test_un_system_prompt_de_texto_no_es_un_hallazgo():
     messages = [{"role": "system", "content": "You are a helpful assistant."}]
-    assert extract_finding_context(messages) is None
+    assert extract_findings_context(messages) == []
 
 
 def test_un_system_json_ajeno_no_es_un_hallazgo():
     messages = [{"role": "system", "content": json.dumps({"foo": 1})}]
-    assert extract_finding_context(messages) is None
+    assert extract_findings_context(messages) == []
 
 
 # ======================================================================
@@ -130,3 +169,32 @@ def test_recorta_mensajes_largos():
 def test_max_messages_cero_desactiva_el_historial():
     messages = conversation({"role": "user", "content": "a"}, {"role": "user", "content": "b"})
     assert select_history(messages, "b", max_messages=0) == []
+
+
+# ======================================================================
+# Varios hallazgos adjuntos
+# ======================================================================
+def test_ids_de_todos_los_adjuntos_sin_repetir():
+    assert findings_vuln_ids([FINDING, OTHER, FINDING]) == ["CVE-2023-4863", "CWE-787", "CVE-2019-11358", "CWE-79"]
+
+
+def test_sin_adjuntos_no_hay_ids_ni_texto():
+    assert findings_vuln_ids([]) == []
+    assert format_findings([]) == ""
+
+
+def test_un_solo_adjunto_se_formatea_como_antes():
+    assert format_findings([FINDING]) == format_finding(FINDING)
+
+
+def test_varios_adjuntos_van_numerados():
+    text = format_findings([FINDING, OTHER])
+    assert text.startswith("[1]\n- Identifier: CVE-2023-4863")
+    assert "\n\n[2]\n- Identifier: CVE-2019-11358" in text
+
+
+def test_con_varios_adjuntos_el_advisory_se_reparte():
+    long = dict(FINDING, details="palabra " * 1000)
+    text = format_findings([long] * 2 + [OTHER] * 8)
+    advisory = next(line for line in text.splitlines() if line.startswith("- Advisory"))
+    assert len(advisory) < 400

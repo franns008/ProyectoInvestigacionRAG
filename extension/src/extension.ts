@@ -1,8 +1,9 @@
 /**
  * Punto de entrada de la extensión.
  *
- * Un solo comando: escanear un requirements.txt y mostrar los hallazgos priorizados.
- * La extensión no sabe cómo se resuelve el escaneo — eso lo decide el `ScanProvider`
+ * Dos superficies: el comando que escanea un requirements.txt y muestra los hallazgos
+ * priorizados, y el chat de la barra lateral, al que se le adjuntan hallazgos desde ese
+ * informe (ver chatView.ts). La extensión no sabe cómo se resuelve el escaneo — eso lo decide el `ScanProvider`
  * que arma `buildProvider()` a partir de los ajustes. Las explicaciones del LLM entran
  * como un decorador sobre ese proveedor, no como un proveedor distinto.
  */
@@ -10,6 +11,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
+import { ChatOptions, ChatView } from './chatView';
 import { ExplainedProvider } from './scan/explainedProvider';
 import { ResultsPanel } from './panel';
 import { LocalScannerProvider } from './scan/localProvider';
@@ -18,10 +20,18 @@ import { RagProvider } from './scan/ragProvider';
 import { ScanError, ScanProvider } from './scan/types';
 
 export function activate(context: vscode.ExtensionContext): void {
+    const chat = new ChatView(chatOptions);
     context.subscriptions.push(
+        chat,
+        // retainContextWhenHidden: el hilo y el input a medio escribir sobreviven a
+        // cambiar de vista en la barra lateral, igual que en Copilot.
+        vscode.window.registerWebviewViewProvider(ChatView.viewType, chat, {
+            webviewOptions: { retainContextWhenHidden: true },
+        }),
+        vscode.commands.registerCommand('cibersec.newChat', () => chat.newChat()),
         vscode.commands.registerCommand(
             'cibersec.scanRequirements',
-            scanCommand,
+            (resource?: vscode.Uri) => scanCommand(chat, resource),
         ),
     );
 
@@ -53,13 +63,24 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 export function deactivate(): void {
-    // Sin recursos de larga vida: el panel se limpia solo al cerrarse.
+    // El chat se libera con context.subscriptions; el panel se limpia solo al cerrarse.
+}
+
+/** Se leen en cada pregunta: cambiar un ajuste no obliga a recargar la ventana. */
+function chatOptions(): ChatOptions {
+    const config = vscode.workspace.getConfiguration('cibersec');
+    return {
+        url: config.get<string>('ragUrl', 'http://localhost:9099'),
+        model: config.get<string>('chatModel', 'pipeline_ciberseguridad'),
+        apiKey: config.get<string>('ragApiKey', '0p3n-w3bui'),
+        timeoutMs: config.get<number>('chatTimeoutSeconds', 240) * 1000,
+    };
 }
 
 /** Mismo criterio que el `when` de los menús en package.json. */
 const IS_MANIFEST = /requirements.*\.txt$/;
 
-async function scanCommand(resource?: vscode.Uri): Promise<void> {
+async function scanCommand(chat: ChatView, resource?: vscode.Uri): Promise<void> {
     const manifest = resource ?? vscode.window.activeTextEditor?.document.uri;
     if (!manifest || manifest.scheme !== 'file') {
         vscode.window.showWarningMessage(
@@ -80,7 +101,7 @@ async function scanCommand(resource?: vscode.Uri): Promise<void> {
         workspace.uri.fsPath,
         path.dirname(manifest.fsPath),
     );
-    const panel = ResultsPanel.show();
+    const panel = ResultsPanel.show(chat);
     panel.loading(
         path.basename(manifest.fsPath),
         await readPreview(manifest.fsPath),

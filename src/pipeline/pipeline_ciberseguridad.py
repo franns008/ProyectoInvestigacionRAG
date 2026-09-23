@@ -41,7 +41,7 @@ _PIPELINES_DIR = os.path.dirname(os.path.abspath(__file__))
 if _PIPELINES_DIR not in sys.path:
     sys.path.insert(0, _PIPELINES_DIR)
 
-from chat import extract_finding_context, finding_vuln_ids, format_finding, select_history
+from chat import extract_findings_context, findings_vuln_ids, format_findings, select_history
 
 # Configurar el logger específico para nuestra app
 logger = logging.getLogger("HaystackRAG_Query")
@@ -92,11 +92,11 @@ Rules:
 - If the context does not contain the answer, say explicitly that you don't know.
 - Answer in the language of the question, NOT the language of the documents.
 - The conversation so far is only there to understand follow-ups ("it", "this vulnerability").
-  Facts must still come from the context or the vulnerability under discussion.
+  Facts must still come from the context or the vulnerabilities under discussion.
 
-{% if finding %}
-Vulnerability under discussion (from the user's dependency scan; it is the topic of the conversation):
-{{ finding }}
+{% if findings %}
+Vulnerabilities under discussion (attached by the user from their dependency scan; they are the topic of the conversation):
+{{ findings }}
 {% endif %}
 
 Context:
@@ -478,9 +478,9 @@ class Pipeline:
         keyword_query = build_keyword_query(user_message)
         log.info(f"[KEYWORD QUERY] -> {keyword_query!r}")
 
-        # Hallazgo e historial sólo para preguntas reales: los prompts internos de
-        # OpenWebUI ya traen el chat embebido.
-        finding = extract_finding_context(messages) if kind == "user" else None
+        # Hallazgos adjuntos e historial sólo para preguntas reales: los prompts internos
+        # de OpenWebUI ya traen el chat embebido.
+        findings = extract_findings_context(messages) if kind == "user" else []
         history = (
             select_history(
                 messages,
@@ -491,16 +491,16 @@ class Pipeline:
             if kind == "user"
             else []
         )
-        if finding:
+        for finding in findings:
             log.info(f"[HALLAZGO] {finding.get('vulnerability')} | paquete={finding.get('package')} {finding.get('installed_version')}")
         log.info(f"[HISTORIAL] {len(history)} mensajes al prompt")
 
         vuln_ids, ids_origin = resolve_vuln_ids(user_message, messages)
-        # Los IDs del hallazgo van DETRÁS: si la pregunta nombra otro CVE, ese manda.
-        for vid in finding_vuln_ids(finding):
+        # Los IDs de los hallazgos van DETRÁS: si la pregunta nombra otro CVE, ese manda.
+        for vid in findings_vuln_ids(findings):
             if vid not in vuln_ids:
                 vuln_ids.append(vid)
-        log.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin}{', +hallazgo' if finding else ''})")
+        log.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin}{f', +{len(findings)} hallazgo(s)' if findings else ''})")
 
         ranker_query = build_ranker_query(user_message, vuln_ids)
         log.info(f"[RANKER QUERY] -> {_one_line(ranker_query)!r}")
@@ -514,7 +514,7 @@ class Pipeline:
                     "ranker":            {"query": ranker_query},
                     "prompt_builder":    {
                         "question": user_message,
-                        "finding":  format_finding(finding) if finding else "",
+                        "findings": format_findings(findings),
                         "history":  history,
                     },
                 },

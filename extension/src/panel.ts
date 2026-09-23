@@ -11,10 +11,10 @@
  */
 
 import * as vscode from 'vscode';
-import { ChatPanel, ChatOptions } from './chatPanel';
+import { ChatView } from './chatView';
 import { PreviewPackage } from './scan/manifest';
 import { chip } from './references';
-import { Finding, ScanResult } from './scan/types';
+import { Finding, ScanResult, findingKey } from './scan/types';
 import { BASE_STYLES, escapeHtml as escape, nonceValue } from './styles';
 
 export class ResultsPanel {
@@ -29,7 +29,7 @@ export class ResultsPanel {
      */
     private findings = new Map<string, Finding>();
 
-    private constructor() {
+    private constructor(private readonly chat: ChatView) {
         this.panel = vscode.window.createWebviewPanel(
             'cibersec.results',
             'Dependencias vulnerables',
@@ -38,9 +38,9 @@ export class ResultsPanel {
         );
         this.panel.webview.onDidReceiveMessage(
             (message: { type?: string; key?: string; url?: string }) => {
-                if (message.type === 'openChat' && message.key) {
+                if (message.type === 'toggleContext' && message.key) {
                     const finding = this.findings.get(message.key);
-                    if (finding) ChatPanel.show(finding, this.chatOptions());
+                    if (finding) void this.chat.toggle(finding);
                     return;
                 }
                 if (message.type === 'openExternal' && message.url && /^https?:\/\//i.test(message.url)) {
@@ -51,12 +51,18 @@ export class ResultsPanel {
             this.disposables,
         );
         this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
+        // Los botones reflejan qué está adjunto, también cuando se quita desde el chat.
+        this.disposables.push(
+            chat.onDidChangeAttachments((keys) => {
+                void this.panel.webview.postMessage({ type: 'attached', keys: [...keys] });
+            }),
+        );
     }
 
     /** Reusa el panel si ya está abierto, para no acumular pestañas en cada escaneo. */
-    static show(): ResultsPanel {
+    static show(chat: ChatView): ResultsPanel {
         if (!ResultsPanel.current) {
-            ResultsPanel.current = new ResultsPanel();
+            ResultsPanel.current = new ResultsPanel(chat);
         }
         ResultsPanel.current.panel.reveal(vscode.ViewColumn.Beside, true);
         return ResultsPanel.current;
@@ -90,10 +96,28 @@ export class ResultsPanel {
 <style>${BASE_STYLES}${STYLES}</style>
 <script nonce="${nonce}">
   const vscode = acquireVsCodeApi();
+  // Marca los botones de los hallazgos que ya están en el chat. El estado inicial va
+  // embebido porque un postMessage anterior a la carga del webview se pierde.
+  function markAttached(keys) {
+    const attached = new Set(keys);
+    for (const button of document.querySelectorAll("button[data-finding]")) {
+      const on = attached.has(button.dataset.finding);
+      button.setAttribute("aria-pressed", String(on));
+      const name = on ? button.dataset.labelOn : button.dataset.labelOff;
+      button.title = name;
+      button.setAttribute("aria-label", name);
+      const text = button.querySelector(".label");
+      if (text) text.textContent = on ? "En el chat" : "Agregar al chat";
+    }
+  }
+  document.addEventListener("DOMContentLoaded", () => markAttached(${JSON.stringify([...this.chat.attachedKeys()])}));
+  window.addEventListener("message", (event) => {
+    if (event.data.type === "attached") markAttached(event.data.keys);
+  });
   document.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-finding]");
     if (button) {
-      vscode.postMessage({ type: "openChat", key: button.dataset.finding });
+      vscode.postMessage({ type: "toggleContext", key: button.dataset.finding });
       return;
     }
     const link = event.target.closest("a[href]");
@@ -106,16 +130,6 @@ export class ResultsPanel {
 </head>
 <body><div class="page">${body}</div></body>
 </html>`;
-    }
-
-    private chatOptions(): ChatOptions {
-        const config = vscode.workspace.getConfiguration('cibersec');
-        return {
-            url: config.get<string>('ragUrl', 'http://localhost:9099'),
-            model: config.get<string>('chatModel', 'pipeline_ciberseguridad'),
-            apiKey: config.get<string>('ragApiKey', '0p3n-w3bui'),
-            timeoutMs: config.get<number>('chatTimeoutSeconds', 240) * 1000,
-        };
     }
 
     private dispose(): void {
@@ -312,11 +326,11 @@ function renderFunnel(f: ScanResult['funnel']): string {
   </section>`;
 }
 
-/** Burbuja de chat. SVG inline: el CSP es default-src 'none' y no hay assets. */
-const ICONO_CHAT = `<svg class="icono" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" d="M2.75 2.5h10.5a.75.75 0 0 1 .75.75v6.5a.75.75 0 0 1-.75.75H6.25L3.5 13.25V10.5h-.75A.75.75 0 0 1 2 9.75v-6.5a.75.75 0 0 1 .75-.75Z"/></svg>`;
+/** Clip de adjuntar, como en Copilot. SVG inline: el CSP es default-src 'none' y no hay assets. */
+const ICONO_ADJUNTAR = `<svg class="icono" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" d="M13.5 7.5 8.1 12.9a3.25 3.25 0 0 1-4.6-4.6l5.6-5.6a2.1 2.1 0 0 1 3 3L6.5 11.3a1 1 0 0 1-1.4-1.4l5.2-5.2"/></svg>`;
 
 /**
- * La acción de la tarjeta, con el peso que le corresponde a cada sección.
+ * La acción de la tarjeta: adjuntar el hallazgo al chat, o quitarlo si ya está.
  *
  * En "Explotadas activamente" son siete tarjetas y la acción es la esperable, así que
  * lleva ícono y etiqueta. En los grupos de librería se repite en las ciento quince: ahí
@@ -325,16 +339,17 @@ const ICONO_CHAT = `<svg class="icono" viewBox="0 0 16 16" width="14" height="14
  *
  * En los dos casos el nombre accesible incluye el identificador. Sin eso serían ciento
  * veintidós botones llamados igual, y el de sólo ícono no tendría nombre en absoluto.
+ * `aria-pressed` y los nombres los ajusta el script según lo que esté adjunto.
  */
 function renderAction(finding: Finding, seccion: Seccion): string {
-    const nombre = escape(
-        `Preguntar sobre ${finding.cve ?? finding.osv_ids[0] ?? 'este hallazgo'} en ${finding.package}`,
-    );
-    const attrs = `class="button quiet chat-button" data-finding="${escape(findingKey(finding))}" title="${nombre}" aria-label="${nombre}"`;
+    const id = `${finding.cve ?? finding.osv_ids[0] ?? 'este hallazgo'} de ${finding.package}`;
+    const off = escape(`Agregar ${id} al chat`);
+    const on = escape(`Quitar ${id} del chat`);
+    const attrs = `class="button quiet chat-button" data-finding="${escape(findingKey(finding))}" data-label-off="${off}" data-label-on="${on}" aria-pressed="false" title="${off}" aria-label="${off}"`;
 
     return seccion === 'urgente'
-        ? `<button ${attrs} data-with-text>${ICONO_CHAT}Profundizar</button>`
-        : `<button ${attrs} data-icon-only>${ICONO_CHAT}</button>`;
+        ? `<button ${attrs} data-with-text>${ICONO_ADJUNTAR}<span class="label">Agregar al chat</span></button>`
+        : `<button ${attrs} data-icon-only>${ICONO_ADJUNTAR}</button>`;
 }
 
 /** Dónde se está dibujando el hallazgo, que cambia qué hace falta decir. */
@@ -432,10 +447,6 @@ function formatEpss(epss: number): string {
 }
 
 /** Identifica un hallazgo entre el webview y la extensión. `scan` dedupe por este par. */
-function findingKey(finding: Finding): string {
-    return `${finding.package}|${finding.cve ?? finding.osv_ids[0] ?? '?'}`;
-}
-
 function escapeRegExp(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -654,6 +665,12 @@ const STYLES = `
     padding: 0;
   }
   .icono { flex: none; }
+  /* Adjunto: el botón queda marcado, como un toggle de la barra de herramientas. */
+  .chat-button[aria-pressed="true"] {
+    color: var(--vscode-inputOption-activeForeground, var(--vscode-foreground));
+    background: var(--vscode-inputOption-activeBackground, var(--surface));
+    box-shadow: inset 0 0 0 1px var(--vscode-inputOption-activeBorder, var(--border-strong));
+  }
 
   .skipped {
     margin-top: var(--sp-6);

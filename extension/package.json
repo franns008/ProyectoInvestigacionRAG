@@ -30,8 +30,32 @@
         "category": "Ciberseguridad",
         "shortTitle": "Escanear",
         "icon": "$(shield)"
+      },
+      {
+        "command": "cibersec.newChat",
+        "title": "Nuevo chat",
+        "category": "Ciberseguridad",
+        "icon": "$(add)"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cibersec",
+          "title": "Ciberseguridad",
+          "icon": "media/escudo.svg"
+        }
+      ]
+    },
+    "views": {
+      "cibersec": [
+        {
+          "type": "webview",
+          "id": "cibersec.chat",
+          "name": "Chat"
+        }
+      ]
+    },
     "menus": {
       "editor/title": [
         {
@@ -45,6 +69,13 @@
           "command": "cibersec.scanRequirements",
           "when": "resourceFilename =~ /requirements.*\\.txt$/",
           "group": "7_modification"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "cibersec.newChat",
+          "when": "view == cibersec.chat",
+          "group": "navigation"
         }
       ]
     },
@@ -107,7 +138,7 @@
         "cibersec.chatModel": {
           "type": "string",
           "default": "pipeline_ciberseguridad",
-          "description": "Pipeline RAG para conversar sobre una vulnerabilidad seleccionada."
+          "description": "Pipeline RAG del chat de la barra lateral. Recibe como contexto los hallazgos que se le adjuntan desde el informe."
         },
         "cibersec.chatTimeoutSeconds": {
           "type": "number",
