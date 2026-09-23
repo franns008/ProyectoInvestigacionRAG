@@ -10,100 +10,159 @@
  * `renderMarkdown`, que escapa todo antes de dar formato.
  */
 
-import * as vscode from "vscode";
-import { renderMarkdown } from "./markdown";
-import { chip } from "./references";
-import { Finding } from "./scan/types";
-import { BASE_STYLES, escapeHtml as escape, nonceValue } from "./styles";
+import * as vscode from 'vscode';
+import { renderMarkdown } from './markdown';
+import { chip } from './references';
+import { Finding } from './scan/types';
+import { BASE_STYLES, escapeHtml as escape, nonceValue } from './styles';
 
 export interface ChatOptions {
-  url: string;
-  model: string;
-  apiKey: string;
-  timeoutMs: number;
+    url: string;
+    model: string;
+    apiKey: string;
+    timeoutMs: number;
 }
 
 interface ChatMessage {
-  role: "system" | "user" | "assistant";
-  content: string;
+    role: 'system' | 'user' | 'assistant';
+    content: string;
 }
 
 export class ChatPanel {
-  private readonly panel: vscode.WebviewPanel;
-  private readonly messages: ChatMessage[];
-  private disposables: vscode.Disposable[] = [];
+    private readonly panel: vscode.WebviewPanel;
+    private readonly messages: ChatMessage[];
+    private disposables: vscode.Disposable[] = [];
 
-  private constructor(private readonly finding: Finding, private readonly options: ChatOptions) {
-    // `system` y no `user`: es el tema de la charla, no algo que dijo el usuario. El
-    // pipeline lo lee aparte (src/pipeline/chat/context.py) y lo pone en el prompt.
-    this.messages = [{ role: "system", content: JSON.stringify(contextFor(finding)) }];
-    this.panel = vscode.window.createWebviewPanel(
-      "cibersec.vulnerabilityChat",
-      `Chat: ${identifierOf(finding)}`,
-      vscode.ViewColumn.Beside,
-      { enableScripts: true, retainContextWhenHidden: true },
-    );
-    this.panel.webview.onDidReceiveMessage(this.onMessage, this, this.disposables);
-    this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
-    this.panel.webview.html = this.html();
-  }
-
-  static show(finding: Finding, options: ChatOptions): void {
-    new ChatPanel(finding, options);
-  }
-
-  private readonly onMessage = async (message: { type?: string; text?: string; url?: string }) => {
-    if (message.type === "openExternal" && message.url && /^https?:\/\//i.test(message.url)) {
-      await vscode.env.openExternal(vscode.Uri.parse(message.url));
-      return;
+    private constructor(
+        private readonly finding: Finding,
+        private readonly options: ChatOptions,
+    ) {
+        // `system` y no `user`: es el tema de la charla, no algo que dijo el usuario. El
+        // pipeline lo lee aparte (src/pipeline/chat/context.py) y lo pone en el prompt.
+        this.messages = [
+            { role: 'system', content: JSON.stringify(contextFor(finding)) },
+        ];
+        this.panel = vscode.window.createWebviewPanel(
+            'cibersec.vulnerabilityChat',
+            `Chat: ${identifierOf(finding)}`,
+            vscode.ViewColumn.Beside,
+            { enableScripts: true, retainContextWhenHidden: true },
+        );
+        this.panel.webview.onDidReceiveMessage(
+            this.onMessage,
+            this,
+            this.disposables,
+        );
+        this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
+        this.panel.webview.html = this.html();
     }
-    if (message.type !== "send" || !message.text?.trim()) return;
-    const text = message.text.trim();
-    this.messages.push({ role: "user", content: text });
-    try {
-      const answer = await this.ask();
-      this.messages.push({ role: "assistant", content: answer });
-      this.panel.webview.postMessage({
-        type: "answer",
-        html: renderMarkdown(answer) + renderCitedIds(answer, this.finding),
-      });
-    } catch (error) {
-      this.panel.webview.postMessage({
-        type: "error",
-        text: `No se pudo consultar el pipeline: ${(error as Error).message}`,
-      });
-    }
-  };
 
-  private async ask(): Promise<string> {
-    const response = await fetch(`${trimSlash(this.options.url)}/v1/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.options.apiKey}`,
-      },
-      body: JSON.stringify({ model: this.options.model, stream: false, messages: this.messages }),
-      signal: AbortSignal.timeout(this.options.timeoutMs),
-    });
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText}`);
+    static show(finding: Finding, options: ChatOptions): void {
+        new ChatPanel(finding, options);
     }
-    const body = (await response.json()) as {
-      choices?: { message?: { content?: string } }[];
+
+    private readonly onMessage = async (message: {
+        type?: string;
+        text?: string;
+        url?: string;
+    }) => {
+        if (
+            message.type === 'openExternal' &&
+            message.url &&
+            /^https?:\/\//i.test(message.url)
+        ) {
+            await vscode.env.openExternal(vscode.Uri.parse(message.url));
+            return;
+        }
+        if (message.type !== 'send' || !message.text?.trim()) return;
+        const text = message.text.trim();
+        this.messages.push({ role: 'user', content: text });
+        try {
+            const answer = await this.ask((delta) => {
+                this.panel.webview.postMessage({
+                    type: 'answerDelta',
+                    text: delta,
+                });
+            });
+            this.messages.push({ role: 'assistant', content: answer });
+            this.panel.webview.postMessage({
+                type: 'answer',
+                html:
+                    renderMarkdown(answer) +
+                    renderCitedIds(answer, this.finding),
+            });
+        } catch (error) {
+            this.panel.webview.postMessage({
+                type: 'error',
+                text: `No se pudo consultar el pipeline: ${(error as Error).message}`,
+            });
+        }
     };
-    const answer = body.choices?.[0]?.message?.content;
-    if (!answer) throw new Error("la respuesta no trae contenido");
-    return answer;
-  }
 
-  private html(): string {
-    const nonce = nonceValue();
-    const csp = `default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';`;
-    const finding = this.finding;
-    const fix = finding.fixed_version
-      ? `arreglada en <strong>${escape(finding.fixed_version)}</strong>`
-      : `<span class="muted">sin versión de arreglo publicada</span>`;
-    return `<!DOCTYPE html>
+    private async ask(onDelta: (text: string) => void): Promise<string> {
+        const response = await fetch(
+            `${trimSlash(this.options.url)}/v1/chat/completions`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${this.options.apiKey}`,
+                },
+                body: JSON.stringify({
+                    model: this.options.model,
+                    stream: true,
+                    messages: this.messages,
+                }),
+                signal: AbortSignal.timeout(this.options.timeoutMs),
+            },
+        );
+        if (!response.ok) {
+            throw new Error(`${response.status} ${response.statusText}`);
+        }
+        if (!response.body)
+            throw new Error('la respuesta no permite streaming');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let answer = '';
+        while (true) {
+            const { value, done } = await reader.read();
+            buffer += decoder.decode(value, { stream: !done });
+            const lines = buffer.split(/\r?\n/);
+            buffer = lines.pop() ?? '';
+            for (const line of lines) {
+                if (!line.startsWith('data:')) continue;
+                const data = line.slice(5).trim();
+                if (!data || data === '[DONE]') continue;
+                const chunk = JSON.parse(data) as {
+                    choices?: {
+                        delta?: { content?: string };
+                        message?: { content?: string };
+                    }[];
+                };
+                const text =
+                    chunk.choices?.[0]?.delta?.content ??
+                    chunk.choices?.[0]?.message?.content ??
+                    '';
+                if (text) {
+                    answer += text;
+                    onDelta(text);
+                }
+            }
+            if (done) break;
+        }
+        if (!answer) throw new Error('la respuesta no trae contenido');
+        return answer;
+    }
+
+    private html(): string {
+        const nonce = nonceValue();
+        const csp = `default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';`;
+        const finding = this.finding;
+        const fix = finding.fixed_version
+            ? `arreglada en <strong>${escape(finding.fixed_version)}</strong>`
+            : `<span class="muted">sin versión de arreglo publicada</span>`;
+        return `<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -128,41 +187,47 @@ export class ChatPanel {
 <script nonce="${nonce}">${CHAT_SCRIPT}</script>
 </body>
 </html>`;
-  }
+    }
 
-  private dispose(): void {
-    this.disposables.forEach((disposable) => disposable.dispose());
-    this.disposables = [];
-  }
+    private dispose(): void {
+        this.disposables.forEach((disposable) => disposable.dispose());
+        this.disposables = [];
+    }
 }
 
 function contextFor(finding: Finding) {
-  return {
-    vulnerability: identifierOf(finding),
-    package: finding.package,
-    installed_version: finding.installed_version,
-    fixed_version: finding.fixed_version,
-    cwe_ids: finding.cwe_ids,
-    cvss_score: finding.cvss_score,
-    epss: finding.epss,
-    kev: finding.kev,
-    summary: finding.summary,
-    details: finding.details,
-  };
+    return {
+        vulnerability: identifierOf(finding),
+        package: finding.package,
+        installed_version: finding.installed_version,
+        fixed_version: finding.fixed_version,
+        cwe_ids: finding.cwe_ids,
+        cvss_score: finding.cvss_score,
+        epss: finding.epss,
+        kev: finding.kev,
+        summary: finding.summary,
+        details: finding.details,
+    };
 }
 
 /** Panel desplegable con lo que la extensión le mandó al pipeline como primer mensaje. */
 function renderLoadedContext(finding: Finding): string {
-  const vulnIds = unique([finding.cve, ...finding.osv_ids, ...finding.aliases]);
-  const row = (label: string, value: string) =>
-    value ? `<div class="context-row"><span class="muted">${label}</span><span>${value}</span></div>` : "";
-  return `<details class="loaded-context">
+    const vulnIds = unique([
+        finding.cve,
+        ...finding.osv_ids,
+        ...finding.aliases,
+    ]);
+    const row = (label: string, value: string) =>
+        value
+            ? `<div class="context-row"><span class="muted">${label}</span><span>${value}</span></div>`
+            : '';
+    return `<details class="loaded-context">
     <summary>Ver contexto cargado</summary>
     <div class="card context-panel">
-      ${row("Vulnerabilidad", vulnIds.map(chip).join(" "))}
-      ${row("Debilidad (CWE)", finding.cwe_ids.map(chip).join(" "))}
-      ${row("Paquete", `<code>${escape(finding.package)} ${escape(finding.installed_version)}</code>`)}
-      ${row("Arreglo", finding.fixed_version ? `<code>${escape(finding.fixed_version)}</code>` : "")}
+      ${row('Vulnerabilidad', vulnIds.map(chip).join(' '))}
+      ${row('Debilidad (CWE)', finding.cwe_ids.map(chip).join(' '))}
+      ${row('Paquete', `<code>${escape(finding.package)} ${escape(finding.installed_version)}</code>`)}
+      ${row('Arreglo', finding.fixed_version ? `<code>${escape(finding.fixed_version)}</code>` : '')}
       <details class="raw">
         <summary class="muted">JSON enviado al pipeline</summary>
         <pre><code>${escape(JSON.stringify(contextFor(finding), null, 2))}</code></pre>
@@ -173,33 +238,48 @@ function renderLoadedContext(finding: Finding): string {
 
 /** CVE/CWE que aparecen en la respuesta, marcando los que no venían del escaneo. */
 function renderCitedIds(answer: string, finding: Finding): string {
-  const cited = unique((answer.match(/\b(?:CVE-\d{4}-\d{4,7}|CWE-\d{1,5})\b/gi) ?? []).map((id) => id.toUpperCase()));
-  if (cited.length === 0) return "";
-  const known = new Set(
-    [finding.cve, ...finding.osv_ids, ...finding.aliases, ...finding.cwe_ids]
-      .filter((id): id is string => Boolean(id))
-      .map((id) => id.toUpperCase()),
-  );
-  const outside = cited.filter((id) => !known.has(id));
-  const items = cited
-    .map((id) => (known.has(id) ? chip(id) : `${chip(id)}<span class="tag warning outside" title="No viene del escaneo: puede salir del corpus del RAG o ser inventado">fuera del escaneo</span>`))
-    .join(" ");
-  return `<details class="cited">
-    <summary class="muted">IDs citados en la respuesta (${cited.length}${outside.length ? `, ${outside.length} fuera del escaneo` : ""})</summary>
+    const cited = unique(
+        (answer.match(/\b(?:CVE-\d{4}-\d{4,7}|CWE-\d{1,5})\b/gi) ?? []).map(
+            (id) => id.toUpperCase(),
+        ),
+    );
+    if (cited.length === 0) return '';
+    const known = new Set(
+        [
+            finding.cve,
+            ...finding.osv_ids,
+            ...finding.aliases,
+            ...finding.cwe_ids,
+        ]
+            .filter((id): id is string => Boolean(id))
+            .map((id) => id.toUpperCase()),
+    );
+    const outside = cited.filter((id) => !known.has(id));
+    const items = cited
+        .map((id) =>
+            known.has(id)
+                ? chip(id)
+                : `${chip(id)}<span class="tag warning outside" title="No viene del escaneo: puede salir del corpus del RAG o ser inventado">fuera del escaneo</span>`,
+        )
+        .join(' ');
+    return `<details class="cited">
+    <summary class="muted">IDs citados en la respuesta (${cited.length}${outside.length ? `, ${outside.length} fuera del escaneo` : ''})</summary>
     <p>${items}</p>
   </details>`;
 }
 
 function unique(values: (string | null | undefined)[]): string[] {
-  return [...new Set(values.filter((value): value is string => Boolean(value)))];
+    return [
+        ...new Set(values.filter((value): value is string => Boolean(value))),
+    ];
 }
 
 function identifierOf(finding: Finding): string {
-  return finding.cve ?? finding.osv_ids[0] ?? "sin identificador";
+    return finding.cve ?? finding.osv_ids[0] ?? 'sin identificador';
 }
 
 function trimSlash(url: string): string {
-  return url.replace(/\/+$/, "");
+    return url.replace(/\/+$/, '');
 }
 
 const CHAT_SCRIPT = `
@@ -209,6 +289,7 @@ const input = document.getElementById("input");
 const send = document.getElementById("send");
 const messages = document.getElementById("messages");
 let typing = null;
+let streamingMessage = null;
 const MAX_LINES = 3;
 
 // Arranca en una línea y crece con el contenido hasta MAX_LINES; de ahí en más
@@ -251,7 +332,25 @@ document.addEventListener("click", (event) => {
 });
 window.addEventListener("message", (event) => {
   const message = event.data;
-  if (message.type === "answer") { addMessage("assistant", (item) => { item.innerHTML = message.html; }); setBusy(false); }
+  if (message.type === "answerDelta") {
+    if (typing) { typing.remove(); typing = null; }
+    if (!streamingMessage) {
+      streamingMessage = document.createElement("div");
+      streamingMessage.className = "message assistant card";
+      messages.appendChild(streamingMessage);
+    }
+    streamingMessage.textContent += message.text;
+    messages.scrollTop = messages.scrollHeight;
+  }
+  if (message.type === "answer") {
+    if (streamingMessage) {
+      streamingMessage.innerHTML = message.html;
+      streamingMessage = null;
+    } else {
+      addMessage("assistant", (item) => { item.innerHTML = message.html; });
+    }
+    setBusy(false);
+  }
   if (message.type === "error") { addMessage("error", (item) => { item.textContent = message.text; }); setBusy(false); }
 });
 function setBusy(busy) {

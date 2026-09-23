@@ -16,7 +16,7 @@
  *       "messages": [{ "role": "user", "content": "<contenido del requirements.txt>" }] }
  *
  * y la respuesta trae el mismo `ScanResult` de types.ts, con `explanation` y `citations`
- * completos. Los campos duros los sigue armando Python: el modelo sólo redacta.
+ * completosz. Los campos duros los sigue armando Python: el modelo sólo redacta.
  */
 
 import { ScanError, ScanProvider, ScanResult } from "./types";
