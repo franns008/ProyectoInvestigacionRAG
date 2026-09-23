@@ -209,8 +209,8 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
   <div class="composer">
     <div id="context">${renderAttachments([...this.attachments.values()])}</div>
     <form id="form">
-      <textarea id="input" rows="1" placeholder="Preguntá algo (Enter envía, Shift+Enter nueva línea)" required${this.busy ? " disabled" : ""}></textarea>
-      <button id="send" class="button" type="submit"${this.busy ? " disabled" : ""}>Enviar</button>
+      <textarea id="input" rows="1" placeholder="Preguntá sobre ciberseguridad…" title="Enter envía, Shift+Enter agrega una línea" aria-label="Pregunta" required${this.busy ? " disabled" : ""}></textarea>
+      <button id="send" class="send" type="submit" title="Enviar (Enter)" aria-label="Enviar"${this.busy ? " disabled" : ""}>${ICONO_ENVIAR}</button>
     </form>
   </div>
 </main>
@@ -237,9 +237,8 @@ function contextFor(finding: Finding) {
 
 /** Las fichas de adjuntos y, desplegable, el JSON exacto que se manda al pipeline. */
 function renderAttachments(findings: Finding[]): string {
-  if (findings.length === 0) {
-    return `<p class="muted hint">Sin hallazgos adjuntos.</p>`;
-  }
+  // Sin adjuntos no se dibuja nada: #context:empty se oculta y el input queda solo.
+  if (findings.length === 0) return "";
   const items = findings
     .map((finding) => {
       const id = identifierOf(finding);
@@ -295,6 +294,9 @@ function identifierOf(finding: Finding): string {
 function trimSlash(url: string): string {
   return url.replace(/\/+$/, "");
 }
+
+/** Flecha de enviar. SVG inline: el CSP es default-src 'none' y no hay assets. */
+const ICONO_ENVIAR = `<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M1.72 1.05a.5.5 0 0 1 .54-.07l12.5 6.5a.5.5 0 0 1 0 .89l-12.5 6.5a.5.5 0 0 1-.7-.6L3.43 8 1.56 1.73a.5.5 0 0 1 .16-.68ZM4.37 8.5l-1.4 4.63L13.4 8 2.97 2.87 4.37 7.5H9a.5.5 0 0 1 0 1H4.37Z"/></svg>`;
 
 const TYPING = `<div class="message typing" aria-label="El asistente está escribiendo"><span></span><span></span><span></span></div>`;
 
@@ -388,7 +390,8 @@ if (!input.disabled) input.focus();
  */
 const CHAT_STYLES = `
   html, body { height: 100%; }
-  body { overflow: hidden; padding: 0; }
+  /* Vive en la barra lateral: su fondo, no el del editor que usa el informe. */
+  body { overflow: hidden; padding: 0; background: var(--vscode-sideBar-background, var(--vscode-editor-background)); }
   main {
     display: flex; flex-direction: column;
     height: 100vh;
@@ -441,23 +444,29 @@ const CHAT_STYLES = `
   }
   .outside { margin: 0 var(--sp-2) 0 var(--sp-1); }
 
-  /* Adjuntos + input: el bloque fijo de abajo, como el de Copilot. */
+  /*
+   * Adjuntos + input: el bloque fijo de abajo, como el de Copilot. Una sola caja con un
+   * solo indicador de foco (el borde): el textarea no dibuja el suyo.
+   */
   .composer {
     flex: none;
+    display: flex; flex-direction: column; gap: var(--sp-2);
     margin-top: var(--sp-2);
-    padding: var(--sp-2);
-    border: 1px solid var(--vscode-input-border, var(--border));
+    padding: var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-3);
+    border: 1px solid var(--vscode-input-border, var(--border-strong));
     border-radius: var(--radius);
     background: var(--vscode-input-background);
   }
   .composer:focus-within { border-color: var(--vscode-focusBorder); }
-  .hint { margin: 0 0 var(--sp-1); font-size: var(--fs-sm); }
-  .attachments { display: flex; flex-wrap: wrap; gap: var(--sp-1); margin-bottom: var(--sp-1); }
+  #context:empty { display: none; }
+  #context { display: flex; flex-direction: column; gap: var(--sp-1); }
+
+  .attachments { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
   .attachment {
-    display: inline-flex; align-items: center; gap: var(--sp-1);
+    display: inline-flex; align-items: center; gap: .35em;
     max-width: 100%;
-    padding: 0 0 0 var(--sp-2);
-    font-size: var(--fs-sm);
+    padding: 0 0 0 .5em;
+    font-size: var(--fs-sm); line-height: 1.8;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--surface);
@@ -466,31 +475,49 @@ const CHAT_STYLES = `
   .attachment-id { font-family: var(--vscode-editor-font-family); }
   .remove {
     flex: none;
-    width: 1.5rem; height: 1.5rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.6em; height: 1.6em;
+    margin-right: .1em;
     padding: 0;
+    font: inherit; line-height: 1;
     color: var(--muted);
     background: none; border: 0; border-radius: var(--radius-sm);
     cursor: pointer;
   }
   .remove:hover { color: var(--vscode-foreground); background: var(--vscode-toolbar-hoverBackground); }
-  .remove:focus-visible { outline: 1px solid var(--vscode-focusBorder); }
 
-  .loaded-context { margin-bottom: var(--sp-1); font-size: var(--fs-sm); }
-  .loaded-context > summary { color: var(--vscode-textLink-foreground); cursor: pointer; }
-  .loaded-context pre { max-height: 30vh; overflow: auto; }
+  .loaded-context { font-size: var(--fs-sm); }
+  .loaded-context > summary { width: fit-content; color: var(--vscode-textLink-foreground); }
+  .loaded-context pre { margin: var(--sp-1) 0 0; max-height: 30vh; overflow: auto; }
 
+  /*
+   * Una línea de texto mide 1.5em + .25em arriba y abajo = 2em, lo mismo que el botón:
+   * con una sola línea quedan centrados entre sí, y al crecer el botón baja con la última.
+   */
   form { display: flex; align-items: flex-end; gap: var(--sp-2); }
   textarea {
-    flex: 1; resize: none; overflow-y: hidden;
-    padding: var(--sp-1) 0;
+    flex: 1; min-width: 0;
+    resize: none; overflow-y: hidden;
+    margin: 0; padding: .25em 0;
     font: inherit; line-height: 1.5;
     color: var(--vscode-input-foreground);
     background: transparent;
     border: 0;
-    outline: none;
   }
+  textarea:focus, textarea:focus-visible { outline: none; }
   textarea::placeholder { color: var(--vscode-input-placeholderForeground, var(--muted)); }
-  form .button { padding-block: var(--sp-1); }
+  .send {
+    flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2em; height: 2em;
+    padding: 0;
+    color: var(--vscode-button-foreground);
+    background: var(--vscode-button-background);
+    border: 0; border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+  .send:hover { background: var(--vscode-button-hoverBackground); }
+  .send:disabled { opacity: .5; cursor: default; }
 
   .typing {
     display: inline-flex; align-items: center; gap: var(--sp-1);
