@@ -16,7 +16,7 @@ hallazgo antes del chat con contexto adjunto.
 Cada request trae la conversación entera y el contexto vigente (los guarda el cliente), así
 que el pipeline no guarda estado: sólo decide qué parte de `messages` entra al prompt.
 
-Sin mensaje `system` (el chat normal de OpenWebUI) no hay hallazgos y todo sigue como antes.
+Sin mensaje `system` (un chat sin hallazgos adjuntos) no hay hallazgos y todo sigue como antes.
 """
 
 from __future__ import annotations
@@ -70,7 +70,7 @@ def extract_findings_context(messages: Sequence[Mapping[str, Any]] | None) -> li
         try:
             payload = json.loads(_message_text(msg))
         except (TypeError, json.JSONDecodeError):
-            continue  # un system prompt de texto (p. ej. de OpenWebUI): no es un hallazgo
+            continue  # un system prompt de texto: no es un hallazgo
         if isinstance(payload, dict) and isinstance(payload.get("findings"), list):
             candidates = payload["findings"]
         else:

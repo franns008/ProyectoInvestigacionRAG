@@ -181,7 +181,7 @@ _MAX_VULN_IDS  = 6
 
 
 def _message_text(msg: dict) -> str:
-    """El content de OpenWebUI puede ser str o una lista de partes (multimodal)."""
+    """El content puede ser str o una lista de partes (multimodal, formato OpenAI)."""
     content = msg.get("content")
     if isinstance(content, str):
         return content
@@ -341,7 +341,7 @@ def build_generator(valves):
 
     El modelo sale de `LLM_MODEL` si está seteada; si no, del valve `llm_model`
     (que ya trae `DEFAULT_OLLAMA_LLM` como default). La variable de entorno gana
-    para poder cambiar de modelo sin tocar la UI de OpenWebUI.
+    para poder cambiar de modelo sin tocar los valves.
     """
     v = valves
     model = os.getenv("LLM_MODEL") or v.llm_model
