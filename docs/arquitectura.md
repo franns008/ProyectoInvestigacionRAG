@@ -249,9 +249,10 @@ Pregunta del usuario
   Las únicas credenciales son internas del stack.
 - Variables relevantes:
   - `LLM_MODEL` — modelo de generación en Ollama. Vacío = el default del pipeline.
-  - `PIPESERVER_KEY` — key compartida entre OpenWebUI y el servidor de pipelines
-    (`OPENAI_API_KEY` en open-webui = `PIPELINES_API_KEY` en pipelines).
-- OpenWebUI se conecta al servidor de pipelines vía `OPENAI_API_BASE_URL=http://pipelines:9099`.
+  - `PIPESERVER_KEY` — API key del servidor de pipelines (`PIPELINES_API_KEY` en el
+    container). La extensión la manda como Bearer (`cibersec.ragApiKey`).
+- La extensión se conecta al servidor de pipelines en `http://localhost:9099`
+  (`cibersec.ragUrl`).
 
 ## 7. Puesta en marcha
 
