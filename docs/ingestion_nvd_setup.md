@@ -143,7 +143,8 @@ el RAG alcanza con una muestra:
 **Qué hace exactamente** (`src/ingestion/fetch_nvd.py`):
 - Pega contra `https://services.nvd.nist.gov/rest/json/cves/2.0` con la
   `NVD_API_KEY` del `.env` (header `apiKey`).
-- Pagina con `resultsPerPage=2000` + `startIndex`, con `time.sleep(0.7)` entre
+- Pagina con `resultsPerPage=500` + `startIndex` (el máximo de la API es 2000, pero esas
+  páginas se cortan seguido), con `time.sleep(0.7)` entre
   requests para quedar por debajo del límite de 50 req/30s que da la API key
   (sin key el límite es 5 req/30s, por eso hace falta la key).
 - Reintenta hasta 3 veces con backoff exponencial si una request falla

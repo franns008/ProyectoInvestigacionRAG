@@ -29,7 +29,9 @@ from _http import ACTUALIZADO, NUEVO, REPO_ROOT, SIN_CAMBIOS, Result, get_with_r
 
 SOURCE = "nvd"
 BASE_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
-RESULTS_PER_PAGE = 2000
+# El máximo de la API es 2000, pero una página de ese tamaño pesa 5-11 MB y NVD suele
+# cortarla a mitad de la respuesta (Read timed out). Con 500 cada respuesta es 4x más chica.
+RESULTS_PER_PAGE = 500
 REQUEST_DELAY_SECONDS = 0.7  # ~43 req/30s, margen bajo el límite de 50/30s con API key
 REQUEST_DELAY_NO_KEY_SECONDS = 6.5  # sin key el límite es 5 req/30s
 MAX_DATE_RANGE_DAYS = 120    # restricción de la API para lastMod*Date
