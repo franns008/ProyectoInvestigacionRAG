@@ -133,14 +133,9 @@ Por qué así y no mandando el `requirements.txt` entero al servidor:
   Sólo recibe ids y texto, hace el lookup y genera. Es la mitad del trabajo.
 - No cambia `types.ts` (los campos ya son opcionales) ni el panel.
 
-`cibersec.provider`, `cibersec.ragUrl` y `cibersec.ragModel` ya existen en
-[`package.json`](../extension/package.json). Falta agregar `cibersec.ragApiKey` (el servidor
-de Pipelines exige `Authorization: Bearer <PIPELINES_API_KEY>`).
-
-> El stub de [`ragProvider.ts`](../extension/src/scan/ragProvider.ts) describe el otro
-> reparto (mandar el manifiesto entero). Se deja como está, con una nota: el decorador es el
-> camino elegido; el pipeline puede sumar el modo "escaneo completo" más adelante sin romper
-> nada.
+La extensión usa `cibersec.ragUrl` y `cibersec.ragApiKey` (el servidor de Pipelines exige
+`Authorization: Bearer <PIPELINES_API_KEY>`). El stub `ragProvider.ts`, que describía el otro
+reparto (mandar el manifiesto entero), se eliminó: el decorador es el único camino.
 
 ## Contrato del lookup
 
