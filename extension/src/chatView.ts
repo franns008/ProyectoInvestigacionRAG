@@ -52,7 +52,7 @@ interface Entry {
  * Tope de adjuntos. Cada hallazgo suma su advisory al prompt y el generador local corre
  * con un contexto chico: más que esto deja sin lugar a los documentos del corpus.
  */
-export const MAX_ATTACHMENTS = 6;
+const MAX_ATTACHMENTS = 6;
 
 export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
   static readonly viewType = "cibersec.chat";

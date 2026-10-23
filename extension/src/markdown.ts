@@ -149,7 +149,7 @@ function renderTable(rows: string[]): string {
 }
 
 /** Formato en línea. Los spans de código se separan primero para no formatear adentro. */
-export function renderInline(text: string): string {
+function renderInline(text: string): string {
   return text
     .split(/(`[^`]+`)/)
     .map((part, index) => {

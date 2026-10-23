@@ -9,7 +9,7 @@
 
 import { escapeHtml as escape } from "./styles";
 
-export function referenceUrl(id: string): string | null {
+function referenceUrl(id: string): string | null {
   const cwe = id.match(/^CWE-(\d+)$/i);
   if (cwe) return `https://cwe.mitre.org/data/definitions/${cwe[1]}.html`;
   if (/^CVE-\d{4}-\d+$/i.test(id)) return `https://nvd.nist.gov/vuln/detail/${id.toUpperCase()}`;
