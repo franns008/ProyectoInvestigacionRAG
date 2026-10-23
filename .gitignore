@@ -1,7 +1,6 @@
 # Runtime data (Docker volumes — nunca en git)
 infrastructure/appdata/ollama/
 infrastructure/appdata/postgress_vector/
-infrastructure/appdata/pipelines/
 
 # Dumps crudos de fuentes estructuradas (grandes, se regeneran con los scripts de ingestion)
 data/raw/nvd/
