@@ -145,7 +145,7 @@ _STOPWORDS = {
     "tiene", "tienen", "puede", "pueden", "más", "muy", "me", "te", "se", "le", "lo", "su",
     "sus", "mi", "tu", "este", "esta", "esto", "estos", "estas", "eso", "existen", "tipos",
     "explicame", "explícame", "dame", "decime", "contame", "quiero", "saber", "prevenirla",
-    "prevenir", "acerca", "información", "informacion", "the", "a", "an", "of", "to", "in", 
+    "prevenir", "acerca", "información", "informacion", "the", "an", "of", "to", "in", 
     "on", "for", "and", "or", "is", "are", "be", "what", "which", "how", "when", "where", 
     "why", "can", "could", "does", "do", "about", "tell", "give", "explain", "types", "exist",
     "vulnerabilidad", "vulnerabilidades", "vulnerability", "descripcion", "descripción",
