@@ -8,7 +8,6 @@ haystack-ai>=2.30,<3
 # Se les pone techo de major igual, para no repetir esta rotura desde otro paquete.
 ollama-haystack>=6.7,<7
 pgvector-haystack>=6.3,<7
-datasets>=2.6.1
 pypdf
 python-docx
 markdown-it-py
