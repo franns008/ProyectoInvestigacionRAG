@@ -43,6 +43,7 @@ if _PIPELINES_DIR not in sys.path:
     sys.path.insert(0, _PIPELINES_DIR)
 
 from chat import extract_findings_context, findings_vuln_ids, format_findings, select_history
+from common.text import message_text
 
 # Configurar el logger específico para nuestra app
 logger = logging.getLogger("HaystackRAG_Query")
@@ -180,16 +181,6 @@ _HISTORY_TURNS = 4   # ~2 intercambios hacia atrás
 _MAX_VULN_IDS  = 6
 
 
-def _message_text(msg: dict) -> str:
-    """El content puede ser str o una lista de partes (multimodal, formato OpenAI)."""
-    content = msg.get("content")
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        return " ".join(p.get("text", "") for p in content if isinstance(p, dict))
-    return ""
-
-
 def resolve_vuln_ids(
     user_message: str,
     messages: list[dict] | None = None,
@@ -211,7 +202,7 @@ def resolve_vuln_ids(
 
     inherited: list[str] = []
     for msg in reversed(messages[-_HISTORY_TURNS:]):
-        text = _message_text(msg)
+        text = message_text(msg)
         if not text or text.strip() == user_message.strip():
             continue  # messages trae el turno actual al final
         for vid in _extract_vuln_ids(text):

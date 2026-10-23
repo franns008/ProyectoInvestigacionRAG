@@ -27,6 +27,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
+from common.text import advisory_text, trim
+
 from .lookup import ContextDoc, ContextIndex
 
 # Recorte por fuente. Acota el prompt y, sobre todo, acota cuánto texto de terceros entra.
@@ -79,7 +81,7 @@ def _advisory_block(finding: Mapping[str, Any]) -> tuple[str, str] | None:
     No requiere la base ni la red: es el fallback que hace que la explicación exista
     aunque el corpus no tenga el CVE (que hoy es el caso).
     """
-    texto = "\n".join(t for t in (finding.get("summary"), finding.get("details")) if t).strip()
+    texto = advisory_text(finding)
     if not texto:
         return None
     osv_ids: Sequence[str] = finding.get("osv_ids") or []
@@ -88,14 +90,7 @@ def _advisory_block(finding: Mapping[str, Any]) -> tuple[str, str] | None:
 
 
 def _block(label: str, content: str) -> str:
-    return f"{_OPEN.format(label=label)}\n{_trim(content)}\n{_CLOSE}"
-
-
-def _trim(text: str) -> str:
-    text = text.strip()
-    if len(text) <= MAX_SOURCE_CHARS:
-        return text
-    return text[:MAX_SOURCE_CHARS].rsplit(" ", 1)[0] + " […]"
+    return f"{_OPEN.format(label=label)}\n{trim(content, MAX_SOURCE_CHARS)}\n{_CLOSE}"
 
 
 PROMPT_TEMPLATE = """\

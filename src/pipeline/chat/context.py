@@ -21,6 +21,8 @@ import json
 import re
 from typing import Any, Mapping, Sequence
 
+from common.text import advisory_text, message_text, trim
+
 # Recorte de summary + details del advisory. Mismo criterio que explain/prompt.py.
 MAX_ADVISORY_CHARS = 1200
 # Con varios hallazgos adjuntos el presupuesto de advisory se reparte entre ellos, con un
@@ -29,16 +31,6 @@ MAX_ADVISORY_CHARS_TOTAL = 3000
 MIN_ADVISORY_CHARS = 300
 
 _VULN_ID_RE = re.compile(r"^(CVE-\d{4}-\d{4,7}|CWE-\d{1,5})$")
-
-
-def _message_text(msg: Mapping[str, Any]) -> str:
-    """El content puede ser str o una lista de partes (multimodal)."""
-    content = msg.get("content")
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        return " ".join(p.get("text", "") for p in content if isinstance(p, dict))
-    return ""
 
 
 def _is_finding(value: Any) -> bool:
@@ -61,7 +53,7 @@ def extract_findings_context(messages: Sequence[Mapping[str, Any]] | None) -> li
         if msg.get("role") != "system":
             continue
         try:
-            payload = json.loads(_message_text(msg))
+            payload = json.loads(message_text(msg))
         except (TypeError, json.JSONDecodeError):
             continue  # un system prompt de texto: no es un hallazgo
         if not (isinstance(payload, dict) and isinstance(payload.get("findings"), list)):
@@ -129,9 +121,9 @@ def format_finding(finding: Mapping[str, Any], max_advisory_chars: int = MAX_ADV
     if cwe_ids:
         lines.append(f"- Weakness: {', '.join(cwe_ids)}")
 
-    advisory = "\n".join(t for t in (finding.get("summary"), finding.get("details")) if t).strip()
+    advisory = advisory_text(finding)
     if advisory:
-        lines.append(f"- Advisory (OSV): {_trim(advisory, max_advisory_chars)}")
+        lines.append(f"- Advisory (OSV): {trim(advisory, max_advisory_chars)}")
 
     return "\n".join(lines)
 
@@ -161,7 +153,7 @@ def select_history(
     Cada mensaje se recorta a `max_chars`: lo que más crece son las respuestas viejas.
     """
     turns = [
-        {"role": m.get("role"), "content": _message_text(m).strip()}
+        {"role": m.get("role"), "content": message_text(m).strip()}
         for m in (messages or [])
         if m.get("role") in ("user", "assistant")
     ]
@@ -170,14 +162,7 @@ def select_history(
     if max_messages <= 0:
         return []
     return [
-        {"role": t["role"], "content": _trim(t["content"], max_chars)}
+        {"role": t["role"], "content": trim(t["content"], max_chars)}
         for t in turns[-max_messages:]
         if t["content"]
     ]
-
-
-def _trim(text: str, limit: int) -> str:
-    text = text.strip()
-    if len(text) <= limit:
-        return text
-    return text[:limit].rsplit(" ", 1)[0] + " […]"
