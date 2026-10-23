@@ -28,7 +28,6 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import yaml
 
 EVAL_DIR = Path(__file__).resolve().parent
 META_PATH = EVAL_DIR / "eval_meta.yaml"
@@ -36,61 +35,13 @@ sys.path.insert(0, str(EVAL_DIR.parent))
 
 import csv_store  # noqa: E402
 import pipeline_ciberseguridad as rag  # noqa: E402
+from runner import Tee, git_metadata, load_dataset, make_run_id  # noqa: E402
 
 from haystack_integrations.components.generators.ollama import OllamaChatGenerator  # noqa: E402
 from haystack.components.evaluators import (  # noqa: E402
     FaithfulnessEvaluator,
     ContextRelevanceEvaluator,
 )
-
-
-def load_dataset(path: Path) -> list[dict]:
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    if not isinstance(data, list):
-        raise ValueError("dataset.yaml debe ser una lista de preguntas")
-    return data
-
-
-# Los tres helpers de abajo son gemelos de los de `run_eval.py`. Se duplican a
-# propósito y no se importan de ahí: importar `run_eval` arrastraría todo el
-# harness Tier 1 (metrics, report) y ataría los dos runners entre sí. Si alguno
-# cambia, cambian los dos — son 20 líneas.
-
-class _Tee:
-    """Duplica lo escrito a stdout hacia un archivo, para persistir el log."""
-
-    def __init__(self, *streams):
-        self._streams = streams
-
-    def write(self, s):
-        for st in self._streams:
-            st.write(s)
-
-    def flush(self):
-        for st in self._streams:
-            st.flush()
-
-
-def make_run_id(runs_csv: Path) -> str:
-    """`run_id` = timestamp UTC compacto, único dentro de runs.csv."""
-    base = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    usados = set(csv_store.load_runs(runs_csv)["run_id"].dropna())
-    if base not in usados:
-        return base
-    n = 2
-    while f"{base}-{n}" in usados:
-        n += 1
-    return f"{base}-{n}"
-
-
-def git_metadata() -> dict:
-    """Metadata inyectada por `scripts/eval_llm.sh`. El container no tiene el
-    `.git` montado, así que acá nunca se corre `git`: sin las variables, vacío."""
-    return {
-        "git_commit": os.getenv("GIT_COMMIT", ""),
-        "git_branch": os.getenv("GIT_BRANCH", ""),
-        "git_dirty":  os.getenv("GIT_DIRTY", ""),
-    }
 
 
 # Esquemas de salida de cada evaluador (sus `.outputs`), como structured output.
@@ -249,7 +200,7 @@ def main() -> None:
     log_dir = args.out / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = (log_dir / f"{run_id}.log").open("w", encoding="utf-8")
-    sys.stdout = _Tee(sys.__stdout__, log_file)
+    sys.stdout = Tee(sys.__stdout__, log_file)
 
     t0 = time.perf_counter()
     dataset = load_dataset(args.dataset)

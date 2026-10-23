@@ -22,7 +22,6 @@ Ver docs/eval/refactor_resultados_csv.md y docs/eval/eval_harness.md.
 from __future__ import annotations
 
 import argparse
-import os
 import re
 import statistics
 import sys
@@ -41,59 +40,7 @@ import csv_store  # noqa: E402
 import pipeline_ciberseguridad as rag  # noqa: E402
 import metrics as m  # noqa: E402
 import report as rep  # noqa: E402
-
-
-def load_dataset(path: Path) -> list[dict]:
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    if not isinstance(data, list):
-        raise ValueError("dataset.yaml debe ser una lista de preguntas")
-    return data
-
-
-class _Tee:
-    """Duplica lo escrito a stdout hacia un archivo, para persistir el log de la corrida."""
-
-    def __init__(self, *streams):
-        self._streams = streams
-
-    def write(self, s):
-        for st in self._streams:
-            st.write(s)
-
-    def flush(self):
-        for st in self._streams:
-            st.flush()
-
-
-def make_run_id(runs_csv: Path) -> str:
-    """`run_id` = timestamp UTC compacto, único dentro de runs.csv.
-
-    Dos corridas dentro del mismo segundo colisionarían; en ese caso se sufija
-    `-2`, `-3`, … El orden lexicográfico de los run_id sigue siendo cronológico,
-    que es de lo que depende `report.py` para saber cuál es "la última corrida".
-    """
-    base = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    usados = set(csv_store.load_runs(runs_csv)["run_id"].dropna())
-    if base not in usados:
-        return base
-    n = 2
-    while f"{base}-{n}" in usados:
-        n += 1
-    return f"{base}-{n}"
-
-
-def git_metadata() -> dict:
-    """Metadata de git, inyectada por `scripts/eval.sh` como variables de entorno.
-
-    El container **no** tiene el `.git` montado, así que acá nunca se corre `git`:
-    si las variables no están (corrida a mano, sin el wrapper), quedan vacías y la
-    corrida sigue igual.
-    """
-    return {
-        "git_commit": os.getenv("GIT_COMMIT", ""),
-        "git_branch": os.getenv("GIT_BRANCH", ""),
-        "git_dirty":  os.getenv("GIT_DIRTY", ""),
-    }
+from runner import Tee, git_metadata, load_dataset, make_run_id  # noqa: E402
 
 
 def set_baseline(meta_path: Path, run_id: str) -> None:
@@ -425,7 +372,7 @@ def main() -> None:
     log_dir = args.out / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
     log_file = (log_dir / f"{run_id}.log").open("w", encoding="utf-8")
-    sys.stdout = _Tee(sys.__stdout__, log_file)
+    sys.stdout = Tee(sys.__stdout__, log_file)
 
     dataset = load_dataset(args.dataset)
     if args.limit:

@@ -83,7 +83,7 @@ _no_color = False   # lo prende --no-color; ver paint()
 
 def _stdout_es_tty() -> bool:
     """`getattr` y no `sys.stdout.isatty()` a secas: durante una corrida stdout es
-    el `_Tee` de run_eval.py, que no implementa isatty. Sin esto, el log tee-ado
+    el `Tee` de runner.py, que no implementa isatty. Sin esto, el log tee-ado
     quedaría lleno de códigos ANSI."""
     isatty = getattr(sys.stdout, "isatty", None)
     return bool(isatty and isatty())
