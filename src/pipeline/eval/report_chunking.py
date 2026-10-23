@@ -26,6 +26,8 @@ import argparse
 import json
 from pathlib import Path
 
+import metrics as m
+
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 
 
@@ -70,13 +72,10 @@ def _source_rr(q) -> float | None:
     así que no hace falta re-correr el experimento."""
     if q.get("source_rr") is not None:
         return q["source_rr"]
-    exp = set(q.get("expected_sources") or [])
-    if not exp:
+    expected = q.get("expected_sources") or []
+    if not expected:
         return None
-    for i, s in enumerate(q.get("ranked_sources") or [], start=1):
-        if s in exp:
-            return 1.0 / i
-    return 0.0
+    return m.source_reciprocal_rank(q.get("ranked_sources") or [], expected)
 
 
 def _agg_source_mrr(per_question: list[dict]) -> float | None:
