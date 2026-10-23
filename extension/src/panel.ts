@@ -16,6 +16,7 @@ import { PreviewPackage } from './scan/manifest';
 import { chip } from './references';
 import { Finding, ScanResult, findingKey, identifierOf, packageKey } from './scan/types';
 import { BASE_STYLES, escapeHtml as escape, nonceValue } from './styles';
+import { openHttpLink } from './webview';
 
 export class ResultsPanel {
     private static current: ResultsPanel | undefined;
@@ -43,8 +44,8 @@ export class ResultsPanel {
                     if (finding) void this.chat.toggle(finding);
                     return;
                 }
-                if (message.type === 'openExternal' && message.url && /^https?:\/\//i.test(message.url)) {
-                    void vscode.env.openExternal(vscode.Uri.parse(message.url));
+                if (message.type === 'openExternal') {
+                    void openHttpLink(message.url);
                 }
             },
             null,

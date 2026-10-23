@@ -29,6 +29,8 @@ import { renderMarkdown } from "./markdown";
 import { chip } from "./references";
 import { Finding, findingKey, identifierOf } from "./scan/types";
 import { BASE_STYLES, escapeHtml as escape, nonceValue } from "./styles";
+import { trimSlash } from "./util";
+import { openHttpLink } from "./webview";
 
 export interface ChatOptions {
   url: string;
@@ -194,8 +196,8 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
   }
 
   private readonly onMessage = async (message: { type?: string; text?: string; url?: string; key?: string }) => {
-    if (message.type === "openExternal" && message.url && /^https?:\/\//i.test(message.url)) {
-      await vscode.env.openExternal(vscode.Uri.parse(message.url));
+    if (message.type === "openExternal") {
+      await openHttpLink(message.url);
       return;
     }
     if (message.type === "remove" && message.key) {
@@ -433,10 +435,6 @@ function describe(error: Error): string {
 
 function unique(values: (string | null | undefined)[]): string[] {
   return [...new Set(values.filter((value): value is string => Boolean(value)))];
-}
-
-function trimSlash(url: string): string {
-  return url.replace(/\/+$/, "");
 }
 
 /** Flecha de enviar. SVG inline: el CSP es default-src 'none' y no hay assets. */

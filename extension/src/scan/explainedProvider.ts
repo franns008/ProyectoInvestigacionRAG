@@ -14,6 +14,7 @@
  * Python desde los datos estructurados. Del LLM entra únicamente prosa.
  */
 
+import { trimSlash } from '../util';
 import { Finding, ScanProvider, ScanResult, identifierOf, packageKey } from './types';
 
 export interface ExplainOptions {
@@ -195,8 +196,4 @@ function describe(error: unknown, options: ExplainOptions): string {
         );
     }
     return (error as Error).message;
-}
-
-function trimSlash(url: string): string {
-    return url.replace(/\/+$/, '');
 }
