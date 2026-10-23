@@ -27,7 +27,7 @@ import {
 } from "./contextMeter";
 import { renderMarkdown } from "./markdown";
 import { chip } from "./references";
-import { Finding, findingKey } from "./scan/types";
+import { Finding, findingKey, identifierOf } from "./scan/types";
 import { BASE_STYLES, escapeHtml as escape, nonceValue } from "./styles";
 
 export interface ChatOptions {
@@ -355,7 +355,7 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
 
 function contextFor(finding: Finding) {
   return {
-    vulnerability: identifierOf(finding),
+    vulnerability: identifierOf(finding, "sin identificador"),
     package: finding.package,
     installed_version: finding.installed_version,
     fixed_version: finding.fixed_version,
@@ -374,7 +374,7 @@ function renderAttachments(findings: Finding[]): string {
   if (findings.length === 0) return "";
   const items = findings
     .map((finding) => {
-      const id = identifierOf(finding);
+      const id = identifierOf(finding, "sin identificador");
       const label = escape(`Quitar ${id} del contexto`);
       return `<span class="attachment" title="${escape(finding.summary ?? id)}">
         <span class="attachment-id">${escape(id)}</span>
@@ -433,10 +433,6 @@ function describe(error: Error): string {
 
 function unique(values: (string | null | undefined)[]): string[] {
   return [...new Set(values.filter((value): value is string => Boolean(value)))];
-}
-
-function identifierOf(finding: Finding): string {
-  return finding.cve ?? finding.osv_ids[0] ?? "sin identificador";
 }
 
 function trimSlash(url: string): string {

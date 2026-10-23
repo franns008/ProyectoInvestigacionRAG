@@ -14,7 +14,7 @@ import * as vscode from 'vscode';
 import { ChatView } from './chatView';
 import { PreviewPackage } from './scan/manifest';
 import { chip } from './references';
-import { Finding, ScanResult, findingKey } from './scan/types';
+import { Finding, ScanResult, findingKey, identifierOf, packageKey } from './scan/types';
 import { BASE_STYLES, escapeHtml as escape, nonceValue } from './styles';
 
 export class ResultsPanel {
@@ -261,7 +261,7 @@ function renderNoUrgentFindings(): string {
 function renderPackageGroups(findings: Finding[]): string {
     const groups = new Map<string, Finding[]>();
     for (const finding of findings) {
-        const key = finding.package.toLowerCase().replace(/[-_.]+/g, '-');
+        const key = packageKey(finding.package);
         const group = groups.get(key) ?? [];
         group.push(finding);
         groups.set(key, group);
@@ -342,7 +342,7 @@ const ICONO_ADJUNTAR = `<svg class="icono" viewBox="0 0 16 16" width="14" height
  * `aria-pressed` y los nombres los ajusta el script según lo que esté adjunto.
  */
 function renderAction(finding: Finding, seccion: Seccion): string {
-    const id = `${finding.cve ?? finding.osv_ids[0] ?? 'este hallazgo'} de ${finding.package}`;
+    const id = `${identifierOf(finding, 'este hallazgo')} de ${finding.package}`;
     const off = escape(`Agregar ${id} al chat`);
     const on = escape(`Quitar ${id} del chat`);
     const attrs = `class="button quiet chat-button" data-finding="${escape(findingKey(finding))}" data-label-off="${off}" data-label-on="${on}" aria-pressed="false" title="${off}" aria-label="${off}"`;

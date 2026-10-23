@@ -14,7 +14,7 @@
  * Python desde los datos estructurados. Del LLM entra únicamente prosa.
  */
 
-import { Finding, ScanProvider, ScanResult } from './types';
+import { Finding, ScanProvider, ScanResult, identifierOf, packageKey } from './types';
 
 export interface ExplainOptions {
     /** Servidor de Pipelines (API compatible con OpenAI). */
@@ -145,10 +145,6 @@ function firstFindingsByPackage(findings: Finding[], limit: number): Finding[] {
     return targets;
 }
 
-function packageKey(packageName: string): string {
-    return packageName.toLowerCase().replace(/[-_.]+/g, '-');
-}
-
 /** Sólo lo que el pipeline necesita: ids y el texto del advisory. */
 function payload(finding: Finding) {
     return {
@@ -184,10 +180,6 @@ function merge(findings: Finding[], explanations: WireExplanation[]): void {
 }
 
 /** Mismo criterio que `Vulnerability.identifier` en Python: el CVE si existe, si no el OSV. */
-function identifierOf(finding: Finding): string {
-    return finding.cve ?? finding.osv_ids[0] ?? '?';
-}
-
 /**
  * Un timeout y un servidor caído se ven igual en el `catch` (`TimeoutError` vs
  * `TypeError: fetch failed`) y se arreglan distinto. Vale la pena distinguirlos.

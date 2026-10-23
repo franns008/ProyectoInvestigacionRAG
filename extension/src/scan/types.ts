@@ -97,5 +97,15 @@ export class ScanError extends Error {
  * tocó) y el chat (qué hallazgos ya están adjuntos).
  */
 export function findingKey(finding: Finding): string {
-  return `${finding.package}|${finding.cve ?? finding.osv_ids[0] ?? "?"}`;
+  return `${finding.package}|${identifierOf(finding)}`;
+}
+
+/** El CVE si el advisory lo declara; si no, el primer id de OSV. */
+export function identifierOf(finding: Finding, fallback = "?"): string {
+  return finding.cve ?? finding.osv_ids[0] ?? fallback;
+}
+
+/** Nombre de paquete normalizado (PEP 503), para agrupar sin importar mayúsculas ni separadores. */
+export function packageKey(packageName: string): string {
+  return packageName.toLowerCase().replace(/[-_.]+/g, "-");
 }
