@@ -44,7 +44,7 @@ if _PIPELINES_DIR not in sys.path:
 
 from chat import extract_findings_context, findings_vuln_ids, format_findings, select_history
 from common.log import get_logger
-from common.llm import effective_num_ctx, llm_model
+from common.llm import DEFAULT_OLLAMA_LLM, effective_num_ctx, llm_model
 from common.store import OLLAMA_URL, get_document_store
 from common.text import message_text
 
@@ -61,8 +61,6 @@ from haystack.components.joiners import DocumentJoiner
 from haystack.components.rankers import SentenceTransformersSimilarityRanker
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
 from haystack_integrations.components.generators.ollama import OllamaGenerator
-
-DEFAULT_OLLAMA_LLM = "qwen2.5:3b-instruct"
 
 _WARM_UP_LOCK = threading.Lock()
 

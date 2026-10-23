@@ -12,6 +12,11 @@ import urllib.request
 from functools import lru_cache
 from typing import Any, Optional
 
+# Modelo de generación cuando no hay `LLM_MODEL`: el default del valve `llm_model` de los
+# dos pipelines. Vive acá y no en pipeline_ciberseguridad porque importar ese módulo carga
+# torch, y pipeline_dependencias lo necesita al definir sus valves.
+DEFAULT_OLLAMA_LLM = "qwen2.5:3b-instruct"
+
 _NUM_CTX_RE = re.compile(r"^num_ctx\s+(\d+)\s*$", re.MULTILINE)
 
 

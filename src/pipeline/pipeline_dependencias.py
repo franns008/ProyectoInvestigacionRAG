@@ -55,6 +55,7 @@ from typing import Generator, Iterator, List, Union
 
 from pydantic import BaseModel
 
+from common.llm import DEFAULT_OLLAMA_LLM
 from common.log import get_logger
 from explain import explain_findings
 from explain.payload import parse_findings
@@ -66,7 +67,7 @@ class Pipeline:
 
     class Valves(BaseModel):
         # Mismos nombres que los Valves del chat: build_generator() los lee por atributo.
-        llm_model:   str   = "meta-llama/llama-4-scout-17b-16e-instruct"
+        llm_model:   str   = DEFAULT_OLLAMA_LLM
         max_tokens:  int   = 220    # 2-3 frases; más que esto es el modelo desobedeciendo
         temperature: float = 0.2    # es un resumen de un texto dado, no escritura creativa
         top_n:       int   = 3      # cuántas tarjetas se explican
@@ -92,7 +93,7 @@ class Pipeline:
         `get_document_store()` y `build_generator()` ya son funciones módulo-level, así
         que alcanza con importarlas: el pipeline de chat no se toca. El import es local
         para que este archivo se pueda importar fuera del container (tests) sin arrastrar
-        torch ni pedir GROQ_API_KEY.
+        torch.
         """
         try:
             from pipeline_ciberseguridad import build_generator, get_document_store
@@ -122,7 +123,8 @@ class Pipeline:
             self._build()
         if self.generator is None:
             return json.dumps(
-                {"error": "El generador no está disponible (revisá LLM_PROVIDER y la API key)."},
+                {"error": "El generador no está disponible: revisá LLM_MODEL y que el modelo "
+                          "esté descargado en Ollama (el detalle está en el log de pipelines)."},
                 ensure_ascii=False,
             )
 

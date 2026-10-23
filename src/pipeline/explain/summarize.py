@@ -93,9 +93,9 @@ def explain_findings(
             logger.info("%s: sin contexto en ninguna fuente, no se explica", identifier)
             continue
 
-        # El tiempo se loguea siempre: con LLM_PROVIDER=ollama la generación corre en CPU
-        # y tarda decenas de segundos por tarjeta. Sin este número, "lento" y "colgado"
-        # son indistinguibles desde afuera.
+        # El tiempo se loguea siempre: con el LLM en CPU la generación tarda decenas de
+        # segundos por tarjeta. Sin este número, "lento" y "colgado" son indistinguibles
+        # desde afuera.
         started = time.perf_counter()
         try:
             raw = generate(build_prompt(finding, context))
