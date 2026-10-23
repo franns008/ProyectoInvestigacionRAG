@@ -69,13 +69,20 @@ export function deactivate(): void {
     // El chat se libera con context.subscriptions; el panel se limpia solo al cerrarse.
 }
 
+/** URL y key del servidor de Pipelines (mismos defaults que package.json). */
+function serverOptions(config: vscode.WorkspaceConfiguration) {
+    return {
+        url: config.get<string>('ragUrl', 'http://localhost:9099'),
+        apiKey: config.get<string>('ragApiKey', '0p3n-w3bui'),
+    };
+}
+
 /** Se leen en cada pregunta: cambiar un ajuste no obliga a recargar la ventana. */
 function chatOptions(): ChatOptions {
     const config = vscode.workspace.getConfiguration('cibersec');
     return {
-        url: config.get<string>('ragUrl', 'http://localhost:9099'),
+        ...serverOptions(config),
         model: config.get<string>('chatModel', 'pipeline_ciberseguridad'),
-        apiKey: config.get<string>('ragApiKey', '0p3n-w3bui'),
         timeoutMs: config.get<number>('chatTimeoutSeconds', 240) * 1000,
     };
 }
@@ -164,9 +171,8 @@ function buildProvider(
         return local;
     }
     return new ExplainedProvider(local, {
-        url: config.get<string>('ragUrl', 'http://localhost:9099'),
+        ...serverOptions(config),
         model: config.get<string>('explainModel', 'pipeline_dependencias'),
-        apiKey: config.get<string>('ragApiKey', '0p3n-w3bui'),
         topN: config.get<number>('explainTopN', 10),
         timeoutMs: config.get<number>('explainTimeoutSeconds', 240) * 1000,
     });
