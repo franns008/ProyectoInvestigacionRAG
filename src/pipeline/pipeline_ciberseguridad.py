@@ -235,21 +235,6 @@ class _RequestLog(logging.LoggerAdapter):
         return f"[{self.extra['rid']}] {msg}", kwargs
 
 
-def _classify_request(user_message: str) -> str:
-    """'user' para una pregunta real; 'meta:<tarea>' para los prompts internos de
-    OpenWebUI (título, follow-ups, tags), que también pasan por el pipeline."""
-    if not user_message.lstrip().startswith("### Task:"):
-        return "user"
-    task = next((l for l in user_message.splitlines()[1:] if l.strip()), "").lower()
-    if "title" in task:
-        return "meta:title"
-    if "follow-up" in task:
-        return "meta:follow_ups"
-    if "tags" in task:
-        return "meta:tags"
-    return "meta:otro"
-
-
 def _one_line(text: str) -> str:
     return (text or "").strip().replace("\n", " ⏎ ")
 
@@ -464,34 +449,23 @@ class Pipeline:
         body: dict,
     ) -> Union[str, Generator, Iterator]:
         
-        # OpenWebUI dispara corridas concurrentes (chat + título + follow-ups + tags):
+        # Puede haber corridas concurrentes (varios chats o clientes a la vez):
         # sin un id por request sus líneas quedan intercaladas y no se pueden separar.
         log = _RequestLog(logger, {"rid": uuid.uuid4().hex[:8]})
-        kind = _classify_request(user_message)
         t0 = time.perf_counter()
         stream = bool(body.get("stream"))
 
-        if kind == "user":
-            log.info(f"[INICIO] kind=user | pregunta={_one_line(user_message)}")
-        else:
-            # El prompt interno trae todo el chat embebido: no se vuelca entero.
-            log.info(f"[INICIO] kind={kind} | prompt interno de OpenWebUI ({len(user_message)} chars)")
+        log.info(f"[INICIO] pregunta={_one_line(user_message)}")
 
         keyword_query = build_keyword_query(user_message)
         log.info(f"[KEYWORD QUERY] -> {keyword_query!r}")
 
-        # Hallazgos adjuntos e historial sólo para preguntas reales: los prompts internos
-        # de OpenWebUI ya traen el chat embebido.
-        findings = extract_findings_context(messages) if kind == "user" else []
-        history = (
-            select_history(
-                messages,
-                user_message,
-                max_messages=self.valves.history_max_messages,
-                max_chars=self.valves.history_max_chars,
-            )
-            if kind == "user"
-            else []
+        findings = extract_findings_context(messages)
+        history = select_history(
+            messages,
+            user_message,
+            max_messages=self.valves.history_max_messages,
+            max_chars=self.valves.history_max_chars,
         )
         for finding in findings:
             log.info(f"[HALLAZGO] {finding.get('vulnerability')} | paquete={finding.get('package')} {finding.get('installed_version')}")
@@ -519,7 +493,7 @@ class Pipeline:
             },
         }
         if stream:
-            return self._stream(inputs, log, kind, t0)
+            return self._stream(inputs, log, t0)
 
         try:
             result = self.rag_pipeline.run(
@@ -534,14 +508,14 @@ class Pipeline:
                 },
             )
         except Exception:
-            log.exception(f"[ERROR] kind={kind} | falló tras {time.perf_counter() - t0:.1f}s")
+            log.exception(f"[ERROR] falló tras {time.perf_counter() - t0:.1f}s")
             raise
 
         answer = result["llm"]["replies"][0]
         self._log_retrieved_docs(log, result)
         self._log_token_usage(log, result)
         log.info(f"[RESPUESTA] {_one_line(answer)}")
-        log.info(f"[FIN] kind={kind} | {time.perf_counter() - t0:.1f}s")
+        log.info(f"[FIN] {time.perf_counter() - t0:.1f}s")
 
         return answer
 
@@ -549,7 +523,6 @@ class Pipeline:
         self,
         inputs: dict,
         log: logging.LoggerAdapter,
-        kind: str,
         t0: float,
     ) -> Iterator[str]:
         """Ejecuta Haystack en segundo plano y entrega los tokens al servidor HTTP."""
@@ -581,9 +554,9 @@ class Pipeline:
                 self._log_retrieved_docs(log, result)
                 self._log_token_usage(log, result)
                 log.info(f"[RESPUESTA] {_one_line(answer)}")
-                log.info(f"[FIN] kind={kind} | {time.perf_counter() - t0:.1f}s")
+                log.info(f"[FIN] {time.perf_counter() - t0:.1f}s")
             except Exception as error:
-                log.exception(f"[ERROR] kind={kind} | falló tras {time.perf_counter() - t0:.1f}s")
+                log.exception(f"[ERROR] falló tras {time.perf_counter() - t0:.1f}s")
                 events.put(error)
             finally:
                 events.put(finished)
@@ -666,9 +639,9 @@ class Pipeline:
 
     def _build_rag_pipeline(self) -> HaystackPipeline:
         pipeline = build_rag_pipeline(self.store, self.valves)
-        # Warm-up eager y bajo lock: si se deja al primer run(), OpenWebUI dispara
-        # requests concurrentes (chat + título) y dos CrossEncoder cargando a la vez
-        # en threads distintos rompen con "Cannot copy out of meta tensor".
+        # Warm-up eager y bajo lock: si se deja al primer run(), dos requests
+        # concurrentes cargarían dos CrossEncoder a la vez en threads distintos, y
+        # eso rompe con "Cannot copy out of meta tensor".
         with _WARM_UP_LOCK:
             pipeline.warm_up()
         return pipeline
