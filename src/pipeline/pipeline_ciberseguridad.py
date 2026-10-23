@@ -373,7 +373,7 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves, include_llm: bool =
     pipeline.add_component("text_embedder",       OllamaTextEmbedder(model=v.embedding_model, url=OLLAMA_URL))
     pipeline.add_component("embedding_retriever", PgvectorEmbeddingRetriever(document_store=store, top_k=v.retriever_top_k))
     pipeline.add_component("keyword_retriever",   PgvectorKeywordRetriever(document_store=store, top_k=v.retriever_top_k))
-    pipeline.add_component("id_lookup",           VulnIdLookup(document_store=store, top_k=getattr(v, "id_lookup_top_k", 10)))
+    pipeline.add_component("id_lookup",           VulnIdLookup(document_store=store, top_k=v.id_lookup_top_k))
     pipeline.add_component("document_joiner",     DocumentJoiner(join_mode="reciprocal_rank_fusion", top_k=v.retriever_top_k * 2))
     pipeline.add_component("ranker",              SentenceTransformersSimilarityRanker(model=v.ranker_model, top_k=v.ranker_top_k))
 
