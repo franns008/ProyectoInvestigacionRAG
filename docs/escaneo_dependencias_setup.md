@@ -166,23 +166,17 @@ hay lenguaje natural generado**: hay una tabla bien ordenada.
 | [`extension/src/scan/localProvider.ts`](../extension/src/scan/localProvider.ts) | lanza la CLI y parsea su JSON |
 | [`extension/src/panel.ts`](../extension/src/panel.ts) | el webview |
 
-## Qué cambia cuando se integre el RAG
+## Integración con el RAG
 
-La costura ya está puesta, así que el cambio es acotado.
+El escaneo sigue siendo local; el servidor sólo **explica**. En la extensión,
+`ExplainedProvider` decora al `LocalScannerProvider`: toma los primeros hallazgos y se los
+manda a `pipeline_dependencias`, el segundo modelo del `9099`. Ese pipeline trae el CVE/CWE
+del corpus **por clave exacta** (`filter_documents`, sin búsqueda semántica) y le pide al LLM
+**sólo el párrafo explicativo**. Si el servidor no responde, el escaneo se muestra igual, sin
+los párrafos. Detalle en [`explicacion_hallazgos.md`](explicacion_hallazgos.md).
 
-**En Python** aparece `pipeline_dependencias.py`: una clase `Pipeline` que el servidor
-levanta sola y publica como un segundo modelo en el `9099`, al lado del chat. Hace el
-mismo escaneo determinístico —importa el mismo `deps/`— y después trae el documento del
-CWE **por clave exacta** (`filter_documents`, no búsqueda semántica: el id ya se conoce)
-y le pide al LLM **solo el párrafo explicativo**.
-
-**En la extensión** cambia el ajuste `cibersec.provider` de `local` a `rag`, y
-[`ragProvider.ts`](../extension/src/scan/ragProvider.ts) —que hoy existe y lanza "no
-implementado"— recibe un cuerpo que hace un POST al `9099`.
-
-**No cambia** el contrato ni la vista. Los dos proveedores devuelven el mismo
-`ScanResult`; el RAG solo completa dos campos que hoy vienen vacíos, `explanation` y
-`citations`. El panel ya los renderiza si están y los omite si no.
+El contrato y la vista no cambian: el decorador sólo completa `explanation` y `citations`,
+que el panel renderiza si están y omite si no.
 
 > **La regla que no se rompe:** la versión de arreglo, el CVSS, el EPSS, el flag de KEV y
 > todos los identificadores los concatena Python desde los datos estructurados. El modelo
@@ -194,7 +188,7 @@ implementado"— recibe un cuerpo que hace un POST al `9099`.
 |---|---|
 | Fase 1 — fetchers de OSV/EPSS/KEV y catálogo CWE completo | hecho. `src/ingestion/fetch_all.py` y un `fetch_<fuente>.py` por feed — ver [`ingestion_fetchers.md`](ingestion_fetchers.md). |
 | Fase 2 — resolver, priorización, tests | hecho |
-| Fase 3 — converter de OSV a pgvector, lookup de CWE, `pipeline_dependencias` | **pendiente**. Es lo que habilita la explicación. |
+| Fase 3 — converter de OSV a pgvector, lookup de CWE, `pipeline_dependencias` | **parcial**: lookup por clave y `pipeline_dependencias` hechos ([`explicacion_hallazgos.md`](explicacion_hallazgos.md)); el converter de OSV a pgvector sigue pendiente. |
 | Fase 4 — extensión | hecho, contra el escáner local |
 
 ## Problemas comunes
