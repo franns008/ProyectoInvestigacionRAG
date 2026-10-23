@@ -9,19 +9,6 @@ services:
         volumes:
             - ollama_data:/root/.ollama
 
-    db:
-        image: postgres:15-alpine
-        restart: unless-stopped
-        env_file:
-            - env/db.env
-        environment:
-            POSTGRES_USER: ${DATABASE_USER:-owui}
-            POSTGRES_PASSWORD: ${DATABASE_PASS:-owui}
-        ports:
-            - "${DB_PORT:-5432}:5432"
-        volumes:
-            - pg_data:/var/lib/postgresql/data
-
     vdb:
         image: ankane/pgvector
         restart: unless-stopped
@@ -74,12 +61,6 @@ volumes:
             type: 'none'
             o: 'bind'
             device: ./appdata/ollama/
-    pg_data:
-        driver: local
-        driver_opts:
-            type: 'none'
-            o: 'bind'
-            device: ./appdata/postgress/
     pgv_data:
         driver: local
         driver_opts:
