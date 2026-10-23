@@ -92,7 +92,8 @@ ignora.
    sólo reconstruye el pipeline de query, no re-indexa.
 
 7. **Inconsistencias código ↔ runtime.** El `valves.json` de runtime puede diferir del
-   código en `retriever_top_k` y `max_tokens`.
+   código en `retriever_top_k` y `max_tokens`. *(Resuelto: el archivo ya no se versiona;
+   ver `arquitectura.md` §4.3.)*
 
 8. **⚠ Bug latente descubierto: `MarkdownToDocument` borra los headers.** El pipeline
    convierte cada PDF→markdown con marker (que **sí** deja `#`, `##`…) pero luego lo

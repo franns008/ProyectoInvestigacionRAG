@@ -142,9 +142,10 @@ OllamaGenerator(
 > Se leen con `GET /<pipeline>/valves` y se cambian con `POST /<pipeline>/valves/update`
 > del servidor de Pipelines (`:9099`, con la `PIPESERVER_KEY` como Bearer). El servidor
 > **persiste** las valves en `src/pipeline/pipeline_ciberseguridad/valves.json`
-> y las restaura al arrancar: un valor guardado ahí le gana al default del código (hoy,
-> por ejemplo, fija `retriever_top_k: 5`). Las valves que no están en el archivo toman
-> el default.
+> y las restaura al arrancar: un valor guardado ahí le gana al default del código. Las
+> valves que no están en el archivo toman el default. El archivo es estado local del
+> server, no está versionado (`.gitignore`) y aparece la primera vez que se editan los
+> valves; borrarlo vuelve a los defaults.
 
 ### 4.4 Chat con hallazgos adjuntos (historial y contexto)
 

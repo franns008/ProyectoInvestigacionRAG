@@ -56,6 +56,10 @@ src/pipeline/eval/results/*
 # NVD
 data/raw/nvd
 
+# Valves persistidos por el servidor de Pipelines (POST /<pipeline>/valves/update). Es
+# estado del server, no configuración del repo: versionado, pisaba los defaults del código.
+src/pipeline/*/valves.json
+
 # Log del pipeline RAG (lo escribe el container en el volumen montado)
 src/pipeline/logCiberseguridad.txt
 
