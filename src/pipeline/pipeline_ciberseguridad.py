@@ -24,9 +24,9 @@ def _patched_pad_sequence(sequences, batch_first=False, padding_value=0.0, **kwa
 _rnn.pad_sequence = _patched_pad_sequence
 _torch.nn.utils.rnn.pad_sequence = _patched_pad_sequence
 
-from typing import List, Union, Generator, Iterator
+from typing import List, Optional, Union, Generator, Iterator
 from queue import Queue
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 import logging
 import os
 import re
@@ -44,6 +44,7 @@ if _PIPELINES_DIR not in sys.path:
 
 from chat import extract_findings_context, findings_vuln_ids, format_findings, select_history
 from common.log import get_logger
+from common.llm import effective_num_ctx, llm_model
 from common.store import OLLAMA_URL, get_document_store
 from common.text import message_text
 
@@ -309,19 +310,19 @@ def build_generator(valves):
     """La generación corre siempre en el Ollama local (ver docs/arquitectura.md).
 
     El modelo sale de `LLM_MODEL` si está seteada; si no, del valve `llm_model`
-    (que ya trae `DEFAULT_OLLAMA_LLM` como default). La variable de entorno gana
-    para poder cambiar de modelo sin tocar los valves.
+    (que ya trae `DEFAULT_OLLAMA_LLM` como default). La ventana, igual: `LLM_NUM_CTX`
+    le gana al valve `num_ctx`, y 0 toma la del Modelfile. Las variables de entorno
+    ganan para poder cambiar de modelo sin tocar los valves.
     """
     v = valves
-    model = os.getenv("LLM_MODEL") or v.llm_model
+    model = llm_model(v)
     generation_kwargs = {
         "num_predict": v.max_tokens,
         "temperature": v.temperature,
     }
     # Sin num_ctx, Ollama usa su default y, si el prompt no entra, recorta el PRINCIPIO
-    # sin avisar: justo las reglas. `getattr` porque pipeline_dependencias comparte esta
-    # función y sus valves no lo traen.
-    num_ctx = getattr(v, "num_ctx", None)
+    # sin avisar: justo las reglas. Por eso se manda explícito aunque salga del Modelfile.
+    num_ctx = effective_num_ctx(v, OLLAMA_URL)
     if num_ctx:
         generation_kwargs["num_ctx"] = num_ctx
     return OllamaGenerator(
@@ -382,6 +383,17 @@ class Pipeline:
         history_max_messages: int = 6
         history_max_chars:    int = 600
         # NOTA: split_length y split_overlap se movieron al script de indexación.
+
+        @computed_field
+        @property
+        def effective_num_ctx(self) -> Optional[int]:
+            """La ventana con la que corre el generador (`LLM_NUM_CTX` le gana a `num_ctx`).
+
+            De sólo lectura: sale en `GET /valves` para el medidor de contexto de la
+            extensión, pero no en el schema de edición, y el servidor la ignora al
+            restaurar valves.json.
+            """
+            return effective_num_ctx(self, OLLAMA_URL)
 
     def __init__(self):
         self.name   = "RAG ciberseguridad"

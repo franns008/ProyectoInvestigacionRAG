@@ -94,7 +94,7 @@ OllamaGenerator(
     model=model,                       # LLM_MODEL, o el valve llm_model
     url="http://ollama:11434",
     timeout=120,
-    generation_kwargs={"num_predict": 512, "temperature": 0.5, "num_ctx": 8192},
+    generation_kwargs={"num_predict": 512, "temperature": 0.5, "num_ctx": 8192},  # LLM_NUM_CTX, o el valve num_ctx
 )
 ```
 
@@ -106,7 +106,17 @@ OllamaGenerator(
 - Parámetros de Ollama: `num_predict` (longitud de la respuesta), `temperature` y
   `num_ctx` (ventana de contexto). `num_ctx` se fija explícito porque, si el prompt no
   entra en el default de Ollama, éste recorta el **principio** sin avisar, que es donde
-  están las reglas. `pipeline_dependencias` comparte `build_generator` y no lo setea.
+  están las reglas.
+- La ventana se resuelve igual que el modelo: `LLM_NUM_CTX` (env) **>** valve `num_ctx`.
+  `LLM_NUM_CTX=0` toma el `num_ctx` del Modelfile del modelo efectivo, que se le pide a
+  Ollama (`/api/show`) y se manda explícito igual. Si el Modelfile no la fija, el
+  pipeline no levanta: no se cae en el default de Ollama sin avisar. Se resuelve una vez
+  por modelo: si se recrea el modelo con otro Modelfile, hay que reiniciar `pipelines`.
+- `pipeline_dependencias` comparte `build_generator`. Sus valves no traen `num_ctx`, así
+  que sólo manda una ventana si `LLM_NUM_CTX` está definida.
+- La ventana efectiva sale en `GET /pipeline_ciberseguridad/valves` como
+  `effective_num_ctx`. Es de sólo lectura: no aparece en el schema de edición y el
+  servidor la ignora al restaurar `valves.json`. La usa el medidor de contexto (§4.4).
 
 ### 4.3 Valves (parámetros ajustables en caliente)
 
@@ -120,7 +130,7 @@ OllamaGenerator(
 | `id_lookup_top_k` | `10`                       | Tope del canal determinístico por CWE/CVE     |
 | `max_tokens`      | `512`                      | Longitud máxima de la respuesta               |
 | `temperature`     | `0.5`                      | Creatividad de la generación                  |
-| `num_ctx`         | `8192`                     | Ventana de contexto de Ollama (prompt + respuesta) |
+| `num_ctx`         | `8192`                     | Ventana de contexto de Ollama (prompt + respuesta; `LLM_NUM_CTX` le gana) |
 | `history_max_messages` | `6`                   | Mensajes previos del chat que entran al prompt (0 lo desactiva) |
 | `history_max_chars`    | `600`                 | Recorte de cada mensaje previo                |
 
@@ -249,6 +259,8 @@ Pregunta del usuario
   Las únicas credenciales son internas del stack.
 - Variables relevantes:
   - `LLM_MODEL` — modelo de generación en Ollama. Vacío = el default del pipeline.
+  - `LLM_NUM_CTX` — ventana de contexto del LLM. Vacío = el valve `num_ctx`; `0` = la
+    del Modelfile (los tiers `gemma4-*` la traen). Ver §4.2.
   - `PIPESERVER_KEY` — API key del servidor de pipelines (`PIPELINES_API_KEY` en el
     container). La extensión la manda como Bearer (`cibersec.ragApiKey`).
 - La extensión se conecta al servidor de pipelines en `http://localhost:9099`

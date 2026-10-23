@@ -32,6 +32,8 @@ services:
             # Modelo de generación en el Ollama local. Vacío = el default del
             # pipeline (DEFAULT_OLLAMA_LLM). Ver docs/arquitectura.md.
             LLM_MODEL: ${LLM_MODEL:-}
+            # Ventana de contexto del LLM. Vacío = el valve num_ctx; 0 = la del Modelfile.
+            LLM_NUM_CTX: ${LLM_NUM_CTX:-}
             PIPELINES_API_KEY: ${PIPESERVER_KEY:-0p3n-w3bui}
         ports:
             - "${PIPELINES_PORT:-9099}:9099"
