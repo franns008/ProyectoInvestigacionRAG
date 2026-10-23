@@ -388,7 +388,7 @@ class Pipeline:
         self.valves = self.Valves()
         
         # Conectamos a la BD solo para recuperar datos
-        self.store  = self._get_document_store()
+        self.store  = get_document_store()
         self.rag_pipeline = self._build_rag_pipeline()
         
         logger.info("Pipeline RAG inicializado. Listo para responder.")
@@ -565,9 +565,6 @@ class Pipeline:
         log.info(f"[RANKER] {len(ranked_docs)} documentos re-rankeados enviados al prompt:")
         for i, doc in enumerate(ranked_docs):
             log.info(doc_line(i, doc, True, 300))
-
-    def _get_document_store(self) -> PgvectorDocumentStore:
-        return get_document_store()
 
     def _build_rag_pipeline(self) -> HaystackPipeline:
         pipeline = build_rag_pipeline(self.store, self.valves)
