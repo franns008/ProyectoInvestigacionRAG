@@ -72,3 +72,9 @@ services:
             # con 4 GB se baja a 1.
             OLLAMA_KEEP_ALIVE: "-1"
             OLLAMA_NUM_PARALLEL: "1"
+            # VRAM que el loader de llama.cpp deja libre al repartir capas (--fit-target).
+            # Default 1024 MiB. Con 256 entra gemma4:e4b-text entero (43/43 capas, hasta
+            # 12k de contexto); con 1024 queda en 36/43. Es global para todos los modelos y
+            # sin margen el escritorio puede dejar sin VRAM al load: bajarlo sólo con pocas
+            # cosas abiertas. Se fija con FIT_TARGET_MIB en el .env.
+            LLAMA_ARG_FIT_TARGET: "${FIT_TARGET_MIB:-1024}"
