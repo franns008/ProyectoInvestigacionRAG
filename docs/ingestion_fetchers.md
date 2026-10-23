@@ -64,9 +64,6 @@ Todo va a `data/raw/`, que es lo que el `docker-compose` montea como el volumen 
 → `/app/pipelines/rawdata` (el `INPUT_DIR` del indexer) y también el `--data` que espera
 `deps/cli.py`. Está en `.gitignore`: son dumps regenerables.
 
-> `infrastructure/appdata/rawdata/` es una copia vieja que **no montea nada**. El corpus
-> real es `data/raw/`.
-
 ### Por qué el XML de CWE va suelto en `data/raw/`
 
 El indexer levanta los XML con `INPUT_DIR.glob("*.xml")` filtrando subcarpetas, así que
