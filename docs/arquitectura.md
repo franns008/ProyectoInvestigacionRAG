@@ -163,9 +163,8 @@ messages = [
 - **El historial** (`select_history`) toma los últimos `history_max_messages` mensajes
   `user`/`assistant` anteriores al turno actual, cada uno recortado a
   `history_max_chars`. Entra en *"Conversation so far"*, justo antes de la pregunta.
-- Los dos bloques son **opcionales** en el template: sin mensaje `system` (el chat de
-  OpenWebUI, el eval) el prompt es el de siempre. A los prompts internos de OpenWebUI
-  (título, tags) no se les pasa ninguno.
+- Los dos bloques son **opcionales** en el template: sin mensaje `system` (un chat sin
+  hallazgos adjuntos, el eval) el prompt es el de siempre.
 - La lógica vive en `src/pipeline/chat/` (pura, se testea con `pytest` sin stack). El log
   deja un `[HALLAZGO]` por adjunto y `[HISTORIAL]` por request.
 
