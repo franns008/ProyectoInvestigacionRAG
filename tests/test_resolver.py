@@ -145,7 +145,6 @@ def test_excluye_advisories_retirados(advisories):
     assert retirado.get("aliases") is None
 
     assert "pillow" not in build_index([retirado])
-    assert build_index([retirado], include_withdrawn=True).keys() == {"pillow"}
 
 
 def test_version_invalida_no_rompe(advisories):

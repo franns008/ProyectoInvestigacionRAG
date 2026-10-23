@@ -186,10 +186,10 @@ def parse_requirements(text: str) -> list[Requirement]:
 # ======================================================================
 # Índice de advisories
 # ======================================================================
-def load_osv_zip(path: str | Path, include_malicious: bool = False) -> Iterator[dict]:
+def load_osv_zip(path: str | Path) -> Iterator[dict]:
     """Itera los advisories del `all.zip` de OSV para PyPI, uno por JSON.
 
-    Los registros `MAL` (paquetes maliciosos) se saltean por defecto: no traen rangos
+    Los registros `MAL` (paquetes maliciosos) se saltean: no traen rangos
     de versión y son una clase de hallazgo distinta.
     """
     with zipfile.ZipFile(path) as archive:
@@ -201,24 +201,24 @@ def load_osv_zip(path: str | Path, include_malicious: bool = False) -> Iterator[
             except json.JSONDecodeError:
                 logger.warning("Advisory ilegible en el zip de OSV: %s", name)
                 continue
-            if not include_malicious and str(advisory.get("id", "")).startswith(_MALICIOUS_PREFIX):
+            if str(advisory.get("id", "")).startswith(_MALICIOUS_PREFIX):
                 continue
             yield advisory
 
 
-def build_index(advisories: Iterable[dict], include_withdrawn: bool = False) -> dict[str, list[dict]]:
+def build_index(advisories: Iterable[dict]) -> dict[str, list[dict]]:
     """Advisories -> índice `nombre PyPI normalizado -> advisories que lo mencionan`.
 
     Es el lookup que reemplaza al retrieval: la clave es el nombre del paquete, que es
     exactamente lo que uno tiene al mirar un requirements.txt. Un advisory que afecta
     a varios paquetes se indexa bajo cada uno.
 
-    Los advisories con `withdrawn` quedan afuera por defecto: OSV los marca así cuando
+    Los advisories con `withdrawn` quedan afuera: OSV los marca así cuando
     se retractan o se publican duplicados, y contarlos infla los hallazgos.
     """
     index: dict[str, list[dict]] = {}
     for advisory in advisories:
-        if not include_withdrawn and advisory.get("withdrawn"):
+        if advisory.get("withdrawn"):
             continue
         for affected in advisory.get("affected", []):
             package = affected.get("package", {})
