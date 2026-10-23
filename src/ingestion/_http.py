@@ -12,8 +12,10 @@ validación de tamaño mínimo, porque más de una de estas fuentes responde 200
 cuerpo truncado en vez de fallar.
 """
 
+import argparse
 import os
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from email.utils import formatdate, parsedate_to_datetime
@@ -129,3 +131,11 @@ def download(url: str, dest: Path, min_bytes: int, source: str, force: bool = Fa
     detail = f"{human_size(len(payload))} -> {dest.relative_to(REPO_ROOT)}"
     print(f"[{source}] {status}: {detail}")
     return Result(status, detail)
+
+
+def run_cli(description: str, fetch: Callable[..., Result], what: str) -> None:
+    """CLI de un fetcher de un solo archivo: sólo acepta `--force`."""
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("--force", action="store_true",
+                        help=f"rebaja {what} aunque el servidor diga que no cambió")
+    fetch(force=parser.parse_args().force)

@@ -8,9 +8,7 @@ Uso:
     python src/ingestion/fetch_osv.py --force   # rebaja aunque ya esté
 """
 
-import argparse
-
-from _http import RAW_DIR, Result, download
+from _http import RAW_DIR, Result, download, run_cli
 
 SOURCE = "osv"
 URL = "https://storage.googleapis.com/osv-vulnerabilities/PyPI/all.zip"
@@ -23,11 +21,7 @@ def fetch(force: bool = False) -> Result:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fetch OSV (advisories de PyPI) a data/raw/osv/")
-    parser.add_argument("--force", action="store_true",
-                        help="rebaja el dump aunque el servidor diga que no cambió")
-    args = parser.parse_args()
-    fetch(force=args.force)
+    run_cli("Fetch OSV (advisories de PyPI) a data/raw/osv/", fetch, "el dump")
 
 
 if __name__ == "__main__":

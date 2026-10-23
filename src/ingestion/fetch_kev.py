@@ -8,9 +8,7 @@ Uso:
     python src/ingestion/fetch_kev.py --force   # rebaja aunque ya esté
 """
 
-import argparse
-
-from _http import RAW_DIR, Result, download
+from _http import RAW_DIR, Result, download, run_cli
 
 SOURCE = "kev"
 URL = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
@@ -23,11 +21,7 @@ def fetch(force: bool = False) -> Result:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fetch CISA KEV a data/raw/kev/")
-    parser.add_argument("--force", action="store_true",
-                        help="rebaja el catálogo aunque el servidor diga que no cambió")
-    args = parser.parse_args()
-    fetch(force=args.force)
+    run_cli("Fetch CISA KEV a data/raw/kev/", fetch, "el catálogo")
 
 
 if __name__ == "__main__":

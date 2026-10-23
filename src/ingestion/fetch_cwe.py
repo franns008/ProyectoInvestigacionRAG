@@ -23,14 +23,13 @@ Uso:
     python src/ingestion/fetch_cwe.py --force   # rebaja aunque no haya cambiado
 """
 
-import argparse
 import io
 import xml.etree.ElementTree as ET
 import zipfile
 from datetime import datetime, timezone
 
 from _http import (ACTUALIZADO, NUEVO, RAW_DIR, REPO_ROOT, SIN_CAMBIOS, Result,
-                   checked_payload, conditional_get, human_size, write_atomic)
+                   checked_payload, conditional_get, human_size, run_cli, write_atomic)
 
 SOURCE = "cwe"
 URL = "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip"
@@ -88,11 +87,7 @@ def fetch(force: bool = False) -> Result:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fetch del catálogo completo de CWE a data/raw/")
-    parser.add_argument("--force", action="store_true",
-                        help="rebaja el catálogo aunque el servidor diga que no cambió")
-    args = parser.parse_args()
-    fetch(force=args.force)
+    run_cli("Fetch del catálogo completo de CWE a data/raw/", fetch, "el catálogo")
 
 
 if __name__ == "__main__":

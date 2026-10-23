@@ -10,9 +10,7 @@ Uso:
     python src/ingestion/fetch_epss.py --force   # rebaja aunque ya esté
 """
 
-import argparse
-
-from _http import RAW_DIR, Result, download
+from _http import RAW_DIR, Result, download, run_cli
 
 SOURCE = "epss"
 URL = "https://epss.empiricalsecurity.com/epss_scores-current.csv.gz"
@@ -25,11 +23,7 @@ def fetch(force: bool = False) -> Result:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fetch EPSS a data/raw/epss/")
-    parser.add_argument("--force", action="store_true",
-                        help="rebaja el CSV aunque el servidor diga que no cambió")
-    args = parser.parse_args()
-    fetch(force=args.force)
+    run_cli("Fetch EPSS a data/raw/epss/", fetch, "el CSV")
 
 
 if __name__ == "__main__":
