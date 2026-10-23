@@ -76,7 +76,7 @@ export interface ScanResult {
 /**
  * Quien sabe resolver un escaneo.
  *
- * Implementaciones: LocalScannerProvider (hoy) y RagProvider (Fase 3). La vista sólo
+ * Implementaciones: LocalScannerProvider y el decorador ExplainedProvider. La vista sólo
  * conoce esta interfaz.
  */
 export interface ScanProvider {

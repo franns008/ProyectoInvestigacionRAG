@@ -16,7 +16,6 @@ import { ExplainedProvider } from './scan/explainedProvider';
 import { ResultsPanel } from './panel';
 import { LocalScannerProvider } from './scan/localProvider';
 import { previewPackages } from './scan/manifest';
-import { RagProvider } from './scan/ragProvider';
 import { ScanError, ScanProvider } from './scan/types';
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -130,25 +129,14 @@ async function scanCommand(chat: ChatView, resource?: vscode.Uri): Promise<void>
 }
 
 /**
- * Elige quién resuelve el escaneo.
- *
- * Es la costura de la que habla docs/escaneo_dependencias.md. `local` resuelve el escaneo
- * offline; encima va el decorador que le pide las explicaciones al pipeline (ajuste
- * `cibersec.explain`, ver docs/explicacion_hallazgos.md). `rag` —que resolvería TODO el
- * escaneo en el servidor— sigue declarado y sin implementar.
+ * Escáner local y, encima, el decorador que le pide las explicaciones al pipeline
+ * (ajuste `cibersec.explain`, ver docs/explicacion_hallazgos.md).
  */
 function buildProvider(
     workspaceRoot: string,
     manifestDirectory: string,
 ): ScanProvider {
     const config = vscode.workspace.getConfiguration('cibersec');
-
-    if (config.get<string>('provider') === 'rag') {
-        return new RagProvider({
-            url: config.get<string>('ragUrl', 'http://localhost:9099'),
-            model: config.get<string>('ragModel', 'pipeline_dependencias'),
-        });
-    }
 
     const projectRoot = findProjectRoot(
         workspaceRoot,

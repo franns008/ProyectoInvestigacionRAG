@@ -93,19 +93,6 @@
     "configuration": {
       "title": "Escaneo de dependencias",
       "properties": {
-        "cibersec.provider": {
-          "type": "string",
-          "enum": [
-            "local",
-            "rag"
-          ],
-          "default": "local",
-          "enumDescriptions": [
-            "Corre el escáner determinístico local (sin LLM, sin stack).",
-            "Consulta el pipeline RAG, que agrega la explicación en lenguaje natural."
-          ],
-          "markdownDescription": "De dónde salen los hallazgos. `local` no necesita infraestructura; `rag` requiere el servidor de Pipelines levantado."
-        },
         "cibersec.pythonPath": {
           "type": "string",
           "default": "",
@@ -124,12 +111,7 @@
         "cibersec.ragUrl": {
           "type": "string",
           "default": "http://localhost:9099",
-          "description": "Servidor de Pipelines (API compatible con OpenAI). Sólo se usa con el proveedor `rag`."
-        },
-        "cibersec.ragModel": {
-          "type": "string",
-          "default": "pipeline_dependencias",
-          "description": "Pipeline que resuelve el escaneo. Sólo se usa con el proveedor `rag`."
+          "description": "Servidor de Pipelines (API compatible con OpenAI). Lo usan el chat y las explicaciones."
         },
         "cibersec.ragApiKey": {
           "type": "string",
