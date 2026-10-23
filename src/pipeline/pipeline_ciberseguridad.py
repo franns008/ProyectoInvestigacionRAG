@@ -176,9 +176,6 @@ def _extract_vuln_ids(text: str) -> list[str]:
     return out
 
 
-# Marcadores de los prompts internos de OpenWebUI (generación de títulos, tags...).
-# No se heredan IDs desde ellos: traen <chat_history> embebido y contaminarían la query.
-_META_PROMPT_MARKERS = ("### Task:", "<chat_history>")
 _HISTORY_TURNS = 4   # ~2 intercambios hacia atrás
 _MAX_VULN_IDS  = 6
 
@@ -218,9 +215,7 @@ def resolve_vuln_ids(
     for msg in reversed(messages[-history_turns:]):
         text = _message_text(msg)
         if not text or text.strip() == user_message.strip():
-            continue  # OpenWebUI repite el turno actual al final de messages
-        if any(marker in text for marker in _META_PROMPT_MARKERS):
-            continue
+            continue  # messages trae el turno actual al final
         for vid in _extract_vuln_ids(text):
             if vid not in inherited:
                 inherited.append(vid)
