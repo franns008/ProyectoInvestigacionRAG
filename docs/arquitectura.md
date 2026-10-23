@@ -287,7 +287,14 @@ cd infrastructure
    Para un arranque de desarrollo no hace falta completar nada: todo tiene defaults
    en el compose.
 
-2. **Levantar el stack** (la primera vez buildea la imagen, tarda):
+2. **Crear las carpetas de datos** (una sola vez). El compose guarda los modelos de
+   Ollama y la base en carpetas del host, y Docker no las crea solo: si faltan,
+   `up` falla con *no such file or directory*.
+   ```bash
+   mkdir -p appdata/ollama appdata/postgress_vector
+   ```
+
+3. **Levantar el stack** (la primera vez buildea la imagen, tarda):
    ```bash
    # CPU (cualquier máquina):
    docker compose up -d --build
@@ -299,7 +306,7 @@ cd infrastructure
    docker compose -f docker-compose.yml -f docker-compose.amd.yml up -d --build
    ```
 
-3. **Descargar los modelos** en Ollama (una sola vez): embeddings **y** el LLM de
+4. **Descargar los modelos** en Ollama (una sola vez): embeddings **y** el LLM de
    generación.
    ```bash
    docker compose exec ollama ollama pull qwen3-embedding:4b
@@ -308,7 +315,7 @@ cd infrastructure
    > Si configuraste otro `LLM_MODEL` en el `.env`, descargá **ese** en vez de
    > `qwen2.5:3b-instruct`.
 
-4. **Usar el RAG**: desde el chat de la extensión de VSCode (ver
+5. **Usar el RAG**: desde el chat de la extensión de VSCode (ver
    [`extension/README.md`](../extension/README.md)), o directo contra la API:
    ```bash
    curl -s http://localhost:9099/v1/chat/completions \
