@@ -80,7 +80,6 @@ class Requirement:
     name: str
     version: str | None = None
     line_number: int = 0
-    marker: str | None = None
     skip_reason: str | None = None
 
     @property
@@ -159,7 +158,6 @@ def parse_requirements(text: str) -> list[Requirement]:
         pins = [s.version for s in parsed.specifier if s.operator == "=="]
         # `==1.2.*` no fija una versión: se descarta como pin.
         pins = [p for p in pins if "*" not in p]
-        marker = str(parsed.marker) if parsed.marker else None
 
         if len(pins) != 1:
             specifier = str(parsed.specifier) or "sin especificador"
@@ -168,7 +166,6 @@ def parse_requirements(text: str) -> list[Requirement]:
                     raw_name=parsed.name,
                     name=normalize_name(parsed.name),
                     line_number=number,
-                    marker=marker,
                     skip_reason=f"sin pin exacto ({specifier}): el resolver sólo soporta '=='",
                 )
             )
@@ -180,7 +177,6 @@ def parse_requirements(text: str) -> list[Requirement]:
                 name=normalize_name(parsed.name),
                 version=pins[0],
                 line_number=number,
-                marker=marker,
             )
         )
 

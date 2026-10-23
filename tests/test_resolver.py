@@ -71,7 +71,6 @@ def test_extras_y_markers_se_escanean():
     reqs = parse_requirements('celery[redis]==5.3.0\nurllib3==1.24.1 ; python_version < "3.10"\n')
     assert all(r.is_scannable for r in reqs)
     assert [r.name for r in reqs] == ["celery", "urllib3"]
-    assert reqs[1].marker is not None
 
 
 # ======================================================================
