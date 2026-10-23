@@ -56,6 +56,7 @@ from typing import Generator, Iterator, List, Union
 from pydantic import BaseModel
 
 from common.log import get_logger
+from explain import explain_findings
 from explain.payload import parse_findings
 
 logger = get_logger("DepsExplain")
@@ -124,8 +125,6 @@ class Pipeline:
                 {"error": "El generador no está disponible (revisá LLM_PROVIDER y la API key)."},
                 ensure_ascii=False,
             )
-
-        from explain import explain_findings
 
         logger.info("explicando %d hallazgo(s), findings: %s", len(findings), ", ".join(str(f) for f in findings))
         explicaciones = explain_findings(
