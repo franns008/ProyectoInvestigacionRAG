@@ -48,26 +48,19 @@ interface WireExplanation {
 }
 
 export class ExplainedProvider implements ScanProvider {
-    readonly label: string;
-
     constructor(
         private readonly inner: ScanProvider,
         private readonly options: ExplainOptions,
-    ) {
-        this.label = `${inner.label} + explicaciones`;
-    }
+    ) {}
 
-    async scan(
-        manifestPath: string,
-        token?: { isCancellationRequested: boolean },
-    ): Promise<ScanResult> {
-        const result = await this.inner.scan(manifestPath, token);
+    async scan(manifestPath: string): Promise<ScanResult> {
+        const result = await this.inner.scan(manifestPath);
 
         const targets = firstFindingsByPackage(
             result.findings,
             Math.min(Math.max(this.options.topN, 0), 10),
         );
-        if (targets.length === 0 || token?.isCancellationRequested) {
+        if (targets.length === 0) {
             return result;
         }
 

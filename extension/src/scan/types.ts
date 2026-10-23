@@ -80,10 +80,8 @@ export interface ScanResult {
  * conoce esta interfaz.
  */
 export interface ScanProvider {
-  /** Nombre corto para mostrar al usuario y en los errores. */
-  readonly label: string;
   /** @param manifestPath ruta absoluta al requirements.txt */
-  scan(manifestPath: string, token?: { isCancellationRequested: boolean }): Promise<ScanResult>;
+  scan(manifestPath: string): Promise<ScanResult>;
 }
 
 /** Error con un mensaje pensado para mostrarle al usuario, no para el log. */

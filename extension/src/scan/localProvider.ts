@@ -22,8 +22,6 @@ export interface LocalScannerOptions {
 const TIMEOUT_MS = 60_000;
 
 export class LocalScannerProvider implements ScanProvider {
-  readonly label = "escáner local";
-
   constructor(private readonly options: LocalScannerOptions) {}
 
   async scan(manifestPath: string): Promise<ScanResult> {
