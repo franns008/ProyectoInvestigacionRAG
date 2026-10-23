@@ -47,9 +47,16 @@ embeddings (`qwen3-embedding:4b`) y generación.
 - `src/pipeline/chat/` — contexto del chat de la extensión: separa los hallazgos adjuntos
   que manda como mensaje `system` (`{"findings": [...]}`) y recorta el historial que entra
   al prompt. Lógica pura, se testea sin stack. Ver `docs/arquitectura.md` §4.4.
+- `src/pipeline/common/` — funciones compartidas: `text.py` (texto de mensajes, recorte,
+  advisory), `store.py` (conexión a pgvector/Ollama y `get_document_store()`) y `log.py`.
+  Es un paquete y no se llama `utils`: el server trata cada `.py` de la raíz de
+  `src/pipeline/` como un pipeline, y ya tiene un `utils` propio en `/app`. Los helpers de
+  los runners del eval están aparte, en `eval/runner.py`.
 - `extension/` — extensión de VSCode que muestra el escaneo y un chat en la barra lateral
-  al que se le adjuntan hallazgos (`src/chatView.ts`). Cliente del `deps.cli` hoy,
-  del pipeline RAG cuando exista (`src/scan/types.ts` es el contrato compartido).
+  al que se le adjuntan hallazgos (`src/chatView.ts`). Escanea con el `deps.cli` local y
+  le pide al `:9099` las explicaciones y las respuestas del chat (`src/scan/types.ts` es
+  el contrato compartido). Helpers: `src/util.ts` (sin `vscode`) y `src/webview.ts`
+  (esqueleto del webview y apertura de links).
 - `infrastructure/` — stack Docker Compose. `docker-compose.yml` (base, CPU) +
   `docker-compose.nvidia.yml` (overlay GPU NVIDIA, vía CUDA) +
   `docker-compose.amd.yml` (overlay GPU AMD, vía Vulkan; sólo acelera Ollama).
