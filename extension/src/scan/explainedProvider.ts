@@ -38,6 +38,12 @@ export interface ExplainOptions {
  */
 const DEFAULT_TIMEOUT_MS = 240_000;
 
+/**
+ * Tope de `cibersec.explainTopN`: lo más que acepta el servidor (MAX_FINDINGS en
+ * src/pipeline/explain/payload.py). Si cambia, cambiar los dos.
+ */
+const MAX_EXPLAIN_TOP_N = 10;
+
 /** Recorte del texto del advisory que se manda. El servidor vuelve a recortar. */
 const MAX_TEXT_CHARS = 4_000;
 
@@ -59,7 +65,7 @@ export class ExplainedProvider implements ScanProvider {
 
         const targets = firstFindingsByPackage(
             result.findings,
-            Math.min(Math.max(this.options.topN, 0), 10),
+            Math.min(Math.max(this.options.topN, 0), MAX_EXPLAIN_TOP_N),
         );
         if (targets.length === 0) {
             return result;

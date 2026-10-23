@@ -62,8 +62,8 @@ recomendada, lo que permite comparar rápidamente varias librerías.
 
 Cuando están activadas las explicaciones, la extensión envía al LLM la primera
 vulnerabilidad de cada librería siguiendo el orden de priorización del escaneo. Se explican
-como máximo diez librerías; `cibersec.explainTopN` permite reducir ese número, pero nunca
-ampliarlo por encima de diez.
+tres librerías por defecto: `cibersec.explainTopN` lo cambia, hasta un máximo de diez, que es
+lo que acepta el servidor.
 
 En el chat, **Enter** envía y **Shift+Enter** agrega una línea. Las respuestas se muestran
 con formato markdown (se escapa todo antes, así que el modelo no puede inyectar HTML).
@@ -91,7 +91,7 @@ detecta solo si hay un `.venv` en la raíz del repo.
 | `cibersec.explain` | `true` | Solicita explicaciones al pipeline de dependencias. Si está desactivado, el escaneo sigue funcionando sin prosa del LLM. |
 | `cibersec.explainModel` | `pipeline_dependencias` | Pipeline que redacta las explicaciones. |
 | `cibersec.explainTimeoutSeconds` | `240` | Tiempo máximo de espera para obtener las explicaciones. |
-| `cibersec.explainTopN` | `10` | Cantidad máxima configurable de librerías explicadas. Se toma una vulnerabilidad por librería y el límite absoluto es 10. |
+| `cibersec.explainTopN` | `3` | Cantidad de librerías explicadas. Se toma una vulnerabilidad por librería; el máximo es 10. |
 
 Las rutas relativas se resuelven contra la raíz del workspace.
 

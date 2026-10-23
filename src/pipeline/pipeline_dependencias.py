@@ -70,7 +70,6 @@ class Pipeline:
         llm_model:   str   = DEFAULT_OLLAMA_LLM
         max_tokens:  int   = 220    # 2-3 frases; más que esto es el modelo desobedeciendo
         temperature: float = 0.2    # es un resumen de un texto dado, no escritura creativa
-        top_n:       int   = 3      # cuántas tarjetas se explican
 
     def __init__(self):
         self.name = "Explicación de dependencias vulnerables"
@@ -133,7 +132,6 @@ class Pipeline:
             findings,
             generate=self._generate,
             store=self.store,
-            top_n=self.valves.top_n,
         )
         return json.dumps(
             {"explanations": [e.as_dict() for e in explicaciones]},

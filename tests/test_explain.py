@@ -136,7 +136,7 @@ def test_dos_queries_en_total_sin_importar_cuantos_hallazgos(hallazgo):
     store = FakeStore([CWE_787, CVE_4863])
     tres = [dict(hallazgo, cve=f"CVE-2020-{n}") for n in range(3)]
 
-    explain_findings(tres, generate=repite("texto"), store=store, top_n=3)
+    explain_findings(tres, generate=repite("texto"), store=store)
 
     assert len(store.calls) == 2, "un query por source_type, no uno por hallazgo (N+1)"
 
@@ -205,20 +205,20 @@ def test_las_fuentes_se_recortan(hallazgo):
 # ======================================================================
 # La orquestación
 # ======================================================================
-def test_explica_solo_los_primeros_n(hallazgo):
+def test_explica_todos_los_que_recibe(hallazgo):
     diez = [dict(hallazgo, cve=f"CVE-2020-{n}") for n in range(10)]
     generate = repite("Es un desbordamiento de búfer.")
 
-    explicaciones = explain_findings(diez, generate=generate, store=FakeStore(), top_n=3)
+    explicaciones = explain_findings(diez, generate=generate, store=FakeStore())
 
-    assert len(explicaciones) == 3
-    assert len(generate.prompts) == 3, "una llamada al LLM por hallazgo"
+    assert len(explicaciones) == 10
+    assert len(generate.prompts) == 10, "una llamada al LLM por hallazgo"
 
 
 def test_cada_explicacion_trae_sus_citas(hallazgo):
     store = FakeStore([CWE_787])
     (explicacion,) = explain_findings(
-        [hallazgo], generate=repite("Escribe fuera del búfer."), store=store, top_n=3
+        [hallazgo], generate=repite("Escribe fuera del búfer."), store=store
     )
 
     assert explicacion.identifier == "CVE-2023-4863"
@@ -229,7 +229,7 @@ def test_cada_explicacion_trae_sus_citas(hallazgo):
 def test_el_hallazgo_no_se_modifica(hallazgo):
     """Los campos duros los arma Python; el LLM no puede tocarlos ni por accidente."""
     original = dict(hallazgo)
-    explain_findings([hallazgo], generate=repite("bla"), store=FakeStore(), top_n=3)
+    explain_findings([hallazgo], generate=repite("bla"), store=FakeStore())
     assert hallazgo == original
 
 
@@ -237,12 +237,12 @@ def test_sin_contexto_no_se_explica(hallazgo):
     pelado = dict(hallazgo, summary="", details="", cwe_ids=[], cve=None, osv_ids=["GHSA-x"])
     generate = repite("no debería llamarse")
 
-    assert explain_findings([pelado], generate=generate, store=FakeStore(), top_n=3) == []
+    assert explain_findings([pelado], generate=generate, store=FakeStore()) == []
     assert generate.prompts == [], "sin fuentes no se le pregunta al modelo"
 
 
 def test_la_respuesta_sin_contexto_del_modelo_se_descarta(hallazgo):
-    assert explain_findings([hallazgo], generate=repite(NO_CONTEXT), store=FakeStore(), top_n=3) == []
+    assert explain_findings([hallazgo], generate=repite(NO_CONTEXT), store=FakeStore()) == []
 
 
 def test_una_generacion_que_falla_no_arrastra_a_las_demas(hallazgo):
@@ -255,7 +255,7 @@ def test_una_generacion_que_falla_no_arrastra_a_las_demas(hallazgo):
             raise RuntimeError("429 rate limited")
         return "Permite inyectar HTML en la página."
 
-    explicaciones = explain_findings([hallazgo, otro], generate=generate, store=FakeStore(), top_n=3)
+    explicaciones = explain_findings([hallazgo, otro], generate=generate, store=FakeStore())
 
     assert [e.identifier for e in explicaciones] == ["CVE-2019-11358"]
 
@@ -274,7 +274,7 @@ def test_una_generacion_que_falla_no_arrastra_a_las_demas(hallazgo):
     ],
 )
 def test_la_salida_del_modelo_se_normaliza(hallazgo, crudo, esperado):
-    explicaciones = explain_findings([hallazgo], generate=repite(crudo), store=FakeStore(), top_n=3)
+    explicaciones = explain_findings([hallazgo], generate=repite(crudo), store=FakeStore())
     if esperado is None:
         assert explicaciones == []
     else:
@@ -283,7 +283,7 @@ def test_la_salida_del_modelo_se_normaliza(hallazgo, crudo, esperado):
 
 def test_una_explicacion_larguisima_se_corta_en_una_frase(hallazgo):
     largo = "Es un desbordamiento. " * 200
-    (explicacion,) = explain_findings([hallazgo], generate=repite(largo), store=FakeStore(), top_n=3)
+    (explicacion,) = explain_findings([hallazgo], generate=repite(largo), store=FakeStore())
 
     assert len(explicacion.explanation) <= 700
     assert explicacion.explanation.endswith(".")

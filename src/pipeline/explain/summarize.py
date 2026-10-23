@@ -27,8 +27,6 @@ from .prompt import build_context, build_prompt
 
 logger = logging.getLogger("DepsExplain")
 
-DEFAULT_TOP_N = 3
-
 # Lo que el modelo tiene que responder cuando las fuentes no alcanzan (ver PROMPT_TEMPLATE).
 NO_CONTEXT = "SIN CONTEXTO"
 
@@ -65,9 +63,9 @@ def explain_findings(
     *,
     generate: Callable[[str], str],
     store: Any = None,
-    top_n: int = DEFAULT_TOP_N,
 ) -> list[Explanation]:
-    """Explica los primeros `top_n` hallazgos.
+    """Explica todos los hallazgos recibidos. Cuántos son lo decide la extensión
+    (`cibersec.explainTopN`); el tope defensivo lo pone `payload.parse_findings`.
 
     `generate` y `store` se inyectan: este módulo no sabe de Haystack ni de pgvector, y
     por eso se testea con dobles sin levantar nada.
@@ -75,7 +73,7 @@ def explain_findings(
     Sólo se devuelven los hallazgos que efectivamente tienen explicación. Uno sin contexto
     —o cuya generación falló— simplemente no aparece, y su tarjeta se renderiza como hoy.
     """
-    seleccionados = list(findings)[: max(top_n, 0)]
+    seleccionados = list(findings)
     if not seleccionados:
         return []
 

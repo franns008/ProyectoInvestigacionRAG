@@ -173,7 +173,7 @@ function buildProvider(
     return new ExplainedProvider(local, {
         ...serverOptions(config),
         model: config.get<string>('explainModel', 'pipeline_dependencias'),
-        topN: config.get<number>('explainTopN', 10),
+        topN: config.get<number>('explainTopN', 3),
         timeoutMs: config.get<number>('explainTimeoutSeconds', 240) * 1000,
     });
 }

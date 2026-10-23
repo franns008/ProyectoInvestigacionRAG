@@ -10,8 +10,13 @@ usuario, así que una entrada mala devuelve un mensaje legible, nunca una excepc
 from __future__ import annotations
 
 import json
+import logging
 
-# Tope defensivo: la extensión manda 3, pero la entrada viene de afuera del proceso.
+logger = logging.getLogger("DepsExplain")
+
+# Tope defensivo: cuántos hallazgos se explican lo decide la extensión, pero la entrada
+# viene de afuera del proceso. La extensión limita su ajuste a este mismo número
+# (MAX_EXPLAIN_TOP_N en extension/src/scan/explainedProvider.ts): si cambia, cambiar los dos.
 MAX_FINDINGS = 10
 
 
@@ -31,4 +36,6 @@ def parse_findings(user_message: str) -> list[dict]:
     if not all(isinstance(f, dict) for f in findings):
         raise ValueError("Cada hallazgo tiene que ser un objeto JSON.")
 
+    if len(findings) > MAX_FINDINGS:
+        logger.warning("llegaron %d hallazgos, se explican los primeros %d", len(findings), MAX_FINDINGS)
     return findings[:MAX_FINDINGS]
