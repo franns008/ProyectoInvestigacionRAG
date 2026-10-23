@@ -103,22 +103,28 @@ def _fetch_window(api_key: str | None, run_dir: Path, page_counter: list[int],
     return fetched
 
 
+def _fetch_range(api_key: str | None, run_dir: Path, page_counter: list[int],
+                 start: datetime | None, end: datetime, date_param: str,
+                 url: str = BASE_URL) -> int:
+    """Una consulta sin fechas si `start` es None; si no, una por ventana de `date_param`
+    (`lastMod` o `pub`) entre `start` y `end`."""
+    if start is None:
+        return _fetch_window(api_key, run_dir, page_counter, url=url)
+    total = 0
+    for window_start, window_end in _date_windows(start, end):
+        total += _fetch_window(api_key, run_dir, page_counter, {
+            f"{date_param}StartDate": window_start.strftime(DATE_FMT),
+            f"{date_param}EndDate": window_end.strftime(DATE_FMT),
+        }, url=url)
+    return total
+
+
 def fetch_cves(api_key: str | None, last_mod_start: str | None, run_start_dt: datetime) -> int:
     run_dir = RAW_DIR / run_start_dt.strftime("%Y%m%dT%H%M%SZ")
     run_dir.mkdir(parents=True, exist_ok=True)
-    page_counter = [0]
-
-    if last_mod_start is None:
-        return _fetch_window(api_key, run_dir, page_counter)
-
-    start_dt = datetime.strptime(last_mod_start, DATE_FMT).replace(tzinfo=timezone.utc)
-    total = 0
-    for window_start, window_end in _date_windows(start_dt, run_start_dt):
-        total += _fetch_window(api_key, run_dir, page_counter, {
-            "lastModStartDate": window_start.strftime(DATE_FMT),
-            "lastModEndDate": window_end.strftime(DATE_FMT),
-        })
-    return total
+    start_dt = (datetime.strptime(last_mod_start, DATE_FMT).replace(tzinfo=timezone.utc)
+                if last_mod_start is not None else None)
+    return _fetch_range(api_key, run_dir, [0], start_dt, run_start_dt, "lastMod")
 
 
 def fetch_sample(kev: bool, since: str | None) -> Result:
@@ -137,21 +143,12 @@ def fetch_sample(kev: bool, since: str | None) -> Result:
                                        f"since-{since}" if since else "") if part)
     run_dir = RAW_DIR / f"{run_start_dt.strftime('%Y%m%dT%H%M%SZ')}_{label}"
     run_dir.mkdir(parents=True, exist_ok=True)
-    page_counter = [0]
     # `hasKev` es un flag sin valor: va en la URL porque `params` le agregaría un "=".
     url = f"{BASE_URL}?hasKev" if kev else BASE_URL
     print(f"[{SOURCE}] iniciando muestra {label} (sin checkpoint)")
 
-    if since is None:
-        total = _fetch_window(api_key, run_dir, page_counter, url=url)
-    else:
-        since_dt = datetime.strptime(since, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-        total = 0
-        for window_start, window_end in _date_windows(since_dt, run_start_dt):
-            total += _fetch_window(api_key, run_dir, page_counter, {
-                "pubStartDate": window_start.strftime(DATE_FMT),
-                "pubEndDate": window_end.strftime(DATE_FMT),
-            }, url=url)
+    since_dt = datetime.strptime(since, "%Y-%m-%d").replace(tzinfo=timezone.utc) if since is not None else None
+    total = _fetch_range(api_key, run_dir, [0], since_dt, run_start_dt, "pub", url=url)
 
     detail = f"{total} CVEs -> {run_dir.relative_to(REPO_ROOT)}"
     print(f"[{SOURCE}] {NUEVO}: {detail}")
