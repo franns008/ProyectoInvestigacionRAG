@@ -254,10 +254,10 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
         ? `La respuesta parece cortada por el límite de largo (≈${estimateTokens(answer)} de ${maxTokens} tokens).`
         : undefined;
     this.history.push({ role: "assistant", content: answer });
-    const html = renderMarkdown(answer) + (truncation ? renderTruncation(truncation, false) : "") + renderCitedIds(answer, findings);
-    this.transcript.push({ role: "assistant", html });
-    const live = renderMarkdown(answer) + (truncation ? renderTruncation(truncation, true) : "") + renderCitedIds(answer, findings);
-    void this.view?.webview.postMessage({ type: "answer", html: live });
+    const answerHtml = (live: boolean) =>
+      renderMarkdown(answer) + (truncation ? renderTruncation(truncation, live) : "") + renderCitedIds(answer, findings);
+    this.transcript.push({ role: "assistant", html: answerHtml(false) });
+    void this.view?.webview.postMessage({ type: "answer", html: answerHtml(true) });
     void this.loadLimits();
   };
 
