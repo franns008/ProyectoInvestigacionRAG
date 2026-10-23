@@ -1,6 +1,6 @@
 # Unificación de la ingesta de NVD
 
-**Estado:** propuesto, sin aplicar · **Fecha:** 2026-09-06 · **Rama base:** `main` (`015bb2f`)
+**Estado:** Fase 2 aplicada (`f699c2b`, 2026-10-22); resto propuesto, sin aplicar · **Fecha:** 2026-09-06 · **Rama base:** `main` (`015bb2f`)
 
 ## Resumen
 
