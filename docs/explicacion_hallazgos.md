@@ -184,12 +184,8 @@ corpus no tiene el CWE" cuando sí lo tiene.
 Es el bug más probable de toda esta integración. Normalización en un solo lugar
 (`_cwe_key("CWE-787") -> 787`) y un test dedicado.
 
-> Segunda asimetría, para no tropezarse después:
-> [`index_nvd.py`](../src/ingestion/index_nvd.py) escribe `cwe_ids` como lista de strings
-> `"CWE-787"`, y `converters.py` escribe el `cwe_id` pelado como int. Son dos indexadores
-> distintos sobre la misma tabla. Como el filtro se hace por `cwe_id` (el del converter que
-> corre en la indexación real), alcanza con normalizar a int; queda anotado que hay que
-> unificarlo cuando se toque la indexación.
+> El único indexador es `converters.py`, que escribe el `cwe_id` pelado como int: el filtro
+> por `cwe_id` alcanza con normalizar a int.
 
 ## Degradación en cascada del contexto
 
@@ -294,11 +290,6 @@ Distinto al del chat: no responde una pregunta, resume un hallazgo concreto.
 - **El advisory de OSV no está indexado** (era la Fase 3, paso 8). Por eso el nivel 3 se lee
   del `Finding` y no del store. Cuando se indexe, pasa a ser un lookup más y el código no
   cambia de forma.
-- La inconsistencia de dimensión de embeddings entre
-  [`pipeline_ciberseguridad.py`](../src/pipeline/pipeline_ciberseguridad.py) (2560,
-  `qwen3-embedding:4b`) e [`index_nvd.py`](../src/ingestion/index_nvd.py) (1024, `bge-m3`)
-  **no afecta este camino**: acá no se embebe nada. Es un argumento a favor del lookup por
-  clave — funciona incluso mientras eso está sin resolver.
 
 ## Plan de implementación
 
