@@ -8,7 +8,8 @@
  *
  * - Lo que es valve (ventana, tope de respuesta, documentos, historial) se lee del
  *   pipeline en vivo (`PipelineLimits`, vía `GET /<pipeline>/valves`), así que sigue a
- *   los cambios de valves en el servidor.
+ *   los cambios de valves en el servidor. La ventana es la efectiva
+ *   (`effective_num_ctx`): `LLM_NUM_CTX` en el servidor le gana al valve `num_ctx`.
  * - Lo que son constantes de módulo del pipeline (el reparto de advisories de
  *   src/pipeline/chat/context.py, el largo de PROMPT_TEMPLATE, el tamaño de chunk) está
  *   copiado acá abajo. Si cambian allá, hay que cambiarlos acá. Pendiente: que el
@@ -22,7 +23,7 @@ const CHARS_PER_TOKEN = 3.5;
 
 /** Los valves de pipeline_ciberseguridad que deciden el tamaño del prompt (docs/arquitectura.md §4.3). */
 export interface PipelineLimits {
-  /** Ventana de Ollama: prompt y respuesta la comparten. */
+  /** Ventana de Ollama: prompt y respuesta la comparten. Sale de `effective_num_ctx`. */
   num_ctx: number;
   /** Tope de largo de la respuesta. */
   max_tokens: number;
@@ -41,14 +42,22 @@ export const DEFAULT_LIMITS: PipelineLimits = {
   history_max_chars: 600,
 };
 
+function isCount(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0;
+}
+
 /** Toma de la respuesta de `/valves` sólo los números válidos; el resto queda en su default. */
 export function parseLimits(valves: unknown): PipelineLimits {
   const source = (valves ?? {}) as Record<string, unknown>;
   const limits = { ...DEFAULT_LIMITS };
   for (const key of Object.keys(limits) as (keyof PipelineLimits)[]) {
     const value = source[key];
-    if (typeof value === "number" && Number.isFinite(value) && value >= 0) limits[key] = value;
+    if (isCount(value)) limits[key] = value;
   }
+  // La ventana con la que corre el generador, ya resuelta por el pipeline (campo de sólo
+  // lectura de los valves). El valve `num_ctx` queda sólo para un servidor que no la publique.
+  const effective = source.effective_num_ctx;
+  if (isCount(effective) && effective > 0) limits.num_ctx = effective;
   return limits;
 }
 

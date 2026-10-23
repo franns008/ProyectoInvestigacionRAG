@@ -182,10 +182,11 @@ Una conversación de dos turnos con un hallazgo adjunto usa ~900 tokens de promp
 de `num_ctx`.
 
 **Medidor de contexto de la extensión.** Junto al botón de enviar, un anillo con tooltip
-estima cuánto de `num_ctx` ocupa lo que el chat tiene cargado ahora: adjuntos, historial y,
+estima cuánto de la ventana ocupa lo que el chat tiene cargado ahora: adjuntos, historial y,
 desde la primera pregunta, instrucciones y documentos (`extension/src/contextMeter.ts`).
 Es el estado actual: no suma lo que se está escribiendo ni lo reservado para la respuesta.
-Los valves que deciden el tamaño del prompt (`num_ctx`, `max_tokens`, `ranker_top_k`,
+La ventana es la efectiva (`effective_num_ctx`, §4.2), así que sigue a `LLM_NUM_CTX`.
+Los valves que deciden el tamaño del prompt (`effective_num_ctx`, `max_tokens`, `ranker_top_k`,
 `history_max_messages`, `history_max_chars`) los lee en vivo de `GET
 /pipeline_ciberseguridad/valves` del servidor de Pipelines: al abrir la vista, al cambiar
 la configuración y tras cada respuesta. `max_tokens` también sirve para inferir si una
