@@ -569,26 +569,15 @@ class Pipeline:
         n_docs = len(result.get("ranker", {}).get("documents", []))
         meta_list = result.get("llm", {}).get("meta") or []
         meta = meta_list[0] if meta_list else {}
-
-        prompt_tokens = completion_tokens = total_tokens = None
-        usage = meta.get("usage")
-        if isinstance(usage, dict):
-            prompt_tokens     = usage.get("prompt_tokens")
-            completion_tokens = usage.get("completion_tokens")
-            total_tokens      = usage.get("total_tokens")
-        else:
-            prompt_tokens     = meta.get("prompt_eval_count")
-            completion_tokens = meta.get("eval_count")
-
-        if total_tokens is None and (prompt_tokens is not None or completion_tokens is not None):
-            total_tokens = (prompt_tokens or 0) + (completion_tokens or 0)
+        # OllamaGenerator ya convierte los contadores de Ollama al formato `usage` de OpenAI.
+        usage = meta.get("usage") or {}
+        model = meta.get("model", "desconocido")
 
         log.info(f"[TOKENS] docs_al_prompt={n_docs} | prompt_chars={len(prompt)} | prompt_words={len(prompt.split())}")
-        if prompt_tokens is None and completion_tokens is None:
-            model = meta.get("model", "desconocido")
+        if not usage:
             log.info(f"[TOKENS] uso no reportado por el generador (model={model}).")
         else:
-            log.info(f"[TOKENS] prompt={prompt_tokens} | completion={completion_tokens} | total={total_tokens} | model={meta.get('model', 'desconocido')}")
+            log.info(f"[TOKENS] prompt={usage.get('prompt_tokens')} | completion={usage.get('completion_tokens')} | total={usage.get('total_tokens')} | model={model}")
 
     def _log_retrieved_docs(self, log: logging.LoggerAdapter, result: dict) -> None:
         # Una línea por documento: con saltos de línea las continuaciones quedan
