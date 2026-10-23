@@ -31,27 +31,24 @@ ciberseguridad. Todo el cómputo ocurre dentro de Docker:
                           ┌──────────────────────────────────────────────┐
                           │                 Docker host                  │
                           │                                              │
-   Usuario ──HTTP──▶ ┌────┴──────────┐        ┌──────────────────────┐   │
-   (navegador)       │  open-webui   │──────▶ │      pipelines       │   │
-                     │  (frontend)   │ OpenAI │ (OpenWebUI Pipelines │   │
-                     │  :8180        │  API   │  + Haystack RAG      │   │
-                     └────┬──────────┘ compat │  + reranker en CPU)  │   │
-                          │                   │  :9099               │   │
-                          │                   └───┬───────────┬──────┘   │
-                          │                       │           │          │
-                          │   embeddings +        │           │ retrieval│
-                          │   generación          ▼           ▼          │
+   Extensión VSCode ──────┼─HTTP (API OpenAI compat)─▶┌────────────────┐ │
+   (chat + escaneo)       │                           │   pipelines    │ │
+                          │                           │ (OpenWebUI     │ │
+                          │                           │  Pipelines +   │ │
+                          │                           │  Haystack RAG +│ │
+                          │                           │  reranker CPU) │ │
+                          │                           │  :9099         │ │
+                          │                           └──┬──────────┬──┘ │
+                          │                              │          │    │
+                          │                  embeddings +│          │    │
+                          │                    generación│ retrieval│    │
+                          │                              ▼          ▼    │
                           │              ┌────────────────┐  ┌─────────┐ │
                           │              │     ollama     │  │   vdb   │ │
                           │              │ qwen3-embedding│  │pgvector │ │
                           │              │ + LLM de gen.  │  │ :5433   │ │
                           │              │ :11434         │  └─────────┘ │
                           │              └────────────────┘              │
-                          │                                              │
-                          │  ┌──────────┐                                │
-                          │  │   db     │  (postgres para OpenWebUI)     │
-                          │  │ :5432    │                                │
-                          │  └──────────┘                                │
                           └──────────────────────────────────────────────┘
 ```
 
@@ -59,11 +56,9 @@ ciberseguridad. Todo el cómputo ocurre dentro de Docker:
 
 | Servicio     | Imagen                         | Rol                                                        | Puerto |
 |--------------|--------------------------------|------------------------------------------------------------|--------|
-| `open-webui` | `ghcr.io/open-webui/open-webui`| Frontend tipo ChatGPT; habla con `pipelines` vía API OpenAI| 8180   |
 | `pipelines`  | build de `Dockerfile.pipelines`| Servidor OpenWebUI Pipelines que hostea el RAG en Haystack | 9099   |
 | `ollama`     | `ollama/ollama`                | Embeddings **y** generación, ambos locales                 | 11434  |
 | `vdb`        | `ankane/pgvector`              | Base vectorial (documentos + embeddings)                  | 5433   |
-| `db`         | `postgres:15-alpine`           | Persistencia interna de OpenWebUI                         | 5432   |
 
 ## 4. El pipeline RAG (Haystack)
 
