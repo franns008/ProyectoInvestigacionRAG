@@ -43,6 +43,7 @@ if _PIPELINES_DIR not in sys.path:
     sys.path.insert(0, _PIPELINES_DIR)
 
 from chat import extract_findings_context, findings_vuln_ids, format_findings, select_history
+from common.store import OLLAMA_URL, get_document_store
 from common.text import message_text
 
 # Configurar el logger específico para nuestra app
@@ -57,7 +58,6 @@ if not logger.handlers:
     logger.addHandler(file_handler)
 
 from haystack import Pipeline as HaystackPipeline, Document, component
-from haystack.utils import Secret
 from haystack_integrations.document_stores.pgvector import PgvectorDocumentStore
 from haystack_integrations.components.retrievers.pgvector import (
     PgvectorEmbeddingRetriever,
@@ -69,12 +69,7 @@ from haystack.components.rankers import SentenceTransformersSimilarityRanker
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
 from haystack_integrations.components.generators.ollama import OllamaGenerator
 
-# --- Configuración fija de infraestructura ---
-DB_CONNECTION       = "postgresql://avdbuser:avdbpass@vdb:5432/pgvdb"
-OLLAMA_URL          = "http://ollama:11434"
-DB_TABLE            = "ciberseguridad_docs"
-EMBEDDING_DIMENSION = 2560  # nativa de qwen3-embedding:4b (sin truncar vía MRL)
-DEFAULT_OLLAMA_LLM  = "qwen2.5:3b-instruct"
+DEFAULT_OLLAMA_LLM = "qwen2.5:3b-instruct"
 
 _WARM_UP_LOCK = threading.Lock()
 
@@ -318,23 +313,6 @@ class VulnIdLookup:
 # ======================================================================
 # Motor RAG
 # ======================================================================
-def get_document_store(
-    table_name: str = DB_TABLE,
-    keyword_index_name: str = "ciberseguridad_keyword_index",
-) -> PgvectorDocumentStore:
-    """`table_name`/`keyword_index_name` son overrideables para instanciar stores
-    paralelos (p. ej. un experimento de chunking en una tabla
-    `ciberseguridad_docs_chunk_<estrategia>`) sin tocar la tabla de producción.
-    Los defaults reproducen exactamente el store de producción. Ver
-    docs/data_splitting.md y src/pipeline/eval/run_chunking_experiment.py.
-    """
-    return PgvectorDocumentStore(
-        connection_string=Secret.from_token(DB_CONNECTION),
-        embedding_dimension=EMBEDDING_DIMENSION,
-        table_name=table_name,
-        keyword_index_name=keyword_index_name,
-    )
-
 def build_generator(valves):
     """La generación corre siempre en el Ollama local (ver docs/arquitectura.md).
 

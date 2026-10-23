@@ -11,6 +11,7 @@ Se encarga de:
 import logging
 import os
 import re
+import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import islice
@@ -20,12 +21,10 @@ import psycopg
 
 from haystack import Document
 from haystack.dataclasses import ByteStream
-from haystack.utils import Secret
 from haystack.components.preprocessors import DocumentSplitter
 from haystack.components.converters import (
     DOCXToDocument, MarkdownToDocument, TextFileToDocument
 )
-from haystack_integrations.document_stores.pgvector import PgvectorDocumentStore
 from haystack_integrations.components.embedders.ollama import OllamaDocumentEmbedder
 from haystack.document_stores.types import DuplicatePolicy
 
@@ -39,11 +38,14 @@ try:
 except ImportError:  # ejecutado como script: no hay paquete padre
     from converters import XMLCWEConverter, NVDJsonConverter
 
+# Ejecutado como script, sys.path sólo tiene indexing/: `common` vive un nivel arriba.
+_PIPELINES_DIR = str(Path(__file__).resolve().parents[1])
+if _PIPELINES_DIR not in sys.path:
+    sys.path.insert(0, _PIPELINES_DIR)
+
+from common.store import DB_CONNECTION, DB_TABLE, OLLAMA_URL, get_document_store  # noqa: E402
+
 # --- Configuración ---
-DB_CONNECTION       = "postgresql://avdbuser:avdbpass@vdb:5432/pgvdb"
-OLLAMA_URL          = "http://ollama:11434"
-DB_TABLE            = "ciberseguridad_docs"
-EMBEDDING_DIMENSION = 2560  # nativa de qwen3-embedding:4b (sin truncar vía MRL)
 INPUT_DIR           = Path("/app/pipelines/rawdata")
 CONVERTED_DIR       = INPUT_DIR / "_converted_md"
 
@@ -142,12 +144,7 @@ class Indexer:
         # local en CPU domina el tiempo de indexación (~20 min) sin aportar a las
         # preguntas de CWE/guías. Activar con --include-cve cuando se los quiera indexar.
         self.include_cve = include_cve
-        self.store = PgvectorDocumentStore(
-            connection_string=Secret.from_token(DB_CONNECTION),
-            embedding_dimension=EMBEDDING_DIMENSION,
-            table_name=DB_TABLE,
-            keyword_index_name="ciberseguridad_keyword_index",
-        )
+        self.store = get_document_store()
         self._marker_converter = None
         self._marker_load_failed = False
 
