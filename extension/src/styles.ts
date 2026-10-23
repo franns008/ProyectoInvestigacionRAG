@@ -204,12 +204,6 @@ export const BASE_STYLES = `
   }
   .button:hover { background: var(--vscode-button-hoverBackground); }
   .button:disabled { opacity: .5; cursor: default; }
-  .button.secondary {
-    color: var(--vscode-button-secondaryForeground);
-    background: var(--vscode-button-secondaryBackground);
-    border-color: transparent;
-  }
-  .button.secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
   /* Para acciones que se repiten en cada ítem: presentes, sin competir con el contenido. */
   .button.quiet {
     color: var(--vscode-foreground);
