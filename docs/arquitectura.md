@@ -117,6 +117,8 @@ OllamaGenerator(
 - La ventana efectiva sale en `GET /pipeline_ciberseguridad/valves` como
   `effective_num_ctx`. Es de sólo lectura: no aparece en el schema de edición y el
   servidor la ignora al restaurar `valves.json`. La usa el medidor de contexto (§4.4).
+- Detalle, cómo fijar la ventana para otro modelo y cómo verificarla:
+  [`ventana_contexto_llm.md`](ventana_contexto_llm.md).
 
 ### 4.3 Valves (parámetros ajustables en caliente)
 

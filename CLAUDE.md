@@ -29,6 +29,9 @@ embeddings (`qwen3-embedding:4b`) y generación.
 - [`docs/chat_proximos_pasos.md`](docs/chat_proximos_pasos.md) — próximos pasos del chat de
   la extensión (propuesto): que el LLM cargue los hallazgos a demanda y que el contexto se
   arme según la ventana del modelo.
+- [`docs/ventana_contexto_llm.md`](docs/ventana_contexto_llm.md) — ventana de contexto
+  del LLM: `LLM_NUM_CTX` y el valve `num_ctx` (0 = la del Modelfile), cómo fijarla para el
+  modelo local de cada uno y `effective_num_ctx`, que es lo que lee el medidor de la extensión.
 - [`docs/reranker_cross_encoder.md`](docs/reranker_cross_encoder.md) — reranker cross-encoder
   (`bge-reranker-v2-m3`) tras el retrieval híbrido: retrieve-and-rerank, implicancias (modelo
   local en CPU, latencia) y cambios en pipeline/Dockerfile/eval.

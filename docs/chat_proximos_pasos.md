@@ -25,6 +25,11 @@
    - repartir el resto con prioridad: pregunta y reglas > hallazgos > documentos
      (`ranker_top_k` hasta 2) > historial viejo. Un adjunto nunca se descarta en silencio.
 
+   **Ya hecho:** el pipeline publica la ventana con la que corre de verdad
+   (`effective_num_ctx` en `GET /valves`, con `LLM_NUM_CTX` y el Modelfile resueltos) y el
+   medidor la usa. Ver [`ventana_contexto_llm.md`](ventana_contexto_llm.md). Falta todo lo
+   de arriba: derivar `max_tokens` y repartir el prompt según esa ventana.
+
    La lógica iría pura en `src/pipeline/chat/budget.py`, con tests de pytest. El resultado,
    límites y `max_attachments`, lo publica la consulta de info del pendiente de §4.4 en `arquitectura.md`, y la
    extensión reemplaza `MAX_ATTACHMENTS` y las constantes copiadas de `contextMeter.ts`.
