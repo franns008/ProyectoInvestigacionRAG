@@ -567,7 +567,6 @@ class Pipeline:
             yield event
 
     def _log_token_usage(self, log: logging.LoggerAdapter, result: dict) -> None:
-        sep = "-" * 60
         prompt = result.get("prompt_builder", {}).get("prompt") or ""
         n_docs = len(result.get("ranker", {}).get("documents", []))
         meta_list = result.get("llm", {}).get("meta") or []
