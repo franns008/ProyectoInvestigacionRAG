@@ -27,10 +27,7 @@ services:
             context: ..
             dockerfile: infrastructure/Dockerfile.pipelines
         restart: unless-stopped
-        env_file:
-            - env/pipelines.env
         environment:
-            PG_CONN_STR: postgresql://${PGVECTOR_USR:-avdbuser}:${PGVECTOR_PASS:-avdbpass}@vdb/pgvdb?sslmode=disable
             TORCH_DEVICE: cpu
             # Modelo de generación en el Ollama local. Vacío = el default del
             # pipeline (DEFAULT_OLLAMA_LLM). Ver docs/arquitectura.md.
