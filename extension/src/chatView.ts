@@ -90,7 +90,7 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
    * Lee los valves del pipeline (`GET /<pipeline>/valves` del servidor de Pipelines) para
    * que el medidor use la misma ventana y los mismos topes que el prompt real. Se relee
    * al abrir la vista, al cambiar la configuración y después de cada respuesta, así sigue
-   * a los cambios hechos desde OpenWebUI. Si falla, quedan los últimos valores leídos.
+   * a los cambios de valves en el servidor. Si falla, quedan los últimos valores leídos.
    */
   async loadLimits(): Promise<void> {
     const { url, model, apiKey } = this.options();

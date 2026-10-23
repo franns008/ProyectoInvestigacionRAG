@@ -8,7 +8,7 @@
  *
  * - Lo que es valve (ventana, tope de respuesta, documentos, historial) se lee del
  *   pipeline en vivo (`PipelineLimits`, vía `GET /<pipeline>/valves`), así que sigue a
- *   los cambios hechos desde OpenWebUI.
+ *   los cambios de valves en el servidor.
  * - Lo que son constantes de módulo del pipeline (el reparto de advisories de
  *   src/pipeline/chat/context.py, el largo de PROMPT_TEMPLATE, el tamaño de chunk) está
  *   copiado acá abajo. Si cambian allá, hay que cambiarlos acá. Pendiente: que el
