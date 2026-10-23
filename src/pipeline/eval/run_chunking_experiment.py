@@ -36,8 +36,6 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-import yaml
-
 EVAL_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(EVAL_DIR.parent))
 
@@ -45,6 +43,7 @@ import pipeline_ciberseguridad as rag  # noqa: E402
 import chunking_strategies as cstrat  # noqa: E402
 import metrics as m  # noqa: E402
 import run_eval as re_  # noqa: E402
+from runner import load_dataset  # noqa: E402
 from haystack import Document  # noqa: E402
 from haystack.components.converters import (  # noqa: E402
     DOCXToDocument, MarkdownToDocument, TextFileToDocument,
@@ -242,7 +241,7 @@ def main() -> None:
         ap.error(f"estrategias desconocidas: {unknown}. Disponibles: {list(cstrat.STRATEGIES)}")
 
     args.out.mkdir(parents=True, exist_ok=True)
-    dataset = yaml.safe_load(args.dataset.read_text(encoding="utf-8"))
+    dataset = load_dataset(args.dataset)
     if args.limit:
         dataset = dataset[: args.limit]
 
