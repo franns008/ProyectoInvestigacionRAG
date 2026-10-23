@@ -292,8 +292,14 @@ cd infrastructure
    > Si configuraste otro `LLM_MODEL` en el `.env`, descargá **ese** en vez de
    > `qwen2.5:3b-instruct`.
 
-4. **Usar el RAG**: abrí OpenWebUI en `http://localhost:8180` y elegí el modelo
-   *"RAG ciberseguridad"* en el selector.
+4. **Usar el RAG**: desde el chat de la extensión de VSCode (ver
+   [`extension/README.md`](../extension/README.md)), o directo contra la API:
+   ```bash
+   curl -s http://localhost:9099/v1/chat/completions \
+     -H "Authorization: Bearer 0p3n-w3bui" -H "Content-Type: application/json" \
+     -d '{"model": "pipeline_ciberseguridad", "stream": false,
+          "messages": [{"role": "user", "content": "¿Qué es CWE-79?"}]}'
+   ```
 
 ### 7.2 Operación
 
@@ -310,7 +316,8 @@ cd infrastructure
 >   que repetirlo salvo que borres el volumen.
 > - `ollama` sin GPU funciona, pero la generación es lenta. Si no tenés GPU, usá un
 >   modelo chico vía `LLM_MODEL`.
-> - Si `8180` está ocupado, cambiá `OWEBUI_PORT` en `.env` (ver puertos opcionales).
+> - Si `9099` está ocupado, cambiá `PIPELINES_PORT` en `.env` (ver puertos opcionales)
+>   y `cibersec.ragUrl` en la extensión.
 
 ### 7.3 Troubleshooting
 
