@@ -153,8 +153,8 @@ messages = [
 
 - **Los hallazgos van como `system`**, no como `user`: son el tema de la charla, no algo
   que dijo el usuario. Sin adjuntos no se manda el `system` y es un chat común.
-  `extract_findings_context` los separa (sin repetidos; también acepta la forma vieja,
-  un hallazgo suelto en el `system`) y `format_findings` los pasa a líneas con etiqueta,
+  `extract_findings_context` los separa (sin repetidos) y `format_findings` los pasa a
+  líneas con etiqueta,
   numeradas si son varios, más fáciles de leer para un modelo chico que un JSON. Entran
   al prompt en *"Vulnerabilities under discussion"*. Con varios adjuntos el advisory de
   cada uno se recorta más, repartiendo un presupuesto fijo; la extensión admite hasta 6.
