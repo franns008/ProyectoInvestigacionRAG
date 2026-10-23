@@ -173,7 +173,6 @@ function merge(findings: Finding[], explanations: WireExplanation[]): void {
     }
 }
 
-/** Mismo criterio que `Vulnerability.identifier` en Python: el CVE si existe, si no el OSV. */
 /**
  * Un timeout y un servidor caído se ven igual en el `catch` (`TimeoutError` vs
  * `TypeError: fetch failed`) y se arreglan distinto. Vale la pena distinguirlos.
