@@ -51,19 +51,14 @@ if _PIPELINES_DIR not in sys.path:
     sys.path.insert(0, _PIPELINES_DIR)
 
 import json
-import logging
 from typing import Generator, Iterator, List, Union
 
 from pydantic import BaseModel
 
+from common.log import get_logger
 from explain.payload import parse_findings
 
-logger = logging.getLogger("DepsExplain")
-logger.setLevel(logging.INFO)
-if not logger.handlers:
-    handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - [%(name)s] - %(message)s"))
-    logger.addHandler(handler)
+logger = get_logger("DepsExplain")
 
 
 class Pipeline:

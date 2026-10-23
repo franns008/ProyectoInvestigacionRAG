@@ -43,19 +43,11 @@ if _PIPELINES_DIR not in sys.path:
     sys.path.insert(0, _PIPELINES_DIR)
 
 from chat import extract_findings_context, findings_vuln_ids, format_findings, select_history
+from common.log import get_logger
 from common.store import OLLAMA_URL, get_document_store
 from common.text import message_text
 
-# Configurar el logger específico para nuestra app
-logger = logging.getLogger("HaystackRAG_Query")
-logger.setLevel(logging.INFO)
-logger.propagate = False
-
-if not logger.handlers:
-    file_handler = logging.FileHandler('/app/pipelines/logCiberseguridad.txt')
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - [%(name)s] - %(message)s')
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+logger = get_logger("HaystackRAG_Query", file="/app/pipelines/logCiberseguridad.txt", propagate=False)
 
 from haystack import Pipeline as HaystackPipeline, Document, component
 from haystack_integrations.document_stores.pgvector import PgvectorDocumentStore

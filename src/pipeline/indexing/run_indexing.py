@@ -8,7 +8,6 @@ Se encarga de:
 5. Guardarlos en PostgreSQL.
 """
 
-import logging
 import os
 import re
 import sys
@@ -43,6 +42,7 @@ _PIPELINES_DIR = str(Path(__file__).resolve().parents[1])
 if _PIPELINES_DIR not in sys.path:
     sys.path.insert(0, _PIPELINES_DIR)
 
+from common.log import get_logger  # noqa: E402
 from common.store import DB_CONNECTION, DB_TABLE, OLLAMA_URL, get_document_store  # noqa: E402
 
 # --- Configuración ---
@@ -76,13 +76,7 @@ EMBED_TIMEOUT_SECONDS = _env_int("EMBED_TIMEOUT_SECONDS", 120)
 EMBED_NUM_CTX       = _env_int("EMBED_NUM_CTX", None)
 
 # --- Logger ---
-logger = logging.getLogger("IndexingRAG")
-logger.setLevel(logging.INFO)
-if not logger.handlers:
-    ch = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - [%(name)s] - %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
+logger = get_logger("IndexingRAG")
 
 def _chunk_key(doc: Document) -> tuple[str, str] | None:
     """Clave de un chunk. `split_id` se normaliza a texto porque de la BD vuelve
