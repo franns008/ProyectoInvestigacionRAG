@@ -35,22 +35,6 @@ services:
         volumes:
             - pgv_data:/var/lib/postgresql/data
 
-    open-webui:
-        image: 'ghcr.io/open-webui/open-webui:latest'
-        restart: unless-stopped
-        env_file:
-            - env/openwebui.env
-        environment:
-            DATABASE_URL: postgresql://${DATABASE_USER:-owui}:${DATABASE_PASS:-owui}@db/owebuidb?sslmode=disable
-            PGVECTOR_DB_URL: postgresql://${PGVECTOR_USR:-avdbuser}:${PGVECTOR_PASS:-avdbpass}@vdb/pgvdb?sslmode=disable
-            OPENAI_API_BASE_URL: http://pipelines:9099
-            OPENAI_API_KEY: ${PIPESERVER_KEY:-0p3n-w3bui}
-        depends_on:
-            - db
-            - vdb
-        ports:
-            - "${OWEBUI_PORT:-8180}:8080"
-
     pipelines:
         build:
             context: ..
@@ -90,12 +74,6 @@ volumes:
             type: 'none'
             o: 'bind'
             device: ./appdata/ollama/
-    owui_data:
-        driver: local
-        driver_opts:
-            type: 'none'
-            o: 'bind'
-            device: ./appdata/owui/
     pg_data:
         driver: local
         driver_opts:
