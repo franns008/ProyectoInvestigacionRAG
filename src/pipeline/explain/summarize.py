@@ -19,7 +19,7 @@ from __future__ import annotations
 import logging
 import re
 import time
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Mapping, Sequence
 
 from .lookup import fetch_context
@@ -48,12 +48,7 @@ class Explanation:
     kinds: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict:
-        return {
-            "identifier": self.identifier,
-            "explanation": self.explanation,
-            "citations": list(self.citations),
-            "kinds": list(self.kinds),
-        }
+        return asdict(self)
 
 
 def finding_identifier(finding: Mapping[str, Any]) -> str:
