@@ -68,7 +68,7 @@ NVD, en cambio, gira alrededor de **CPE**, un identificador pensado para product
 comerciales y sistemas operativos. Para librerías de un ecosistema de lenguaje eso implica:
 
 - Los nombres CPE no coinciden con los de PyPI (hay que mantener una tabla de equivalencias).
-- [`index_nvd.py`](../src/ingestion/index_nvd.py) hoy **descarta las versiones**:
+- La indexación ([`converters.py`](../src/pipeline/indexing/converters.py)) hoy **descarta las versiones**:
   `_vendors_products()` parsea el CPE y se queda solo con `parts[3]` (vendor) y `parts[4]`
   (producto), sin tocar `versionStartIncluding` / `versionEndExcluding`.
 
