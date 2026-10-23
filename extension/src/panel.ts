@@ -446,7 +446,6 @@ function formatEpss(epss: number): string {
     return `${(epss * 100).toFixed(epss >= 0.01 ? 0 : 1)}%`;
 }
 
-/** Identifica un hallazgo entre el webview y la extensión. `scan` dedupe por este par. */
 function escapeRegExp(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
