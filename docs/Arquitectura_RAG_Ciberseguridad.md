@@ -67,7 +67,7 @@ El chatbot funciona de manera continua. Para levantar todo el sistema, basta seg
 docker compose up -d
 ```
 
-*Una vez encendido, podés acceder a Open WebUI (ej. `http://localhost:8180`), seleccionar el modelo "RAG ciberseguridad" y comenzar a chatear. El bot responderá utilizando los datos que ya estén almacenados en la base de datos.*
+*Una vez encendido, podés chatear desde la extensión de VSCode o directo contra la API del servidor de pipelines (`http://localhost:9099`, modelo `pipeline_ciberseguridad`; ver [`arquitectura.md`](arquitectura.md) §7.1). El bot responderá utilizando los datos que ya estén almacenados en la base de datos.*
 
 ### B. Ejecutar la Indexación (Actualizar la Base de Datos)
 
