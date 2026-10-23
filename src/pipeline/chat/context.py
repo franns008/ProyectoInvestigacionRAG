@@ -47,7 +47,7 @@ def _is_finding(value: Any) -> bool:
 
 def _finding_key(finding: Mapping[str, Any]) -> tuple:
     return (
-        finding.get("vulnerability") or finding.get("cve"),
+        finding.get("vulnerability"),
         finding.get("package"),
         finding.get("installed_version"),
     )
@@ -81,9 +81,7 @@ def finding_vuln_ids(finding: Mapping[str, Any] | None) -> list[str]:
     """
     if not finding:
         return []
-    candidates: list[Any] = [finding.get("vulnerability"), finding.get("cve")]
-    candidates += list(finding.get("aliases") or [])
-    candidates += list(finding.get("cwe_ids") or [])
+    candidates: list[Any] = [finding.get("vulnerability"), *(finding.get("cwe_ids") or [])]
     out: list[str] = []
     for value in candidates:
         vid = str(value or "").strip().upper()
@@ -106,11 +104,9 @@ def format_finding(finding: Mapping[str, Any], max_advisory_chars: int = MAX_ADV
     """El hallazgo como líneas con etiqueta: un modelo chico las lee mejor que un JSON."""
     lines: list[str] = []
 
-    identifier = finding.get("vulnerability") or finding.get("cve")
-    aliases = [a for a in (finding.get("aliases") or []) if a and a != identifier]
+    identifier = finding.get("vulnerability")
     if identifier:
-        suffix = f" (aliases: {', '.join(aliases)})" if aliases else ""
-        lines.append(f"- Identifier: {identifier}{suffix}")
+        lines.append(f"- Identifier: {identifier}")
 
     package = finding.get("package")
     if package:

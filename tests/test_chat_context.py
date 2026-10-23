@@ -19,7 +19,6 @@ FINDING = {
     "installed_version": "5.2.0",
     "fixed_version": "10.0.1",
     "cwe_ids": ["CWE-787"],
-    "aliases": ["GHSA-j7hp-h8jx-5ppr", "CVE-2023-4863"],
     "cvss_score": 8.8,
     "epss": 0.93,
     "kev": True,
@@ -90,7 +89,7 @@ def test_ids_canonicos_sin_duplicados_ni_ghsa():
 
 
 def test_hallazgo_sin_cve_aporta_solo_los_cwe():
-    finding = {"vulnerability": "GHSA-xxxx-yyyy-zzzz", "cve": None, "cwe_ids": ["CWE-79"]}
+    finding = {"vulnerability": "GHSA-xxxx-yyyy-zzzz", "cwe_ids": ["CWE-79"]}
     assert finding_vuln_ids(finding) == ["CWE-79"]
 
 
@@ -103,7 +102,7 @@ def test_sin_hallazgo_no_hay_ids():
 # ======================================================================
 def test_formato_con_todos_los_campos():
     text = format_finding(FINDING)
-    assert "- Identifier: CVE-2023-4863 (aliases: GHSA-j7hp-h8jx-5ppr)" in text
+    assert "- Identifier: CVE-2023-4863" in text
     assert "- Affected package: pillow 5.2.0 (fixed in 10.0.1)" in text
     assert "CVSS=8.8 | EPSS=0.93 | in CISA KEV: yes" in text
     assert "- Weakness: CWE-787" in text
@@ -111,7 +110,7 @@ def test_formato_con_todos_los_campos():
 
 
 def test_formato_con_lo_que_manda_la_extension_hoy():
-    """Sin CVSS/EPSS/KEV/aliases (el contextFor actual) no aparece la línea de scores."""
+    """Sin CVSS/EPSS/KEV no aparece la línea de scores."""
     minimal = {k: FINDING[k] for k in ("vulnerability", "package", "installed_version", "cwe_ids", "summary")}
     minimal["fixed_version"] = None
     text = format_finding(minimal)
