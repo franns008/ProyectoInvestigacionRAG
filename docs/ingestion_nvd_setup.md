@@ -32,12 +32,9 @@ Documentos relacionados (leer si hace falta más contexto):
 
 ## 2) Qué falta (a propósito, no es un olvido)
 
-- **Indexado en el RAG**: falta el script (`src/ingestion/index_nvd.py`, todavía no
-  escrito) que lea `data/raw/nvd/**/cves_page_*.json`, arme un `Document` de Haystack
-  por CVE y lo embeba/guarde en la tabla pgvector que ya usa
-  `src/pipeline/pipeline_ciberseguridad.py`. El diseño ya está acordado (ver sección 6)
-  pero no implementado — si alguien retoma esto, ese es el próximo paso, no hay que
-  rediscutir el diseño salvo que algo no cierre.
+- **Indexado en el RAG**: ya no falta. Lo hace `run_indexing.py --include-cve`
+  (`src/pipeline/indexing/`), con `qwen3-embedding:4b`, sobre la misma tabla que usa el
+  pipeline. Ver la sección 6.
 - **Las otras 4 fuentes de Capa 1** (ATT&CK, CWE, EPSS, CISA KEV): investigadas en
   `docs/data_sourcing_research.md`, sin script de fetch todavía.
 - **Tabla SQL relacional `cves`** (la que describe `docs/data_transform_spec.md` con
@@ -169,7 +166,12 @@ completo. Progreso aproximado: ~20-30s por página, 182 páginas totales → ~70
 Si se cortó o no terminó, simplemente correr de nuevo `--full` (no importa si ya hay
 carpetas parciales de una corrida anterior, cada corrida es independiente).
 
-## 6) Diseño acordado para el paso de indexado (no implementado)
+## 6) Diseño acordado para el paso de indexado (histórico)
+
+> **Superado.** El script standalone que se describe acá nunca se usó y se eliminó: la
+> ingesta de CVE la hace `run_indexing.py --include-cve` con `qwen3-embedding:4b` (no
+> `bge-m3`). Se conserva como registro del diseño. Ver
+> [`unificacion_ingesta_nvd.md`](unificacion_ingesta_nvd.md).
 
 Cuando se retome, el próximo script (`src/ingestion/index_nvd.py`, a crear) debe:
 
