@@ -26,12 +26,8 @@ from .prioritize import funnel, load_epss, load_kev, prioritize
 from .resolver import build_index, load_osv_zip, parse_requirements, scan
 
 
-def _first_existing(base: Path, *candidates: str) -> Path | None:
-    for candidate in candidates:
-        path = base / candidate
-        if path.exists():
-            return path
-    return None
+def _if_exists(path: Path) -> Path | None:
+    return path if path.exists() else None
 
 
 def _plural(n: int, singular: str, plural: str) -> str:
@@ -117,12 +113,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--top", type=int, default=0, help="mostrar sólo los N primeros hallazgos")
     args = parser.parse_args(argv)
 
-    osv_zip = _first_existing(args.data, "osv/all.zip", "osv/PyPI/all.zip", "all.zip")
+    osv_zip = _if_exists(args.data / "osv" / "all.zip")
     if osv_zip is None:
         parser.error(f"no encontré el dump de OSV bajo {args.data}/osv/. Corré primero el fetcher (Fase 1).")
 
-    epss_path = _first_existing(args.data, "epss/epss_scores-current.csv.gz", "epss.csv.gz")
-    kev_path = _first_existing(args.data, "kev/known_exploited_vulnerabilities.json", "kev.json")
+    epss_path = _if_exists(args.data / "epss" / "epss_scores-current.csv.gz")
+    kev_path = _if_exists(args.data / "kev" / "known_exploited_vulnerabilities.json")
 
     started = time.perf_counter()
     index = build_index(load_osv_zip(osv_zip))
