@@ -79,11 +79,6 @@ QUESTIONS_COLUMNS = [
     "question", "answer", "reference_answer",
 ]
 
-# Renombres históricos de columnas: la migración de esquema los consulta antes
-# de descartar datos. {nombre_viejo: nombre_nuevo}. Arranca vacío.
-RENAMES: dict[str, str] = {}
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Serialización
 # ─────────────────────────────────────────────────────────────────────────────
@@ -176,21 +171,17 @@ def _migrar_y_append(
     with path.open("r", newline="", encoding="utf-8") as fh:
         filas_viejas = list(csv.DictReader(fh))
 
-    eliminadas = [c for c in header if c not in columns and c not in RENAMES]
+    eliminadas = [c for c in header if c not in columns]
     for col in eliminadas:
         print(
             f"⚠ csv_store: columna '{col}' eliminada del esquema; "
             f"datos descartados en {path}"
         )
 
-    migradas = []
-    for vieja in filas_viejas:
-        nueva = {}
-        for col_vieja, valor in vieja.items():
-            destino = RENAMES.get(col_vieja, col_vieja)
-            if destino in columns:
-                nueva[destino] = valor
-        migradas.append(nueva)
+    migradas = [
+        {col: valor for col, valor in vieja.items() if col in columns}
+        for vieja in filas_viejas
+    ]
 
     tmp = path.with_suffix(path.suffix + ".tmp")
     with tmp.open("w", newline="", encoding="utf-8") as fh:
