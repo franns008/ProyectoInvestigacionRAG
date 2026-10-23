@@ -193,8 +193,6 @@ def _message_text(msg: dict) -> str:
 def resolve_vuln_ids(
     user_message: str,
     messages: list[dict] | None = None,
-    history_turns: int = _HISTORY_TURNS,
-    max_ids: int = _MAX_VULN_IDS,
 ) -> tuple[list[str], str]:
     """IDs del turno actual; si no hay ninguno, los hereda de los últimos turnos.
 
@@ -207,12 +205,12 @@ def resolve_vuln_ids(
     """
     current = _extract_vuln_ids(user_message)
     if current:
-        return current[:max_ids], "turno"
+        return current[:_MAX_VULN_IDS], "turno"
     if not messages:
         return [], "ninguno"
 
     inherited: list[str] = []
-    for msg in reversed(messages[-history_turns:]):
+    for msg in reversed(messages[-_HISTORY_TURNS:]):
         text = _message_text(msg)
         if not text or text.strip() == user_message.strip():
             continue  # messages trae el turno actual al final
@@ -221,7 +219,7 @@ def resolve_vuln_ids(
                 inherited.append(vid)
     if not inherited:
         return [], "ninguno"
-    return inherited[:max_ids], "historial"
+    return inherited[:_MAX_VULN_IDS], "historial"
 
 class _RequestLog(logging.LoggerAdapter):
     """Prefija cada línea con el id de la corrida (`[rid]`)."""
