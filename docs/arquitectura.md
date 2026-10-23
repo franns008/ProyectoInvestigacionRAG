@@ -108,7 +108,7 @@ OllamaGenerator(
   entra en el default de Ollama, éste recorta el **principio** sin avisar, que es donde
   están las reglas. `pipeline_dependencias` comparte `build_generator` y no lo setea.
 
-### 4.3 Valves (parámetros ajustables desde OpenWebUI)
+### 4.3 Valves (parámetros ajustables en caliente)
 
 | Valve             | Default                    | Descripción                                   |
 |-------------------|----------------------------|-----------------------------------------------|
@@ -127,7 +127,9 @@ OllamaGenerator(
 > `split_length` / `split_overlap` ya no son valves: el chunking se decide en el
 > script de indexación. Ver [`data_splitting.md`](data_splitting.md).
 
-> OpenWebUI **persiste** las valves en `src/pipeline/pipeline_ciberseguridad/valves.json`
+> Se leen con `GET /<pipeline>/valves` y se cambian con `POST /<pipeline>/valves/update`
+> del servidor de Pipelines (`:9099`, con la `PIPESERVER_KEY` como Bearer). El servidor
+> **persiste** las valves en `src/pipeline/pipeline_ciberseguridad/valves.json`
 > y las restaura al arrancar: un valor guardado ahí le gana al default del código (hoy,
 > por ejemplo, fija `retriever_top_k: 5`). Las valves que no están en el archivo toman
 > el default.
@@ -314,12 +316,12 @@ cd infrastructure
 
 - **Respuesta vacía / error de modelo** → falta `ollama pull <LLM_MODEL>`.
 - **Error de modelo inexistente con un nombre que no configuraste** (p. ej.
-  `meta-llama/llama-4-...`) → OpenWebUI **persiste los valves** en
+  `meta-llama/llama-4-...`) → el servidor de Pipelines **persiste los valves** en
   `<volumen pipelines>/<nombre_pipeline>/valves.json` y los restaura al arrancar, así
   que puede estar reinyectando el modelo que se usaba en la etapa Groq. Se resuelve
   seteando `LLM_MODEL` en el `.env` (le gana al valve) o borrando ese `valves.json`.
 - **Cambiaste `.env` y no toma efecto** → recreá el stack (`docker compose up -d`).
-- **El pipeline aparece en `failed/`** → OpenWebUI no pudo cargar el `.py` (suele ser
+- **El pipeline aparece en `failed/`** → el servidor de Pipelines no pudo cargar el `.py` (suele ser
   una versión de dependencia). Ver el hallazgo 17 de
   [`eval/bitacora_refactor_csv.md`](eval/bitacora_refactor_csv.md).
 - **Generación muy lenta** → estás en CPU (sin el overlay de GPU que corresponda a tu
