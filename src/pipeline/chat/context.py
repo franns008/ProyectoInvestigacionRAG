@@ -9,10 +9,6 @@ mensaje, con `role: "system"`: no es algo que haya dicho el usuario, es el tema 
      {"role": "assistant", "content": "..."},
      {"role": "user",      "content": "¿cómo lo mitigo?"}]   ← el turno actual
 
-También se acepta la forma vieja, un único hallazgo suelto en el `system`
-(`'{"vulnerability": "CVE-...", "package": ...}'`), que era lo que mandaba el chat por
-hallazgo antes del chat con contexto adjunto.
-
 Cada request trae la conversación entera y el contexto vigente (los guarda el cliente), así
 que el pipeline no guarda estado: sólo decide qué parte de `messages` entra al prompt.
 
@@ -58,10 +54,7 @@ def _finding_key(finding: Mapping[str, Any]) -> tuple:
 
 
 def extract_findings_context(messages: Sequence[Mapping[str, Any]] | None) -> list[dict]:
-    """Los hallazgos adjuntos en los mensajes `system` de la extensión, sin repetidos.
-
-    Acepta `{"findings": [...]}` y también un hallazgo suelto (la forma vieja).
-    """
+    """Los hallazgos adjuntos (`{"findings": [...]}`) en los mensajes `system`, sin repetidos."""
     found: list[dict] = []
     seen: set[tuple] = set()
     for msg in messages or []:
@@ -71,11 +64,9 @@ def extract_findings_context(messages: Sequence[Mapping[str, Any]] | None) -> li
             payload = json.loads(_message_text(msg))
         except (TypeError, json.JSONDecodeError):
             continue  # un system prompt de texto: no es un hallazgo
-        if isinstance(payload, dict) and isinstance(payload.get("findings"), list):
-            candidates = payload["findings"]
-        else:
-            candidates = [payload]
-        for candidate in candidates:
+        if not (isinstance(payload, dict) and isinstance(payload.get("findings"), list)):
+            continue
+        for candidate in payload["findings"]:
             if _is_finding(candidate) and _finding_key(candidate) not in seen:
                 seen.add(_finding_key(candidate))
                 found.append(candidate)

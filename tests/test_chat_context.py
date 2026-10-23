@@ -29,7 +29,7 @@ FINDING = {
 
 
 def conversation(*turns):
-    return [{"role": "system", "content": json.dumps(FINDING)}, *turns]
+    return [{"role": "system", "content": json.dumps({"findings": [FINDING]})}, *turns]
 
 
 # ======================================================================
@@ -51,10 +51,6 @@ def attached(*findings):
 def test_extrae_los_hallazgos_adjuntos():
     messages = [attached(FINDING, OTHER), {"role": "user", "content": "hola"}]
     assert extract_findings_context(messages) == [FINDING, OTHER]
-
-
-def test_acepta_el_hallazgo_suelto_de_antes():
-    assert extract_findings_context(conversation({"role": "user", "content": "hola"})) == [FINDING]
 
 
 def test_no_repite_un_hallazgo_adjunto_dos_veces():
