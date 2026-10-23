@@ -21,7 +21,8 @@ dist/
 build/
 .venv/
 venv/
-env/
+# Anclado a la raíz: sin la barra también tapaba infrastructure/env/, que se versiona.
+/env/
 
 # Secretos
 .env
@@ -51,9 +52,6 @@ extension/*.vsix
 # directorio a secas haría la excepción inefectiva.
 src/pipeline/eval/results/*
 !src/pipeline/eval/results/runs.csv
-
-# NVD
-data/raw/nvd
 
 # Valves persistidos por el servidor de Pipelines (POST /<pipeline>/valves/update). Es
 # estado del server, no configuración del repo: versionado, pisaba los defaults del código.
