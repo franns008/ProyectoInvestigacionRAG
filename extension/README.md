@@ -82,12 +82,10 @@ detecta solo si hay un `.venv` en la raíz del repo.
 
 | Ajuste | Default | Para qué |
 |---|---|---|
-| `cibersec.provider` | `local` | `local` = escáner determinístico. `rag` = pipeline con explicación (Fase 3, todavía no implementado). |
 | `cibersec.pythonPath` | `python3` | Intérprete con el que corre el escáner. |
 | `cibersec.scannerRoot` | `src/pipeline` | De dónde se importa el módulo `deps`. |
 | `cibersec.dataDir` | `data/raw` | Dumps de OSV, EPSS y KEV. |
-| `cibersec.ragUrl` | `http://localhost:9099` | Servidor de Pipelines. Sólo con `provider: rag`. |
-| `cibersec.ragModel` | `pipeline_dependencias` | Sólo con `provider: rag`. |
+| `cibersec.ragUrl` | `http://localhost:9099` | Servidor de Pipelines (chat y explicaciones). |
 | `cibersec.chatModel` | `pipeline_ciberseguridad` | Pipeline RAG del chat de la barra lateral. |
 | `cibersec.chatTimeoutSeconds` | `240` | Tiempo máximo de espera de cada respuesta. |
 | `cibersec.explain` | `true` | Solicita explicaciones al pipeline de dependencias. Si está desactivado, el escaneo sigue funcionando sin prosa del LLM. |
@@ -103,16 +101,14 @@ La extensión no sabe cómo se resuelve un escaneo: le pide el resultado a un
 `ScanProvider` ([`src/scan/types.ts`](src/scan/types.ts)) y renderiza lo que recibe.
 
 ```
-extension.ts → buildProvider() ─┬→ LocalScannerProvider   (hoy: python -m deps.cli --json)
-                                └→ RagProvider            (Fase 3: POST al 9099)
+extension.ts → buildProvider() → ExplainedProvider → LocalScannerProvider
+                                 (POST al 9099)      (python -m deps.cli --json)
 ```
 
-Ambos devuelven el **mismo** `ScanResult`. La única diferencia es que el proveedor RAG
-completa los campos opcionales `explanation` y `citations` de cada hallazgo; el panel ya
+`LocalScannerProvider` resuelve el escaneo offline. `ExplainedProvider` lo decora: completa
+los campos opcionales `explanation` y `citations` de los primeros hallazgos pidiéndoselos al
+pipeline de dependencias, y si el servidor no responde devuelve el escaneo tal cual. El panel
 los renderiza si están y los omite si no.
-
-Por eso integrar la Fase 3 es implementar el cuerpo de `RagProvider.scan()`. No hay que
-tocar la vista, ni el contrato, ni el resto de la extensión.
 
 **Lo que no cambia nunca:** los campos duros (versión de arreglo, CVSS, EPSS, KEV,
 identificadores) los arma Python por concatenación desde los datos estructurados. El LLM
