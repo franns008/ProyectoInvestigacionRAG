@@ -78,6 +78,16 @@ DEFAULT_OLLAMA_LLM  = "qwen2.5:3b-instruct"
 
 _WARM_UP_LOCK = threading.Lock()
 
+# Componentes intermedios cuya salida se pide a Haystack para loguearla.
+_LOGGED_OUTPUTS = {
+    "embedding_retriever",
+    "keyword_retriever",
+    "id_lookup",
+    "document_joiner",
+    "ranker",
+    "prompt_builder",
+}
+
 PROMPT_TEMPLATE = """
 You are a cybersecurity assistant. Answer strictly from the provided context.
 
@@ -478,29 +488,28 @@ class Pipeline:
         }
         if stream:
             return self._stream(inputs, log, t0)
+        return self._run(inputs, log, t0)
 
+    def _run(
+        self,
+        inputs: dict,
+        log: logging.LoggerAdapter,
+        t0: float,
+        streaming_callback=None,
+    ) -> str:
+        """Corre el pipeline de Haystack, loguea lo recuperado y devuelve la respuesta."""
+        if streaming_callback is not None:
+            inputs = {**inputs, "llm": {"streaming_callback": streaming_callback}}
         try:
-            result = self.rag_pipeline.run(
-                inputs,
-                include_outputs_from={
-                    "embedding_retriever",
-                    "keyword_retriever",
-                    "id_lookup",
-                    "document_joiner",
-                    "ranker",
-                    "prompt_builder",
-                },
-            )
+            result = self.rag_pipeline.run(inputs, include_outputs_from=_LOGGED_OUTPUTS)
+            answer = result["llm"]["replies"][0]
+            self._log_retrieved_docs(log, result)
+            self._log_token_usage(log, result)
+            log.info(f"[RESPUESTA] {_one_line(answer)}")
+            log.info(f"[FIN] {time.perf_counter() - t0:.1f}s")
         except Exception:
             log.exception(f"[ERROR] falló tras {time.perf_counter() - t0:.1f}s")
             raise
-
-        answer = result["llm"]["replies"][0]
-        self._log_retrieved_docs(log, result)
-        self._log_token_usage(log, result)
-        log.info(f"[RESPUESTA] {_one_line(answer)}")
-        log.info(f"[FIN] {time.perf_counter() - t0:.1f}s")
-
         return answer
 
     def _stream(
@@ -520,27 +529,8 @@ class Pipeline:
 
         def run() -> None:
             try:
-                result = self.rag_pipeline.run(
-                    {
-                        **inputs,
-                        "llm": {"streaming_callback": on_chunk},
-                    },
-                    include_outputs_from={
-                        "embedding_retriever",
-                        "keyword_retriever",
-                        "id_lookup",
-                        "document_joiner",
-                        "ranker",
-                        "prompt_builder",
-                    },
-                )
-                answer = result["llm"]["replies"][0]
-                self._log_retrieved_docs(log, result)
-                self._log_token_usage(log, result)
-                log.info(f"[RESPUESTA] {_one_line(answer)}")
-                log.info(f"[FIN] {time.perf_counter() - t0:.1f}s")
-            except Exception as error:
-                log.exception(f"[ERROR] falló tras {time.perf_counter() - t0:.1f}s")
+                self._run(inputs, log, t0, streaming_callback=on_chunk)
+            except Exception as error:  # _run ya lo logueó
                 events.put(error)
             finally:
                 events.put(finished)
