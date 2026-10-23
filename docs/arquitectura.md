@@ -157,7 +157,7 @@ conversación **entera** y los adjuntos vigentes: el pipeline no tiene estado.
 
 ```
 messages = [
-  {role: "system",    content: '{"findings": [{"vulnerability": "CVE-...", "package": ..., "cvss_score": ...}, ...]}'},
+  {role: "system",    content: '{"findings": [{"package": ..., "cve": "CVE-...", "cvss_score": ...}, ...]}'},
   {role: "user",      content: "¿qué tan grave es?"},
   {role: "assistant", content: "..."},
   {role: "user",      content: "¿cómo lo mitigo?"}     ← user_message
@@ -165,8 +165,9 @@ messages = [
 ```
 
 - **Los hallazgos van como `system`**, no como `user`: son el tema de la charla, no algo
-  que dijo el usuario. Sin adjuntos no se manda el `system` y es un chat común.
-  `extract_findings_context` los separa (sin repetidos) y `format_findings` los pasa a
+  que dijo el usuario. Sin adjuntos no se manda el `system` y es un chat común. Cada
+  hallazgo va en el mismo formato que en las explicaciones (`wireFinding` en
+  `extension/src/scan/types.ts`). `extract_findings_context` los separa (sin repetidos) y `format_findings` los pasa a
   líneas con etiqueta,
   numeradas si son varios, más fáciles de leer para un modelo chico que un JSON. Entran
   al prompt en *"Vulnerabilities under discussion"*. Con varios adjuntos el advisory de

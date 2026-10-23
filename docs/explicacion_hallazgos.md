@@ -240,11 +240,12 @@ Distinto al del chat: no responde una pregunta, resume un hallazgo concreto.
 `/app/pipelines`, así que el servidor lo levanta solo y aparece como segundo modelo en el
 `:9099`, al lado del chat.
 
-- **Entrada:** `pipe()` recibe en `user_message` un JSON `{"findings": [...]}` con los top-3
-  (ids, `summary`, `details`). Si no parsea, devuelve un error legible en vez de tratarlo
-  como pregunta de chat.
-- **Salida:** un JSON `{"explanations": [{"cve": ..., "explanation": ..., "citations": [...]}]}`
-  como string. La extensión lo parsea.
+- **Entrada:** `pipe()` recibe en `user_message` un JSON `{"findings": [...]}` con los
+  hallazgos que la extensión decide explicar, en el mismo formato que usa el chat
+  (`wireFinding` en `extension/src/scan/types.ts`). Si no parsea, devuelve un error legible
+  en vez de tratarlo como pregunta de chat.
+- **Salida:** un JSON `{"explanations": [{"identifier": ..., "explanation": ..., "citations": [...]}]}`
+  como string. La extensión lo parsea y lo cruza con cada tarjeta por `identifier`.
 - **Reuso:** importa `get_document_store()` y `build_generator()` de
   `pipeline_ciberseguridad` — ya son funciones módulo-level, no hace falta refactor. El
   import ejecuta los parches de torch de ese módulo; dentro del container ese costo ya está
