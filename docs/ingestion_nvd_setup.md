@@ -147,8 +147,10 @@ el RAG alcanza con una muestra:
   páginas se cortan seguido), con `time.sleep(0.7)` entre
   requests para quedar por debajo del límite de 50 req/30s que da la API key
   (sin key el límite es 5 req/30s, por eso hace falta la key).
-- Reintenta hasta 3 veces con backoff exponencial si una request falla
-  (status ≠ 200).
+- Reintenta con backoff exponencial si una request falla (status ≠ 200, timeout o
+  corte de conexión). NVD usa más paciencia que los otros fetchers: hasta 5 intentos
+  (esperas de 2, 4, 8 y 16 s) y un timeout de 90 s, porque a veces tarda más de 30 s
+  en empezar a responder.
 - **Modo incremental**: guarda un checkpoint (`data/raw/nvd/_checkpoint.json`, un
   timestamp UTC) al terminar cada corrida exitosa. La siguiente corrida sin `--full`
   usa ese timestamp como `lastModStartDate` y pide solo los CVEs modificados desde

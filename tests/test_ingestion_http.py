@@ -67,3 +67,19 @@ def test_status_malo_persistente_levanta_http_error(fake_get):
     fake_get(*[response(404)] * _http.MAX_RETRIES)
     with pytest.raises(requests.HTTPError):
         _http.get_with_retries(URL, "test")
+
+
+def test_max_retries_y_timeout_configurables(monkeypatch):
+    waits = []
+    timeouts = []
+    monkeypatch.setattr(_http.time, "sleep", waits.append)
+
+    def get(url, timeout, **kwargs):
+        timeouts.append(timeout)
+        raise requests.ReadTimeout("Read timed out.")
+
+    monkeypatch.setattr(_http.requests, "get", get)
+    with pytest.raises(requests.ReadTimeout):
+        _http.get_with_retries(URL, "test", max_retries=5, timeout=90)
+    assert waits == [2, 4, 8, 16]
+    assert timeouts == [90] * 5

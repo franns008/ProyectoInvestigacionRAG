@@ -35,6 +35,10 @@ RESULTS_PER_PAGE = 500
 REQUEST_DELAY_SECONDS = 0.7  # ~43 req/30s, margen bajo el límite de 50/30s con API key
 REQUEST_DELAY_NO_KEY_SECONDS = 6.5  # sin key el límite es 5 req/30s
 MAX_DATE_RANGE_DAYS = 120    # restricción de la API para lastMod*Date
+# NVD tarda a veces más de 30 s en empezar a responder: más paciencia que el default
+# de _http. Con 5 intentos las esperas son 2, 4, 8 y 16 s.
+NVD_TIMEOUT_SECONDS = 90
+NVD_MAX_RETRIES = 5
 
 # Escribe dentro de data/raw/, que el docker-compose bind-montea como el volumen
 # `rawdata` → /app/pipelines/rawdata (INPUT_DIR del pipeline), para que el
@@ -86,7 +90,9 @@ def _fetch_window(api_key: str | None, run_dir: Path, page_counter: list[int],
     fetched = 0
 
     while total_results is None or params["startIndex"] < total_results:
-        data = get_with_retries(url, SOURCE, headers=headers, params=params).json()
+        data = get_with_retries(url, SOURCE, max_retries=NVD_MAX_RETRIES,
+                                timeout=NVD_TIMEOUT_SECONDS,
+                                headers=headers, params=params).json()
         total_results = data["totalResults"]
         vulnerabilities = data.get("vulnerabilities", [])
         fetched += len(vulnerabilities)

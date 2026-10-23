@@ -56,23 +56,24 @@ def fecha_utc(timestamp: float) -> str:
     return datetime.fromtimestamp(timestamp, timezone.utc).strftime("%Y-%m-%d")
 
 
-def get_with_retries(url: str, source: str, **kwargs) -> requests.Response:
+def get_with_retries(url: str, source: str, *, max_retries: int = MAX_RETRIES,
+                     timeout: float = TIMEOUT_SECONDS, **kwargs) -> requests.Response:
     """GET con reintentos y backoff exponencial. `kwargs` van tal cual a requests.get.
 
     Reintenta tanto un status inesperado como un timeout o un corte de conexión: NVD a
     veces deja de mandar a mitad de una página, y eso llega como excepción, no como status.
     """
-    for attempt in range(1, MAX_RETRIES + 1):
+    for attempt in range(1, max_retries + 1):
         try:
-            response = requests.get(url, timeout=TIMEOUT_SECONDS, **kwargs)
+            response = requests.get(url, timeout=timeout, **kwargs)
         except (requests.Timeout, requests.ConnectionError) as error:
-            if attempt == MAX_RETRIES:
+            if attempt == max_retries:
                 raise
             problem = type(error).__name__
         else:
             if response.status_code in OK_STATUSES:
                 return response
-            if attempt == MAX_RETRIES:
+            if attempt == max_retries:
                 # Levanta para >= 400; para un 2xx/3xx raro hay que ser explícito, o el
                 # error termina siendo imposible de diagnosticar.
                 response.raise_for_status()
@@ -80,7 +81,7 @@ def get_with_retries(url: str, source: str, **kwargs) -> requests.Response:
             problem = f"status {response.status_code}"
         wait = 2 ** attempt
         print(f"[{source}] {problem}, reintentando en {wait}s "
-              f"(intento {attempt}/{MAX_RETRIES})")
+              f"(intento {attempt}/{max_retries})")
         time.sleep(wait)
     raise RuntimeError("unreachable")
 
