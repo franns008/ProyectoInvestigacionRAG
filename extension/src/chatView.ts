@@ -28,9 +28,9 @@ import {
 import { renderMarkdown } from "./markdown";
 import { chip } from "./references";
 import { Finding, findingKey, identifierOf } from "./scan/types";
-import { BASE_STYLES, escapeHtml as escape, nonceValue } from "./styles";
+import { escapeHtml as escape } from "./styles";
 import { trimSlash } from "./util";
-import { openHttpLink } from "./webview";
+import { openHttpLink, webviewPage } from "./webview";
 
 export interface ChatOptions {
   url: string;
@@ -320,22 +320,12 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
   }
 
   private html(): string {
-    const nonce = nonceValue();
-    const csp = `default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';`;
     const thread = this.transcript.length
       ? this.transcript.map(renderEntry).join("")
       : `<p class="muted intro">Preguntá lo que quieras sobre ciberseguridad. Para hablar de
           hallazgos concretos, adjuntalos desde el informe del escaneo con el clip: van como
           contexto en cada pregunta hasta que los quites.</p>`;
-    return `<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="${csp}">
-<style>${BASE_STYLES}${CHAT_STYLES}</style>
-</head>
-<body>
-<main>
+    return webviewPage(CHAT_STYLES, `<main>
   <div id="messages" aria-live="polite">${thread}${this.busy ? TYPING : ""}</div>
   <div class="composer">
     <div id="context">${renderAttachments([...this.attachments.values()])}</div>
@@ -348,10 +338,7 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
       <button id="send" class="send" type="submit" title="Enviar (Enter)" aria-label="Enviar"${this.busy ? " disabled" : ""}>${ICONO_ENVIAR}</button>
     </form>
   </div>
-</main>
-<script nonce="${nonce}">let meter = ${JSON.stringify(this.meter())};${CHAT_SCRIPT}</script>
-</body>
-</html>`;
+</main>`, `let meter = ${JSON.stringify(this.meter())};${CHAT_SCRIPT}`);
   }
 }
 

@@ -15,8 +15,8 @@ import { ChatView } from './chatView';
 import { PreviewPackage } from './scan/manifest';
 import { chip } from './references';
 import { Finding, ScanResult, findingKey, identifierOf, packageKey } from './scan/types';
-import { BASE_STYLES, escapeHtml as escape, nonceValue } from './styles';
-import { openHttpLink } from './webview';
+import { escapeHtml as escape } from './styles';
+import { openHttpLink, webviewPage } from './webview';
 
 export class ResultsPanel {
     private static current: ResultsPanel | undefined;
@@ -87,15 +87,7 @@ export class ResultsPanel {
     }
 
     private wrap(body: string): string {
-        const nonce = nonceValue();
-        const csp = `default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';`;
-        return `<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="${csp}">
-<style>${BASE_STYLES}${STYLES}</style>
-<script nonce="${nonce}">
+        return webviewPage(STYLES, `<div class="page">${body}</div>`, `
   const vscode = acquireVsCodeApi();
   // Marca los botones de los hallazgos que ya están en el chat. El estado inicial va
   // embebido porque un postMessage anterior a la carga del webview se pierde.
@@ -127,10 +119,7 @@ export class ResultsPanel {
       vscode.postMessage({ type: "openExternal", url: link.getAttribute("href") });
     }
   });
-</script>
-</head>
-<body><div class="page">${body}</div></body>
-</html>`;
+`);
     }
 
     private dispose(): void {
