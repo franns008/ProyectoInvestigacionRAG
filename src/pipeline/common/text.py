@@ -1,4 +1,4 @@
-"""Helpers de texto: contenido de mensajes, recorte y texto de un advisory."""
+"""Helpers de texto: contenido de mensajes, recorte, texto de un advisory e id de un hallazgo."""
 
 from typing import Any, Mapping
 
@@ -24,3 +24,12 @@ def trim(text: str, limit: int) -> str:
 def advisory_text(finding: Mapping[str, Any]) -> str:
     """Summary y details del advisory de OSV, unidos."""
     return "\n".join(t for t in (finding.get("summary"), finding.get("details")) if t).strip()
+
+
+def finding_identifier(finding: Mapping[str, Any], fallback: str = "?") -> str:
+    """El CVE si el advisory lo declara; si no, el primer id de OSV (como `identifierOf` en la extensión)."""
+    cve = finding.get("cve")
+    if cve:
+        return str(cve)
+    osv_ids = finding.get("osv_ids") or []
+    return str(osv_ids[0]) if osv_ids else fallback

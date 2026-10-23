@@ -27,7 +27,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
-from common.text import advisory_text, trim
+from common.text import advisory_text, finding_identifier, trim
 
 from .lookup import ContextDoc, ContextIndex
 
@@ -127,7 +127,7 @@ def _facts(finding: Mapping[str, Any]) -> str:
     version = finding.get("installed_version") or "?"
     lineas = [f"- Paquete afectado: {package} {version}"]
 
-    identifier = finding.get("cve") or next(iter(finding.get("osv_ids") or []), None)
+    identifier = finding_identifier(finding, fallback="")
     if identifier:
         lineas.append(f"- Identificador: {identifier}")
 

@@ -14,9 +14,10 @@ from chat import (
 )
 
 FINDING = {
-    "vulnerability": "CVE-2023-4863",
     "package": "pillow",
     "installed_version": "5.2.0",
+    "cve": "CVE-2023-4863",
+    "osv_ids": ["GHSA-j7hp-h8jx-5ppr"],
     "fixed_version": "10.0.1",
     "cwe_ids": ["CWE-787"],
     "cvss_score": 8.8,
@@ -35,9 +36,10 @@ def conversation(*turns):
 # extract_findings_context
 # ======================================================================
 OTHER = {
-    "vulnerability": "CVE-2019-11358",
     "package": "django",
     "installed_version": "2.2.0",
+    "cve": "CVE-2019-11358",
+    "osv_ids": [],
     "cwe_ids": ["CWE-79"],
     "summary": "XSS",
 }
@@ -89,7 +91,7 @@ def test_ids_canonicos_sin_duplicados_ni_ghsa():
 
 
 def test_hallazgo_sin_cve_aporta_solo_los_cwe():
-    finding = {"vulnerability": "GHSA-xxxx-yyyy-zzzz", "cwe_ids": ["CWE-79"]}
+    finding = {"cve": None, "osv_ids": ["GHSA-xxxx-yyyy-zzzz"], "cwe_ids": ["CWE-79"]}
     assert finding_vuln_ids(finding) == ["CWE-79"]
 
 
@@ -109,13 +111,18 @@ def test_formato_con_todos_los_campos():
     assert "Heap buffer overflow in libwebp" in text
 
 
-def test_formato_con_lo_que_manda_la_extension_hoy():
+def test_formato_sin_scores():
     """Sin CVSS/EPSS/KEV no aparece la línea de scores."""
-    minimal = {k: FINDING[k] for k in ("vulnerability", "package", "installed_version", "cwe_ids", "summary")}
+    minimal = {k: FINDING[k] for k in ("package", "installed_version", "cve", "cwe_ids", "summary")}
     minimal["fixed_version"] = None
     text = format_finding(minimal)
     assert "no fixed version published" in text
     assert "CVSS" not in text
+
+
+def test_sin_cve_el_identificador_es_el_de_osv():
+    text = format_finding({**FINDING, "cve": None})
+    assert "- Identifier: GHSA-j7hp-h8jx-5ppr" in text
 
 
 def test_el_advisory_largo_se_recorta():

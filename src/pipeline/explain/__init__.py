@@ -7,7 +7,7 @@ nada. Ver docs/explicacion_hallazgos.md.
 
 from .lookup import ContextDoc, ContextIndex, cwe_key, fetch_context
 from .prompt import FindingContext, build_context, build_prompt
-from .summarize import Explanation, explain_findings, finding_identifier
+from .summarize import Explanation, explain_findings
 
 __all__ = [
     "ContextDoc",
@@ -19,5 +19,4 @@ __all__ = [
     "build_prompt",
     "Explanation",
     "explain_findings",
-    "finding_identifier",
 ]

@@ -46,7 +46,7 @@ from chat import extract_findings_context, findings_vuln_ids, format_findings, s
 from common.log import get_logger
 from common.llm import DEFAULT_OLLAMA_LLM, effective_num_ctx, llm_model
 from common.store import OLLAMA_URL, get_document_store
-from common.text import message_text
+from common.text import finding_identifier, message_text
 
 logger = get_logger("HaystackRAG_Query", file="/app/pipelines/logCiberseguridad.txt", propagate=False)
 
@@ -442,7 +442,7 @@ class Pipeline:
             max_chars=self.valves.history_max_chars,
         )
         for finding in findings:
-            log.info(f"[HALLAZGO] {finding.get('vulnerability')} | paquete={finding.get('package')} {finding.get('installed_version')}")
+            log.info(f"[HALLAZGO] {finding_identifier(finding)} | paquete={finding.get('package')} {finding.get('installed_version')}")
         log.info(f"[HISTORIAL] {len(history)} mensajes al prompt")
 
         vuln_ids, ids_origin = resolve_vuln_ids(user_message, messages)

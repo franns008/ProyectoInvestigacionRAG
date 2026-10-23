@@ -105,6 +105,29 @@ export function identifierOf(finding: Finding, fallback = "?"): string {
   return finding.cve ?? finding.osv_ids[0] ?? fallback;
 }
 
+/** Recorte del texto del advisory que se manda al servidor. El servidor vuelve a recortar. */
+const MAX_WIRE_TEXT_CHARS = 4_000;
+
+/**
+ * El hallazgo como viaja al servidor, igual para el chat y las explicaciones: los campos
+ * de la CLI que leen los pipelines, con el advisory recortado.
+ */
+export function wireFinding(finding: Finding) {
+  return {
+    package: finding.package,
+    installed_version: finding.installed_version,
+    fixed_version: finding.fixed_version,
+    cve: finding.cve,
+    osv_ids: finding.osv_ids,
+    cwe_ids: finding.cwe_ids,
+    cvss_score: finding.cvss_score,
+    epss: finding.epss,
+    kev: finding.kev,
+    summary: (finding.summary ?? "").slice(0, MAX_WIRE_TEXT_CHARS),
+    details: (finding.details ?? "").slice(0, MAX_WIRE_TEXT_CHARS),
+  };
+}
+
 /** Nombre de paquete normalizado (PEP 503), para agrupar sin importar mayúsculas ni separadores. */
 export function packageKey(packageName: string): string {
   return packageName.toLowerCase().replace(/[-_.]+/g, "-");

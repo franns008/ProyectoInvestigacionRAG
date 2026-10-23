@@ -4,7 +4,7 @@ Hallazgos adjuntos e historial para el chat de la extensión de VSCode.
 El chat de la extensión de VSCode manda los hallazgos que el usuario adjuntó como primer
 mensaje, con `role: "system"`: no es algo que haya dicho el usuario, es el tema de la charla.
 
-    [{"role": "system",    "content": '{"findings": [{"vulnerability": "CVE-...", ...}, ...]}'},
+    [{"role": "system",    "content": '{"findings": [{"package": ..., "cve": "CVE-...", ...}, ...]}'},
      {"role": "user",      "content": "¿qué tan grave es?"},
      {"role": "assistant", "content": "..."},
      {"role": "user",      "content": "¿cómo lo mitigo?"}]   ← el turno actual
@@ -21,7 +21,7 @@ import json
 import re
 from typing import Any, Mapping, Sequence
 
-from common.text import advisory_text, message_text, trim
+from common.text import advisory_text, finding_identifier, message_text, trim
 
 # Recorte de summary + details del advisory. Mismo criterio que explain/prompt.py.
 MAX_ADVISORY_CHARS = 1200
@@ -34,12 +34,12 @@ _VULN_ID_RE = re.compile(r"^(CVE-\d{4}-\d{4,7}|CWE-\d{1,5})$")
 
 
 def _is_finding(value: Any) -> bool:
-    return isinstance(value, dict) and ("vulnerability" in value or "package" in value)
+    return isinstance(value, dict) and "package" in value
 
 
 def _finding_key(finding: Mapping[str, Any]) -> tuple:
     return (
-        finding.get("vulnerability"),
+        finding_identifier(finding),
         finding.get("package"),
         finding.get("installed_version"),
     )
@@ -73,7 +73,7 @@ def finding_vuln_ids(finding: Mapping[str, Any] | None) -> list[str]:
     """
     if not finding:
         return []
-    candidates: list[Any] = [finding.get("vulnerability"), *(finding.get("cwe_ids") or [])]
+    candidates: list[Any] = [finding.get("cve"), *(finding.get("cwe_ids") or [])]
     out: list[str] = []
     for value in candidates:
         vid = str(value or "").strip().upper()
@@ -96,7 +96,7 @@ def format_finding(finding: Mapping[str, Any], max_advisory_chars: int = MAX_ADV
     """El hallazgo como líneas con etiqueta: un modelo chico las lee mejor que un JSON."""
     lines: list[str] = []
 
-    identifier = finding.get("vulnerability")
+    identifier = finding_identifier(finding, fallback="")
     if identifier:
         lines.append(f"- Identifier: {identifier}")
 

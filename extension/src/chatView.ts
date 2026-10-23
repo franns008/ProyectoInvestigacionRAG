@@ -27,7 +27,7 @@ import {
 } from "./contextMeter";
 import { renderMarkdown } from "./markdown";
 import { chip } from "./references";
-import { Finding, findingKey, identifierOf } from "./scan/types";
+import { Finding, findingKey, identifierOf, wireFinding } from "./scan/types";
 import { escapeHtml as escape } from "./styles";
 import { trimSlash } from "./util";
 import { openHttpLink, webviewPage } from "./webview";
@@ -274,7 +274,7 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
     const { url, model, apiKey, timeoutMs } = this.options();
     // `system` y no `user`: es el tema de la charla, no algo que dijo el usuario.
     const context: ChatMessage[] = findings.length
-      ? [{ role: "system", content: JSON.stringify({ findings: findings.map(contextFor) }) }]
+      ? [{ role: "system", content: JSON.stringify({ findings: findings.map(wireFinding) }) }]
       : [];
     const response = await fetch(`${trimSlash(url)}/v1/chat/completions`, {
       method: "POST",
@@ -342,21 +342,6 @@ export class ChatView implements vscode.WebviewViewProvider, vscode.Disposable {
   }
 }
 
-function contextFor(finding: Finding) {
-  return {
-    vulnerability: identifierOf(finding, "sin identificador"),
-    package: finding.package,
-    installed_version: finding.installed_version,
-    fixed_version: finding.fixed_version,
-    cwe_ids: finding.cwe_ids,
-    cvss_score: finding.cvss_score,
-    epss: finding.epss,
-    kev: finding.kev,
-    summary: finding.summary,
-    details: finding.details,
-  };
-}
-
 /** Las fichas de adjuntos y, desplegable, el JSON exacto que se manda al pipeline. */
 function renderAttachments(findings: Finding[]): string {
   // Sin adjuntos no se dibuja nada: #context:empty se oculta y el input queda solo.
@@ -372,7 +357,7 @@ function renderAttachments(findings: Finding[]): string {
       </span>`;
     })
     .join("");
-  const payload = { findings: findings.map(contextFor) };
+  const payload = { findings: findings.map(wireFinding) };
   return `<div class="attachments" aria-label="Hallazgos adjuntos">${items}</div>
     <details class="loaded-context">
       <summary>Ver contexto enviado (${findings.length})</summary>

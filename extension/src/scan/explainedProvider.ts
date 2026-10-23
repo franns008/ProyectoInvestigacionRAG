@@ -15,7 +15,14 @@
  */
 
 import { trimSlash } from '../util';
-import { Finding, ScanProvider, ScanResult, identifierOf, packageKey } from './types';
+import {
+    Finding,
+    ScanProvider,
+    ScanResult,
+    identifierOf,
+    packageKey,
+    wireFinding,
+} from './types';
 
 export interface ExplainOptions {
     /** Servidor de Pipelines (API compatible con OpenAI). */
@@ -43,9 +50,6 @@ const DEFAULT_TIMEOUT_MS = 240_000;
  * src/pipeline/explain/payload.py). Si cambia, cambiar los dos.
  */
 const MAX_EXPLAIN_TOP_N = 10;
-
-/** Recorte del texto del advisory que se manda. El servidor vuelve a recortar. */
-const MAX_TEXT_CHARS = 4_000;
 
 /** Lo que devuelve el pipeline. */
 interface WireExplanation {
@@ -101,7 +105,7 @@ export class ExplainedProvider implements ScanProvider {
                         {
                             role: 'user',
                             content: JSON.stringify({
-                                findings: findings.map(payload),
+                                findings: findings.map(wireFinding),
                             }),
                         },
                     ],
@@ -150,23 +154,6 @@ function firstFindingsByPackage(findings: Finding[], limit: number): Finding[] {
     }
 
     return targets;
-}
-
-/** Sólo lo que el pipeline necesita: ids y el texto del advisory. */
-function payload(finding: Finding) {
-    return {
-        package: finding.package,
-        installed_version: finding.installed_version,
-        cve: finding.cve,
-        osv_ids: finding.osv_ids,
-        cwe_ids: finding.cwe_ids,
-        summary: cut(finding.summary),
-        details: cut(finding.details),
-    };
-}
-
-function cut(text: string | undefined): string {
-    return (text ?? '').slice(0, MAX_TEXT_CHARS);
 }
 
 /**

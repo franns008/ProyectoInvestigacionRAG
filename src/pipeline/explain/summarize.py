@@ -22,6 +22,8 @@ import time
 from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Mapping, Sequence
 
+from common.text import finding_identifier
+
 from .lookup import fetch_context
 from .prompt import build_context, build_prompt
 
@@ -47,15 +49,6 @@ class Explanation:
 
     def as_dict(self) -> dict:
         return asdict(self)
-
-
-def finding_identifier(finding: Mapping[str, Any]) -> str:
-    """El id con el que la extensión reconoce a qué tarjeta pertenece la explicación."""
-    cve = finding.get("cve")
-    if cve:
-        return str(cve)
-    osv_ids: Sequence[str] = finding.get("osv_ids") or []
-    return str(osv_ids[0]) if osv_ids else "?"
 
 
 def explain_findings(
