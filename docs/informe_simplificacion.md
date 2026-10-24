@@ -36,8 +36,12 @@ se refieren al estado de la rama en la fecha del informe; el código ya no está
 | C6 | descartado | funciona y no molesta; `RENAMES` ya se había sacado (`abe7bf4`) |
 | C7 | aplicado | `340ab1a`, `847d05e`: `scripts/check_extension.py` reemplaza al `.sh` |
 | X1 | aplicado | `4dc1d9a`: `requirements-host.txt`; imagen rebuildeada |
-| X2 | aplicado | `ccd8cd5` |
+| X2 | aplicado | `d4acdf8` |
 | §5 docstrings | aplicado | `961ba94`..`70bfa96`; los `__init__.py` quedaron como estaban (opcional) |
+
+Re-baseline de la epoch nueva: `20261024T015349Z` (Tier 1+2, qwen2.5:3b). Sobre el mismo
+corpus que la última corrida con los inputs viejos, recall 0.796 → 0.811, hit 0.818 →
+0.864, MRR 0.678 → 0.693. Detalle y salvedades en `src/pipeline/eval/eval_meta.yaml`.
 
 Encontrado al aplicar, fuera del análisis original:
 
