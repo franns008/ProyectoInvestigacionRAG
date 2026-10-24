@@ -48,8 +48,9 @@ embeddings (`qwen3-embedding:4b`) y generación.
   generador inyectados, así que también se testea sin stack. Lo expone
   `pipeline_dependencias.py` como segundo modelo del `:9099`.
 - `src/pipeline/chat/` — contexto del chat de la extensión: separa los hallazgos adjuntos
-  que manda como mensaje `system` (`{"findings": [...]}`) y recorta el historial que entra
-  al prompt. Lógica pura, se testea sin stack. Ver `docs/arquitectura.md` §4.4.
+  que manda como mensaje `system` (`{"findings": [...]}`), recorta el historial que entra
+  al prompt y resuelve los CVE/CWE de la pregunta y la conversación (`vuln_ids.py`). Lógica
+  pura, se testea sin stack. Ver `docs/arquitectura.md` §4.4.
 - `src/pipeline/common/` — funciones compartidas: `text.py` (texto de mensajes, recorte,
   advisory), `store.py` (conexión a pgvector/Ollama y `get_document_store()`) y `log.py`.
   Es un paquete y no se llama `utils`: el server trata cada `.py` de la raíz de
