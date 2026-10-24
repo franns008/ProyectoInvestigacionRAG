@@ -74,6 +74,15 @@ _LOGGED_OUTPUTS = {
     "prompt_builder",
 }
 
+# Qué documentos se loguean de cada componente: (componente, encabezado, con score, ancho).
+_LOGGED_DOCS = (
+    ("embedding_retriever", "[EMBEDDING RETRIEVER] {n} documentos recuperados:", True, 200),
+    ("keyword_retriever", "[KEYWORD RETRIEVER] {n} documentos recuperados:", True, 200),
+    ("id_lookup", "[ID LOOKUP] {n} documentos por metadata:", False, 200),
+    ("document_joiner", "[DOCUMENT JOINER] {n} candidatos fusionados (RRF):", False, 300),
+    ("ranker", "[RANKER] {n} documentos re-rankeados enviados al prompt:", True, 300),
+)
+
 PROMPT_TEMPLATE = """
 You are a cybersecurity assistant. Answer strictly from the provided context.
 
@@ -543,38 +552,16 @@ class Pipeline:
     def _log_retrieved_docs(self, log: logging.LoggerAdapter, result: dict) -> None:
         # Una línea por documento: con saltos de línea las continuaciones quedan
         # sin request id y no se pueden filtrar con grep.
-        def doc_line(i: int, doc: Document, with_score: bool, width: int) -> str:
-            source  = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
-            snippet = " ".join((doc.content or "")[:width].split())
-            if not with_score:
-                return f"  [{i+1}] fuente={source} | {snippet}..."
-            score = f"{doc.score:.4f}" if doc.score is not None else "N/A"
-            return f"  [{i+1}] score={score} | fuente={source} | {snippet}..."
-
-        emb_docs = result.get("embedding_retriever", {}).get("documents", [])
-        log.info(f"[EMBEDDING RETRIEVER] {len(emb_docs)} documentos recuperados:")
-        for i, doc in enumerate(emb_docs):
-            log.info(doc_line(i, doc, True, 200))
-
-        kw_docs = result.get("keyword_retriever", {}).get("documents", [])
-        log.info(f"[KEYWORD RETRIEVER] {len(kw_docs)} documentos recuperados:")
-        for i, doc in enumerate(kw_docs):
-            log.info(doc_line(i, doc, True, 200))
-
-        lookup_docs = result.get("id_lookup", {}).get("documents", [])
-        log.info(f"[ID LOOKUP] {len(lookup_docs)} documentos por metadata:")
-        for i, doc in enumerate(lookup_docs):
-            log.info(f"  [{i+1}] source={doc.meta.get('source')}")
-
-        joined_docs = result.get("document_joiner", {}).get("documents", [])
-        log.info(f"[DOCUMENT JOINER] {len(joined_docs)} candidatos fusionados (RRF):")
-        for i, doc in enumerate(joined_docs):
-            log.info(doc_line(i, doc, False, 300))
-
-        ranked_docs = result.get("ranker", {}).get("documents", [])
-        log.info(f"[RANKER] {len(ranked_docs)} documentos re-rankeados enviados al prompt:")
-        for i, doc in enumerate(ranked_docs):
-            log.info(doc_line(i, doc, True, 300))
+        for component, header, with_score, width in _LOGGED_DOCS:
+            docs = result.get(component, {}).get("documents", [])
+            log.info(header.format(n=len(docs)))
+            for i, doc in enumerate(docs):
+                source = doc.meta.get("source") or doc.meta.get("file_path", "desconocido")
+                snippet = " ".join((doc.content or "")[:width].split())
+                score = ""
+                if with_score:
+                    score = f"score={doc.score:.4f} | " if doc.score is not None else "score=N/A | "
+                log.info(f"  [{i+1}] {score}fuente={source} | {snippet}...")
 
     def _build_rag_pipeline(self) -> HaystackPipeline:
         pipeline = build_rag_pipeline(self.store, self.valves)
