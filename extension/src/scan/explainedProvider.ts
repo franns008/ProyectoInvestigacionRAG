@@ -33,17 +33,9 @@ export interface ExplainOptions {
     apiKey: string;
     /** Cuántas tarjetas se explican. */
     topN: number;
-    /** Cuánto esperar al servidor, en milisegundos. */
-    timeoutMs?: number;
+    /** Cuánto esperar al servidor, en milisegundos (`cibersec.explainTimeoutSeconds`). */
+    timeoutMs: number;
 }
-
-/**
- * Cuánto se espera al servidor. El default (240 s) está calibrado para el caso lento:
- * `LLM_PROVIDER=ollama` genera en CPU dentro del container, entre 20 y 40 s por tarjeta
- * más la carga del modelo en RAM la primera vez. Con Groq son ~1 s por tarjeta y esto
- * sobra. Se puede subir o bajar con `cibersec.explainTimeoutSeconds`.
- */
-const DEFAULT_TIMEOUT_MS = 240_000;
 
 /**
  * Tope de `cibersec.explainTopN`: lo más que acepta el servidor (MAX_FINDINGS en
@@ -110,9 +102,7 @@ export class ExplainedProvider implements ScanProvider {
                         },
                     ],
                 }),
-                signal: AbortSignal.timeout(
-                    this.options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
-                ),
+                signal: AbortSignal.timeout(this.options.timeoutMs),
             },
         );
 
@@ -178,13 +168,11 @@ function merge(findings: Finding[], explanations: WireExplanation[]): void {
  * `TypeError: fetch failed`) y se arreglan distinto. Vale la pena distinguirlos.
  */
 function describe(error: unknown, options: ExplainOptions): string {
-    const segundos = Math.round(
-        (options.timeoutMs ?? DEFAULT_TIMEOUT_MS) / 1000,
-    );
     if ((error as Error)?.name === 'TimeoutError') {
+        const segundos = Math.round(options.timeoutMs / 1000);
         return (
-            `el servidor no respondió en ${segundos} s. Con LLM_PROVIDER=ollama la generación ` +
-            `corre en CPU y tarda; subí cibersec.explainTimeoutSeconds o bajá cibersec.explainTopN.`
+            `el servidor no respondió en ${segundos} s. Cada explicación es una generación del LLM; ` +
+            `subí cibersec.explainTimeoutSeconds o bajá cibersec.explainTopN.`
         );
     }
     return (error as Error).message;
