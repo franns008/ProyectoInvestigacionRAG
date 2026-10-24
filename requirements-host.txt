@@ -1,0 +1,6 @@
+# Lo que corre en el host, fuera de la imagen de pipelines: los fetchers de
+# src/ingestion/, el escaneo (python -m deps.cli, que también usa la extensión) y
+# scripts/check_extension.py. Nada de esto lo necesita el container.
+packaging
+requests
+python-dotenv

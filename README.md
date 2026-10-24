@@ -36,7 +36,7 @@ CVSS), con una extensión de VSCode que la muestra.
 determinística sobre tres archivos descargados, y corre en ~1 segundo.
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install packaging pytest requests
+python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python src/ingestion/fetch_all.py --only osv epss kev
 .venv/bin/python -m pytest
 PYTHONPATH=src/pipeline .venv/bin/python -m deps.cli <tu-requirements.txt> --data data/raw

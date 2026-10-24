@@ -85,16 +85,10 @@ Este archivo **no se commitea** (ver sección 3).
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip
-.venv/bin/pip install requests python-dotenv haystack-ai pgvector-haystack ollama-haystack
+.venv/bin/pip install -r requirements-host.txt
 ```
-Nota: `requirements.txt` en la raíz incluye además `marker-pdf` (y arrastra
-`torch`/`transformers`, varios GB) — eso es para la conversión de PDFs dentro del
-contenedor `pipelines` (ver `infrastructure/Dockerfile.pipelines`), **no hace falta
-para trabajar con la ingesta de CVEs**. Si en algún momento se necesita correr/debuggear
-esa parte en local, instalar `requirements.txt` completo:
-```bash
-.venv/bin/pip install -r requirements.txt
-```
+La indexación corre dentro del contenedor `pipelines`, que trae sus propias dependencias
+(`requirements.txt`): en el host alcanza con lo de la ingesta.
 
 **d) Verificar que el entorno quedó bien armado:**
 ```bash
@@ -222,7 +216,7 @@ Cuando se retome, el próximo script (`src/ingestion/index_nvd.py`, a crear) deb
 # Setup (una vez)
 cp infrastructure/.env.example infrastructure/.env   # completar NVD_API_KEY
 python3 -m venv .venv
-.venv/bin/pip install requests python-dotenv haystack-ai pgvector-haystack ollama-haystack
+.venv/bin/pip install -r requirements-host.txt
 
 # Fetch inicial completo
 .venv/bin/python src/ingestion/fetch_nvd.py --full

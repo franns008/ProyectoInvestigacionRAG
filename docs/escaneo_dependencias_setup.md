@@ -30,11 +30,11 @@ dos paquetes y nada más. El `requirements.txt` del repo es para el RAG, que es 
 ```bash
 git clone <repo> && cd ProyectoInvestigacionRAG
 python3 -m venv .venv
-.venv/bin/pip install packaging pytest requests
+.venv/bin/pip install -r requirements-dev.txt
 ```
 
-Si además vas a tocar el RAG, `pip install -r requirements.txt -r requirements-dev.txt`.
-Para el escaneo solo, con lo de arriba alcanza.
+`requirements-dev.txt` trae lo del host (`requirements-host.txt`: escaneo, fetchers) más
+`pytest`. Lo del RAG corre en la imagen de pipelines, no hace falta en el host.
 
 ### 2. Datos
 

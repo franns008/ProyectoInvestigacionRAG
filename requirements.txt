@@ -8,13 +8,10 @@ haystack-ai>=2.30,<3
 # Se les pone techo de major igual, para no repetir esta rotura desde otro paquete.
 ollama-haystack>=6.7,<7
 pgvector-haystack>=6.3,<7
-pypdf
 python-docx
 markdown-it-py
 mdit-plain
 nltk
-requests
-python-dotenv
 # Comparación de versiones PEP 440 y parseo de requirements.txt (PEP 508) para el
 # escaneo de dependencias (src/pipeline/deps/). Ya venía como dependencia transitiva
 # de haystack, pero ahora se importa directo, así que se declara.
