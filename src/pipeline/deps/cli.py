@@ -1,16 +1,9 @@
-"""
-CLI del escaneo de dependencias: requirements.txt -> hallazgos priorizados.
+"""CLI del escaneo: requirements.txt → hallazgos priorizados, sin stack ni LLM.
 
-Corre sin stack, sin LLM y sin base de datos. Sirve para tres cosas:
-verificar el resolver contra el dump real de OSV, alimentar la extensión de VSCode
-(`--json`), y tener algo que mostrar sin levantar infraestructura.
+    python -m deps.cli requirements.txt --data data/raw [--json]
 
-    python -m deps.cli requirements.txt --data data/raw
-
-Espera en `--data` los archivos que bajan los fetchers de la Fase 1:
-    osv/all.zip                        (obligatorio)
-    epss/epss_scores-current.csv.gz    (opcional)
-    kev/known_exploited_vulnerabilities.json (opcional)
+`--json` es lo que lee la extensión. `--data` es la carpeta de los fetchers
+(docs/ingestion_fetchers.md): `osv/all.zip` obligatorio; `epss/` y `kev/` opcionales.
 """
 
 from __future__ import annotations

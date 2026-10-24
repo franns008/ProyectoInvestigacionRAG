@@ -1,31 +1,8 @@
-"""
-Resolución determinística: qué advisories de OSV afectan a ESTAS versiones exactas.
+"""Resolución determinística: qué advisories de OSV afectan a estas versiones exactas.
 
-Es la mitad determinística del escaneo descrito en docs/escaneo_dependencias.md.
-No usa LLM, ni embeddings, ni base de datos: dado un requirements.txt y el dump de
-OSV para PyPI, la respuesta es siempre la misma. El ORDEN en que hay que atacar los
-hallazgos lo decide prioritize.py.
-
-Tres decisiones que el esquema de OSV obliga a tomar (las tres medidas sobre el dump
-real, ver docs/escaneo_dependencias.md):
-
-- **Un mismo CVE llega por varios advisories.** GHSA y PYSEC publican el mismo fallo
-  por separado: sin colapsarlos, un requirements.txt de 10 dependencias devuelve 362
-  hallazgos en vez de 144. scan() los deduplica por CVE y UNE sus `cwe_ids`, lo que
-  además cierra un hueco real: los 7.346 advisories PYSEC no traen `cwe_ids` en
-  ningún caso y el GHSA hermano se los presta (cobertura de CWE: 61% -> 98%).
-
-- **La versión de arreglo es el menor `fixed` estrictamente mayor que la instalada.**
-  Tomar el mínimo global de los `fixed` propone downgrades: para django 2.2.0
-  devolvería 2.1.9, que es anterior a lo que ya está instalado.
-
-- **Los rangos `GIT` se ignoran.** Referencian commits, no versiones de PyPI. El dump
-  trae 1.581 y ninguno es resoluble contra un pin de requirements.txt.
-
-- **Los advisories retirados (`withdrawn`) no cuentan.** Son 492 (3,7% del dump) y no
-  son inocuos: GHSA-56pw-mpj4-fxww es un duplicado de CVE-2023-4863 publicado sin
-  aliases, así que la deduplicación por CVE no lo agarra y aparecería como un hallazgo
-  extra con el texto "Duplicate Advisory" a la vista.
+Sin LLM ni base: el mismo requirements.txt y el mismo dump dan siempre lo mismo. Las
+decisiones que impone el esquema de OSV (deduplicar por CVE, versión de arreglo, rangos
+GIT, advisories retirados) están en docs/escaneo_dependencias.md.
 """
 
 from __future__ import annotations

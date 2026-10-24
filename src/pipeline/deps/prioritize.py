@@ -1,23 +1,7 @@
-"""
-Priorización por explotabilidad real: qué arreglar primero.
+"""Priorización por explotabilidad real (KEV > EPSS > CVSS): qué arreglar primero.
 
-resolver.py responde *qué* te afecta; este módulo responde *en qué orden*. La
-distinción es el hallazgo central de docs/escaneo_dependencias.md: sobre un
-requirements.txt real de 10 dependencias, filtrar por severidad alta deja 75 de 144
-hallazgos (52%) — o sea, no filtra nada. Ordenar por explotabilidad deja 1 en el
-catálogo de CISA KEV.
-
-Son preguntas distintas:
-- **CVSS** = qué tan grave sería si te la explotan.
-- **EPSS** = qué probabilidad hay de que se explote en los próximos 30 días.
-- **CISA KEV** = se está explotando, confirmado, hoy.
-
-El orden es KEV > EPSS > CVSS. Ningún score lo escribe un LLM: todos salen de acá.
-
-OSV publica el *vector* CVSS, no el número, así que el base score se calcula. Se
-implementa CVSS 3.1 (especificación FIRST); los advisories que sólo traen vector v4
-(7,3% del dump) quedan con `cvss_score = None` — el score numérico llega después por
-enriquecimiento con NVD, no se inventa.
+Ningún score lo escribe un LLM. El base score CVSS 3.1 se calcula del vector; los
+advisories que sólo traen vector v4 quedan en None. Ver docs/escaneo_dependencias.md.
 """
 
 from __future__ import annotations
