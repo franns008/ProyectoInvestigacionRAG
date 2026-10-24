@@ -45,81 +45,53 @@ import metrics as m  # noqa: E402
 import run_eval as re_  # noqa: E402
 from runner import load_dataset  # noqa: E402
 from haystack import Document  # noqa: E402
-from haystack.components.converters import (  # noqa: E402
-    DOCXToDocument, MarkdownToDocument, TextFileToDocument,
-)
 from haystack.document_stores.types import DuplicatePolicy  # noqa: E402
 from haystack_integrations.components.embedders.ollama import (  # noqa: E402
     OllamaDocumentEmbedder,
 )
 
-# La etapa de indexación vive en src/pipeline/indexing/ desde el refactor que la
-# desacopló del pipeline de inferencia: las rutas del corpus y los conversores de
-# fuentes atómicas (CWE/CVE) ya no cuelgan de pipeline_ciberseguridad.
-from indexing.converters import NVDJsonConverter, XMLCWEConverter  # noqa: E402
-from indexing.run_indexing import CONVERTED_DIR, INPUT_DIR  # noqa: E402
+# El corpus se carga con las mismas funciones que la indexación de producción.
+from indexing.run_indexing import (  # noqa: E402
+    CONVERTED_DIR, INPUT_DIR, is_blank, load_atomic, load_splittable, markdown_text,
+)
 
 
 def load_splittable_corpus() -> tuple[list[Document], list[Document]]:
     """Devuelve (rendered, raw_markdown) del corpus splittable.
 
-    - rendered:     texto pasado por MarkdownToDocument (headers '#' renderizados a
-                    texto plano). Es lo que consume el pipeline de producción.
-    - raw_markdown: el markdown crudo (sintaxis '#' intacta), necesario para
-                    MarkdownHeaderSplitter (needs_raw_markdown=True). Ver
+    - rendered:     lo mismo que indexa producción (`load_splittable`), headers '#'
+                    renderizados a texto plano.
+    - raw_markdown: el markdown crudo (sintaxis '#' intacta) de esos mismos documentos,
+                    necesario para MarkdownHeaderSplitter (needs_raw_markdown=True). Ver
                     docs/data_splitting.md §3.8.
 
     Ambas listas comparten el mismo meta.source (nombre del archivo original), que es
     el ground truth de Tier 1b.
     """
-    input_dir = INPUT_DIR
-    converted_dir = CONVERTED_DIR
-
-    rendered: list[Document] = []
-    raw_markdown: list[Document] = []
-
-    # PDFs → markdown cacheado en _converted_md (marker no se re-corre en el experimento).
-    for pdf_path in sorted(input_dir.glob("*.pdf")):
-        md_path = converted_dir / (pdf_path.stem + ".md")
-        if not md_path.exists():
-            print(f"  [warn] sin conversión cacheada para {pdf_path.name}; se saltea "
-                  f"(correr el pipeline una vez para generar {md_path.name})")
-            continue
-        text = md_path.read_text(encoding="utf-8")
-        meta = {"file_path": str(pdf_path), "source": pdf_path.name}
-        rendered.extend(_render_markdown(md_path, meta))
-        raw_markdown.append(Document(content=text, meta=dict(meta)))
-
-    # DOCX / MD nativo / TXT en INPUT_DIR (no en _converted_md).
-    simple = [
-        ("*.docx", DOCXToDocument()),
-        ("*.md",   MarkdownToDocument()),
-        ("*.txt",  TextFileToDocument()),
-    ]
-    for pattern, converter in simple:
-        files = [f for f in input_dir.glob(pattern) if f.parent == input_dir]
-        if not files:
-            continue
-        for f in files:
-            docs = converter.run(sources=[f])["documents"]
-            for d in docs:
-                d.meta.setdefault("source", f.name)
-            rendered.extend(docs)
-            # Para el raw path: .md se usa crudo; el resto no tiene headers markdown → texto plano.
-            if pattern == "*.md":
-                raw_markdown.append(Document(content=f.read_text(encoding="utf-8"),
-                                             meta={"source": f.name, "file_path": str(f)}))
-            else:
-                raw_markdown.extend([Document(content=d.content, meta=dict(d.meta)) for d in docs])
-
-    return rendered, raw_markdown
+    rendered = load_splittable(_cached_markdown)
+    return rendered, [_raw_markdown(doc) for doc in rendered]
 
 
-def _render_markdown(md_path: Path, meta: dict) -> list[Document]:
-    docs = MarkdownToDocument().run(sources=[md_path])["documents"]
-    for d in docs:
-        d.meta.update(meta)
-    return docs
+def _cached_markdown(pdf_path: Path) -> Path | None:
+    """El markdown de marker ya cacheado: el experimento no corre marker."""
+    md_path = CONVERTED_DIR / (pdf_path.stem + ".md")
+    if not md_path.exists():
+        print(f"  [warn] sin conversión cacheada para {pdf_path.name}; se saltea "
+              f"(correr la indexación una vez para generar {md_path.name})")
+        return None
+    return md_path
+
+
+def _raw_markdown(doc: Document) -> Document:
+    """El markdown crudo de un documento; DOCX y TXT no tienen headers y van como texto."""
+    source = Path(doc.meta["source"])
+    if source.suffix == ".pdf":
+        text = markdown_text(CONVERTED_DIR / (source.stem + ".md"))
+    elif source.suffix == ".md":
+        text = (INPUT_DIR / source.name).read_text(encoding="utf-8")
+    else:
+        text = doc.content
+    return Document(content=text, meta=dict(doc.meta))
 
 
 def load_atomic_corpus(include_cve: bool = False) -> list[Document]:
@@ -131,18 +103,9 @@ def load_atomic_corpus(include_cve: bool = False) -> list[Document]:
     embedding local en CPU tarda horas. Las preguntas CWE (que sí controlan el
     recall por doc-id) sólo necesitan el catálogo CWE. Ver docs/data_splitting.md.
     """
-    input_dir = INPUT_DIR
-    atomic: list[Document] = []
-    xml_files = [f for f in input_dir.glob("*.xml") if f.parent == input_dir]
-    if xml_files:
-        atomic.extend(XMLCWEConverter().run(sources=xml_files)["documents"])
-    if include_cve:
-        cve_files = sorted(input_dir.rglob("cves_page_*.json"))
-        if cve_files:
-            atomic.extend(NVDJsonConverter().run(sources=cve_files)["documents"])
-    # Dedup por id (mismo criterio que el pipeline).
+    # Dedup por id: el experimento escribe todo en una tabla nueva de una sola vez.
     seen, out = set(), []
-    for d in atomic:
+    for d in load_atomic(include_cve):
         if d.id in seen:
             continue
         seen.add(d.id)
@@ -158,7 +121,8 @@ def chunk_for_strategy(strat: cstrat.ChunkingStrategy,
     chunks = splitter.run(documents=[Document(content=d.content, meta=dict(d.meta)) for d in source])["documents"]
     if strat.needs_raw_markdown:
         chunks = [cstrat.prepend_header_context(c) for c in chunks]
-    return chunks
+    # Mismo descarte que la indexación de producción.
+    return [c for c in chunks if not is_blank(c)]
 
 
 def index_strategy(table: str, chunks: list[Document], embedded_atomic: list[Document],

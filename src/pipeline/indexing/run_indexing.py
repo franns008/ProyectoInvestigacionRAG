@@ -15,6 +15,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from itertools import islice
 from pathlib import Path
+from typing import Callable
 
 import psycopg
 
@@ -88,7 +89,7 @@ def _chunk_key(doc: Document) -> tuple[str, str] | None:
     return (str(file_path), "" if split_id is None else str(split_id))
 
 
-def _is_blank(doc: Document) -> bool:
+def is_blank(doc: Document) -> bool:
     """Chunk sin una sola letra: sólo espacios, saltos de línea y tabs.
 
     marker-pdf rellena las celdas de sus tablas markdown hasta el ancho de la columna, así
@@ -109,7 +110,7 @@ def _is_blank(doc: Document) -> bool:
 _BR_RE = re.compile(r"<br\s*/?>", re.IGNORECASE)
 
 
-def _md_source(md_path: Path) -> ByteStream:
+def markdown_text(md_path: Path) -> str:
     """El markdown de marker, con los `<br>` pasados a espacio.
 
     marker usa `<br>` para los saltos de línea DENTRO de las celdas de tabla, y
@@ -118,12 +119,57 @@ def _md_source(md_path: Path) -> ByteStream:
     retrieval a la vez — el embedder tokeniza mal esos engendros y el keyword retriever no
     encuentra `seguridad` porque como término dejó de existir.
 
-    Se pasa el markdown ya corregido como ByteStream en vez de la ruta, que es lo que
-    `MarkdownToDocument` acepta además de los paths, para no tocar el `.md` cacheado:
-    es la salida cruda de marker y reconvertir un PDF cuesta una corrida de OCR.
+    El `.md` cacheado no se toca: es la salida cruda de marker y reconvertir un PDF
+    cuesta una corrida de OCR.
     """
-    text = _BR_RE.sub(" ", md_path.read_text(encoding="utf-8"))
-    return ByteStream(data=text.encode("utf-8"), meta={"file_path": str(md_path)})
+    return _BR_RE.sub(" ", md_path.read_text(encoding="utf-8"))
+
+
+def load_splittable(pdf_markdown: Callable[[Path], Path | None]) -> list[Document]:
+    """PDF, DOCX, MD y TXT de INPUT_DIR como documentos enteros, todavía sin chunkear.
+
+    `pdf_markdown` da el markdown de marker de cada PDF (o None para saltearlo). Lo usan
+    el Indexer, que convierte lo que falte, y el experimento de chunking, que sólo lee lo
+    cacheado: así los dos parten del mismo corpus.
+    """
+    docs: list[Document] = []
+    for pdf_path in sorted(INPUT_DIR.glob("*.pdf")):
+        md_path = pdf_markdown(pdf_path)
+        if md_path is None:
+            continue
+        source = ByteStream(data=markdown_text(md_path).encode("utf-8"), meta={"file_path": str(md_path)})
+        for doc in MarkdownToDocument().run(sources=[source])["documents"]:
+            doc.meta["file_path"] = str(pdf_path)
+            doc.meta["source"] = pdf_path.name
+            docs.append(doc)
+
+    converters = [
+        ("*.docx", DOCXToDocument()),
+        ("*.md", MarkdownToDocument()),
+        ("*.txt", TextFileToDocument()),
+    ]
+    for pattern, converter in converters:
+        for path in sorted(f for f in INPUT_DIR.glob(pattern) if f.parent == INPUT_DIR):
+            for doc in converter.run(sources=[path])["documents"]:
+                doc.meta.setdefault("source", path.name)
+                docs.append(doc)
+    return docs
+
+
+def load_atomic(include_cve: bool) -> list[Document]:
+    """CWE (XML) y, con `include_cve`, CVE (JSON de NVD): un documento por entrada, sin chunkear."""
+    atomic: list[Document] = []
+    xml_files = sorted(f for f in INPUT_DIR.glob("*.xml") if f.parent == INPUT_DIR)
+    if xml_files:
+        atomic.extend(XMLCWEConverter().run(sources=xml_files)["documents"])
+
+    if include_cve:
+        cve_files = sorted(INPUT_DIR.rglob("cves_page_*.json"))
+        if cve_files:
+            atomic.extend(NVDJsonConverter().run(sources=cve_files)["documents"])
+    else:
+        logger.info("CVE (NVD) OMITIDOS — usar --include-cve para indexarlos.")
+    return atomic
 
 
 def _in_groups(items: list, size: int):
@@ -216,50 +262,7 @@ class Indexer:
         return ids, keys
 
     def load_documents(self) -> tuple[list[Document], list[Document]]:
-        splittable: list[Document] = []
-        atomic: list[Document] = []
-
-        # 1. PDFs
-        pdf_files = list(INPUT_DIR.glob("*.pdf"))
-        if pdf_files:
-            md_paths, source_names = [], []
-            for pdf_path in pdf_files:
-                md_path = self._convert_pdf_with_marker(pdf_path)
-                if md_path:
-                    md_paths.append(md_path)
-                    source_names.append(pdf_path)
-
-            if md_paths:
-                result = MarkdownToDocument().run(sources=[_md_source(m) for m in md_paths])
-                for doc, original_pdf in zip(result["documents"], source_names):
-                    doc.meta["file_path"] = str(original_pdf)
-                    doc.meta["source"] = original_pdf.name
-                splittable.extend(result["documents"])
-
-        # 2. DOCX, MD nativo, TXT
-        converters = [
-            ("*.docx", DOCXToDocument()),
-            ("*.md", MarkdownToDocument()),
-            ("*.txt", TextFileToDocument()),
-        ]
-        for pattern, converter in converters:
-            files = [f for f in INPUT_DIR.glob(pattern) if f.parent == INPUT_DIR]
-            if files:
-                splittable.extend(converter.run(sources=files)["documents"])
-
-        # 3. XML (CWE) y JSON (CVE)
-        xml_files = [f for f in INPUT_DIR.glob("*.xml") if f.parent == INPUT_DIR]
-        if xml_files:
-            atomic.extend(XMLCWEConverter().run(sources=xml_files)["documents"])
-
-        if self.include_cve:
-            cve_files = sorted(INPUT_DIR.rglob("cves_page_*.json"))
-            if cve_files:
-                atomic.extend(NVDJsonConverter().run(sources=cve_files)["documents"])
-        else:
-            logger.info("CVE (NVD) OMITIDOS — usar --include-cve para indexarlos.")
-
-        return splittable, atomic
+        return load_splittable(self._convert_pdf_with_marker), load_atomic(self.include_cve)
 
     def run(self):
         if not INPUT_DIR.exists():
@@ -284,8 +287,8 @@ class Indexer:
             # Los chunks en blanco tienen todos el MISMO contenido, o sea el mismo
             # embedding: no se recuperan sueltos sino en bloque, y con ranker_top_k=4 se
             # comen casi todos los lugares del prompt dejando al LLM el nombre del PDF sin
-            # texto al lado. Ver _is_blank.
-            splittable_docs = [d for d in chunks if not _is_blank(d)]
+            # texto al lado. Ver is_blank.
+            splittable_docs = [d for d in chunks if not is_blank(d)]
             blank = len(chunks) - len(splittable_docs)
             if blank:
                 logger.info(

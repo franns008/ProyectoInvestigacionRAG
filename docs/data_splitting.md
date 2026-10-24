@@ -297,7 +297,7 @@ liberar RAM (cerrar apps, `docker stop` de otros proyectos). No es un problema d
 |-----------|--------|-----------|--------------|
 | 1 | Correr `run_chunking_experiment.py` (una estrategia por vez) y leer `source_recall` | Decisión basada en datos, no en teoría | Requiere la imagen buildeada + vdb/ollama arriba; RAM (§7.3) |
 | 2 | Adoptar la ganadora (probable **C** o **D**) como splitter de producción | Mejor contexto por chunk | Reindexar la tabla de producción |
-| 3 | Si gana **D**: cambiar el pipeline para pasar **markdown crudo** al splitter markdown-aware (evitar `MarkdownToDocument` para PDFs) | Aprovecha la estructura de sección | Toca `Indexer.load_documents()` |
+| 3 | Si gana **D**: cambiar el pipeline para pasar **markdown crudo** al splitter markdown-aware (evitar `MarkdownToDocument` para PDFs) | Aprovecha la estructura de sección | Toca `load_splittable()` en `indexing/run_indexing.py` |
 | 4 | Re-indexar al cambiar los valves de chunking | Config utilizable de verdad | Cambio en `on_valves_updated` |
 | 5 | Alinear parámetros código ↔ runtime | Consistencia | — |
 
