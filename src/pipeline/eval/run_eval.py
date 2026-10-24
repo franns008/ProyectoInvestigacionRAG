@@ -385,7 +385,7 @@ def main() -> None:
     pipeline = rag.build_rag_pipeline(store, valves)
     embedder = rag.OllamaTextEmbedder(model=valves.embedding_model, url=rag.OLLAMA_URL)
 
-    n_docs_store = len(store.filter_documents())
+    n_docs_store = store.count_documents()
     print(f"Corriendo {len(dataset)} preguntas — run_id={run_id} epoch={meta['epoch']} "
           f"(top_k={valves.retriever_top_k}, temp={valves.temperature}, "
           f"docs_en_store={n_docs_store})\n")

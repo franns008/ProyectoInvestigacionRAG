@@ -406,7 +406,7 @@ class Pipeline:
     async def on_startup(self):
         # Ya no indexamos. Solo verificamos cuántos documentos existen.
         try:
-            total = len(self.store.filter_documents())
+            total = self.store.count_documents()
             logger.info(f"Conexión a store verificada. Documentos en BD: {total}")
         except Exception as e:
             logger.error(f"Error conectando a la BD en el arranque: {e}")
