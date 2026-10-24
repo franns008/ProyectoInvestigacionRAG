@@ -87,7 +87,8 @@ def run_pipeline(pipeline, question: str):
     # Contexto = la salida del ranker, que es lo que lee el LLM, no la del joiner
     # (bitácora, hallazgo 15).
     contexts = [d.content for d in result["ranker"]["documents"] if d.content]
-    answer   = result.get("llm", {}).get("replies", [""])[0] or ""
+    replies  = result.get("llm", {}).get("replies") or []
+    answer   = (replies[0].text if replies else "") or ""
     return contexts, answer
 
 

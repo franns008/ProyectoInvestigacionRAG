@@ -43,11 +43,12 @@ from haystack_integrations.components.retrievers.pgvector import (
     PgvectorEmbeddingRetriever,
     PgvectorKeywordRetriever,
 )
-from haystack.components.builders import PromptBuilder
+from haystack.components.builders import ChatPromptBuilder
 from haystack.components.joiners import DocumentJoiner
 from haystack.components.rankers import SentenceTransformersSimilarityRanker
 from haystack_integrations.components.embedders.ollama import OllamaTextEmbedder
-from haystack_integrations.components.generators.ollama import OllamaGenerator
+from haystack.dataclasses import ChatMessage
+from haystack_integrations.components.generators.ollama import OllamaChatGenerator
 
 _WARM_UP_LOCK = threading.Lock()
 
@@ -302,7 +303,7 @@ def build_generator(valves):
     num_ctx = effective_num_ctx(v, OLLAMA_URL)
     if num_ctx:
         generation_kwargs["num_ctx"] = num_ctx
-    return OllamaGenerator(
+    return OllamaChatGenerator(
         model=model,
         url=OLLAMA_URL,
         timeout=120,
@@ -333,7 +334,7 @@ def build_rag_pipeline(store: PgvectorDocumentStore, valves, include_llm: bool =
     pipeline.connect("document_joiner",         "ranker.documents")
 
     if include_llm:
-        pipeline.add_component("prompt_builder", PromptBuilder(template=PROMPT_TEMPLATE))
+        pipeline.add_component("prompt_builder", ChatPromptBuilder(template=[ChatMessage.from_user(PROMPT_TEMPLATE)]))
         pipeline.add_component("llm",            build_generator(v))
         pipeline.connect("ranker",          "prompt_builder.documents")
         pipeline.connect("prompt_builder",  "llm")
@@ -439,7 +440,7 @@ class Pipeline:
             inputs = {**inputs, "llm": {"streaming_callback": streaming_callback}}
         try:
             result = self.rag_pipeline.run(inputs, include_outputs_from=_LOGGED_OUTPUTS)
-            answer = result["llm"]["replies"][0]
+            answer = result["llm"]["replies"][0].text or ""
             self._log_retrieved_docs(log, result)
             self._log_token_usage(log, result)
             log.info(f"[RESPUESTA] {_one_line(answer)}")
@@ -483,11 +484,12 @@ class Pipeline:
             yield event
 
     def _log_token_usage(self, log: logging.LoggerAdapter, result: dict) -> None:
-        prompt = result.get("prompt_builder", {}).get("prompt") or ""
+        messages = result.get("prompt_builder", {}).get("prompt") or []
+        prompt = "\n".join(m.text or "" for m in messages)
         n_docs = len(result.get("ranker", {}).get("documents", []))
-        meta_list = result.get("llm", {}).get("meta") or []
-        meta = meta_list[0] if meta_list else {}
-        # OllamaGenerator ya convierte los contadores de Ollama al formato `usage` de OpenAI.
+        replies = result.get("llm", {}).get("replies") or []
+        meta = replies[0].meta if replies else {}
+        # OllamaChatGenerator ya convierte los contadores de Ollama al formato `usage` de OpenAI.
         usage = meta.get("usage") or {}
         model = meta.get("model", "desconocido")
 

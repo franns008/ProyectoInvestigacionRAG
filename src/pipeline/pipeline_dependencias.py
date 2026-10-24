@@ -106,7 +106,9 @@ class Pipeline:
         )
 
     def _generate(self, prompt: str) -> str:
-        """Una llamada al LLM. La forma de la respuesta es la misma en Groq y en Ollama."""
-        replies = (self.generator.run(prompt=prompt) or {}).get("replies") or []
-        return replies[0] if replies else ""
+        """Una llamada al LLM, con el prompt como único mensaje del usuario."""
+        from haystack.dataclasses import ChatMessage
+
+        replies = (self.generator.run(messages=[ChatMessage.from_user(prompt)]) or {}).get("replies") or []
+        return (replies[0].text or "") if replies else ""
 

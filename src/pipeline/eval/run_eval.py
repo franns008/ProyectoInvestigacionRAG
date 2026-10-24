@@ -95,7 +95,8 @@ def run_question(pipeline, question: str):
     document_ids   = [d.id for d in result["document_joiner"]["documents"]]
     ranked_ids     = [d.id for d in ranked_docs]
     ranked_sources = [d.meta.get("source") for d in ranked_docs]
-    answer         = result.get("llm", {}).get("replies", [None])[0]
+    replies        = result.get("llm", {}).get("replies") or []
+    answer         = replies[0].text if replies else None
     return channel_ids(result), ranked_ids, ranked_sources, answer, document_ids
 
 
