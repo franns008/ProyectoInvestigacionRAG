@@ -59,7 +59,9 @@ embeddings (`qwen3-embedding:4b`) y generación.
   al que se le adjuntan hallazgos (`src/chatView.ts`). Escanea con el `deps.cli` local y
   le pide al `:9099` las explicaciones y las respuestas del chat (`src/scan/types.ts` es
   el contrato compartido). Helpers: `src/util.ts` (sin `vscode`) y `src/webview.ts`
-  (esqueleto del webview y apertura de links).
+  (esqueleto del webview y apertura de links). El CSS y el JS de los webviews viven en
+  `media/` (`base.css` compartido, `chat.*` y `panel.*`); el host les pasa su estado
+  inicial como JSON en `data-state` del `<body>`.
 - `infrastructure/` — stack Docker Compose. `docker-compose.yml` (base, CPU) +
   `docker-compose.nvidia.yml` (overlay GPU NVIDIA, vía CUDA) +
   `docker-compose.amd.yml` (overlay GPU AMD, vía Vulkan; sólo acelera Ollama).
