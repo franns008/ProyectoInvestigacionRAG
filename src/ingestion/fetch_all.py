@@ -1,17 +1,8 @@
-"""Orquestador de los fetchers de la Capa 1: baja todos los datos crudos de una.
+"""Baja todos los datos crudos de la Capa 1 encadenando los `fetch_<fuente>.py`.
 
-Cada fuente vive en su propio `fetch_<fuente>.py` y se puede correr suelta; esto sólo
-las encadena y reporta. Todas exponen el mismo contrato: `fetch(force: bool) -> Result`.
+Las descargas son condicionales, así que correrlo seguido es barato. NVD queda fuera por
+defecto por su tamaño. Ver docs/ingestion_fetchers.md.
 
-Las descargas son condicionales: si el servidor dice que el archivo no cambió, no se
-baja nada. Así que correrlo seguido es barato y mantiene los datos frescos — que es lo
-que hace falta con EPSS y KEV, que se actualizan a diario.
-
-NVD queda fuera del set por defecto porque su carga inicial son ~250k CVEs y domina el
-tiempo por órdenes de magnitud; las otras cuatro son ~57 MB en segundos. Es el mismo
-criterio que usa run_indexing.py con --include-cve.
-
-Uso:
     python src/ingestion/fetch_all.py                  # osv, epss, kev, cwe
     python src/ingestion/fetch_all.py --include-nvd    # + NVD (lento la primera vez)
     python src/ingestion/fetch_all.py --only cwe osv

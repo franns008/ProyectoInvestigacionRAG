@@ -1,26 +1,9 @@
-"""Fetch CWE (Capa 1): baja el catálogo completo de MITRE y lo deja listo para indexar.
+"""Baja el catálogo CWE completo de MITRE y deja el XML plano en data/raw/cwec_latest.xml.
 
-CWE no tiene cadencia incremental — se libera por versiones (hoy 4.20), así que cada
-release trae el catálogo entero y no hay checkpoint fino. Sí hay descarga condicional:
-entre release y release el servidor contesta 304 y no se baja nada. Tampoco hace falta
-API key.
+Descarga condicional (304 entre releases), sin API key. Por qué el XML va suelto y por qué
+no se usa la REST API de MITRE: docs/ingestion_fetchers.md.
 
-Deja dos cosas:
-  - el zip crudo archivado en data/raw/cwe/<timestamp>/, como hace fetch_nvd.py
-  - el XML extraído en data/raw/cwec_latest.xml, *plano*, porque el indexer levanta
-    `INPUT_DIR.glob("*.xml")` filtrando subcarpetas (ver run_indexing.py)
-
-El nombre publicado es fijo a propósito: el XML pesa ~18 MB y el de adentro del zip
-viene versionado (cwec_v4.20.xml), así que cada corrida pisa el anterior en vez de
-acumular una copia por release.
-
-La REST API de MITRE (cwe-api.mitre.org) no sirve para esto: su endpoint no documentado
-/cwe/weakness/all devuelve 200 con el JSON truncado. Sólo es útil para consultas
-puntuales y para la jerarquía padre-hijo, que hoy no usamos.
-
-Uso:
-    python src/ingestion/fetch_cwe.py
-    python src/ingestion/fetch_cwe.py --force   # rebaja aunque no haya cambiado
+    python src/ingestion/fetch_cwe.py [--force]
 """
 
 import io

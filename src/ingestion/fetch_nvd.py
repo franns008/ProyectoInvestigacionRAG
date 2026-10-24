@@ -1,18 +1,11 @@
-"""Fetch NVD/CVE (Capa 1) y guarda el JSON crudo en data/raw/nvd/.
+"""Baja CVEs de NVD tal cual llegan de la API a data/raw/nvd/, con checkpoint incremental.
 
-No normaliza ni transforma nada — eso lo hace un paso posterior siguiendo
-docs/data_transform_spec.md. Este script solo trae los datos y los persiste
-tal cual llegan de la API, con un checkpoint para no repetir la carga completa
-en cada corrida.
+Ver docs/ingestion_nvd_setup.md.
 
-Uso:
     python src/ingestion/fetch_nvd.py            # incremental (usa el checkpoint si existe)
-    python src/ingestion/fetch_nvd.py --full      # ignora el checkpoint, trae el catálogo completo
-
-Muestras livianas para probar el RAG (carpeta propia, no tocan el checkpoint):
-    python src/ingestion/fetch_nvd.py --kev                      # ~1.700 CVE explotados (KEV)
-    python src/ingestion/fetch_nvd.py --since 2026-08-01         # publicados desde esa fecha
-    python src/ingestion/fetch_nvd.py --kev --since 2025-01-01   # KEV recientes
+    python src/ingestion/fetch_nvd.py --full     # ignora el checkpoint, trae el catálogo completo
+    python src/ingestion/fetch_nvd.py --kev      # muestra: ~1.700 CVE explotados (KEV)
+    python src/ingestion/fetch_nvd.py --since 2026-08-01   # muestra: publicados desde esa fecha
 """
 
 import argparse
