@@ -3,16 +3,10 @@ Este es un repositorio con ejemplos de infraestructura básica para RAGs.
 Incluye
 - **Ollama**: Ollama es una plataforma de código abierto que permite descargar, ejecutar y gestionar modelos de lenguaje grandes (LLM) directamente en el ordenador local, sin depender de servicios en la nube. Fue lanzado en julio de 2023 por Jeffrey Morgan y está diseñado para ejecutarse en sistemas Windows, macOS y Linux, funcionando principalmente a través de la terminal o mediante una API para integraciones.
 - **pgvector**: es una extensión de código abierto para PostgreSQL que añade soporte nativo para el almacenamiento, indexación y búsqueda de similitud de vectores de alta dimensión, permitiendo integrar capacidades avanzadas de inteligencia artificial directamente en bases de datos relacionales existentes.
-- 
 
-## Startup
-```
-git clone
-cd infrastructure
-docker compose pull
-docker compose run
-```
-And a bit of luck.
+## Puesta en marcha
+
+Paso a paso (CPU o GPU NVIDIA/AMD): [`docs/arquitectura.md`](docs/arquitectura.md) §7.
 
 ## Generación local en Ollama
 
@@ -24,7 +18,7 @@ default del pipeline, `qwen2.5:3b-instruct`) y tiene que estar `ollama pull`-ead
 Anda en CPU; con GPU va bastante más rápido, y hay un overlay de Compose por familia de
 placa (NVIDIA vía CUDA, AMD vía Vulkan). Ver `docs/arquitectura.md` §8.
 
-👉 **Guía completa e instrucciones de uso: [`docs/arquitectura.md`](docs/arquitectura.md)** (doc crucial).
+**Guía completa: [`docs/arquitectura.md`](docs/arquitectura.md).**
 
 ## Escaneo de dependencias vulnerables
 
@@ -42,8 +36,5 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 PYTHONPATH=src/pipeline .venv/bin/python -m deps.cli <tu-requirements.txt> --data data/raw
 ```
 
-👉 **Puesta en marcha completa: [`docs/escaneo_dependencias_setup.md`](docs/escaneo_dependencias_setup.md)**
+**Puesta en marcha completa: [`docs/escaneo_dependencias_setup.md`](docs/escaneo_dependencias_setup.md)**
 · diseño y justificación: [`docs/escaneo_dependencias.md`](docs/escaneo_dependencias.md).
-
-## Creando tu propio RAG
-El código de tu RAG puede vivir en cualquier carpeta fuera de infrastructure e incluso fuera del repositorio. La carpeta `seven_wonders` tiene un ejemplo de RAG sencillo usando HayStack pero pueden crearse RAGs usando cualquier otra librería como LlamaIndex o LangChain. Sigue por el camino de tu arcoiris 🌈.
