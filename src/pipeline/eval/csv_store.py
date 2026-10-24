@@ -68,6 +68,7 @@ QUESTIONS_COLUMNS = [
     # Tier 1
     "n_expected", "expected_ids", "retrieved_ids", "joined_ids", "rank_first_hit",
     "recall_eff", "hit_eff", "rr_eff", "via_embedding", "via_keyword",
+    "via_id_lookup",
     # Tier 1b (fuente)
     "expected_sources", "retrieved_sources",
     "source_recall", "source_hit", "source_rr",
@@ -228,7 +229,9 @@ def _load(path: Path, columns: list[str], dtypes: dict[str, str]) -> "pd.DataFra
         # DataFrame vacío pero con el esquema puesto: evita FileNotFoundError y
         # los `KeyError` aguas abajo en report.py.
         return pd.DataFrame({c: pd.Series(dtype=dtypes[c]) for c in columns})
-    return pd.read_csv(path, dtype=dtypes, keep_default_na=True)
+    # Un archivo de antes de una columna nueva se migra recién al escribir: al leer se
+    # completan las que falten, así report.py siempre ve el esquema entero.
+    return pd.read_csv(path, dtype=dtypes, keep_default_na=True).reindex(columns=columns)
 
 
 def load_runs(path: Path) -> "pd.DataFrame":

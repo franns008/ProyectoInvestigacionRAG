@@ -451,7 +451,7 @@ Con `requirements.txt` de 10 dependencias con versiones viejas fijadas:
     `9099` seleccionando el modelo `pipeline_dependencias`, más un webview que renderiza la
     tarjeta. Se puede desarrollar contra respuestas falsas mientras la Fase 3 avanza.
 13. **Panel de evidencia** — segunda superficie, con procedencia por retriever
-    (`via_embedding` / `via_keyword`, columnas que el eval ya persiste), scores del reranker
+    (`via_embedding` / `via_keyword` / `via_id_lookup`, columnas que el eval ya persiste), scores del reranker
     y resultados del eval.
 
 ### Reparto sugerido (4 personas)

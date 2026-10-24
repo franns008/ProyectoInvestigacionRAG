@@ -647,17 +647,17 @@ def cmd_runs(args) -> int:
 # Modo `question` — drill-down de una pregunta
 # ─────────────────────────────────────────────────────────────────────────────
 
-def via_series(d: "pd.DataFrame"):
-    """De qué retriever vino el documento: emb / kw / emb+kw / -.
+_VIA = {"via_embedding": "emb", "via_keyword": "kw", "via_id_lookup": "id"}
+
+
+def via_series(d: "pd.DataFrame") -> list[str]:
+    """De qué canales vino el acierto: emb / kw / id combinados con '+', o '-'.
 
     Los flags se leen como float (así `.mean()` funciona directo sobre ellos),
     por eso la comparación es contra 1.0 y no contra True.
     """
-    import numpy as np
-
-    emb = d["via_embedding"] == 1.0
-    kw = d["via_keyword"] == 1.0
-    return np.select([emb & kw, emb, kw], ["emb+kw", "emb", "kw"], default="-")
+    flags = {name: (d[col] == 1.0).tolist() for col, name in _VIA.items()}
+    return ["+".join(name for name in flags if flags[name][i]) or "-" for i in range(len(d))]
 
 
 def cmd_question(args) -> int:

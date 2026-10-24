@@ -146,15 +146,14 @@ def index_strategy(table: str, chunks: list[Document], embedded_atomic: list[Doc
 
 def retrieval_only_question(pipeline, question: str):
     """Corre el pipeline SIN LLM (hasta el reranker) y devuelve
-    (emb_ids, kw_ids, ranked_ids, ranked_sources). Ver build_rag_pipeline(include_llm=False)."""
+    (channels, ranked_ids, ranked_sources). Ver build_rag_pipeline(include_llm=False)."""
     result = pipeline.run(
         rag.build_query(question).inputs(include_llm=False),
-        include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner", "ranker"},
+        include_outputs_from={*re_.CHANNELS, "ranker"},
     )
     ranked_docs = result["ranker"]["documents"]
     return (
-        [d.id for d in result["embedding_retriever"]["documents"]],
-        [d.id for d in result["keyword_retriever"]["documents"]],
+        re_.channel_ids(result),
         [d.id for d in ranked_docs],
         [d.meta.get("source") for d in ranked_docs],
     )
@@ -167,8 +166,8 @@ def run_eval_on_store(store, dataset: list[dict], valves) -> list[dict]:
     per_question: list[dict] = []
     for item in dataset:
         try:
-            emb, kw, joined, joined_sources = retrieval_only_question(pipeline, item["question"])
-            rec = re_.evaluate(item, emb, kw, joined, joined_sources, answer=None)
+            channels, ranked, ranked_sources = retrieval_only_question(pipeline, item["question"])
+            rec = re_.evaluate(item, channels, ranked, ranked_sources, answer=None)
         except Exception as e:  # noqa: BLE001
             rec = {"id": item["id"], "category": item.get("category", "?"),
                    "recall": None, "source_recall": None,

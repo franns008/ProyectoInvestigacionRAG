@@ -272,7 +272,7 @@ mejor y mentiroso.
 | `joined_ids` | lista `\|` | Los del `document_joiner`, **antes** del reranker. Comparar con el anterior muestra qué descartó el reranker |
 | `rank_first_hit` | int | Posición (1-indexada) del primer acierto. Vacío = no acertó |
 | `recall_eff` / `hit_eff` / `rr_eff` | 0–1 | Las métricas de esta pregunta sola |
-| `via_embedding` / `via_keyword` | 1-0 | Qué retriever aportó el acierto. Los dos en 1 = ambos |
+| `via_embedding` / `via_keyword` / `via_id_lookup` | 1-0 | Qué canal aportó el acierto (embedding, BM25 o el lookup por CWE/CVE). Varios en 1 = varios |
 | `expected_sources` / `retrieved_sources` | lista `\|` | Ídem pero a nivel fuente |
 | `source_recall` / `source_hit` / `source_rr` | 0–1 | Métricas Tier 1b de esta pregunta |
 | `correct_rejection` | 1-0 | Sólo en **negativas** (sin ground truth): si el RAG se abstuvo como corresponde. ⚠️ Se detecta por **coincidencia de frases** ("no puedo responder", "no tengo suficiente información"), así que una abstención redactada distinto cuenta como fallo. Es el H6 de [mejoras_harness.md](../../../docs/eval/mejoras_harness.md) |

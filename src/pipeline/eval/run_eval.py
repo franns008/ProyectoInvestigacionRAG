@@ -80,9 +80,22 @@ def rank_first_hit(retrieved_ids: list[str], expected_ids: list[str]) -> int | N
     return None
 
 
+# Canales de retrieval cuyo aporte se atribuye en `via_*`: componente → nombre.
+CHANNELS = {
+    "embedding_retriever": "embedding",
+    "keyword_retriever":   "keyword",
+    "id_lookup":           "id_lookup",
+}
+
+
+def channel_ids(result: dict) -> dict[str, list[str]]:
+    """Los ids que trajo cada canal, antes de fusionar."""
+    return {name: [d.id for d in result[comp]["documents"]] for comp, name in CHANNELS.items()}
+
+
 def run_question(pipeline, question: str):
     """Una corrida del pipeline; devuelve
-    (emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids).
+    (channels, ranked_ids, ranked_sources, answer, document_ids).
 
     `ranked_ids`/`ranked_sources` son los docs que el reranker deja al prompt (lo que
     ve el LLM), no los candidatos fusionados del joiner. Las métricas Tier 1 se
@@ -91,16 +104,14 @@ def run_question(pipeline, question: str):
     """
     result = pipeline.run(
         rag.build_query(question).inputs(),
-        include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner", "ranker"},
+        include_outputs_from={*CHANNELS, "document_joiner", "ranker"},
     )
     ranked_docs    = result["ranker"]["documents"]
-    emb_ids        = [d.id for d in result["embedding_retriever"]["documents"]]
     document_ids   = [d.id for d in result["document_joiner"]["documents"]]
-    kw_ids         = [d.id for d in result["keyword_retriever"]["documents"]]
     ranked_ids     = [d.id for d in ranked_docs]
     ranked_sources = [d.meta.get("source") for d in ranked_docs]
     answer         = result.get("llm", {}).get("replies", [None])[0]
-    return emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids
+    return channel_ids(result), ranked_ids, ranked_sources, answer, document_ids
 
 
 def compute_sas(embedder, answer: str | None, reference: str | None) -> float | None:
@@ -112,7 +123,7 @@ def compute_sas(embedder, answer: str | None, reference: str | None) -> float | 
     r = embedder.run(text=reference)["embedding"]
     return round(m.cosine_similarity(a, r), 4)
 
-def evaluate(item: dict, emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids=None) -> dict:
+def evaluate(item: dict, channels: dict[str, list[str]], ranked_ids, ranked_sources, answer, document_ids=None) -> dict:
     """`document_ids` (candidatos del joiner) es opcional: el experimento de chunking
     corre en retrieval puro y sólo necesita ranked_ids/ranked_sources."""
     expected = item.get("expected_doc_ids") or []
@@ -135,10 +146,8 @@ def evaluate(item: dict, emb_ids, kw_ids, ranked_ids, ranked_sources, answer, do
         rec["hit"]    = m.hit_at_k(ranked_ids, expected)
         rec["rr"]     = m.reciprocal_rank(ranked_ids, expected)
         exp = set(expected)
-        rec["hit_source"] = {          # qué retriever aportó algún esperado
-            "embedding": bool(exp & set(emb_ids)),
-            "keyword":   bool(exp & set(kw_ids)),
-        }
+        # qué canal aportó algún esperado
+        rec["hit_source"] = {name: bool(exp & set(ids)) for name, ids in channels.items()}
     else:
         rec["recall"] = rec["hit"] = rec["rr"] = None
         rec["hit_source"] = None
@@ -280,6 +289,7 @@ def question_row(run_id: str, rec: dict) -> dict:
         "rr_eff":            rec.get("rr"),
         "via_embedding":     hit_source.get("embedding"),
         "via_keyword":       hit_source.get("keyword"),
+        "via_id_lookup":     hit_source.get("id_lookup"),
         "expected_sources":  rec.get("expected_sources"),
         "retrieved_sources": rec.get("ranked_sources"),
         "source_recall":     rec.get("source_recall"),
@@ -390,9 +400,9 @@ def main() -> None:
     for i, item in enumerate(dataset, 1):
         try:
             
-            emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids = run_question(pipeline, item["question"])
+            channels, ranked_ids, ranked_sources, answer, document_ids = run_question(pipeline, item["question"])
 
-            rec = evaluate(item, emb_ids, kw_ids, ranked_ids, ranked_sources, answer, document_ids)
+            rec = evaluate(item, channels, ranked_ids, ranked_sources, answer, document_ids)
         except Exception as e:  # noqa: BLE001 — queremos seguir con el resto
             rec = {
                 "id": item["id"], "category": item.get("category", "?"),
