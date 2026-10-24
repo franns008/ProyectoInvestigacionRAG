@@ -1,18 +1,5 @@
-"""
-Orquestación: hallazgos priorizados → una explicación por tarjeta.
-
-**Una llamada al LLM por hallazgo**, no una sola con los tres adentro. Razones, por orden
-de importancia:
-
-- El mapeo hallazgo → explicación queda determinístico: no hay que adivinar qué párrafo
-  corresponde a qué CVE.
-- No hay contaminación cruzada. Con tres CVE en un mismo prompt el modelo mezcla productos
-  y versiones, que es el error más caro posible acá.
-- Una falla es una tarjeta sin explicación, no las tres.
-
-El lookup, en cambio, es **una sola tanda para todos** (ver explain/lookup.py): dos queries
-en total, no dos por hallazgo.
-"""
+"""Hallazgos → una explicación por tarjeta, con una llamada al LLM por hallazgo
+(docs/explicacion_hallazgos.md, "Cuántas llamadas al LLM")."""
 
 from __future__ import annotations
 

@@ -1,20 +1,6 @@
-"""
-Traer del corpus el contenido de un CVE o un CWE **por clave exacta**.
-
-Es un `SELECT` por metadata, no un retrieval: cuando el escaneo de `deps/` termina, el
-identificador ya se conoce (`CVE-2023-4863`, `CWE-787`). Usar embeddings + full-text + RRF
-+ cross-encoder para encontrar un documento cuyo id exacto ya se tiene es aplicar una
-herramienta probabilística a un problema determinístico — y el eval mide `recall_eff`
-0.841, o sea que fallaría ~1 de cada 6 veces. Acá es exacto, o es un "no está" honesto.
-
-Ver docs/explicacion_hallazgos.md.
-
-Dos cosas que este módulo NO hace, a propósito:
-
-- **No construye el store.** Lo recibe. Así los tests corren con un doble y sin levantar
-  pgvector, igual que los de `deps/`.
-- **No hace una query por hallazgo.** Junta los ids de los N hallazgos y hace como mucho
-  dos llamadas (una por `source_type`). El join hallazgo ↔ documento se arma en memoria.
+"""Trae del corpus el contenido de un CVE o un CWE por clave exacta: un SELECT por metadata,
+no un retrieval. Recibe el store inyectado y hace como mucho dos llamadas para todos los
+hallazgos. Ver docs/explicacion_hallazgos.md.
 """
 
 from __future__ import annotations
@@ -33,14 +19,8 @@ _CWE_PREFIX = re.compile(r"^\s*cwe[\s\-_]*", re.IGNORECASE)
 
 
 def cwe_key(raw: Any) -> int | None:
-    """`"CWE-787"` → `787`. Devuelve None si no hay un número adentro.
-
-    **Esta normalización no es cosmética.** El indexador guarda el número pelado como
-    entero (`indexing/converters.py`: `"cwe_id": int(cwe_id)`), mientras que OSV entrega
-    el string `"CWE-787"`. Un filtro `in ["CWE-787"]` contra una columna que tiene `787`
-    no lanza error: devuelve **cero filas en silencio**, y el síntoma es "el corpus no
-    tiene ese CWE" cuando sí lo tiene.
-    """
+    """`"CWE-787"` → `787`, o None. El indexador guarda el número como int: filtrar por el
+    string devuelve cero filas en silencio (docs/explicacion_hallazgos.md)."""
     if isinstance(raw, bool):  # bool es subclase de int: no es un id de CWE
         return None
     if isinstance(raw, int):

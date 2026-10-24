@@ -1,25 +1,8 @@
-"""
-Armado del contexto y del prompt de resumen.
+"""Contexto y prompt de la explicación de un hallazgo.
 
-Dos reglas que vienen del contrato de salida (docs/escaneo_dependencias.md):
-
-1. **El LLM escribe solamente el párrafo.** El CVSS, el EPSS, el flag de KEV, la versión
-   de arreglo y los identificadores se concatenan desde los datos estructurados y nunca
-   pasan por el modelo. Un modelo no puede equivocarse en un score que no escribe. Por eso
-   el prompt le *prohíbe* repetirlos: ya se muestran al lado de su texto.
-2. **Las citas las arma Python**, a partir de las fuentes que realmente se mandaron.
-
-El contexto se arma en cascada, porque ninguna fuente está garantizada (medición en
-docs/explicacion_hallazgos.md: de los CVE del escaneo de demo, 0 de 10 están en el dump
-local de NVD; de los CWE, 6 de 7 están en los XML de MITRE):
-
-    1. documento del CVE   (NVD)    — si el corpus lo tiene
-    2. documento del CWE   (MITRE)  — si el corpus lo tiene
-    3. summary + details del advisory (OSV) — **siempre**: viaja dentro del hallazgo
-
-El nivel 3 es el que sostiene la explicación con el corpus vacío o la base caída. Si los
-tres vienen vacíos no hay prompt: se devuelve un contexto sin bloques y el hallazgo se
-queda sin explicación. **Nunca se deja que el modelo escriba de memoria.**
+El LLM sólo escribe el párrafo: los campos duros y las citas los arma Python. El contexto
+va en cascada CVE → CWE → advisory de OSV, y sin ninguno no hay prompt. Ver
+docs/explicacion_hallazgos.md.
 """
 
 from __future__ import annotations
