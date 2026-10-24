@@ -291,6 +291,10 @@ def build_generator(valves):
     (que ya trae `DEFAULT_OLLAMA_LLM` como default). La ventana, igual: `LLM_NUM_CTX`
     le gana al valve `num_ctx`, y 0 toma la del Modelfile. Las variables de entorno
     ganan para poder cambiar de modelo sin tocar los valves.
+
+    `think` se manda siempre: si no, Ollama usa el default del modelo, y los que piensan
+    (Gemma 4) gastan `num_predict` razonando. Un modelo que no piensa acepta `false`,
+    pero con `true` Ollama responde 400.
     """
     v = valves
     model = llm_model(v)
@@ -308,6 +312,7 @@ def build_generator(valves):
         url=OLLAMA_URL,
         timeout=120,
         generation_kwargs=generation_kwargs,
+        think=v.think,
     )
 
 def build_rag_pipeline(store: PgvectorDocumentStore, valves, include_llm: bool = True) -> HaystackPipeline:
@@ -356,6 +361,7 @@ class Pipeline:
         max_tokens:      int   = 512
         temperature:     float = 0.5
         num_ctx:         int   = 8192  # ventana de Ollama: prompt + respuesta
+        think:           bool  = False # el razonamiento sale de max_tokens
         # Historial del chat que entra al prompt. El hallazgo de la extensión (mensaje
         # system) va aparte y entra siempre. 0 desactiva el historial.
         history_max_messages: int = 6

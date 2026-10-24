@@ -37,6 +37,7 @@ class Pipeline:
         llm_model:   str   = DEFAULT_OLLAMA_LLM
         max_tokens:  int   = 220    # 2-3 frases; más que esto es el modelo desobedeciendo
         temperature: float = 0.2    # es un resumen de un texto dado, no escritura creativa
+        think:       bool  = False  # pensar no entra en 220 tokens: la respuesta sale vacía
 
     def __init__(self):
         self.name = "Explicación de dependencias vulnerables"
