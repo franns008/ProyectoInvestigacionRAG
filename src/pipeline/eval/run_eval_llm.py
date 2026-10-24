@@ -103,14 +103,7 @@ def make_judge(model: str, schema: str | None = None):
 def run_pipeline(pipeline, question: str):
     """Devuelve (contexts: list[str], answer: str) — lo que necesita el juez."""
     result = pipeline.run(
-        {
-            "text_embedder":     {"text": question},
-            "keyword_retriever": {"query": rag.build_keyword_query(question)},
-            # El `ranker` es obligatorio desde que entró el cross-encoder. Sin esta
-            # línea el pipeline ni arranca ("Missing mandatory input 'query'").
-            "ranker":            {"query": question},
-            "prompt_builder":    {"question": question},
-        },
+        rag.build_query(question).inputs(),
         include_outputs_from={"ranker"},
     )
     # Contexto = la salida del RANKER, no la del document_joiner.

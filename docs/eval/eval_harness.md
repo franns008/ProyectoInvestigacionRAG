@@ -218,23 +218,22 @@ vayan fallando en producción (cada bug encontrado → una pregunta nueva de reg
 
 ### `run_eval.py` — Tier 1 + 2 (gate diario)
 
-Por cada pregunta, **una sola corrida** del pipeline con `temperature = 0`:
+Por cada pregunta, **una sola corrida** del pipeline con `temperature = 0`. Los inputs los
+arma `build_query`, la misma función que usa `pipe()` en producción (IDs a `id_lookup`, query
+con instrucción para el embedder, query del ranker): el eval mide el pipeline que corre el
+usuario.
 
 ```python
 result = pipeline.run(
-    {
-        "text_embedder":     {"text": q},
-        "keyword_retriever": {"query": build_keyword_query(q)},
-        "prompt_builder":    {"question": q},
-    },
-    include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner"},
+    rag.build_query(q).inputs(),
+    include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner", "ranker"},
 )
-answer        = result["llm"]["replies"][0]
-retrieved_ids = [d.id for d in result["document_joiner"]["documents"]]
+answer     = result["llm"]["replies"][0]
+ranked_ids = [d.id for d in result["ranker"]["documents"]]
 ```
 
 De ese único resultado:
-- **Tier 1:** `retrieved_ids` vs `expected_doc_ids` → recall@k, hit@k, MRR + contribución por
+- **Tier 1:** `ranked_ids` vs `expected_doc_ids` → recall@k, hit@k, MRR + contribución por
   retriever.
 - **Tier 2:** SAS entre `answer` y `reference_answer` (embeddings Ollama).
 

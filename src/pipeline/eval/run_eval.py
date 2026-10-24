@@ -90,12 +90,7 @@ def run_question(pipeline, question: str):
     truth agnóstico a la estrategia de chunking (ver metrics.source_recall_at_k).
     """
     result = pipeline.run(
-        {
-            "text_embedder":     {"text": question},
-            "keyword_retriever": {"query": rag.build_keyword_query(question)},
-            "ranker":            {"query": question},
-            "prompt_builder":    {"question": question},
-        },
+        rag.build_query(question).inputs(),
         include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner", "ranker"},
     )
     ranked_docs    = result["ranker"]["documents"]
@@ -164,8 +159,8 @@ def evaluate(item: dict, emb_ids, kw_ids, ranked_ids, ranked_sources, answer, do
     if rec["expect_refusal"]:
         # Guiones a ASCII antes de extraer: el modelo escribe `CVE‑2021‑44228`
         # con U+2011 y el regex de ids sólo entiende `-`.
-        ids_resp = rag._extract_vuln_ids(m.normalizar_guiones(answer or ""))
-        ids_preg = rag._extract_vuln_ids(m.normalizar_guiones(item.get("question", "")))
+        ids_resp = rag.extract_vuln_ids(m.normalizar_guiones(answer or ""))
+        ids_preg = rag.extract_vuln_ids(m.normalizar_guiones(item.get("question", "")))
         fabricados = m.fabricated_ids(ids_resp, ids_preg)
         rec["fabricated_ids"] = fabricados
         rec["correct_rejection"] = rec["refused"] and not fabricados

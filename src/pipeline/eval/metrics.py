@@ -144,7 +144,7 @@ def aggregate_sas(per_question: list[dict]) -> dict:
 
 # Guiones tipográficos → ASCII. Los LLM escriben `CVE‑2021‑44228` con U+2011 y el
 # regex de ids del pipeline sólo entiende `-`: sin esto, un id inventado con
-# guión "bonito" es invisible. Verificado (2026-08-18): `_extract_vuln_ids`
+# guión "bonito" es invisible. Verificado (2026-08-18): `extract_vuln_ids`
 # devuelve `[]` sobre un texto con U+2011, y las respuestas de gpt-oss los usan.
 _GUIONES = dict.fromkeys(map(ord, "\u2010\u2011\u2012\u2013\u2014\u2212"), "-")
 
@@ -202,7 +202,7 @@ def fabricated_ids(answer_ids: Iterable[str], question_ids: Iterable[str]) -> li
     Restar los de la pregunta es lo que evita el falso positivo obvio: si te
     preguntan por CVE-2021-44228, repetirlo en la respuesta no es inventar nada.
 
-    Recibe listas de ids ya extraídas (`rag._extract_vuln_ids` sobre el texto
+    Recibe listas de ids ya extraídas (`rag.extract_vuln_ids` sobre el texto
     normalizado) en vez de los textos: así `metrics.py` no depende del pipeline.
     """
     de_la_pregunta = set(question_ids)

@@ -120,7 +120,7 @@ orden. Con esto, **todos los deltas actuales engañan**.
 > **Dos cosas que aparecieron al implementarlo:**
 >
 > 1. **Los guiones tipográficos rompían la detección de ids inventados.**
->    `_extract_vuln_ids` sólo entiende `-` ASCII y el modelo escribe `CVE‑2021‑44228`
+>    `extract_vuln_ids` sólo entiende `-` ASCII y el modelo escribe `CVE‑2021‑44228`
 >    con U+2011 → devolvía `[]`. Se normaliza con `metrics.normalizar_guiones()`
 >    **antes** de extraer. Cualquier código nuevo que extraiga ids tiene que hacer lo
 >    mismo.
@@ -170,7 +170,7 @@ orden. Con esto, **todos los deltas actuales engañan**.
 > `openai/gpt-oss-120b`), útil como punto de partida:
 >
 > - **17 preguntas negativas, 0 con ids inventados** (`fabricated = ids_respuesta −
->   ids_pregunta` sobre `rag._extract_vuln_ids`). Es una mejora respecto de lo que
+>   ids_pregunta` sobre `rag.extract_vuln_ids`). Es una mejora respecto de lo que
 >   registra el punto 3 de abajo, donde `cve-log4j-nombre` soltaba "CWE-779, CWE-464,
 >   CWE-244". Ese caso hoy sale limpio.
 > - O sea que `fabricated` ya se puede calcular y hoy daría 0/17. La mitad que falta de
@@ -190,7 +190,7 @@ sistema. Hoy se verifica a ojo.
 1. Definir marcadores de rechazo en [metrics.py](../../src/pipeline/eval/metrics.py)
    (sacados de las respuestas reales del baseline: "no sé", "no dispongo", "no tengo
    información", "fuera del alcance"…) y una función `is_refusal(answer)`.
-2. Detectar ids inventados reusando `rag._extract_vuln_ids` (desde `run_eval.py`, que ya
+2. Detectar ids inventados reusando `rag.extract_vuln_ids` (desde `run_eval.py`, que ya
    importa `rag`). Clave anti-falso-positivo: **restar los ids que ya están en la pregunta**
    para no penalizar que la respuesta repita el CVE del enunciado:
    `fabricated = answer_ids − question_ids`.

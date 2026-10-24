@@ -24,6 +24,7 @@ def _patched_pad_sequence(sequences, batch_first=False, padding_value=0.0, **kwa
 _rnn.pad_sequence = _patched_pad_sequence
 _torch.nn.utils.rnn.pad_sequence = _patched_pad_sequence
 
+from dataclasses import dataclass
 from typing import List, Optional, Union, Generator, Iterator
 from queue import Queue
 from pydantic import BaseModel, computed_field
@@ -160,7 +161,7 @@ _STOPWORDS = {
     "description", "cwe", "cve", "weakness", "debilidad",
 }
 
-def _extract_vuln_ids(text: str) -> list[str]:
+def extract_vuln_ids(text: str) -> list[str]:
     """IDs en ORDEN DE APARICIÓN en el texto, no agrupados por tipo.
 
     Antes se recorrían todos los CWE y después todos los CVE, así que el orden
@@ -199,7 +200,7 @@ def resolve_vuln_ids(
 
     Devuelve (ids, origen); `origen` se loguea para poder auditar el arrastre.
     """
-    current = _extract_vuln_ids(user_message)
+    current = extract_vuln_ids(user_message)
     if current:
         return current[:_MAX_VULN_IDS], "turno"
     if not messages:
@@ -210,7 +211,7 @@ def resolve_vuln_ids(
         text = message_text(msg)
         if not text or text.strip() == user_message.strip():
             continue  # messages trae el turno actual al final
-        for vid in _extract_vuln_ids(text):
+        for vid in extract_vuln_ids(text):
             if vid not in inherited:
                 inherited.append(vid)
     if not inherited:
@@ -253,7 +254,7 @@ def build_ranker_query(user_message: str, vuln_ids: list[str]) -> str:
     la pregunta no los nombra y el ranker deja los docs de VulnIdLookup por debajo
     de CVEs al azar. Se agregan los IDs que el texto no menciona.
     """
-    mentioned = set(_extract_vuln_ids(user_message))
+    mentioned = set(extract_vuln_ids(user_message))
     missing = [vid for vid in vuln_ids if vid not in mentioned]
     if not missing:
         return user_message
@@ -262,7 +263,7 @@ def build_ranker_query(user_message: str, vuln_ids: list[str]) -> str:
 
 def build_keyword_query(user_message: str) -> str:
     text = user_message.strip()
-    ids = _extract_vuln_ids(text)
+    ids = extract_vuln_ids(text)
     if ids:
         return ids[0]
     low = text.lower()
@@ -272,6 +273,62 @@ def build_keyword_query(user_message: str) -> str:
     tokens = re.findall(r"[a-záéíóúñü0-9][a-záéíóúñü0-9\-]*", low)
     keywords = [t for t in tokens if len(t) > 2 and t not in _STOPWORDS]
     return " ".join(keywords) or text
+
+
+@dataclass(frozen=True)
+class Query:
+    """Lo que el pipeline saca de una pregunta. Lo usan `pipe()` y el eval, así los dos
+    corren exactamente el mismo grafo con los mismos inputs."""
+
+    question: str
+    keyword_query: str
+    vuln_ids: list[str]
+    ids_origin: str
+    ranker_query: str
+    findings: list[dict]
+    history: list[dict]
+
+    def inputs(self, include_llm: bool = True) -> dict:
+        """Los inputs de `build_rag_pipeline`; sin LLM no hay `prompt_builder`."""
+        inputs = {
+            "text_embedder":     {"text": build_embedding_query(self.question)},
+            "keyword_retriever": {"query": self.keyword_query},
+            "id_lookup":         {"ids": self.vuln_ids},
+            "ranker":            {"query": self.ranker_query},
+        }
+        if include_llm:
+            inputs["prompt_builder"] = {
+                "question": self.question,
+                "findings": format_findings(self.findings),
+                "history":  self.history,
+            }
+        return inputs
+
+
+def build_query(
+    user_message: str,
+    messages: list[dict] | None = None,
+    history_max_messages: int = 0,
+    history_max_chars: int = 0,
+) -> Query:
+    """Una pregunta del chat (con su conversación y hallazgos adjuntos) o del eval (sola)."""
+    findings = extract_findings_context(messages)
+    vuln_ids, ids_origin = resolve_vuln_ids(user_message, messages)
+    # Los IDs de los hallazgos van DETRÁS: si la pregunta nombra otro CVE, ese manda.
+    for vid in findings_vuln_ids(findings):
+        if vid not in vuln_ids:
+            vuln_ids.append(vid)
+    return Query(
+        question=user_message,
+        keyword_query=build_keyword_query(user_message),
+        vuln_ids=vuln_ids,
+        ids_origin=ids_origin,
+        ranker_query=build_ranker_query(user_message, vuln_ids),
+        findings=findings,
+        history=select_history(
+            messages, user_message, max_messages=history_max_messages, max_chars=history_max_chars,
+        ),
+    )
 
 
 @component
@@ -285,11 +342,8 @@ class VulnIdLookup:
 
     Se filtra por `meta.source` y no por `cwe_id`/`cve_id` porque `cwe_id` es int
     y `cve_id` es str, mientras que `source` es str en ambos y guarda exactamente
-    la forma canónica que produce _extract_vuln_ids ("CWE-79", "CVE-2021-44228").
+    la forma canónica que produce extract_vuln_ids ("CWE-79", "CVE-2021-44228").
     Las guías INCIBE tienen un nombre de archivo en `source`, así que no colisionan.
-
-    `ids` es opcional a propósito: los scripts de eval que no lo pasan siguen
-    corriendo sin tocarlos (el lookup simplemente no aporta candidatos).
     """
 
     def __init__(self, document_store, top_k: int = 10):
@@ -297,8 +351,7 @@ class VulnIdLookup:
         self.top_k = top_k
 
     @component.output_types(documents=list[Document])
-    def run(self, ids: list[str] | None = None):
-        ids = ids or []
+    def run(self, ids: list[str]):
         if not ids:
             return {"documents": []}
         wanted = ids[: self.top_k]
@@ -440,44 +493,22 @@ class Pipeline:
 
         log.info(f"[INICIO] pregunta={_one_line(user_message)}")
 
-        keyword_query = build_keyword_query(user_message)
-        log.info(f"[KEYWORD QUERY] -> {keyword_query!r}")
-
-        findings = extract_findings_context(messages)
-        history = select_history(
-            messages,
+        query = build_query(
             user_message,
-            max_messages=self.valves.history_max_messages,
-            max_chars=self.valves.history_max_chars,
+            messages,
+            history_max_messages=self.valves.history_max_messages,
+            history_max_chars=self.valves.history_max_chars,
         )
-        for finding in findings:
+        log.info(f"[KEYWORD QUERY] -> {query.keyword_query!r}")
+        for finding in query.findings:
             log.info(f"[HALLAZGO] {finding_identifier(finding)} | paquete={finding.get('package')} {finding.get('installed_version')}")
-        log.info(f"[HISTORIAL] {len(history)} mensajes al prompt")
+        log.info(f"[HISTORIAL] {len(query.history)} mensajes al prompt")
+        log.info(f"[VULN IDS] -> {query.vuln_ids} (origen={query.ids_origin}{f', +{len(query.findings)} hallazgo(s)' if query.findings else ''})")
+        log.info(f"[RANKER QUERY] -> {_one_line(query.ranker_query)!r}")
 
-        vuln_ids, ids_origin = resolve_vuln_ids(user_message, messages)
-        # Los IDs de los hallazgos van DETRÁS: si la pregunta nombra otro CVE, ese manda.
-        for vid in findings_vuln_ids(findings):
-            if vid not in vuln_ids:
-                vuln_ids.append(vid)
-        log.info(f"[VULN IDS] -> {vuln_ids} (origen={ids_origin}{f', +{len(findings)} hallazgo(s)' if findings else ''})")
-
-        ranker_query = build_ranker_query(user_message, vuln_ids)
-        log.info(f"[RANKER QUERY] -> {_one_line(ranker_query)!r}")
-
-        inputs = {
-            "text_embedder":     {"text": build_embedding_query(user_message)},
-            "keyword_retriever": {"query": keyword_query},
-            "id_lookup":         {"ids": vuln_ids},
-            "ranker":            {"query": ranker_query},
-            "prompt_builder":    {
-                "question": user_message,
-                "findings": format_findings(findings),
-                "history":  history,
-            },
-        }
         if stream:
-            return self._stream(inputs, log, t0)
-        return self._run(inputs, log, t0)
+            return self._stream(query.inputs(), log, t0)
+        return self._run(query.inputs(), log, t0)
 
     def _run(
         self,

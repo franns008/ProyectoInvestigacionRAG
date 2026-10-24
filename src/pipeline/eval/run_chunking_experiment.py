@@ -184,11 +184,7 @@ def retrieval_only_question(pipeline, question: str):
     """Corre el pipeline SIN LLM (hasta el reranker) y devuelve
     (emb_ids, kw_ids, ranked_ids, ranked_sources). Ver build_rag_pipeline(include_llm=False)."""
     result = pipeline.run(
-        {
-            "text_embedder":     {"text": question},
-            "keyword_retriever": {"query": rag.build_keyword_query(question)},
-            "ranker":            {"query": question},
-        },
+        rag.build_query(question).inputs(include_llm=False),
         include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner", "ranker"},
     )
     ranked_docs = result["ranker"]["documents"]

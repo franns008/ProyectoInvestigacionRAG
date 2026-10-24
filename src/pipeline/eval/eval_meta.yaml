@@ -35,7 +35,7 @@ baseline_run_id: 20260827T160439Z
 # no cambia de epoch, agregar una etapa nueva sí. La regla existe porque comparar
 # corridas de topologías distintas produce deltas que no significan nada (bug H2
 # de mejoras_harness.md).
-epoch: qwen3-reranker-v1
+epoch: inputs-produccion-v1
 
 # Historial documental (el código no lo lee; es memoria del proyecto).
 epochs:
@@ -53,3 +53,10 @@ epochs:
       (710 CWE atómicos + 255 chunks de 3 PDFs de INCIBE), 0 CVE.
       Requiere GPU para indexar: en CPU los lotes dan `timed out` y el indexador
       reporta exit 0 perdiendo documentos en silencio.
+  - name: inputs-produccion-v1
+    nota: >-
+      el eval arma los inputs con build_query(), igual que pipe(): ahora pasa los IDs
+      de la pregunta a id_lookup (antes aportaba 0 documentos), usa build_embedding_query
+      (instrucción de qwen3-embedding) y build_ranker_query. Mismos componentes que
+      qwen3-reranker-v1, pero cambia lo que entra a cada uno: los deltas contra esa
+      epoch no son comparables. Falta re-basear.
