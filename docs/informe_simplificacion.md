@@ -1,11 +1,49 @@
 # Informe de simplificación de la codebase
 
-**Estado:** análisis, sin aplicar · **Fecha:** 2026-10-22 · **Rama:** `chore/refactor-to-thesis`
+**Estado:** aplicado (ver la tabla de abajo) · **Fecha del análisis:** 2026-10-22 ·
+**Aplicado:** 2026-10-22 a 2026-10-24 · **Rama:** `chore/refactor-to-thesis`
 
 Resultado de un análisis de sólo lectura de toda la codebase (Python, extensión TS, scripts e
 infraestructura), hecho después de eliminar el frontend de OpenWebUI. Cada hallazgo indica
 archivo de origen, severidad, descripción y solución sugerida. Las líneas son aproximadas y
-se refieren al estado de la rama en la fecha del informe.
+se refieren al estado de la rama en la fecha del informe; el código ya no está ahí.
+
+## Estado de aplicación
+
+| Ítem | Estado | Commits / nota |
+|---|---|---|
+| B1 | aplicado | `0646ec6` |
+| B2 | aplicado | `916b878`: lo decide sólo la extensión (`cibersec.explainTopN`, default 3, máx. 10) |
+| B3 / D3 | aplicado | `4a33d68`: `build_query()` en `pipe()` y en los tres runners; epoch `inputs-produccion-v1` |
+| B4 | aplicado | `3826beb`: `load_splittable` / `load_atomic` compartidos con la indexación |
+| B5 | aplicado | `2614a31` |
+| M1 | aplicado | `f699c2b` y docs `63dc147`..`102606d` |
+| M2 | aplicado | `31aeab6`, `8542c1c`, `9442dc7` |
+| M3, M4, C8 | aplicado | `70e42ea`..`d070ad9` |
+| M5 | aplicado | `e8e5273`..`955ee63` |
+| M6 | aplicado | `e03cc1f` |
+| M7 | aplicado | `f5d4bd0`, `c38f4de` |
+| M8 | aplicado | `02578f8`, `719e591` |
+| M9 | aplicado | `59f8691`, `8970bce`, `2f33288` |
+| M10 | parcial | `docs/image.png` borrado; `data/processed/` se queda (decisión del equipo) |
+| D1, D2, D4, D6–D10 | aplicado | `30c98d0`..`d455372` (`common/`, `eval/runner.py`, helpers de la extensión) |
+| D5 | aplicado | `c1338e6`: `wireFinding` en la extensión y `finding_identifier` en `common/text.py` |
+| C1 | aplicado | por D1 y B3: `pipe()` arma una `Query` y corre |
+| C2 | aplicado | `a83244d` |
+| C3 | aplicado | `a558d67`: CSS y JS de los webviews en `extension/media/` |
+| C4 | aplicado | `e230a38` |
+| C5 | aplicado | `3728c54`: torch 2.7 ya trae lo que emulaban los parches |
+| C6 | descartado | funciona y no molesta; `RENAMES` ya se había sacado (`abe7bf4`) |
+| C7 | aplicado | `340ab1a`, `847d05e`: `scripts/check_extension.py` reemplaza al `.sh` |
+| X1 | aplicado | `4dc1d9a`: `requirements-host.txt`; imagen rebuildeada |
+| X2 | aplicado | `ccd8cd5` |
+| §5 docstrings | aplicado | `961ba94`..`70bfa96`; los `__init__.py` quedaron como estaban (opcional) |
+
+Encontrado al aplicar, fuera del análisis original:
+
+- `bdd9c85`: `resolve_vuln_ids` heredaba IDs del `system` de los hallazgos adjuntos (con
+  `8d2698f`, que la movió a `chat/vuln_ids.py` para testearla).
+- `1816d33`: el eval atribuye aciertos también al canal `id_lookup` (`via_id_lookup`).
 
 **Severidad**
 
