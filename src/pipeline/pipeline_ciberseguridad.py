@@ -5,25 +5,6 @@ version: 2.0 (Arquitectura Desacoplada)
 requirements: haystack-ai, pgvector-haystack, ollama-haystack, sentence-transformers
 """
 
-import torch as _torch
-import torch.nn.utils.rnn as _rnn
-
-# Patch 1: is_bf16_supported(including_emulation=...) agregado en torch 2.4
-if hasattr(_torch.cuda, 'is_bf16_supported'):
-    _orig_bf16 = _torch.cuda.is_bf16_supported
-    def _patched_bf16(*args, **kwargs):
-        kwargs.pop('including_emulation', None)
-        return _orig_bf16(*args, **kwargs)
-    _torch.cuda.is_bf16_supported = _patched_bf16
-
-# Patch 2: pad_sequence(padding_side=...) agregado en torch 2.5
-_orig_pad_sequence = _rnn.pad_sequence
-def _patched_pad_sequence(sequences, batch_first=False, padding_value=0.0, **kwargs):
-    kwargs.pop('padding_side', None)
-    return _orig_pad_sequence(sequences, batch_first=batch_first, padding_value=padding_value, **kwargs)
-_rnn.pad_sequence = _patched_pad_sequence
-_torch.nn.utils.rnn.pad_sequence = _patched_pad_sequence
-
 from dataclasses import dataclass
 from typing import List, Optional, Union, Generator, Iterator
 from queue import Queue

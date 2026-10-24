@@ -247,9 +247,7 @@ Distinto al del chat: no responde una pregunta, resume un hallazgo concreto.
 - **Salida:** un JSON `{"explanations": [{"identifier": ..., "explanation": ..., "citations": [...]}]}`
   como string. La extensión lo parsea y lo cruza con cada tarjeta por `identifier`.
 - **Reuso:** importa `get_document_store()` y `build_generator()` de
-  `pipeline_ciberseguridad` — ya son funciones módulo-level, no hace falta refactor. El
-  import ejecuta los parches de torch de ese módulo; dentro del container ese costo ya está
-  pago porque el pipeline de chat también se carga.
+  `pipeline_ciberseguridad` — ya son funciones módulo-level, no hace falta refactor.
 
 ## Verificación
 
