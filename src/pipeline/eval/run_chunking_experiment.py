@@ -1,32 +1,8 @@
 #!/usr/bin/env python3
-"""Experimento de chunking: indexa el corpus con cada estrategia candidata en una
-tabla pgvector SEPARADA y corre el eval contra cada una, para comparar estrategias
-de forma controlada sin tocar la tabla de producción (`ciberseguridad_docs`).
-
-Cada estrategia se materializa en `ciberseguridad_docs_chunk_<estrategia>`. Los
-documentos atómicos (CWE, y opcionalmente CVE) NO cambian entre estrategias — se
-embeben una sola vez y se reutilizan en cada tabla; solo se re-chunkea el corpus
-splittable (guías INCIBE). Ver docs/data_splitting.md.
-
-Retrieval puro: arma el pipeline SIN LLM (build_rag_pipeline(include_llm=False)), así
-NO carga el modelo de generación ni paga su latencia. El chunking se juzga por
-retrieval, que es lo que mueve; la generación (SAS) se evalúa aparte con run_eval.py.
-
-Ejecutar como container EFÍMERO que saltea el server de Open WebUI (aislamiento: no hace
-falta levantar el server para correr el experimento). En Fedora/SELinux los bind-mounts
-necesitan `:z`. NO se monta el volumen marker_cache (el reranker ya está en la imagen).
-Desde infrastructure/:
-
-    docker run --rm --network infrastructure_default -e TORCH_DEVICE=cpu \
-      -v "$(cd .. && pwd)/src/pipeline":/app/pipelines:z \
-      -v "$(cd .. && pwd)/data/raw":/app/pipelines/rawdata:z \
-      --entrypoint python infrastructure-pipelines:latest \
-      /app/pipelines/eval/run_chunking_experiment.py
-      # opcional: --strategies current_word200 recursive_500   |   --include-cve
-
-Métricas por estrategia (retrieval puro, sin LLM):
-  · Tier 1  (recall@k por doc-id)  — solo válido para preguntas CWE (id estable).
-  · Tier 1b (source_recall@k)      — el eje que mide el chunking del corpus splittable.
+"""Experimento de chunking: indexa el corpus con cada estrategia en su propia tabla
+(`ciberseguridad_docs_chunk_<estrategia>`) y mide retrieval puro, sin LLM, contra cada una.
+Los atómicos (CWE/CVE) se embeben una vez y se reusan. Cómo correrlo (container efímero) y
+qué mide: docs/data_splitting.md §7.
 """
 from __future__ import annotations
 

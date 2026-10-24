@@ -1,23 +1,8 @@
 #!/usr/bin/env python3
-"""Eval harness — runner principal.
+"""Eval harness, Tiers 1-2: corre el dataset contra el RAG y persiste los resultados crudos
+en las tablas CSV; el análisis lo hace report.py. Ver docs/eval/eval_harness.md.
 
-Corre todas las preguntas del dataset contra el RAG, mide retrieval (Tier 1) contra
-el ground truth y **persiste los resultados crudos** en las tablas CSV acumulativas
-(`results/runs.csv` + `results/questions.csv`). La respuesta generada se captura para
-el Tier 2 (SAS).
-
-Principio: este script **escribe crudo, no compara**. Todo el análisis (deltas contra
-el baseline, regresiones, evolución) vive en `report.py`, que lee esas tablas. Al final
-se invoca el reporte por cortesía, pero los datos se escriben ANTES de cualquier
-análisis: si el reporte falla, la corrida no se pierde.
-
-Ejecutar DENTRO del container `pipelines` (donde resuelven los hosts `vdb` y `ollama`):
-
-    docker compose exec pipelines python /app/pipelines/eval/run_eval.py
-
-o vía el wrapper `scripts/eval.sh`, que además inyecta la metadata de git.
-
-Ver docs/eval/refactor_resultados_csv.md y docs/eval/eval_harness.md.
+    scripts/eval.sh [--limit N] [--label ...] [--set-baseline]
 """
 from __future__ import annotations
 
@@ -152,18 +137,11 @@ def evaluate(item: dict, channels: dict[str, list[str]], ranked_ids, ranked_sour
         rec["recall"] = rec["hit"] = rec["rr"] = None
         rec["hit_source"] = None
 
-    # Abstención (H6). Sólo sobre las preguntas marcadas `expect_refusal` en el
-    # dataset. **No** se infiere de `expected_doc_ids == []`: las 12 preguntas de
-    # `guia_incibe` no tienen ground truth de retrieval y sin embargo SÍ deben
-    # responderse — inferirlo las marcaría a todas como abstenciones falladas.
+    # Abstención (H6): sólo las marcadas `expect_refusal`, no las que no tienen
+    # ground truth (las de `guia_incibe` sí deben responderse).
     rec["expect_refusal"] = bool(item.get("expect_refusal"))
-    # `refused` se calcula SIEMPRE, no sólo en las trampa. Abstenerse tiene dos
-    # lecturas opuestas según la pregunta, y las dos importan:
-    #   · con expect_refusal → abstenerse es lo correcto.
-    #   · sin expect_refusal → abstenerse es un FALLO DE GENERACIÓN que hoy no
-    #     detecta nada. Caso real: `prevenir-deserializacion` tiene recall 1.0 y
-    #     rank 1 (el retriever puso cwe-502 primero) y el LLM contestó "No sé.".
-    #     Tier 1 lo da por perfecto y Tier 2 es NaN: era invisible.
+    # `refused` va siempre: sin expect_refusal, abstenerse es un fallo de generación
+    # que Tier 1 y Tier 2 no ven.
     rec["refused"] = m.is_refusal(answer)
     if rec["expect_refusal"]:
         # Guiones a ASCII antes de extraer: el modelo escribe `CVE‑2021‑44228`

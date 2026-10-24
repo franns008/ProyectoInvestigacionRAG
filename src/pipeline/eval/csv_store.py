@@ -1,24 +1,6 @@
-"""Persistencia de resultados del eval en CSV.
-
-Único lugar del harness que sabe leer/escribir las tablas de resultados. Nadie
-más hace `csv.writer` ni `pd.read_csv` a mano: si hace falta una columna nueva,
-se agrega acá y la migración de esquema se encarga del histórico.
-
-Dos tablas acumulativas (ver docs/eval/refactor_resultados_csv.md):
-
-  results/runs.csv       1 fila por corrida     (versionada en git)
-  results/questions.csv  1 fila por corrida × pregunta  (gitignored)
-
-Escribir no depende de pandas (usa el módulo `csv` de la stdlib); pandas sólo
-se importa, de forma lazy, en las funciones de lectura.
-
-Notas asumidas:
-
-- Si un texto contiene la secuencia literal `\\n` (backslash + n tipeado a mano),
-  al des-escaparlo es indistinguible de un salto de línea real. Aceptado: el
-  texto es para lectura humana, no para round-trip exacto.
-- **Sin locking**: se asume un solo runner a la vez (el harness se usa a mano;
-  `run_eval.py` y `run_eval_llm.py` no se corren en simultáneo).
+"""Persistencia del eval en CSV: el único lugar que lee y escribe `results/runs.csv` y
+`results/questions.csv`. Una columna nueva se agrega acá y la migración de esquema se
+encarga del histórico. Diseño y supuestos: docs/eval/refactor_resultados_csv.md.
 """
 
 from __future__ import annotations
@@ -35,10 +17,7 @@ if TYPE_CHECKING:  # sólo para type hints; pandas no se importa en runtime al e
 # ─────────────────────────────────────────────────────────────────────────────
 # Esquemas
 #
-# Orden de las columnas: claves → config/dimensiones → métricas → texto.
-# Una columna nueva se inserta en SU grupo, nunca "al final de todo" (salvo que
-# sea texto). El orden es el del archivo en disco, así que respetarlo mantiene
-# los CSV legibles a ojo.
+# Orden: claves → config → métricas → texto. Una columna nueva va en su grupo.
 # ─────────────────────────────────────────────────────────────────────────────
 
 RUNS_COLUMNS = [

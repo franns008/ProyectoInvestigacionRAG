@@ -1,23 +1,6 @@
-"""Análisis y reporte del eval sobre las tablas CSV.
-
-Sin estado propio: lee `results/runs.csv`, `results/questions.csv` y
-`eval_meta.yaml` vía `csv_store.load_*` / `load_meta`. **Nunca escribe en las
-tablas**; sus únicos outputs son stdout y (en el modo `html`) archivos bajo
-`results/report/`.
-
-Corre siempre dentro del container; en el host sólo si hay pandas + pyyaml (no
-es un requisito del proyecto).
-
-Diseño: docs/eval/refactor_resultados_csv.md (Paso 5).
-
-Principios (§5.0 del plan):
-
-1. Sólo lee crudos; los agregados se recalculan acá, no se persisten.
-2. Degradación en cascada, nunca crash: sin baseline → resumen solo; sin filas
-   del baseline en `questions.csv` → delta global con aviso.
-3. El color nunca es el único canal: `▲▼=` y texto siempre acompañan.
-4. Exit 0 siempre, salvo `--strict` (regresiones) o error de uso (exit 2).
-"""
+"""Análisis y reporte del eval sobre las tablas CSV: lee `results/` y `eval_meta.yaml`,
+nunca escribe en las tablas. Diseño y principios: docs/eval/refactor_resultados_csv.md
+(Paso 5)."""
 
 from __future__ import annotations
 
@@ -567,23 +550,7 @@ def _ultimo_valor(vals) -> str:
 
 def corridas_completas(ctx: Ctx) -> "pd.DataFrame":
     """Corridas de la epoch vigente con el dataset entero, en orden cronológico.
-
-    Las parciales (`--limit N`) quedan afuera: un promedio sobre 3 preguntas al
-    lado de uno sobre 39 no es un punto de la misma serie, y meterlo en la
-    sparkline haría ver saltos que no son cambios del sistema.
-
-    **"Completa" = `dataset_n` MÁXIMO de la epoch, no la moda.** El plan (§5.4,
-    gráfico 1) dice moda; se cambió a propósito y está documentado en la bitácora
-    (hallazgo 13). Motivo: durante el desarrollo uno corre muchas veces con
-    `--limit 3` y pocas con el dataset entero, así que la moda termina siendo el
-    smoke test y la evolución deja afuera justo las corridas que importan — que es
-    exactamente lo que pasaba acá: 5 corridas de 3 preguntas contra 1 de 39.
-
-    Contra conocida: si algún día se achica el dataset a propósito, el máximo
-    queda apuntando al tamaño viejo hasta que se re-basee. Es aceptable porque
-    achicar el dataset es un cambio deliberado y raro, mientras que correr con
-    `--limit` es cosa de todos los días.
-    """
+    "Entero" es el `dataset_n` máximo de la epoch, no la moda (bitácora, hallazgo 13)."""
     r = ctx.runs[(ctx.runs["suite"] == "retrieval")
                  & (ctx.runs["epoch"] == ctx.meta.get("epoch"))].sort_values("run_id")
     if r.empty or r["dataset_n"].isna().all():
@@ -714,13 +681,8 @@ def cmd_question(args) -> int:
 # ─────────────────────────────────────────────────────────────────────────────
 # Modo `html` — reporte con gráficos
 #
-# Documento autocontenido: un solo archivo, cero requests externas, sin JS. Los
-# SVG de matplotlib van embebidos inline. Comprometido a **modo claro único** con
-# fondos explícitos (§5.3): no es un descuido, es que un documento que se abre y
-# se manda por mail no negocia tema con nadie.
-#
-# matplotlib se importa **lazy**, adentro de las funciones: los modos de terminal
-# no lo tocan y siguen andando aunque la imagen no lo tenga.
+# Un solo archivo autocontenido, sin JS, en modo claro (§5.3 del plan). matplotlib
+# se importa lazy: los modos de terminal andan sin él.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Tokens visuales. Los mismos valores que el CSS, para que gráficos y página sean
@@ -958,15 +920,9 @@ def fig_matrix(ctx: Ctx, q: "pd.DataFrame") -> str | None:
     ax.set_yticks([i + .5 for i in range(n_f)])
     ax.set_yticklabels(list(piv.index), fontsize=8)
 
-    # El nombre de categoría va a la IZQUIERDA de los ticks, no en coordenadas de
-    # datos: los question_id son largos y de ancho variable, así que un offset en
-    # unidades del gráfico cae encima de ellos. Con offset en puntos desde el eje,
-    # dimensionado por el id más largo, queda siempre afuera.
-    #
-    # **Horizontal, no rotado** (el plan §5.4 dice rotado). Rotar asume categorías
-    # con muchas filas: acá tienen 1–3, y un nombre vertical de 11 caracteres no
-    # entra en una banda de 2 filas — se pisaban entre sí. Horizontal ocupa ~10px
-    # de alto, entra hasta en una banda de una fila, y a la izquierda sobra lugar.
+    # El nombre de categoría va a la izquierda de los ticks, con offset en puntos
+    # según el id más largo, y horizontal: las categorías tienen 1-3 filas y rotado
+    # no entra.
     trans = ax.get_yaxis_transform()
     off = 14 + 0.55 * 8 * max(len(str(x)) for x in piv.index)
 

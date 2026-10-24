@@ -130,22 +130,11 @@ def aggregate_sas(per_question: list[dict]) -> dict:
 
 
 # ── Abstención en preguntas negativas (H6 de docs/eval/mejoras_harness.md) ───
-#
-# Una pregunta con `expect_refusal: true` en el dataset es una trampa: el RAG NO
-# tiene ese dato y lo correcto es que lo diga. Medirla con SAS no sirve —hay
-# infinitas formas válidas de decir "no sé" y la `reference_answer` es sólo una,
-# así que el SAS premia la que se parezca a esa redacción (hallazgo 18)—. El
-# veredicto correcto es binario y tiene dos partes:
-#
+# Veredicto binario, no SAS (bitácora, hallazgo 18):
 #     correct = se abstuvo  AND  no inventó identificadores
-#
-# Las dos son independientes: un modelo puede decir "no tengo información" y en
-# la misma respuesta soltar tres CWE inventados.
 
-# Guiones tipográficos → ASCII. Los LLM escriben `CVE‑2021‑44228` con U+2011 y el
-# regex de ids del pipeline sólo entiende `-`: sin esto, un id inventado con
-# guión "bonito" es invisible. Verificado (2026-08-18): `extract_vuln_ids`
-# devuelve `[]` sobre un texto con U+2011, y las respuestas de gpt-oss los usan.
+# Guiones tipográficos → ASCII: los LLM escriben `CVE‑2021‑44228` con U+2011 y
+# `extract_vuln_ids` sólo entiende `-`.
 _GUIONES = dict.fromkeys(map(ord, "\u2010\u2011\u2012\u2013\u2014\u2212"), "-")
 
 
@@ -154,13 +143,8 @@ def normalizar_guiones(texto: str) -> str:
     return (texto or "").translate(_GUIONES)
 
 
-# Marcadores de abstención sacados de las RESPUESTAS REALES del baseline
-# (corrida 20260818T202351Z), no inventados de memoria — que es justo el error
-# de la versión anterior: su lista no matcheaba ninguna de las abstenciones que
-# el modelo produce de verdad, así que la métrica daba 0 siempre (hallazgo 19).
-#
-# `"no sé"` va CON tilde a propósito: sin ella matchearía el "no se" reflexivo
-# ("no se recomienda", "no se debe") que aparece en respuestas normales.
+# Marcadores sacados de respuestas reales (corrida 20260818T202351Z; bitácora,
+# hallazgo 19). `"no sé"` va con tilde: sin ella matchea el "no se" reflexivo.
 REFUSAL_MARKERS = (
     "no lo sé",
     "no sé",

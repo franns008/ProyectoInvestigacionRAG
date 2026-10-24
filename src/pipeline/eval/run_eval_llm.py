@@ -1,23 +1,9 @@
 #!/usr/bin/env python3
-"""Eval harness — Tier 3: juez LLM (MANUAL, lento).
-
-Mide la calidad de la RESPUESTA con evaluators nativos de Haystack usando el
-Ollama local como juez (structured output, ver `JSON_SCHEMAS`):
-
-  - Faithfulness       : ¿las afirmaciones de la respuesta están fundadas en los
-                         documentos recuperados? (anti-alucinación)
-  - Context Relevance  : ¿los documentos recuperados son relevantes a la pregunta?
-
-Multiplica llamadas al LLM local (varias por pregunta) → correr a mano y sobre
-subsets (--limit) para no esperar de más. NO va en cada iteración ni en CI.
+"""Eval harness, Tier 3: el Ollama local como juez de faithfulness y context relevance.
+Lento: correr a mano y sobre subsets. Escribe en las mismas tablas con `suite="judge"`.
+Ver docs/eval/eval_harness.md.
 
     scripts/eval_llm.sh --limit 8
-
-Persistencia: igual que `run_eval.py`, escribe en las tablas acumulativas
-`results/runs.csv` (con `suite="judge"`) y `results/questions.csv`. Ya no deja un
-`tier3_<stamp>.json` suelto. Ver docs/eval/refactor_resultados_csv.md (Paso 6).
-
-Ver docs/eval/eval_harness.md.
 """
 from __future__ import annotations
 
@@ -44,17 +30,9 @@ from haystack.components.evaluators import (  # noqa: E402
 )
 
 
-# Esquemas de salida de cada evaluador (sus `.outputs`), como structured output.
-#
-# Sin esto el juez devuelve JSON válido pero con la forma equivocada: ante dos
-# afirmaciones responde `statement_scores: [10]` — pega el 1 y el 0 en un solo
-# número en vez de dar un score por afirmación. Con 7 afirmaciones sale 1111000 y
-# el "promedio" termina en cientos de miles. Ver bitácora, hallazgo 16.
-#
-# `boolean` y NO `integer` con `enum: [0,1]`: con el enum el modelo igual genera
-# `10` y el backend lo rechaza contra el esquema (Groq devolvía 400 cuando el juez
-# corría por API). Con booleanos genera `[true, false]` bien, y Haystack los
-# promedia igual (True==1).
+# Esquemas de salida de cada evaluador, como structured output: sin esto el juez
+# pega los scores en un solo número (`[10]` en vez de `[1, 0]`). `boolean` y no
+# `integer` con enum, que el modelo igual viola. Ver bitácora, hallazgo 16.
 SCHEMA_FAITHFULNESS = {
     "type": "array", "items": {"type": "boolean"},
 }
@@ -106,16 +84,8 @@ def run_pipeline(pipeline, question: str):
         rag.build_query(question).inputs(),
         include_outputs_from={"ranker"},
     )
-    # Contexto = la salida del RANKER, no la del document_joiner.
-    #
-    # El plan (§Paso 6) dice document_joiner, pero eso fue escrito antes de que el
-    # cross-encoder entrara al pipeline. Hoy el cableado es
-    # `ranker → prompt_builder → llm`: el LLM ve los 4 documentos rerankeados, no
-    # los 15 del joiner. Juzgar contra los 15 rompe las dos métricas en direcciones
-    # opuestas: `faithfulness` se vuelve indulgente (una afirmación inventada puede
-    # quedar "respaldada" por un documento que el LLM nunca leyó) y
-    # `context_relevance` se diluye (promedia 11 documentos que no se usaron).
-    # Ver bitacora_refactor_csv.md, hallazgo 15.
+    # Contexto = la salida del ranker, que es lo que lee el LLM, no la del joiner
+    # (bitácora, hallazgo 15).
     contexts = [d.content for d in result["ranker"]["documents"] if d.content]
     answer   = result.get("llm", {}).get("replies", [""])[0] or ""
     return contexts, answer

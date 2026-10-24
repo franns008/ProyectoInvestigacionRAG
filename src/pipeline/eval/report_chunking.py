@@ -1,24 +1,9 @@
 #!/usr/bin/env python3
-"""Reporte detallado de un experimento de chunking: por cada pregunta, QUÉ documentos
-se esperaban y QUÉ documentos usó realmente el RAG, por estrategia.
+"""Detalle de un experimento de chunking: por pregunta y estrategia, qué documentos se
+esperaban y cuáles pasó el reranker al prompt. Lee el JSON del experimento; no recalcula.
+Ver docs/data_splitting.md §6.
 
-La tabla comparativa que imprime run_chunking_experiment.py es agregada (un recall por
-estrategia). Este reporte abre esa caja: muestra pregunta por pregunta el ground truth
-contra lo que el reranker terminó pasando al prompt, que es lo que el LLM realmente ve.
-
-Dos ejes, según el tipo de pregunta:
-  · doc-id  (preguntas CWE)   — `expected_doc_ids` vs `ranked_ids`. El id de un CWE es
-    determinístico (cwe-89), así que es estable entre estrategias.
-  · fuente  (preguntas guía)  — `expected_sources` vs `ranked_sources`. El id de un chunk
-    es hash de su contenido y cambia con cada estrategia; el nombre del archivo original
-    no. Ver docs/data_splitting.md §6.
-
-No recalcula nada: lee el JSON que ya persistió el experimento.
-
-Uso (en el host, no necesita container):
-    python src/pipeline/eval/report_chunking.py                  # último resultado
-    python src/pipeline/eval/report_chunking.py --json <ruta>
-    python src/pipeline/eval/report_chunking.py --solo-fallos    # solo lo que falló
+    python src/pipeline/eval/report_chunking.py [--json <ruta>] [--solo-fallos]
 """
 from __future__ import annotations
 
