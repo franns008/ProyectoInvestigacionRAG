@@ -218,3 +218,9 @@ def test_hereda_los_ids_de_la_conversacion():
     ]
     assert resolve_vuln_ids("¿cómo lo mitigo?", messages) == (["CVE-2021-44228"], "historial")
 
+
+def test_no_hereda_ids_del_system_de_los_hallazgos():
+    """El advisory adjunto nombra otros CVE; los IDs del hallazgo entran por findings_vuln_ids."""
+    finding = {**FINDING, "details": "Related to CVE-2023-5129 and CVE-2023-41064."}
+    messages = [attached(finding), {"role": "user", "content": "¿qué tan grave es?"}]
+    assert resolve_vuln_ids("¿qué tan grave es?", messages) == ([], "ninguno")

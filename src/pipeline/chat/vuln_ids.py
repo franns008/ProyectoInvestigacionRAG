@@ -56,7 +56,10 @@ def resolve_vuln_ids(
         return [], "ninguno"
 
     inherited: list[str] = []
-    for msg in reversed(messages[-_HISTORY_TURNS:]):
+    # Sólo lo que se dijo: el `system` de los hallazgos adjuntos trae el texto del
+    # advisory, con CVEs ajenos; sus IDs ya entran aparte (findings_vuln_ids).
+    turns = [m for m in messages if m.get("role") in ("user", "assistant")]
+    for msg in reversed(turns[-_HISTORY_TURNS:]):
         text = message_text(msg)
         if not text or text.strip() == user_message.strip():
             continue  # messages trae el turno actual al final
