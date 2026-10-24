@@ -1,49 +1,25 @@
 FROM ghcr.io/open-webui/pipelines:main
 
-# Instalar dependencias del proyecto, incluyendo Haystack y los conectores del RAG.
-# marker-pdf NO está acá: se instala condicionalmente más abajo (ver INSTALL_MARKER).
+# Orden de las capas y por qué: docs/imagen_pipelines.md §7.
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-# ── torch (CPU por defecto; CUDA vía build-arg del overlay nvidia) ───────────────
-# Antes lo arrastraba marker-pdf como dependencia; ahora se instala explícito para que
-# la imagen SLIM (sin marker) también tenga torch fijado. torch 2.7.0 es lo que pedía
-# surya-ocr (dep de marker) y sigue sirviendo para el reranker.
-#
-# Por defecto se instala la build de CPU (corre en cualquier máquina; la generación va
-# por Ollama y el reranker en CPU alcanza). Para NVIDIA, buildear con:
-#   --build-arg TORCH_INDEX_URL=https://download.pytorch.org/whl/cu126
-# (lo hace automáticamente docker-compose.nvidia.yml)
+# ── torch fijado (CPU por defecto; CUDA vía TORCH_INDEX_URL del overlay nvidia) ───
 ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu
 RUN pip install --no-cache-dir \
     torch==2.7.0 \
     torchvision==0.22.0 \
     --index-url ${TORCH_INDEX_URL}
 
-# ── Cross-encoder reranker (bge-reranker-v2-m3): corre en CPU con el torch ya fijado ─
-# Pre-descargamos el modelo al buildear (~4.3 GB) para que el primer arranque no espere
-# la descarga de HuggingFace y el container funcione offline.
+# ── Reranker bge-reranker-v2-m3, descargado al buildear (~4.3 GB) ──────────────
 RUN pip install --no-cache-dir sentence-transformers
 RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-v2-m3')"
 
-# ── datos punkt_tab de nltk: SOLO los usa el experimento de chunking ─────────────
-# (estrategias sentence_es y recursive_500, que tokenizan oraciones). La producción
-# (DocumentSplitter word/200/20) no lo necesita. El paquete nltk viene de
-# requirements.txt; acá sólo se bajan los datos. Ver docs/data_splitting.md.
+# ── Datos punkt_tab de nltk: sólo los usa el experimento de chunking ─────────────
 RUN python -c "import nltk; nltk.download('punkt_tab')"
 
-# ── marker-pdf: OPCIONAL vía build-arg. Default OFF → imagen ~3 GB más liviana ────
-# marker-pdf arrastra ~3 GB de modelos OCR (surya). En la indexación SOLO se usa para
-# convertir PDFs NUEVOS a Markdown (_get_marker_converter, carga lazy y guardada con
-# try/except). Con los PDFs ya convertidos y cacheados en rawdata/_converted_md,
-# marker NUNCA se carga, así que por defecto NO se instala. La indexación degrada con
-# gracia si marker no está: loguea un warning y saltea el PDF sin caer.
-# Ver docs/imagen_pipelines.md.
-#
-# Para una imagen capaz de convertir PDFs nuevos (imagen "full"):
+# ── marker-pdf opcional: sólo convierte PDFs nuevos (docs/imagen_pipelines.md) ────
 #   docker compose build --build-arg INSTALL_MARKER=true pipelines
-# El force-reinstall de torch tras marker garantiza el torch CPU/CUDA elegido (marker
-# puede tironear otra build de torch al resolver surya-ocr).
 ARG INSTALL_MARKER=false
 RUN if [ "$INSTALL_MARKER" = "true" ]; then \
         echo "INSTALL_MARKER=true → instalando marker-pdf (imagen full)" && \
@@ -57,13 +33,7 @@ RUN if [ "$INSTALL_MARKER" = "true" ]; then \
              "para habilitar la conversión de PDFs nuevos." ; \
     fi
 
-# ── Gráficos del reporte de evaluación (report.py html) ─────────────────────────
-# Sin backend GUI: report.py fuerza el backend "Agg" antes de importarlo.
-#
-# Deliberadamente NO está en requirements.txt: ese archivo se copia al principio de
-# la imagen, así que tocarlo invalida las capas pesadas que vienen después (torch y
-# la descarga de ~4.3 GB del reranker). Apendeada acá al final, esta layer rebuildea
-# sola. Ver docs/eval/refactor_resultados_csv.md §5.6.
+# ── matplotlib para report.py html: al final, fuera de requirements.txt ────────
 RUN pip install --no-cache-dir matplotlib
 
 # ── Verificaciones (independientes de marker) ────────────────────────────────────

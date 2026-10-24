@@ -98,17 +98,37 @@ docker compose build --build-arg INSTALL_MARKER=true pipelines
 
 ## 6. Relación con el volumen `marker_cache`
 
-Aparte de esto, el mount del volumen `marker_cache` (que duplicaba ~4.3 GB del modelo del
-reranker en disco al crear el container) quedó **desactivado** en
-[`docker-compose.yml`](../infrastructure/docker-compose.yml): el modelo ya está horneado en
-la imagen y el runtime lo lee directo desde ahí. Son dos ahorros independientes:
+Aparte de esto, se sacó de [`docker-compose.yml`](../infrastructure/docker-compose.yml) el
+volumen `marker_cache` montado sobre `/root/.cache`, que duplicaba en disco ~4.3 GB del
+modelo del reranker al crear el container: el modelo ya está horneado en la imagen y el
+runtime lo lee directo desde ahí. Si aparece un PDF nuevo en una imagen full, marker baja
+sus modelos OCR dentro del container y se pierden al recrearlo. Son dos ahorros
+independientes:
 
 | Cambio | Ahorro | Dónde |
 |---|---|---|
 | marker-pdf opcional (default off) | ~3 GB en la **imagen** | `Dockerfile.pipelines` |
 | `marker_cache` desmontado | ~4.3 GB duplicados en **volumen** | `docker-compose.yml` |
 
-## 7. Relacionado
+## 7. Orden de las capas
+
+`Dockerfile.pipelines` está ordenado para que un cambio chico no rebuildee lo pesado:
+
+1. `requirements.txt` (Haystack y conectores). Tocarlo invalida todo lo que sigue.
+2. **torch fijado** (`2.7.0`), explícito para que la imagen slim también lo tenga. Por
+   defecto la build de CPU; el overlay NVIDIA pasa
+   `TORCH_INDEX_URL=https://download.pytorch.org/whl/cu126`.
+3. `sentence-transformers` y la **descarga del reranker** (`bge-reranker-v2-m3`, ~4.3 GB),
+   para que el primer arranque no espere a HuggingFace y el container ande offline.
+4. Los datos `punkt_tab` de nltk, que sólo usa el experimento de chunking (estrategias que
+   tokenizan oraciones); producción parte por palabras.
+5. `marker-pdf` opcional (sección 2). Tras instalarlo se reinstala el torch elegido, porque
+   marker puede traer otra build al resolver `surya-ocr`.
+6. `matplotlib`, para el reporte HTML del eval. Va al final y no en `requirements.txt` a
+   propósito: así agregarlo o actualizarlo rebuildea sólo esa capa.
+7. Verificaciones de import, que hacen fallar el build en vez del primer arranque.
+
+## 8. Relacionado
 
 - [reranker_cross_encoder.md](reranker_cross_encoder.md) — el reranker que se hornea en la
   imagen (esos ~4.3 GB no son opcionales: se usan en cada query).
