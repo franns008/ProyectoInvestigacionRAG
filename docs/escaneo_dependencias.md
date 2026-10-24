@@ -477,6 +477,20 @@ Con `requirements.txt` de 10 dependencias con versiones viejas fijadas:
 4. **Regresión del chat:** correr `scripts/eval.sh` y confirmar delta ≈ 0. El pipeline de
    chat no se tocó; si el eval se mueve, algo se rompió.
 
+### El manifiesto de cobertura (`requirements_cves.txt`)
+
+No es el de la demo (`requirements_demo.txt`, cinco librerías conocidas y una sola KEV):
+está armado para que el escaneo toque **todos** los estados que el corpus local puede
+producir, y así probar el render con volumen y no descubrir en vivo un caso sin contemplar.
+Las versiones no son inventadas: salen de los eventos `introduced`/`fixed` de OSV, y para
+cada paquete se eligió la que arrastra más vulnerabilidades.
+
+Medido contra `data/raw` del 12/09/2026: 115 vulnerabilidades en 13 librerías; 45 con
+CVSS ≥ 7, 14 con EPSS ≥ 10% y 7 en CISA KEV (5 librerías); 27 sin CVSS calculable, 6 sin
+alias a CVE y 7 sin versión de arreglo. Los números se mueven al re-bajar los datos; lo
+que importa es que siga habiendo KEV, algún hallazgo sin CVSS, alguno sin CVE y alguno
+sin arreglo.
+
 ## Limitaciones honestas
 
 - **Alcanzabilidad.** EPSS y KEV dicen si esa CVE se explota *en el mundo*, no si el código
