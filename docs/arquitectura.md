@@ -213,6 +213,26 @@ respuesta se cortó por largo, porque el servidor siempre cierra con `finish_rea
 Los próximos pasos del chat (cargar los hallazgos a demanda y armar el contexto según el
 modelo) están en [`chat_proximos_pasos.md`](chat_proximos_pasos.md).
 
+### 4.5 Cómo carga los pipelines el servidor
+
+El servidor de Pipelines trata **cada `.py` de la raíz de `src/pipeline/`** (montada como
+`/app/pipelines`) como un pipeline, y lo carga al arrancar. Tres consecuencias:
+
+- **El docstring del módulo es frontmatter.** El servidor lo parsea tomando cada línea con
+  `:` como un par clave/valor y hace `pip install` de lo que encuentre bajo `requirements`.
+  Por eso los dos pipelines tienen un docstring corto (`title`, `author`, `version`,
+  `requirements`) y la prosa va en comentarios o en `docs/`.
+- **No agrega el directorio del archivo a `sys.path`.** Carga con
+  `importlib.util.spec_from_file_location` y `sys.path` arranca en `/app`, así que
+  `import chat`, `import common` o `import explain` fallan. Cada pipeline agrega su propio
+  directorio a `sys.path` antes de importar sus paquetes hermanos.
+- **Si el import falla, mueve el `.py` a `failed/`** y el modelo no queda registrado: el
+  síntoma es un 404 `Pipeline <nombre> not found` en `/v1/chat/completions`. El motivo
+  está en el log del container (`Error loading module`); `scripts/check_extension.py` lo
+  señala. Código compartido nuevo va siempre en un subpaquete (`common/`, `chat/`,
+  `explain/`, `deps/`), nunca como `.py` suelto en la raíz: el servidor lo tomaría como
+  pipeline.
+
 ## 5. Flujos de datos
 
 ### 5.1 Indexación
