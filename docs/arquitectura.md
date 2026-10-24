@@ -76,8 +76,8 @@ Es una clase `Pipeline` que el servidor OpenWebUI Pipelines carga y expone como 
 | `id_lookup`           | `VulnIdLookup`                 | Canal determinístico por CWE/CVE en metadata         |
 | `document_joiner`     | `DocumentJoiner` (RRF)         | Fusiona los tres canales (Reciprocal Rank Fusion)    |
 | `ranker`              | `SentenceTransformersSimilarityRanker` | Reranker cross-encoder (local, CPU)          |
-| `prompt_builder`      | `PromptBuilder`                | Arma el prompt con el contexto recuperado            |
-| `llm`                 | `OllamaGenerator` → **local**  | Genera la respuesta                                  |
+| `prompt_builder`      | `ChatPromptBuilder`            | Arma el prompt con el contexto recuperado            |
+| `llm`                 | `OllamaChatGenerator` → **local** | Genera la respuesta                               |
 
 La recuperación es **híbrida**: combina retrieval semántico (embeddings), retrieval
 por palabras clave y un canal determinístico por identificador, unificados con
@@ -86,15 +86,16 @@ Reciprocal Rank Fusion y reordenados por el cross-encoder. Ver
 
 ### 4.2 Configuración de la generación
 
-El componente `llm` usa el `OllamaGenerator` de Haystack contra el servicio `ollama`
-del compose:
+El componente `llm` usa el `OllamaChatGenerator` de Haystack contra el servicio `ollama`
+del compose. El prompt entero va como único mensaje del usuario:
 
 ```python
-OllamaGenerator(
+OllamaChatGenerator(
     model=model,                       # LLM_MODEL, o el valve llm_model
     url="http://ollama:11434",
     timeout=120,
     generation_kwargs={"num_predict": 512, "temperature": 0.5, "num_ctx": 8192},  # LLM_NUM_CTX, o el valve num_ctx
+    think=False,                       # valve think
 )
 ```
 
@@ -112,6 +113,12 @@ OllamaGenerator(
   Ollama (`/api/show`) y se manda explícito igual. Si el Modelfile no la fija, el
   pipeline no levanta: no se cae en el default de Ollama sin avisar. Se resuelve una vez
   por modelo: si se recrea el modelo con otro Modelfile, hay que reiniciar `pipelines`.
+- `think` (valve, default `false`) se manda siempre. Si no se manda, Ollama usa el
+  default del modelo, y los que piensan (Gemma 4) razonan por su cuenta: ese razonamiento
+  sale de `num_predict`, y con los 220 tokens de las explicaciones la respuesta llega
+  vacía (`done_reason: length`). Cualquier modelo acepta `false`; `true` con un modelo
+  que no piensa (qwen2.5) da `400 does not support thinking`. Cada pipeline tiene el
+  suyo: en el chat se puede prender, en las explicaciones no entra.
 - `pipeline_dependencias` comparte `build_generator`. Sus valves no traen `num_ctx`, así
   que sólo manda una ventana si `LLM_NUM_CTX` está definida.
 - La ventana efectiva sale en `GET /pipeline_ciberseguridad/valves` como
@@ -133,6 +140,7 @@ OllamaGenerator(
 | `max_tokens`      | `512`                      | Longitud máxima de la respuesta               |
 | `temperature`     | `0.5`                      | Creatividad de la generación                  |
 | `num_ctx`         | `8192`                     | Ventana de contexto de Ollama (prompt + respuesta; `LLM_NUM_CTX` le gana) |
+| `think`           | `false`                    | Razonamiento de los modelos que piensan; sale de `max_tokens` (§4.2) |
 | `history_max_messages` | `6`                   | Mensajes previos del chat que entran al prompt (0 lo desactiva) |
 | `history_max_chars`    | `600`                 | Recorte de cada mensaje previo                |
 
@@ -267,10 +275,10 @@ Pregunta del usuario
                                                             Ranker (cross-encoder)
                                                                    │
                                                                    ▼
-                                                            PromptBuilder
+                                                            ChatPromptBuilder
                                                                    │
                                                                    ▼
-                                                     OllamaGenerator (local)
+                                                   OllamaChatGenerator (local)
                                                                    │
                                                                    ▼
                                                               Respuesta

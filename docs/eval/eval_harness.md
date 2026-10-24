@@ -228,7 +228,7 @@ result = pipeline.run(
     rag.build_query(q).inputs(),
     include_outputs_from={"embedding_retriever", "keyword_retriever", "document_joiner", "ranker"},
 )
-answer     = result["llm"]["replies"][0]
+answer     = result["llm"]["replies"][0].text
 ranked_ids = [d.id for d in result["ranker"]["documents"]]
 ```
 
