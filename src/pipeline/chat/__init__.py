@@ -12,6 +12,7 @@ from .context import (
     format_findings,
     select_history,
 )
+from .vuln_ids import extract_vuln_ids, resolve_vuln_ids
 
 __all__ = [
     "extract_findings_context",
@@ -20,4 +21,6 @@ __all__ = [
     "format_finding",
     "format_findings",
     "select_history",
+    "extract_vuln_ids",
+    "resolve_vuln_ids",
 ]

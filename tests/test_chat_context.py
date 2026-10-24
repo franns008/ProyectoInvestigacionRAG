@@ -10,6 +10,7 @@ from chat import (
     findings_vuln_ids,
     format_finding,
     format_findings,
+    resolve_vuln_ids,
     select_history,
 )
 
@@ -200,3 +201,20 @@ def test_con_varios_adjuntos_el_advisory_se_reparte():
     text = format_findings([long] * 2 + [OTHER] * 8)
     advisory = next(line for line in text.splitlines() if line.startswith("- Advisory"))
     assert len(advisory) < 400
+
+
+# ======================================================================
+# resolve_vuln_ids
+# ======================================================================
+def test_el_turno_actual_manda():
+    assert resolve_vuln_ids("¿y CWE-79?", conversation({"role": "user", "content": "¿y CWE-79?"})) == (["CWE-79"], "turno")
+
+
+def test_hereda_los_ids_de_la_conversacion():
+    messages = [
+        {"role": "user", "content": "¿Qué es CVE-2021-44228?"},
+        {"role": "assistant", "content": "Es Log4Shell."},
+        {"role": "user", "content": "¿cómo lo mitigo?"},
+    ]
+    assert resolve_vuln_ids("¿cómo lo mitigo?", messages) == (["CVE-2021-44228"], "historial")
+
