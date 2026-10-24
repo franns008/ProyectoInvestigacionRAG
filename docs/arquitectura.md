@@ -528,6 +528,57 @@ otro. Se paga una vez por consulta si venís de indexar, y no se paga en consult
 positivos). Si el modelo elegido no entra en VRAM, `ollama ps` lo muestra como split
 `x%/y%` CPU/GPU: la palanca sin tocar código es `LLM_MODEL` en el `.env` con uno más chico.
 
+### 8.3 El override `docker-compose.nvidia-3gb.yml`
+
+**Para qué sirve:** GPU NVIDIA con poca VRAM (probado en una GTX 1050 de 3 GB con un Ryzen 5
+4600H). En 3 GB no entran el embedder (2,5 GB) y el generador (1,0 GB) a la vez, y turnarlos
+cuesta ~3 s de carga por consulta. La salida es un reparto **fijo** CPU/GPU con los dos
+modelos residentes (`OLLAMA_MAX_LOADED_MODELS=2`, `OLLAMA_KEEP_ALIVE=-1`), y como lo que
+conviene poner en la GPU cambia entre indexar y consultar, hay **dos modos**. Se cambia
+editando `LLM_MODEL` / `EMBEDDING_MODEL` en `.env` y haciendo `up -d`, sin rebuild:
+
+| Modo | `EMBEDDING_MODEL` | `LLM_MODEL` |
+|---|---|---|
+| Consulta (default) | `qwen3-embedding:4b-cpu` → CPU | `qwen2.5:1.5b-instruct` → GPU, 1,5 GB |
+| Indexación (sólo mientras corre `run_indexing.py`) | `qwen3-embedding:4b-ctx512` → GPU, 2,6 GB | `qwen2.5:1.5b-instruct-cpu` → CPU |
+
+**Medido en esa máquina:**
+
+- Embedding: 3,46 s/chunk en CPU contra 0,46 en GPU (7,5x). Por eso la indexación quiere la
+  placa: 965 docs pasaron de ~1 h a 6 min.
+- Generación: 31 tok/s en CPU contra 33 en GPU (nada). Lo que sí gana es el procesamiento
+  del prompt: 104 tok/s contra 782 (7,5x).
+- El costo dominante de una consulta **no** es el LLM sino el reranker en CPU (3-17 s según
+  el largo de los docs, proporcional a `retriever_top_k`).
+
+**`pipelines` se queda en CPU** a propósito: no se rebuildea con torch CUDA, lo que ahorra
+~3 GB de imagen que esa máquina no tenía. El precio es que el reranker domina la latencia.
+Si sobra disco, pasarlo a GPU es la mejora más grande disponible; mientras tanto, bajar
+`retriever_top_k` de 15 a 8 corta la consulta a la mitad (11,6 s → 6,2 s) a costa de
+recall, algo para decidir con el eval y no a ojo. Por lo mismo se levanta **sin
+`--build`**: con `--build` se dispara el rebuild CUDA.
+
+**Requiere los modelos derivados**, que comparten los blobs con sus modelos base y no
+ocupan disco extra:
+
+```bash
+printf 'FROM qwen3-embedding:4b\nPARAMETER num_ctx 512\n' > /tmp/mf
+docker compose exec -T ollama sh -c 'cat > /tmp/mf' < /tmp/mf
+docker compose exec ollama ollama create qwen3-embedding:4b-ctx512 -f /tmp/mf
+
+printf 'FROM qwen3-embedding:4b\nPARAMETER num_gpu 0\nPARAMETER num_ctx 512\n' > /tmp/mf
+docker compose exec -T ollama sh -c 'cat > /tmp/mf' < /tmp/mf
+docker compose exec ollama ollama create qwen3-embedding:4b-cpu -f /tmp/mf
+
+printf 'FROM qwen2.5:1.5b-instruct\nPARAMETER num_gpu 0\n' > /tmp/mf
+docker compose exec -T ollama sh -c 'cat > /tmp/mf' < /tmp/mf
+docker compose exec ollama ollama create qwen2.5:1.5b-instruct-cpu -f /tmp/mf
+```
+
+`num_ctx 512` en el embedder no es cosmético: con el default de 4096 el KV cache se come
+1,3 GB y el modelo queda 30%/70% CPU/GPU. Los chunks son de 200 palabras (~300 tokens), así
+que 512 sobra, y son los mismos pesos: los vectores no cambian.
+
 ## 9. Resumen de decisiones de arquitectura
 
 - **Todo local sobre Ollama:** sin dependencia de APIs externas, sin claves, sin
