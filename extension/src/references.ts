@@ -7,7 +7,7 @@
  * enlace que lo acompaña también tiene que serlo.
  */
 
-import { escapeHtml as escape } from "./styles";
+import { escapeHtml as escape } from "./util";
 
 function referenceUrl(id: string): string | null {
   const cwe = id.match(/^CWE-(\d+)$/i);

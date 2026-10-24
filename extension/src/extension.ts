@@ -19,7 +19,7 @@ import { previewPackages } from './scan/manifest';
 import { ScanError, ScanProvider } from './scan/types';
 
 export function activate(context: vscode.ExtensionContext): void {
-    const chat = new ChatView(chatOptions);
+    const chat = new ChatView(chatOptions, context.extensionUri);
     context.subscriptions.push(
         chat,
         // retainContextWhenHidden: el hilo y el input a medio escribir sobreviven a
@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }),
         vscode.commands.registerCommand(
             'cibersec.scanRequirements',
-            (resource?: vscode.Uri) => scanCommand(chat, resource),
+            (resource?: vscode.Uri) => scanCommand(chat, context.extensionUri, resource),
         ),
     );
 
@@ -90,7 +90,11 @@ function chatOptions(): ChatOptions {
 /** Mismo criterio que el `when` de los menús en package.json. */
 const IS_MANIFEST = /requirements.*\.txt$/;
 
-async function scanCommand(chat: ChatView, resource?: vscode.Uri): Promise<void> {
+async function scanCommand(
+    chat: ChatView,
+    extensionUri: vscode.Uri,
+    resource?: vscode.Uri,
+): Promise<void> {
     const manifest = resource ?? vscode.window.activeTextEditor?.document.uri;
     if (!manifest || manifest.scheme !== 'file') {
         vscode.window.showWarningMessage(
@@ -111,7 +115,7 @@ async function scanCommand(chat: ChatView, resource?: vscode.Uri): Promise<void>
         workspace.uri.fsPath,
         path.dirname(manifest.fsPath),
     );
-    const panel = ResultsPanel.show(chat);
+    const panel = ResultsPanel.show(chat, extensionUri);
     panel.loading(
         path.basename(manifest.fsPath),
         await readPreview(manifest.fsPath),

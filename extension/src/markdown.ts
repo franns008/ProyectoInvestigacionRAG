@@ -7,7 +7,7 @@
  * inyecte HTML. Los links sólo se aceptan con esquema http(s).
  */
 
-import { escapeHtml } from "./styles";
+import { escapeHtml } from "./util";
 
 const FENCE = /^\s*```/;
 const HEADING = /^\s*(#{1,6})\s+(.*?)\s*#*\s*$/;

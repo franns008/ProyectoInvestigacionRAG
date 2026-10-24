@@ -15,8 +15,8 @@ import { ChatView } from './chatView';
 import { PreviewPackage } from './scan/manifest';
 import { chip } from './references';
 import { Finding, ScanResult, findingKey, identifierOf, packageKey } from './scan/types';
-import { escapeHtml as escape } from './styles';
-import { openHttpLink, webviewPage } from './webview';
+import { escapeHtml as escape } from './util';
+import { mediaRoot, openHttpLink, webviewPage } from './webview';
 
 export class ResultsPanel {
     private static current: ResultsPanel | undefined;
@@ -30,12 +30,19 @@ export class ResultsPanel {
      */
     private findings = new Map<string, Finding>();
 
-    private constructor(private readonly chat: ChatView) {
+    private constructor(
+        private readonly chat: ChatView,
+        private readonly extensionUri: vscode.Uri,
+    ) {
         this.panel = vscode.window.createWebviewPanel(
             'cibersec.results',
             'Dependencias vulnerables',
             vscode.ViewColumn.Beside,
-            { enableScripts: true, retainContextWhenHidden: true },
+            {
+                enableScripts: true,
+                retainContextWhenHidden: true,
+                localResourceRoots: [mediaRoot(extensionUri)],
+            },
         );
         this.panel.webview.onDidReceiveMessage(
             (message: { type?: string; key?: string; url?: string }) => {
@@ -61,9 +68,9 @@ export class ResultsPanel {
     }
 
     /** Reusa el panel si ya está abierto, para no acumular pestañas en cada escaneo. */
-    static show(chat: ChatView): ResultsPanel {
+    static show(chat: ChatView, extensionUri: vscode.Uri): ResultsPanel {
         if (!ResultsPanel.current) {
-            ResultsPanel.current = new ResultsPanel(chat);
+            ResultsPanel.current = new ResultsPanel(chat, extensionUri);
         }
         ResultsPanel.current.panel.reveal(vscode.ViewColumn.Beside, true);
         return ResultsPanel.current;
@@ -87,39 +94,9 @@ export class ResultsPanel {
     }
 
     private wrap(body: string): string {
-        return webviewPage(STYLES, `<div class="page">${body}</div>`, `
-  const vscode = acquireVsCodeApi();
-  // Marca los botones de los hallazgos que ya están en el chat. El estado inicial va
-  // embebido porque un postMessage anterior a la carga del webview se pierde.
-  function markAttached(keys) {
-    const attached = new Set(keys);
-    for (const button of document.querySelectorAll("button[data-finding]")) {
-      const on = attached.has(button.dataset.finding);
-      button.setAttribute("aria-pressed", String(on));
-      const name = on ? button.dataset.labelOn : button.dataset.labelOff;
-      button.title = name;
-      button.setAttribute("aria-label", name);
-      const text = button.querySelector(".label");
-      if (text) text.textContent = on ? "En el chat" : "Agregar al chat";
-    }
-  }
-  document.addEventListener("DOMContentLoaded", () => markAttached(${JSON.stringify([...this.chat.attachedKeys()])}));
-  window.addEventListener("message", (event) => {
-    if (event.data.type === "attached") markAttached(event.data.keys);
-  });
-  document.addEventListener("click", (event) => {
-    const button = event.target.closest("button[data-finding]");
-    if (button) {
-      vscode.postMessage({ type: "toggleContext", key: button.dataset.finding });
-      return;
-    }
-    const link = event.target.closest("a[href]");
-    if (link) {
-      event.preventDefault();
-      vscode.postMessage({ type: "openExternal", url: link.getAttribute("href") });
-    }
-  });
-`);
+        return webviewPage(this.panel.webview, this.extensionUri, 'panel', `<div class="page">${body}</div>`, {
+            attached: [...this.chat.attachedKeys()],
+        });
     }
 
     private dispose(): void {
@@ -141,7 +118,7 @@ export class ResultsPanel {
 function renderScanning(manifest: string, packages: PreviewPackage[]): string {
     const items = packages
         .map(
-            (item, index) => `<li class="scan-item ${item.pinned ? '' : 'loose'}" style="--i:${index}">
+            (item) => `<li class="scan-item ${item.pinned ? '' : 'loose'}">
                 <span class="scan-name">${escape(item.name)}</span>
                 <span class="scan-version">${item.version ? escape(item.version) : ''}</span>
             </li>`,
@@ -526,211 +503,3 @@ function basename(fsPath: string): string {
 function plural(n: number, singular: string, plural_: string): string {
     return `${n} ${n === 1 ? singular : plural_}`;
 }
-
-/**
- * Sólo lo específico del informe. Todo lo que comparte con el chat —superficie,
- * tags, chips, botones, escalas, foco— vive en BASE_STYLES y acá no se redefine.
- */
-const STYLES = `
-  .page-header { padding-bottom: var(--sp-4); border-bottom: 1px solid var(--border); }
-  .page-header h1 { margin-bottom: var(--sp-1); }
-
-  .summary-line { margin: var(--sp-2) 0 0; color: var(--muted); }
-  .summary-line strong { color: var(--vscode-foreground); }
-  .summary-line .danger, .summary-line .danger strong { color: var(--danger); }
-
-  .urgent-section, .library-section { margin-top: var(--sp-5); }
-  .quiet-section {
-    margin-top: var(--sp-5);
-    padding: var(--sp-3) var(--sp-4);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-  }
-  .section-heading {
-    display: flex; align-items: baseline; justify-content: space-between;
-    gap: var(--sp-4); margin-bottom: var(--sp-2);
-  }
-  .section-heading h2 { margin: 0; }
-  .section-count, .urgent-count {
-    flex: none;
-    color: var(--muted); font-size: var(--fs-sm); font-variant-numeric: tabular-nums;
-  }
-
-  .package-group {
-    margin: var(--sp-3) 0;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .package-group > summary {
-    padding: var(--sp-3) var(--sp-4);
-    color: var(--vscode-foreground);
-    background: var(--surface);
-    /* .package-group recorta (overflow:hidden), así que sin esto un nombre de paquete
-       largo se corta contra el borde en vez de envolver. */
-    overflow-wrap: anywhere;
-  }
-  .package-group > summary:hover { background: var(--vscode-list-hoverBackground); }
-  .package-findings { padding: 0 var(--sp-3) var(--sp-2); }
-
-  /* Mismo relleno que las tarjetas: el resumen es un bloque más, no texto suelto. */
-  .funnel-section {
-    margin-top: var(--sp-4);
-    padding: var(--sp-3) var(--sp-4);
-    border-radius: var(--radius);
-    background: var(--card-bg);
-    /* La tabla no envuelve: cuando no entra, scrollea adentro en vez de salirse. */
-    overflow-x: auto;
-  }
-  /* Todo el ancho de la caja: el criterio a la izquierda y las cifras contra el borde
-     derecho, con el mismo padding de los dos lados. */
-  .funnel { width: 100%; margin: var(--sp-2) 0 0; border-collapse: collapse; }
-  /* Sin envolver: si el panel es angosto, la caja scrollea (overflow-x en .funnel-section). */
-  .funnel th, .funnel td {
-    padding: var(--sp-1) var(--sp-2) var(--sp-1) 0;
-    text-align: left;
-    white-space: nowrap;
-  }
-  .funnel th:last-child, .funnel td:last-child { padding-right: 0; }
-  .funnel th { font-size: var(--fs-sm); font-weight: 400; color: var(--muted); }
-  /* width:1% encoge las cifras a su contenido y deja todo el sobrante al criterio. El
-     padding izquierdo las separa de él. */
-  .funnel .num {
-    width: 1%;
-    padding-left: var(--sp-4);
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-  .funnel-section h2 { margin-bottom: var(--sp-2); }
-
-  /* El hallazgo es la superficie compartida; lo único propio es la marca de urgencia. */
-  .finding { margin: var(--sp-2) 0; border-width: 1.5px; border-left-width: 2.5px; }
-  .finding.urgent { border-left-color: var(--danger); }
-
-  /* Título a la izquierda, estado a la derecha: los tags se leen en columna. */
-  .finding-head {
-    display: flex; align-items: baseline; justify-content: space-between;
-    gap: var(--sp-3); margin: 0;
-    font-size: var(--fs-lg);
-    font-weight: 700;
-  }
-  /* Mismo criterio que .finding-meta en el pie: el título envuelve por dentro en vez de
-     empujar a los tags fuera de la tarjeta. Un ítem flex tiene min-width:auto, así que
-     sin esto el nombre del paquete impone su ancho mínimo y desborda la línea entera.
-     overflow-wrap cubre el caso en que un solo token ya no entra: min-width:0 deja que
-     el span se encoja, pero no parte la palabra. */
-  .finding-title { min-width: 0; overflow-wrap: anywhere; }
-  .finding-tags { flex: none; display: flex; gap: var(--sp-2); }
-  .finding-fix { font-weight: 400; color: var(--muted); }
-
-  .finding-summary { margin: var(--sp-2) 0 0; }
-  .explanation { margin: var(--sp-3) 0 0; }
-  .explanation > p:first-child { margin-top: 0; }
-  /* El texto del advisory, tal cual: se lee como fuente, más quieto que la explicación. */
-  .advisory-original {
-    margin: var(--sp-2) 0 0;
-    padding-left: var(--sp-3);
-    border-left: 2px solid var(--border-strong);
-    color: var(--muted);
-    font-size: var(--fs-sm);
-  }
-
-  /* Respaldo y acción en la misma línea: ninguno de los dos merece un renglón propio. */
-  .finding-foot {
-    display: flex; align-items: flex-end; justify-content: space-between;
-    gap: var(--sp-3);
-    margin-top: var(--sp-3);
-  }
-  /* min-width:0 deja que la meta envuelva por dentro en vez de empujar al botón. */
-  .finding-meta { min-width: 0; color: var(--muted); font-size: var(--fs-sm); }
-  .chat-button { flex: none; }
-
-  /* El tratamiento discreto lo pone .button.quiet; acá va sólo la forma. */
-  .chat-button { display: inline-flex; align-items: center; gap: .4em; }
-  /* Sólo ícono: caja cuadrada, para que no quede un botón ancho con un glifo al medio. */
-  .chat-button[data-icon-only] {
-    justify-content: center;
-    width: 1.9rem; height: 1.9rem;
-    padding: 0;
-  }
-  .icono { flex: none; }
-  /* Adjunto: el botón queda marcado, como un toggle de la barra de herramientas. */
-  .chat-button[aria-pressed="true"] {
-    color: var(--vscode-inputOption-activeForeground, var(--vscode-foreground));
-    background: var(--vscode-inputOption-activeBackground, var(--surface));
-    box-shadow: inset 0 0 0 1px var(--vscode-inputOption-activeBorder, var(--border-strong));
-  }
-
-  .skipped {
-    margin-top: var(--sp-6);
-    padding-top: var(--sp-4);
-    border-top: 1px solid var(--border);
-  }
-  .skipped ul { margin: 0; padding-left: var(--sp-5); }
-  .skipped li { margin: var(--sp-1) 0; color: var(--muted); }
-
-  /* --- Pantalla de espera ------------------------------------------------------- */
-  .scanning {
-    display: flex; flex-direction: column; gap: var(--sp-4);
-    min-height: calc(100vh - var(--sp-5) - var(--sp-6));
-  }
-  .scan-grid {
-    flex: 1; align-content: start;
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-    gap: var(--sp-2);
-    margin: 0; padding: 0; list-style: none;
-  }
-  .scan-item {
-    display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-2);
-    padding: var(--sp-2) var(--sp-3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--muted);
-    /* El retardo por índice es lo que hace que la onda viaje por la lista. */
-    animation: scan-wave 2.6s ease-in-out infinite;
-    animation-delay: calc(var(--i) * 90ms);
-  }
-  /* Sin pin exacto: el resolver las va a descartar, así que no participan de la onda. */
-  .scan-item.loose { opacity: .45; animation: none; }
-  .scan-name { font-family: var(--vscode-editor-font-family); font-size: var(--fs-sm); }
-  .scan-version { font-size: var(--fs-xs); font-variant-numeric: tabular-nums; }
-
-  @keyframes scan-wave {
-    0%, 55%, 100% { border-color: var(--border); color: var(--muted); background: transparent; }
-    22% {
-      border-color: var(--vscode-focusBorder);
-      color: var(--vscode-foreground);
-      background: var(--surface);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) { .scan-item { animation: none; } }
-
-  /* --- Panel angosto ------------------------------------------------------------ *
-   *
-   * Mismo umbral que en BASE_STYLES, donde la página achica su margen.
-   *
-   * Las dos líneas de la tarjeta —título contra tags, respaldo contra acción— son
-   * pares de "contenido a la izquierda, estado a la derecha". El de la derecha no
-   * puede encogerse (los tags y el botón son cajas de tamaño fijo) y el de la
-   * izquierda ya envuelve todo lo que puede, así que por debajo de cierto ancho la
-   * línea no cierra y lo fijo termina fuera de la tarjeta.
-   *
-   * Envolver dentro de la misma línea no alcanza: con space-between, lo que baja al
-   * segundo renglón queda pegado a la izquierda, o sea en columna pero a medias y con
-   * el alineado roto. Se pasa a columna de una vez, que es lo que efectivamente es.
-   * Se pierde el barrido vertical por la derecha, pero a este ancho ese barrido no
-   * existía: cabe una tarjeta y se lee de arriba a abajo.
-   */
-  @media (max-width: 30rem) {
-    .finding-head, .finding-foot, .section-heading {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--sp-2);
-    }
-    /* Dos tags no siempre entran juntos a este ancho. */
-    .finding-tags { flex-wrap: wrap; }
-    .section-heading { gap: var(--sp-1); }
-    /* Ya no compite con la meta por la línea: puede ocupar el ancho que necesite. */
-    .chat-button { max-width: 100%; }
-  }
-`;
