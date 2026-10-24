@@ -11,13 +11,8 @@ _CVE_ID_RE = re.compile(r"cve[\s\-_]?(\d{4})[\s\-_]?(\d{4,7})", re.IGNORECASE)
 
 
 def extract_vuln_ids(text: str) -> list[str]:
-    """IDs en ORDEN DE APARICIÓN en el texto, no agrupados por tipo.
-
-    Antes se recorrían todos los CWE y después todos los CVE, así que el orden
-    reflejaba el tipo y no la pregunta: "¿qué CVE explota CWE-502?" ponía siempre
-    el CWE primero. El orden importa porque decide el desempate y el corte por
-    top_k en VulnIdLookup (y, vía RRF, cuánto pesa cada uno).
-    """
+    """CWE y CVE en forma canónica, en orden de aparición: el orden es el peso en
+    VulnIdLookup (docs/analisis_keyword_retriever.md)."""
     found: list[tuple[int, str]] = []
     for m in _CWE_ID_RE.finditer(text):
         found.append((m.start(), f"CWE-{int(m.group(1))}"))
@@ -40,15 +35,8 @@ def resolve_vuln_ids(
     user_message: str,
     messages: list[dict] | None = None,
 ) -> tuple[list[str], str]:
-    """IDs del turno actual; si no hay ninguno, los hereda de los últimos turnos.
-
-    El turno actual manda: sólo se mira hacia atrás cuando no trae ningún ID, así
-    un cambio explícito de tema nunca queda contaminado. Dentro del historial se
-    acumulan del más reciente al más viejo, y ese orden ES el peso: VulnIdLookup
-    lo respeta y el RRF le da 1/(k+rango) a cada documento.
-
-    Devuelve (ids, origen); `origen` se loguea para poder auditar el arrastre.
-    """
+    """IDs del turno actual; si no trae ninguno, los de los últimos turnos, del más
+    reciente al más viejo. Devuelve (ids, origen). Ver docs/analisis_keyword_retriever.md."""
     current = extract_vuln_ids(user_message)
     if current:
         return current[:_MAX_VULN_IDS], "turno"
@@ -56,8 +44,7 @@ def resolve_vuln_ids(
         return [], "ninguno"
 
     inherited: list[str] = []
-    # Sólo lo que se dijo: el `system` de los hallazgos adjuntos trae el texto del
-    # advisory, con CVEs ajenos; sus IDs ya entran aparte (findings_vuln_ids).
+    # El `system` de los hallazgos no cuenta: sus IDs entran aparte (findings_vuln_ids).
     turns = [m for m in messages if m.get("role") in ("user", "assistant")]
     for msg in reversed(turns[-_HISTORY_TURNS:]):
         text = message_text(msg)

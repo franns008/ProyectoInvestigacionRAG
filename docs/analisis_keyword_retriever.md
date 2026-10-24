@@ -177,3 +177,29 @@ Con el cambio de idioma esto suele no ser necesario, porque las stopwords ya se 
 | **Por qué a veces trae 3** | Queries cortas (*"Que es la ciberseguridad"*) tienen pocos términos, y esos términos son ubicuos en el corpus, así que el AND se satisface. |
 | **Rol del joiner** | Correcto, pero enmascara el fallo: RRF degrada la búsqueda híbrida a solo-densa sin avisar, y el contexto queda de tamaño variable. |
 | **Fix principal** | `language="spanish"` en el `PgvectorDocumentStore` + recrear el índice GIN de keyword. |
+
+## Canal determinístico de IDs (`VulnIdLookup`)
+
+Los CWE y CVE que nombra la pregunta no se buscan por BM25 sino por metadata, en un canal
+propio (`id_lookup`) que entra al joiner junto a los dos retrievers.
+
+- **Por qué no BM25.** Un ID es una clave primaria disfrazada: no tiene sentido recuperarlo
+  por similitud de coseno ni por términos. Y por el factor 2 de arriba, `plainto_tsquery`
+  AND-ea los lexemas: con dos IDs en la pregunta ningún documento los contiene a ambos y
+  el keyword retriever devuelve 0.
+- **Por qué `meta.source`.** Se filtra por `meta.source` y no por `cwe_id`/`cve_id`
+  porque `cwe_id` es int y `cve_id` es str, mientras que `source` es str en ambos y guarda
+  exactamente la forma canónica que produce `extract_vuln_ids` (`CWE-79`,
+  `CVE-2021-44228`). Las guías de INCIBE tienen un nombre de archivo en `source`, así que
+  no colisionan.
+- **Orden de aparición.** `extract_vuln_ids` (`src/pipeline/chat/vuln_ids.py`) devuelve
+  los IDs en el orden en que aparecen en el texto, no agrupados por tipo: antes recorría
+  todos los CWE y después todos los CVE, y "¿qué CVE explota CWE-502?" ponía siempre el
+  CWE primero. El orden importa porque decide el desempate y el corte por `top_k` en
+  `VulnIdLookup` y, vía RRF, cuánto pesa cada uno.
+- **Herencia en la conversación.** `resolve_vuln_ids` usa los IDs del turno actual; sólo
+  si no trae ninguno los hereda de los últimos 4 mensajes `user`/`assistant`, del más
+  reciente al más viejo, y ese orden es el peso. Así un cambio explícito de tema nunca
+  queda contaminado. El `system` con los hallazgos adjuntos no cuenta: su texto de
+  advisory nombra otros CVE, y los IDs del hallazgo ya entran aparte. El origen (`turno`,
+  `historial`, `ninguno`) se loguea en `[VULN IDS]` para auditar el arrastre.

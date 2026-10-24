@@ -17,9 +17,7 @@ import threading
 import time
 import uuid
 
-# El servidor carga cada pipeline con `spec_from_file_location`, que no agrega su
-# directorio a `sys.path`: sin esto `import chat` falla y el archivo termina en
-# `failed/`. Mismo arreglo que en pipeline_dependencias.py.
+# El servidor no agrega este directorio a sys.path (docs/arquitectura.md §4.5).
 _PIPELINES_DIR = os.path.dirname(os.path.abspath(__file__))
 if _PIPELINES_DIR not in sys.path:
     sys.path.insert(0, _PIPELINES_DIR)
@@ -262,18 +260,8 @@ def build_query(
 
 @component
 class VulnIdLookup:
-    """Canal determinístico de IDs: resuelve CWE-x / CVE-x por metadata.
-
-    Un ID es una clave primaria disfrazada, no tiene sentido recuperarlo por
-    similitud de coseno ni por BM25. Además el PgvectorKeywordRetriever usa
-    plainto_tsquery, que AND-ea los lexemas: con dos IDs ningún documento los
-    contiene a ambos y devuelve 0. Por eso este canal sale de BM25.
-
-    Se filtra por `meta.source` y no por `cwe_id`/`cve_id` porque `cwe_id` es int
-    y `cve_id` es str, mientras que `source` es str en ambos y guarda exactamente
-    la forma canónica que produce extract_vuln_ids ("CWE-79", "CVE-2021-44228").
-    Las guías INCIBE tienen un nombre de archivo en `source`, así que no colisionan.
-    """
+    """Canal determinístico de IDs: trae los documentos de cada CWE/CVE por `meta.source`,
+    en el orden de los IDs. Por qué no BM25: docs/analisis_keyword_retriever.md."""
 
     def __init__(self, document_store, top_k: int = 10):
         self.document_store = document_store

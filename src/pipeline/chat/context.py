@@ -1,18 +1,8 @@
-"""
-Hallazgos adjuntos e historial para el chat de la extensión de VSCode.
+"""Hallazgos adjuntos e historial del chat de la extensión de VSCode.
 
-El chat de la extensión de VSCode manda los hallazgos que el usuario adjuntó como primer
-mensaje, con `role: "system"`: no es algo que haya dicho el usuario, es el tema de la charla.
-
-    [{"role": "system",    "content": '{"findings": [{"package": ..., "cve": "CVE-...", ...}, ...]}'},
-     {"role": "user",      "content": "¿qué tan grave es?"},
-     {"role": "assistant", "content": "..."},
-     {"role": "user",      "content": "¿cómo lo mitigo?"}]   ← el turno actual
-
-Cada request trae la conversación entera y el contexto vigente (los guarda el cliente), así
-que el pipeline no guarda estado: sólo decide qué parte de `messages` entra al prompt.
-
-Sin mensaje `system` (un chat sin hallazgos adjuntos) no hay hallazgos y todo sigue como antes.
+La extensión manda los hallazgos como primer mensaje `system` (`{"findings": [...]}`) y la
+conversación entera en cada request: el pipeline no guarda estado. Ver
+docs/arquitectura.md §4.4.
 """
 
 from __future__ import annotations
