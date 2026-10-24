@@ -269,6 +269,14 @@ Distinto al del chat: no responde una pregunta, resume un hallazgo concreto.
    nivel 1 / 2 / 3. **Ese número va antes que la prosa.**
 8. Latencia extremo a extremo del panel (escaneo + lookup + 3 generaciones).
 
+Para comprobar que el stack sirve lo que usa la extensión (modelos registrados, valves del
+medidor, escaneo, explicaciones y chat con un hallazgo adjunto), con el intérprete de
+`cibersec.pythonPath`:
+
+    .venv/bin/python scripts/check_extension.py
+
+Corta en el primer paso que falla y dice dónde mirar.
+
 > **Estado de esta máquina (2026-09-06):** el corpus **no está indexado**. En `pgvdb` sólo
 > existe `document_chunk` (tabla propia de OpenWebUI, 0 filas); no hay `ciberseguridad_docs`.
 > Y el stack que está levantado bindea `/app/pipelines` a otro proyecto, no a este repo.
