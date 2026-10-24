@@ -1,13 +1,7 @@
 /**
- * El webview que muestra los hallazgos.
- *
- * Disciplina de la vista (docs/escaneo_dependencias.md, "Disciplina de las dos
- * superficies"): acá va la herramienta —hallazgos, prioridad, explicación, citas— y
- * NADA de la maquinaria. Nada de scores de retriever, etapas del pipeline ni métricas
- * de evaluación: eso vive en el panel de evidencia, que es la otra pantalla.
- *
- * Todo el texto que viene de los advisories se escapa antes de insertarse: es contenido
- * de terceros.
+ * El webview que muestra los hallazgos: la herramienta, no la maquinaria del RAG
+ * (docs/escaneo_dependencias.md, "Disciplina de las dos superficies"). Todo texto de los
+ * advisories se escapa antes de insertarse.
  */
 
 import * as vscode from 'vscode';
@@ -22,12 +16,7 @@ export class ResultsPanel {
     private static current: ResultsPanel | undefined;
     private readonly panel: vscode.WebviewPanel;
     private disposables: vscode.Disposable[] = [];
-    /**
-     * Los hallazgos del último escaneo, por clave. Serializar cada uno dentro de un
-     * atributo `data-` costaba 291 KB de HTML en un informe de 115 hallazgos, la mayor
-     * parte en `details` y `references`, que el DOM no usa para nada: el botón sólo
-     * necesita decir cuál se abre.
-     */
+    /** Los hallazgos del último escaneo, por clave: el botón sólo manda la clave, no el hallazgo. */
     private findings = new Map<string, Finding>();
 
     private constructor(
@@ -108,12 +97,8 @@ export class ResultsPanel {
 }
 
 /**
- * Pantalla de espera: el manifiesto y sus dependencias, recorridas por una onda.
- *
- * Los nombres son los reales —la extensión ya tiene el archivo abierto, así que no hay
- * que esperar al escáner para mostrarlos—. La animación es ambiental: no marca avance
- * por paquete, que sería falso (resolver uno son 3,5 ms de los 1.742 que tarda el
- * escaneo; el resto se va en abrir los catálogos).
+ * Pantalla de espera: las dependencias reales del manifiesto, recorridas por una onda
+ * ambiental (no marca avance por paquete, que sería falso).
  */
 function renderScanning(manifest: string, packages: PreviewPackage[]): string {
     const items = packages
@@ -171,14 +156,7 @@ function renderResult(result: ScanResult): string {
     ${renderSkipped(skipped)}`;
 }
 
-/**
- * Los tres números de la cabecera, en una línea.
- *
- * Eran tres tiles con el número en grande sobre un recinto con fondo. Ese patrón es el
- * de un dashboard, y acá lo que se busca es lo contrario (docs/escaneo_dependencias.md:
- * "aburrida y profesional"). El único que lleva color es el de explotadas, que es el que
- * decide qué se hace hoy.
- */
+/** Los tres números de la cabecera, en una línea; sólo el de explotadas lleva color. */
 function renderSummaryLine(total: number, paquetes: number, explotadas: number): string {
     const explotadasTexto = explotadas
         ? `<span class="danger"><strong>${explotadas}</strong> explotadas</span>`
@@ -211,19 +189,8 @@ function renderNoUrgentFindings(): string {
 }
 
 /**
- * Agrupa por librería conservando el orden en que llegan los hallazgos.
- *
- * Acá se los reordenaba por CVSS descendente, con el CVSS ausente valiendo -1. Eso
- * hundía justo lo que hay que mirar primero: en el grupo de pyspark, CVE-2022-33891
- * —que CISA confirma explotada, EPSS 93%— caía tercera debajo de una con CVSS 9.9 y
- * EPSS 1,1%, y CVE-2023-32007, con EPSS 76%, quedaba última de once por no tener CVSS
- * publicado. La vista terminaba ordenando por la métrica que el proyecto demuestra que
- * no ordena el trabajo (ver el embudo, arriba en esta misma pantalla).
- *
- * `prioritize()` en Python ya los manda ordenados por KEV, después EPSS y CVSS sólo
- * como desempate. El Map conserva el orden de inserción, así que no reordenar es
- * respetar esa decisión — y es la regla que fija types.ts: los campos duros los arma
- * Python, la vista no calcula.
+ * Agrupa por librería conservando el orden en que llegan: `prioritize()` ya los ordena por
+ * KEV, EPSS y CVSS. No reordenar acá: la vista no calcula prioridades.
  */
 function renderPackageGroups(findings: Finding[]): string {
     const groups = new Map<string, Finding[]>();
@@ -260,18 +227,8 @@ function renderPackageGroup(findings: Finding[]): string {
 }
 
 /**
- * El embudo: cuántos hallazgos sobreviven a cada criterio de filtrado.
- *
- * Va arriba de todo, antes de los hallazgos. Es la premisa —por qué hay que mirar siete
- * y no ciento quince— y estaba detrás de la conclusión, al final de una página de
- * quince pantallas, donde no lo leía nadie.
- *
- * Lleva encabezados de columna de verdad: es una tabla de datos, y sin th un lector
- * de pantalla la recorre sin saber qué significa cada celda.
- *
- * El total no es una fila de la tabla: es la base contra la que se calculan los
- * porcentajes, y por eso era la única sin uno. No hace falta repetirlo acá — está dos
- * renglones más arriba, en la línea de resumen del encabezado.
+ * El embudo: cuántos hallazgos sobreviven a cada criterio. Va arriba de todo, porque es
+ * la premisa del informe, y con `th` de verdad para los lectores de pantalla.
  */
 function renderFunnel(f: ScanResult['funnel']): string {
     const row = (label: string, value: number) =>
@@ -297,16 +254,8 @@ function renderFunnel(f: ScanResult['funnel']): string {
 const ICONO_ADJUNTAR = `<svg class="icono" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" d="M13.5 7.5 8.1 12.9a3.25 3.25 0 0 1-4.6-4.6l5.6-5.6a2.1 2.1 0 0 1 3 3L6.5 11.3a1 1 0 0 1-1.4-1.4l5.2-5.2"/></svg>`;
 
 /**
- * La acción de la tarjeta: adjuntar el hallazgo al chat, o quitarlo si ya está.
- *
- * En "Explotadas activamente" son siete tarjetas y la acción es la esperable, así que
- * lleva ícono y etiqueta. En los grupos de librería se repite en las ciento quince: ahí
- * va sólo el ícono, porque un botón con texto repetido esa cantidad de veces termina
- * pesando más que los hallazgos.
- *
- * En los dos casos el nombre accesible incluye el identificador. Sin eso serían ciento
- * veintidós botones llamados igual, y el de sólo ícono no tendría nombre en absoluto.
- * `aria-pressed` y los nombres los ajusta el script según lo que esté adjunto.
+ * Adjuntar el hallazgo al chat o quitarlo. En "Explotadas" lleva ícono y etiqueta; en los
+ * grupos, sólo ícono. El nombre accesible siempre incluye el identificador.
  */
 function renderAction(finding: Finding, seccion: Seccion): string {
     const id = `${identifierOf(finding, 'este hallazgo')} de ${finding.package}`;
@@ -323,15 +272,9 @@ function renderAction(finding: Finding, seccion: Seccion): string {
 type Seccion = 'urgente' | 'grupo';
 
 /**
- * Una tarjeta de hallazgo, en tres líneas.
- *
- * Antes eran seis bloques con mucha repetición medida sobre los 115 hallazgos del
- * manifiesto de cobertura: KEV se decía cuatro veces en la misma tarjeta (riel, tag,
- * "en el catálogo CISA KEV" y "CISA KEV" en Fuentes), el CWE dos, y la línea de Fuentes
- * repetía identificadores ya visibles en 109 de 115 casos. Cada cosa se dice una vez:
- *
- *   1. Qué hacer      — paquete, versión instalada, versión que lo arregla.
- *   2. Qué es         — el resumen del advisory.
+ * Una tarjeta de hallazgo, en tres líneas y cada cosa dicha una vez:
+ *   1. Qué hacer        — paquete, versión instalada, versión que lo arregla.
+ *   2. Qué es           — el resumen del advisory.
  *   3. Con qué respaldo — identificadores enlazados a su fuente, y la acción.
  */
 function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
@@ -371,12 +314,7 @@ function renderFinding(finding: Finding, seccion: Seccion = 'grupo'): string {
     </article>`;
 }
 
-/**
- * El resumen del advisory, sin el prefijo con el nombre del paquete.
- *
- * 21 de los 115 hallazgos del manifiesto de cobertura arrancan con "Marimo: ", "Ray: "
- * y similares. El paquete ya es el título de la tarjeta.
- */
+/** El resumen del advisory sin el prefijo "Paquete: ", que ya es el título de la tarjeta. */
 function summaryText(finding: Finding): string {
     if (!finding.summary) return '';
     const prefijo = new RegExp(`^${escapeRegExp(finding.package)}\\s*:\\s*`, 'i');
@@ -390,15 +328,8 @@ function renderSummary(finding: Finding): string {
 }
 
 /**
- * La explicación del LLM, con el resumen original del advisory debajo.
- *
- * El resumen no se descarta: casi siempre es la fuente de la explicación (el CVE rara
- * vez está en el corpus y el advisory entra siempre al contexto), así que es contra lo
- * que se contrasta la prosa del modelo. Va debajo y como cita, no como segunda
- * descripción: es respaldo, no contenido.
- *
- * La línea de "Citado:" se sacó: el advisory citado es casi siempre el mismo que se
- * muestra entre comillas, y los identificadores ya están en los chips del pie.
+ * La explicación del LLM, con el resumen del advisory debajo como cita: es casi siempre
+ * su fuente, y contra eso se contrasta la prosa del modelo.
  */
 function renderExplanation(finding: Finding): string {
     if (!finding.explanation) return '';
