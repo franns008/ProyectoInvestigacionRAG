@@ -90,20 +90,8 @@ def _chunk_key(doc: Document) -> tuple[str, str] | None:
 
 
 def is_blank(doc: Document) -> bool:
-    """Chunk sin una sola letra: sólo espacios, saltos de línea y tabs.
-
-    marker-pdf rellena las celdas de sus tablas markdown hasta el ancho de la columna, así
-    que un índice deja corridas de cientos de espacios seguidos (592 en el estudio de Cloud
-    SCI). `split_by="word"` parte por el carácter " " literal, de modo que cada corrida
-    aporta N unidades vacías que igual cuentan para `split_length`: una sola corrida llena
-    tres chunks enteros sin una letra adentro. El `skip_empty_documents` de Haystack no los
-    ve, porque mide `len(txt) > 0` y un chunk de 200 espacios mide 200.
-
-    Se descarta sólo lo TOTALMENTE vacío, no lo corto: hay filas de tabla de 130-180
-    caracteres con datos reales (las comparativas de la guía 5G) que un mínimo por longitud
-    se llevaría puestas. Los chunks con escombros de tabla ("|", "| Requisitos") quedan para
-    cuando se arregle el parsing, que es donde está la causa.
-    """
+    """Chunk sin una sola letra, como los que dejan las tablas de marker
+    (docs/data_splitting.md §2.1)."""
     return not (doc.content or "").strip()
 
 
@@ -111,17 +99,8 @@ _BR_RE = re.compile(r"<br\s*/?>", re.IGNORECASE)
 
 
 def markdown_text(md_path: Path) -> str:
-    """El markdown de marker, con los `<br>` pasados a espacio.
-
-    marker usa `<br>` para los saltos de línea DENTRO de las celdas de tabla, y
-    `MarkdownToDocument` los borra sin dejar nada en su lugar: "de<br>seguridad" termina
-    como "deseguridad", y "| 14<br>16<br>16 |" como "141616". Eso rompe las dos vías de
-    retrieval a la vez — el embedder tokeniza mal esos engendros y el keyword retriever no
-    encuentra `seguridad` porque como término dejó de existir.
-
-    El `.md` cacheado no se toca: es la salida cruda de marker y reconvertir un PDF
-    cuesta una corrida de OCR.
-    """
+    """El markdown de marker con los `<br>` de las celdas pasados a espacio
+    (docs/data_splitting.md §2.1). No toca el `.md` cacheado."""
     return _BR_RE.sub(" ", md_path.read_text(encoding="utf-8"))
 
 
@@ -284,10 +263,6 @@ class Indexer:
             splitter = DocumentSplitter(split_by="word", split_length=SPLIT_LENGTH, split_overlap=SPLIT_OVERLAP)
             chunks = splitter.run(documents=splittable_docs)["documents"]
 
-            # Los chunks en blanco tienen todos el MISMO contenido, o sea el mismo
-            # embedding: no se recuperan sueltos sino en bloque, y con ranker_top_k=4 se
-            # comen casi todos los lugares del prompt dejando al LLM el nombre del PDF sin
-            # texto al lado. Ver is_blank.
             splittable_docs = [d for d in chunks if not is_blank(d)]
             blank = len(chunks) - len(splittable_docs)
             if blank:

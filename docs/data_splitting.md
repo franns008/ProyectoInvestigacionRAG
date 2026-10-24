@@ -66,6 +66,27 @@ La estructura (`3.1 Definición de XSS`, `7.2 Programación segura`, `8.1 Aplica
 SCADA`, tablas de configuración) es **señal semántica** que la configuración actual
 ignora.
 
+### 2.1 Dos arreglos sobre la salida de marker
+
+La carga del corpus (`load_splittable` y `is_blank` en `indexing/run_indexing.py`, que usa
+también el experimento de chunking) corrige dos cosas de las tablas que genera marker:
+
+- **`<br>` dentro de las celdas.** marker los usa para los saltos de línea dentro de una
+  celda, y `MarkdownToDocument` los borra sin dejar nada: "de<br>seguridad" termina como
+  "deseguridad" y "| 14<br>16<br>16 |" como "141616". Eso rompe las dos vías de retrieval
+  a la vez: el embedder tokeniza mal esas palabras pegadas y el keyword retriever no
+  encuentra `seguridad`. `markdown_text` los pasa a espacio antes de convertir, sin tocar
+  el `.md` cacheado (reconvertir un PDF cuesta una corrida de OCR).
+- **Chunks en blanco.** marker rellena las celdas hasta el ancho de la columna, así que un
+  índice deja corridas de cientos de espacios (592 en el estudio de Cloud SCI).
+  `split_by="word"` parte por el espacio literal, cada corrida aporta N palabras vacías que
+  cuentan para `split_length`, y una sola llena tres chunks sin una letra. El
+  `skip_empty_documents` de Haystack no los ve (mide `len > 0`). Como todos tienen el
+  mismo contenido y el mismo embedding, se recuperan en bloque y se comen los lugares del
+  prompt. Se descarta sólo lo **totalmente** vacío, no lo corto: hay filas de tabla de
+  130-180 caracteres con datos reales (las comparativas de la guía 5G). Los chunks con
+  escombros de tabla ("|", "| Requisitos") quedan para cuando se arregle el parsing.
+
 ---
 
 ## 3. Análisis crítico de la configuración actual
